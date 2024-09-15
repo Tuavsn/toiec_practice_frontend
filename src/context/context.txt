@@ -1,0 +1,1 @@
+Thư mục context sẽ chứa React Context và logic liên quan tới quản lý state (redux || zustand)

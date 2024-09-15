@@ -1,0 +1,2 @@
+Thư mục services thường chứa logic nghiệp vụ (business logic) của ứng dụng.
+Thư mục services chứa các logic giao tiếp với API

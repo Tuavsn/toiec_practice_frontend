@@ -1,0 +1,2 @@
+Thư mục utils được sử dụng để chứa các thư viện hoặc các hàm tiện ích (utility functions) mà không thuộc về một lĩnh vực cụ thể nào trong ứng dụng.
+Đây là nơi tập trung các logic chung và các công cụ mà nhiều phần khác nhau của ứng dụng có thể sử dụng.

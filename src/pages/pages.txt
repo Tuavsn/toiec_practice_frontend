@@ -1,0 +1,1 @@
+Thư mục pages sẽ chứa các trang chính của website
