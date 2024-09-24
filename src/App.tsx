@@ -1,34 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+
 import './App.css'
+import 'primereact/resources/themes/lara-light-indigo/theme.css'; //theme
+import 'primereact/resources/primereact.min.css'; //core css
+import 'primeicons/primeicons.css'; //icons
+import 'primeflex/primeflex.css'; // flex
+
+import {
+  LoginPage,
+  HomePage,
+  AdminDashboardPage,
+  UserProfilePage,
+  TestPage,
+  TestDetailPage,
+  TestReviewPage,
+  NotFoundPage
+} from './pages/Index';
+
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <BrowserRouter>
+      <Routes>
+        {/* Home Page */}
+        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/home" element={<HomePage />} />
+        {/* Admin Page */}
+        <Route path="/dashboard" element={<AdminDashboardPage />} />
+        {/* User Profile */}
+        <Route path="/profile" element={<UserProfilePage />} />
+        {/* Test Page */}
+        <Route path="/test" element={<TestPage />} />
+        {/* Test Detail Page */}
+        <Route path="/test/:id" element={<TestDetailPage />} />
+        {/* Test Review Page */}
+        <Route path="/test/:id/review" element={<TestReviewPage />} />
+        {/* Login Page */}
+        <Route path="/login" element={<LoginPage />} />
+        {/* NotFound Page */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
