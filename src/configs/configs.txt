@@ -1,1 +1,0 @@
-Thư mục configs chứa các file cấu hình (.env, config.dev.js, ...)
