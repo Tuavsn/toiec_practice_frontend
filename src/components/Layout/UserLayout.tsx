@@ -3,15 +3,16 @@ import {
     Header,
     Footer
 } from "../Common/Index"
+import Container from "./Container"
 
 export default function UserLayout({children} : {children:ReactNode}) {
     return (
-        <div className="p-grid p-justify-center">
-            <div className="p-col-12 p-md-10 p-lg-8 bg-primary">
-                <Header />
-                {children}
-                <Footer />
-            </div>
-        </div>
+        <Container>
+            <Header />
+                <div className="min-h-screen" style={{marginTop: "100px"}}>
+                    {children}
+                </div>
+            <Footer />
+        </Container>
     )
 }
