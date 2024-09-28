@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { DataTable, DataTableSelectionCellChangeEvent } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { InputSwitch } from 'primereact/inputswitch';
 
 interface Test {
     name: string;
@@ -15,7 +14,6 @@ export default function Table() {
     
     const [tests, setTests] = useState<Test[]>([]);
     const [selectedTests, setSelectedTests] = useState<Test[]>([]);
-    const [rowClick, setRowClick] = useState(true);
 
     useEffect(() => {
         // Tạo dữ liệu mẫu
@@ -114,9 +112,10 @@ export default function Table() {
         <div className="card my-4">
             <DataTable
                 value={tests} 
+                showGridlines
                 paginator 
                 rows={5} 
-                rowsPerPageOptions={[10, 15, 25, 50]} 
+                rowsPerPageOptions={[5, 15, 25, 50, 100]} 
                 selectionMode={'checkbox'}
                 selection={selectedTests} 
                 onSelectionChange={(e:any) => setSelectedTests(e.value)} 

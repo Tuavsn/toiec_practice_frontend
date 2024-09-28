@@ -9,20 +9,21 @@ export default function ToolBar() {
 
     const startContent = (
         <React.Fragment>
-            <Button icon="pi pi-plus" className="mr-2" />
-            <Button icon="pi pi-upload" className="mr-2" />
-            <Button icon="pi pi-print" />
+            <Button icon="pi pi-plus" className="mr-2" tooltip="Thêm mới" tooltipOptions={{ position: 'top' }} />
+            <Button icon="pi pi-pencil" className="mr-2" tooltip="Chỉnh sửa" tooltipOptions={{ position: 'top' }} />
+            <Button icon="pi pi-upload" className="mr-2" tooltip="Upload" tooltipOptions={{ position: 'top' }} />
+            <Button icon="pi pi-download" className="mr-2" tooltip="Download" tooltipOptions={{ position: 'top' }} />
         </React.Fragment>
     );
 
     const endContent = (
         <IconField iconPosition="left">
-            <InputIcon className="pi pi-search" />
+            <InputIcon className="pi pi-search"/>
             <InputText placeholder="Search" />
         </IconField>
     );
 
     return (
-        <Toolbar start={startContent} end={endContent} className="border-none p-0"/>
+        <Toolbar start={startContent} end={endContent} className="border-none p-0" style={{backgroundColor: 'transparent'}}/>
     );
 }
