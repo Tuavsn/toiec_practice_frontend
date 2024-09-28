@@ -14,7 +14,8 @@ import {
   TestPage,
   TestDetailPage,
   TestReviewPage,
-  NotFoundPage
+  NotFoundPage,
+  FlashCardPage
 } from './pages/Index';
 
 
@@ -35,6 +36,8 @@ function App() {
         <Route path="/test/:id" element={<TestDetailPage />} />
         {/* Test Review Page */}
         <Route path="/test/:id/review" element={<TestReviewPage />} />
+        {/* Flash Card Page */}
+        <Route path="/flash-card" element={<FlashCardPage />} />
         {/* Login Page */}
         <Route path="/login" element={<LoginPage />} />
         {/* NotFound Page */}
