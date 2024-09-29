@@ -1,8 +1,9 @@
 import AdminLayout from "../components/Layout/AdminLayout";
 import { CustomBreadCrumb, Table, ToolBar } from "../components/Common/Index";
 import { Card } from "primereact/card";
+import { memo } from "react";
 
-export default function AdminDashboardPage() {
+export function AdminDashboardPage() {
     return (
         <AdminLayout>
             <div>
@@ -15,3 +16,5 @@ export default function AdminDashboardPage() {
         </AdminLayout>
     )
 }
+
+export default memo(AdminDashboardPage);
