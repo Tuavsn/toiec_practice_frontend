@@ -3,6 +3,7 @@ import { CustomBreadCrumb } from "../../../components/Common/Index";
 import AdminLayout from "../../../components/Layout/AdminLayout";
 import { TabPanel, TabView } from "primereact/tabview";
 import QuestionPart1Component from "./components/part1/questionPart1Component";
+import QuestionPart2Component from "./components/part2/questionPart2Component";
 
 const questions = [
     {
@@ -108,20 +109,35 @@ const Part1 = () => {
     
 }
 
+const Part2 = () => {
+    return (
+        <>
+            <h3>Part 2</h3>
+            <hr />
+            {/* Loop through the questions array to render 6 questions */}
+            {questions.map((question, index) => (
+                <QuestionPart2Component
+                    questionNum={question.questionNum}
+                    key={index}
+                    transcript={question.transcript}
+                    explain={question.explain}
+                    listAnswer={question.listAnswer}
+                    audio={question.audio}
+                />
+            ))}
+        </>
+    )
+}
+
 const TabParts = (
     <TabView>
         <TabPanel header="Part 1">
             <Part1/>
         </TabPanel>
-        <TabPanel header="Header II">
-        <p className="m-0">
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, 
-            eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo
-            enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui 
-            ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
-        </p>
-    </TabPanel>
-    <TabPanel header="Header III">
+        <TabPanel header="Part 2">
+            <Part2/>
+        </TabPanel>
+    <TabPanel header="Part 3">
         <p className="m-0">
             At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti 
             quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in

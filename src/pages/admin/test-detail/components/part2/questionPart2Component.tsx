@@ -5,16 +5,15 @@ import { ScrollPanel } from 'primereact/scrollpanel';
 import { Divider } from 'primereact/divider';
 import { InputText } from 'primereact/inputtext';
 
-interface QuestionPart1Props {
+interface QuestionPart2Props {
     questionNum: number;
     transcript: string; // Dịch nghĩa
     explain: string; // Giải thích đáp án
     listAnswer: { value: string, text: string }[]; // List of answers
-    image: string; // Image URL
     audio: string; // Audio URL
 }
 
-const QuestionPart1Component: React.FC<QuestionPart1Props> = ({ questionNum, transcript, explain, listAnswer, image, audio }) => {
+const QuestionPart2Component: React.FC<QuestionPart2Props> = ({ questionNum, transcript, explain, listAnswer, audio }) => {
   const [transcriptValue, setTranscript] = useState<string>(transcript);
   const [explainValue, setExplain] = useState<string>(explain);
   const [value, setValue] = useState<string>("");
@@ -29,11 +28,7 @@ const QuestionPart1Component: React.FC<QuestionPart1Props> = ({ questionNum, tra
       <div className="flex flex-column md:flex-row gap-6 mt-5">
         <div className="flex-auto">
           <ScrollPanel style={{ width: '400px', height: '400px' }}>
-            <img
-              src={image}
-              alt="question illustration"
-              style={{ width: '100%', height: 'auto' }}
-            />
+            <p className='text-5xl'>Nothing here</p>
           </ScrollPanel>
         </div>
         <div className="flex-auto">
@@ -82,4 +77,4 @@ const QuestionPart1Component: React.FC<QuestionPart1Props> = ({ questionNum, tra
   );
 };
 
-export default QuestionPart1Component;
+export default QuestionPart2Component;
