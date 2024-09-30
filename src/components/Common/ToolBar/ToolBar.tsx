@@ -11,6 +11,7 @@ export default function ToolBar() {
         <React.Fragment>
             <Button icon="pi pi-plus" className="mr-2" tooltip="Thêm mới" tooltipOptions={{ position: 'top' }} />
             <Button icon="pi pi-pencil" className="mr-2" tooltip="Chỉnh sửa" tooltipOptions={{ position: 'top' }} />
+            <Button icon="pi pi-trash" className="mr-2" tooltip="Xóa" tooltipOptions={{ position: 'top' }} />
             <Button icon="pi pi-upload" className="mr-2" tooltip="Upload" tooltipOptions={{ position: 'top' }} />
             <Button icon="pi pi-download" className="mr-2" tooltip="Download" tooltipOptions={{ position: 'top' }} />
         </React.Fragment>
