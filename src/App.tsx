@@ -16,6 +16,7 @@ import {
   TestReviewPage,
   NotFoundPage
 } from './pages/Index';
+import { AdminManageCategoryPage } from './pages/AdminManageCategoryPage';
 
 
 function App() {
@@ -26,7 +27,7 @@ function App() {
         <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/home" element={<HomePage />} />
         {/* Admin Page */}
-        <Route path="/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/dashboard" element={<AdminManageCategoryPage />} />
         {/* User Profile */}
         <Route path="/profile" element={<UserProfilePage />} />
         {/* Test Page */}
