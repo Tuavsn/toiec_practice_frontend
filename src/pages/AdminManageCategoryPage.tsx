@@ -3,12 +3,10 @@ import { CustomBreadCrumb } from "../components/Common/Index";
 import { Card } from "primereact/card";
 import { memo } from "react";
 import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
 import { Tag } from "primereact/tag";
-import { Toast } from "primereact/toast";
-import { Toolbar } from "primereact/toolbar";
 import { Calendar } from "primereact/calendar";
-import { useDataTable } from "../components/Common/Table/GenericTable";
+import { useDataTable } from "../hooks/useDataTable";
+
 
 interface Category {
     id: string;
@@ -21,6 +19,7 @@ interface Category {
     is_active: boolean
 }
 
+
 export function AdminManageCategoryPage() {
     let emptyCategory: Category = {
         id: "",
@@ -32,27 +31,6 @@ export function AdminManageCategoryPage() {
         updated_by: "vô chủ",
         is_active: true
     };
-
-    const {
-        rows                 :categories,
-        selectedRows         : selectedCategories,
-        leftToolbarTemplate  : defaultLeftToolbarTemplate,
-        rightToolbarTemplate : defaultRightToolbarTemplate,
-        toast                : defaultToast, 
-        dt, 
-        header               : defaultHeader,
-        globalFilter         : defaultGlobalFilter,
-        dialog               : defaultDialog,
-        handleSelectionChange: defaultHandleSelectionChange,
-        actionBodyTemplate   : defaultActionBodyTemplate
-    } = useDataTable<Category>(GetFakeData(), emptyCategory)
-
-
-    console.log("render ");
-
-
-
-
     const renderColumns = [
         <Column key="col-selection" selectionMode="multiple" exportable={false} />,
         <Column key="col-id"            field="id"          header="ID"                                      sortable style={{ minWidth: '12rem' }} />,
@@ -62,8 +40,18 @@ export function AdminManageCategoryPage() {
         <Column key="col-created_by"    field="created_by"  header="Created by"                              sortable style={{ minWidth: '16rem' }} />,
         <Column key="col-updated_by"    field="updated_by"  header="Updated by"                              sortable style={{ minWidth: '16rem' }} />,
         <Column key="col-is_active"     field="is_active"   header="Status"     body={statusBodyTemplate}    sortable style={{ minWidth: '12rem' }} />,
-        <Column key="col-action"                                                body={defaultActionBodyTemplate}    exportable={false} style={{ minWidth: '12rem' }} />
     ];
+
+
+   const {toast:ToastElement,
+    toolbar: ToolBarElement,
+    table: TableElement,
+    dialogs: DialogElements
+
+   } = useDataTable(GetFakeData(), emptyCategory,renderColumns, true/*có muốn thêm cột action button hay không*/);
+
+
+    console.log("render ");
 
     return (
         <AdminLayout>
@@ -71,32 +59,12 @@ export function AdminManageCategoryPage() {
                 <CustomBreadCrumb />
                 <Card className="my-2">
                     <div key={'a'}>
-                        <Toast ref={defaultToast} />
+                        {ToastElement}
                         <div className="card">
-                            <Toolbar className="mb-4" start={defaultLeftToolbarTemplate} end={defaultRightToolbarTemplate} />
-
-                            <DataTable
-                                ref={dt}
-                                value={categories}
-                                selection={selectedCategories}
-                                onSelectionChange={(e) => defaultHandleSelectionChange(e)}
-                                dataKey="id"
-                                paginator
-                                rows={10}
-                                rowsPerPageOptions={[5, 10, 25]}
-                                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} categories"
-                                globalFilter={defaultGlobalFilter}
-                                header={defaultHeader}
-                                selectionMode="multiple"
-
-                            >
-
-                                {renderColumns}
-                            </DataTable>
+                            {ToolBarElement}
+                            {TableElement}
                         </div>
-
-                        {defaultDialog}
+                        {DialogElements}
                     </div>
                 </Card>
             </div>
@@ -104,6 +72,10 @@ export function AdminManageCategoryPage() {
     )
 }
 
+export default memo(AdminManageCategoryPage);
+
+
+// ------------------------------------- helper function---------------------------------------------------
 
 function createdAtBodyTemplate(rowData: Category) {
     return (
@@ -144,7 +116,7 @@ function updatedAtBodyTemplate(rowData: Category) {
 };
 
 
-export default memo(AdminManageCategoryPage);
+
 
 
 function GetFakeData(): Category[] {
