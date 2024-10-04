@@ -14,8 +14,10 @@ import {
   TestPage,
   TestDetailPage,
   TestReviewPage,
-  NotFoundPage
+  NotFoundPage,
+  FlashCardPage
 } from './pages/Index';
+import { AdminManageCategoryPage } from './pages/AdminManageCategoryPage';
 
 
 function App() {
@@ -26,7 +28,7 @@ function App() {
         <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/home" element={<HomePage />} />
         {/* Admin Page */}
-        <Route path="/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/dashboard" element={<AdminManageCategoryPage />} />
         {/* User Profile */}
         <Route path="/profile" element={<UserProfilePage />} />
         {/* Test Page */}
@@ -35,6 +37,8 @@ function App() {
         <Route path="/test/:id" element={<TestDetailPage />} />
         {/* Test Review Page */}
         <Route path="/test/:id/review" element={<TestReviewPage />} />
+        {/* Flash Card Page */}
+        <Route path="/flash-card" element={<FlashCardPage />} />
         {/* Login Page */}
         <Route path="/login" element={<LoginPage />} />
         {/* NotFound Page */}

@@ -5,6 +5,7 @@ import UserProfilePage from "./UserProfilePage"
 import TestPage from "./TestPage"
 import TestDetailPage from "./TestDetailPage"
 import TestReviewPage from "./TestReviewPage"
+import FlashCardPage from "./FlashCardPage"
 import NotFoundPage from "./NotFoundPage"
 
 export {
@@ -15,5 +16,6 @@ export {
     TestPage,
     TestDetailPage,
     TestReviewPage,
+    FlashCardPage,
     NotFoundPage
 }
