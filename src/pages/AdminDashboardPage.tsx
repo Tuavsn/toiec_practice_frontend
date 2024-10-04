@@ -2,6 +2,7 @@ import AdminLayout from "../components/Layout/AdminLayout";
 import { CustomBreadCrumb, GenericTable } from "../components/Common/Index";
 import { Card } from "primereact/card";
 import { DataTableValue } from "primereact/datatable";
+import { Tag } from "primereact/tag";
 
 interface Test {
     id: string;
@@ -92,12 +93,22 @@ const data: DataTableValue[] = [
     },
 ];
 
+function getSeverity(): 'warning' {
+
+    return 'warning';
+
+};
+function statusBodyTemplate(rowData: Test) {
+    return <Tag value={45} severity={getSeverity()}></Tag>;
+};
+
 const columns = [
     { field: 'name', header: 'Test Name', sortable: true, selectionMode: undefined },
     { field: 'code', header: 'Code', sortable: true, selectionMode: undefined },
     { field: 'total_question', header: 'Total Questions', sortable: true, selectionMode: undefined },
     { field: 'category', header: 'Category', sortable: true, selectionMode: undefined },
     { field: 'time', header: 'Time Limit', sortable: true, selectionMode: undefined },
+    { field: 'test', header: "test", body: statusBodyTemplate, sortable: true, selectionMode: undefined }
 ];
 
 export default function AdminDashboardPage() {
@@ -107,7 +118,7 @@ export default function AdminDashboardPage() {
             <div>
                 <CustomBreadCrumb />
                 <Card className="my-2">
-                    <GenericTable 
+                    <GenericTable
                         data={data}
                         columns={columns}
                         toolbar={true}
