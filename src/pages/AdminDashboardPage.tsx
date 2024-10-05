@@ -1,6 +1,6 @@
-import AdminLayout from "../components/Layout/AdminLayout";
-import { CustomBreadCrumb, GenericTable } from "../components/Common/Index";
+import { CustomBreadCrumb } from "../components/Common/Index";
 import { Card } from "primereact/card";
+import React from "react";
 
 const breadCrumbItems = [
     { label: 'Trang chủ', icon: 'pi pi-home', url: '/' },
@@ -10,12 +10,12 @@ const breadCrumbItems = [
 export default function AdminDashboardPage() {
 
     return (
-        <AdminLayout>
-            <div>
-                <CustomBreadCrumb items={breadCrumbItems} />
-                <Card className="my-2">
-                </Card>
-            </div>
-        </AdminLayout>
+        <React.Fragment>
+            <CustomBreadCrumb items={breadCrumbItems} />
+            <Card className="my-2">
+                <h1>Đây là trang chính admin page</h1>
+            </Card>
+        </React.Fragment>
+
     )
 }

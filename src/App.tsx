@@ -8,7 +8,6 @@ import 'primeflex/primeflex.css'; // flex
 
 import {
   HomePage,
-  AdminDashboardPage,
   UserProfilePage,
   TestPage,
   TestDetailPage,
@@ -16,7 +15,9 @@ import {
   NotFoundPage,
   CoursePage
 } from './pages/Index';
-import { AdminManageCategoryPage } from './pages/AdminManageCategoryPage';
+import AdminLayout from './components/Layout/AdminLayout';
+import AdminRoutes from './router/AdminRoutes';
+
 
 function App() {
   return (
@@ -26,8 +27,7 @@ function App() {
         <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/home" element={<HomePage />} />
         {/* Admin Page */}
-        <Route path="/dashboard" element={<AdminDashboardPage />} />
-        <Route path="/dashboard/category" element={<AdminManageCategoryPage />} />
+        <Route path="/dashboard/*" element={<AdminLayout><AdminRoutes /></AdminLayout>} />
         {/* User Profile */}
         <Route path="/profile" element={<UserProfilePage />} />
         {/* Test Page */}

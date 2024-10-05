@@ -1,10 +1,8 @@
-import AdminLayout from "../components/Layout/AdminLayout";
 import { Card } from "primereact/card";
 import { memo } from "react";
 import { Column } from "primereact/column";
 import { Tag } from "primereact/tag";
 import { Calendar } from "primereact/calendar";
-
 import GenericTable from "../components/Common/Table/GenericTable";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
@@ -14,6 +12,7 @@ import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
 import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { useDataTable } from "../hooks/useDataTable";
+import React from "react";
 
 
 interface Category {
@@ -82,7 +81,7 @@ export function AdminManageCategoryPage() {
     console.log("render ");
 
     return (
-        <AdminLayout>
+        <React.Fragment>
             <div key={'b'}>
 
                 <Card className="my-2">
@@ -110,7 +109,7 @@ export function AdminManageCategoryPage() {
                     </div>
                 </Card>
             </div>
-        </AdminLayout>
+        </React.Fragment>
     )
 }
 
