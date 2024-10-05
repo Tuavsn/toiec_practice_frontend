@@ -13,6 +13,11 @@ interface Test {
     time: string;
 }
 
+const breadCrumbItems = [
+    { label: 'Trang chủ', icon: 'pi pi-home', url: '/' },
+    { label: 'Dashboard', icon: 'pi pi-cog', url: '/dashboard' },
+];
+
 const data: DataTableValue[] = [
     {
         name: "Toiec 2024 test 1",
@@ -116,13 +121,13 @@ export default function AdminDashboardPage() {
     return (
         <AdminLayout>
             <div>
-                <CustomBreadCrumb />
+                <CustomBreadCrumb items={breadCrumbItems} />
                 <Card className="my-2">
-                    <GenericTable
+                    {/* <GenericTable
                         data={data}
                         columns={columns}
                         toolbar={true}
-                    />
+                    /> */}
                 </Card>
             </div>
         </AdminLayout>

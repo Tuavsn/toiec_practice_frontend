@@ -1,9 +1,9 @@
-import Logo from "../../../assets/Toiec-Logo.png"
+import Logo from "../../../assets/Header-Logo.png"
 
 export default function Footer() {
     return (
         <div className="mt-5 pb-2 flex justify-content-between align-items-center">
-            <img src={Logo} height={50} alt="Logo" />
+            <img src={Logo} height={60} alt="Logo" />
             <div className="">
                 <p className="text-lg">
                     <a className="flex align-items-center gap-2" href="https://github.com/Tuavsn/toiec_practice_frontend" target="_blank">

@@ -11,7 +11,7 @@ export default function LoginDialog() {
 
     return (
         <div className="card flex justify-content-center">
-            <Button label="Đăng nhập" icon="pi pi-user" onClick={() => setVisible(true)} />
+            <Button label="Đăng nhập" icon="pi pi-user" onClick={() => setVisible(true)} style={{backgroundColor: "#004B8D"}}/>
             <Dialog
                 visible={visible}
                 modal
@@ -22,7 +22,7 @@ export default function LoginDialog() {
                             title={(
                                 <div>
                                     <img src={Logo} className="max-w-20rem" />
-                                    <h2 className="my-2">Đăng nhập</h2>
+                                    <h2 className="my-2" style={{color: '#004B8D'}}>Đăng nhập</h2>
                                 </div>
                             )} 
                             className="relative max-w-30rem text-center mx-auto p-6"

@@ -42,3 +42,10 @@ a {
       max-width: 1380px;
   }
 }
+
+@media (min-width: 1680px) {
+  .custom-container {
+      max-width: 1680px;
+  }
+}
+

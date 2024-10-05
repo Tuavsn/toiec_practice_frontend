@@ -1,6 +1,10 @@
 import { BreadCrumb } from 'primereact/breadcrumb';
 
-export default function CustomBreadCrumb() {
+interface CustomBreadCrumbProps {
+    items: { label: string, icon: string, url: string }[];
+}
+
+export default function CustomBreadCrumb({ items }: CustomBreadCrumbProps) {
 
     const iconItemTemplate = (item: any, options: any) => {
         return (
@@ -11,12 +15,12 @@ export default function CustomBreadCrumb() {
         );
     };
 
-    const BreadCrumbItems = [
-        { label: 'Trang chủ', icon: 'pi pi-home', url: '/', template: iconItemTemplate},
-        { label: 'Danh sách đề thi', icon: 'pi pi-file', url: '/category', template: iconItemTemplate},
-    ]
+    const breadCrumbItems = items.map(item => ({
+        ...item,
+        template: iconItemTemplate,
+    }));
 
     return (
-        <BreadCrumb model={BreadCrumbItems}/>
+        <BreadCrumb model={breadCrumbItems}/>
     )
 }
