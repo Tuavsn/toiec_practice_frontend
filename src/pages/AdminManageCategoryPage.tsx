@@ -1,46 +1,35 @@
 import { Card } from "primereact/card";
 import { memo } from "react";
 import { Column } from "primereact/column";
-import { Tag } from "primereact/tag";
 import { Calendar } from "primereact/calendar";
 import GenericTable from "../components/Common/Table/GenericTable";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
-import { DataTableValue } from "primereact/datatable";
 import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
 import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { useDataTable } from "../hooks/useDataTable";
 import React from "react";
+import { VirtualScroller, VirtualScrollerTemplateOptions } from "primereact/virtualscroller";
+import { TestCategory } from "../utils/types/type";
 
 
-interface Category {
-    id: string;
-    name: string;
-    year: number;
-    created_at: Date;
-    created_by: string;
-    updated_at: Date;
-    updated_by: string;
-    is_active: boolean
-}
+
 
 
 export function AdminManageCategoryPage() {
-    let emptyCategory: Category = {
+    const emptyCategory: TestCategory = {
         id: "",
-        name: "vô danh",
+        format: "vô danh",
         year: -9999,
-        created_at: new Date(),
-        created_by: "vô danh",
-        updated_at: new Date(),
-        updated_by: "vô chủ",
-        is_active: true
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        tests: []
     };
 
     const {
-        row,setRow ,rows,
+        row, setRow, rows,
         selectedRows,
         globalFilter,
         dt, toast,
@@ -61,7 +50,34 @@ export function AdminManageCategoryPage() {
         confirmDeleteRow,
         setSelectedRows,
         setGlobalFilter
-    } = useDataTable(GetFakeData(), emptyCategory);
+    } = useDataTable<TestCategory>(GetFakeData(), emptyCategory
+        , (state)=> ({
+            saveRow: () => {
+                state.setSubmitted(true);
+                if (state.row.format.trim()) {
+                    let _rows = [...state.rows];
+                    let _row = { ...state.row };
+        
+                    if (state.row.id) {
+                        const index = state.findIndexById(state.row.id);
+        
+                        _rows[index] = _row;
+                        state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Updated', life: 3000 });
+                    } else {
+                        (_row as any).id = createId();
+        
+                        _rows.push(_row);
+                        state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
+                    }
+        
+                    state.setRows(_rows);
+                    console.log(_rows);
+                    state.setRowDialog(false);
+                    state.setRow(emptyCategory);
+                }
+            },
+        })
+    );
 
 
 
@@ -69,12 +85,11 @@ export function AdminManageCategoryPage() {
     const renderColumns = [
         <Column key="col-selection" selectionMode="multiple" exportable={false} />,
         <Column key="col-id" field="id" header="ID" sortable style={{ minWidth: '12rem' }} />,
-        <Column key="col-name" field="name" header="Name" sortable style={{ minWidth: '16rem' }} />,
-        <Column key="col-created_at" field="created_at" header="Created At" body={createdAtBodyTemplate} sortable style={{ minWidth: '14rem' }} />,
-        <Column key="col-updated_at" field="updated_at" header="Updated At" body={updatedAtBodyTemplate} sortable style={{ minWidth: '14rem' }} />,
-        <Column key="col-created_by" field="created_by" header="Created by" sortable style={{ minWidth: '16rem' }} />,
-        <Column key="col-updated_by" field="updated_by" header="Updated by" sortable style={{ minWidth: '16rem' }} />,
-        <Column key="col-is_active" field="is_active" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }} />,
+        <Column key="col-format" field="format" header="Format" sortable style={{ minWidth: '16rem' }} />,
+        <Column key="col-year" field="year" header="Year" sortable style={{ minWidth: '8rem' }} />,
+        <Column key="col-createdAt" field="createdAt" header="Created At" body={createdAtBodyTemplate} sortable style={{ minWidth: '12rem' }} />,
+        <Column key="col-updatedAt" field="updatedAt" header="Updated At" body={updatedAtBodyTemplate} sortable style={{ minWidth: '12rem' }} />,
+        <Column key="col-tests" field="tests" header="Tests" body={TestsBodyTemplate} style={{ minWidth: '17ream' }} />
     ];
 
 
@@ -91,10 +106,10 @@ export function AdminManageCategoryPage() {
                             <Toolbar className="mb-4"
                                 start={leftToolbarTemplate(openNew, confirmDeleteSelected, selectedRows)}
                                 end={rightToolbarTemplate(exportCSV)} />
-                            {GenericTable(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, editRow, confirmDeleteRow)}
+                            {GenericTable<TestCategory>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, editRow, confirmDeleteRow)}
                         </div>
                         {SimpleDialog(
-                            dialogBody( row,setRow ,submitted),
+                            dialogBody(row, setRow, submitted),
                             rowDialog,
                             hideDialog,
                             saveRow,
@@ -119,10 +134,10 @@ export default memo(AdminManageCategoryPage);
 // ------------------------------------- helper function---------------------------------------------------
 
 //--------------------- def columns---------------------------------
-function createdAtBodyTemplate(rowData: Category) {
+function createdAtBodyTemplate(rowData: TestCategory) {
     return (
         <Calendar
-            value={new Date(rowData.created_at)}
+            value={new Date(rowData.createdAt)}
             dateFormat="dd/mm/yy"
             showIcon
             disabled
@@ -130,38 +145,71 @@ function createdAtBodyTemplate(rowData: Category) {
     );
 };
 
-function getSeverity(category: Category) {
-    switch (category.is_active) {
-        case true:
-            return 'success';
+// function getSeverity(category: TestCategory) {
+//     switch (category.is_active) {
+//         case true:
+//             return 'success';
 
-        case false:
-            return 'warning';
-        default:
-            return null;
-    }
-};
+//         case false:
+//             return 'warning';
+//         default:
+//             return null;
+//     }
+// };
 
-function statusBodyTemplate(rowData: Category) {
-    return <Tag value={(rowData.is_active) + ""} severity={getSeverity(rowData)}></Tag>;
-};
+// function statusBodyTemplate(rowData: TestCategory) {
+//     return <Tag value={(rowData.is_active) + ""} severity={getSeverity(rowData)}></Tag>;
+// };
 
-function updatedAtBodyTemplate(rowData: Category) {
+function updatedAtBodyTemplate(rowData: TestCategory) {
     return (
         <Calendar
-            value={new Date(rowData.updated_at)}
+            value={new Date(rowData.updatedAt)}
             dateFormat="dd/mm/yy"
             showIcon
             disabled
         />
     );
 };
+
+function TestsBodyTemplate(rowData: TestCategory) {
+
+    const handleClick = (testId: string) => {
+        // Handle the click event
+        alert(`You clicked on: ${testId}`);
+    };
+
+    const itemTemplate = (item: string, options: VirtualScrollerTemplateOptions) => {
+        const className = classNames('flex align-items-center p-2', {
+            'surface-hover': options.odd
+        });
+        return (
+            <button
+                className={className}
+                style={{ height: options.props.itemSize + 'px', width: '100%', border: 'none', background: '#f0000055', textAlign: 'left', cursor: 'pointer' }}
+                onClick={() => handleClick(item)}
+            >
+                {item}
+            </button>
+        );
+    };
+
+    return (
+        <VirtualScroller
+            items={rowData.tests}
+            itemSize={50}
+            itemTemplate={itemTemplate}
+            className="border-1 surface-border border-round"
+            style={{ minWidth: '200px', height: '200px' }}
+        />
+    )
+}
 
 //---------------------- for tool bar ----------------------------------
 function leftToolbarTemplate(
     openNew: () => void,
     confirmDeleteSelected: () => void,
-    selectedRows: DataTableValue[]) {
+    selectedRows: TestCategory[]) {
 
     return (
         <div className="flex flex-wrap gap-2">
@@ -177,8 +225,8 @@ function rightToolbarTemplate(exportCSV: () => void) {
 
 //------------------------for dialog-------------------------------------
 
-function dialogBody(row: DataTableValue,setRow: (value: React.SetStateAction<DataTableValue>) => void ,submitted: boolean) {
-    const onInputChange = (e: any, field: keyof DataTableValue) => {
+function dialogBody(row: TestCategory, setRow: (value: React.SetStateAction<TestCategory>) => void, submitted: boolean) {
+    const onInputChange = (e: any, field: keyof TestCategory) => {
         const value = e.target.value ?? ''; // Ensuring fallback to an empty string if value is undefined
         setRow((prevRow) => ({
             ...prevRow,
@@ -192,13 +240,13 @@ function dialogBody(row: DataTableValue,setRow: (value: React.SetStateAction<Dat
             <label htmlFor="name" className="font-bold">Name</label>
             <InputText
                 id="name"
-                value={row.name}
-                onChange={(e)=>onInputChange(e,'name')}
+                value={row.format}
+                onChange={(e) => onInputChange(e, 'format')}
                 required
                 autoFocus
-                className={classNames({ 'p-invalid': submitted && !row.name })}
+                className={classNames({ 'p-invalid': submitted && !row.format })}
             />
-            {submitted && !row.name && <small className="p-error">Name is required.</small>}
+            {submitted && !row.format && <small className="p-error">format is required.</small>}
         </div>
 
     )
@@ -208,59 +256,59 @@ function dialogBody(row: DataTableValue,setRow: (value: React.SetStateAction<Dat
 
 
 
-function GetFakeData(): Category[] {
+function GetFakeData(): TestCategory[] {
     return [
         {
             id: "1",
-            name: "Electronics",
+            format: "Electronics",
             year: 2024,
-            created_at: new Date("2024-01-15T10:00:00Z"),
-            created_by: "admin",
-            updated_at: new Date("2024-03-10T12:30:00Z"),
-            updated_by: "admin",
-            is_active: true
+            createdAt: new Date("2024-01-15T10:00:00Z"),
+            updatedAt: new Date("2024-03-10T12:30:00Z"),
+            tests: ["11119999999999999999999999999999", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"]
         },
         {
             id: "2",
-            name: "Books",
+            format: "Books",
             year: 2023,
-            created_at: new Date("2023-06-22T09:15:00Z"),
-            created_by: "user1",
-            updated_at: new Date("2024-01-05T11:00:00Z"),
-            updated_by: "user2",
-            is_active: true
+            createdAt: new Date("2023-06-22T09:15:00Z"),
+            updatedAt: new Date("2024-01-05T11:00:00Z"),
+            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"]
         },
         {
             id: "3",
-            name: "Fashion",
+            format: "Fashion",
             year: 2022,
-            created_at: new Date("2022-05-10T14:45:00Z"),
-            created_by: "user3",
-            updated_at: new Date("2023-12-30T08:30:00Z"),
-            updated_by: "admin",
-            is_active: false
+            createdAt: new Date("2022-05-10T14:45:00Z"),
+            updatedAt: new Date("2023-12-30T08:30:00Z"),
+            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"]
         },
         {
             id: "4",
-            name: "Home & Kitchen",
+            format: "Home & Kitchen",
             year: 2024,
-            created_at: new Date("2024-02-01T07:20:00Z"),
-            created_by: "admin",
-            updated_at: new Date("2024-04-15T13:15:00Z"),
-            updated_by: "user4",
-            is_active: true
+            createdAt: new Date("2024-02-01T07:20:00Z"),
+            updatedAt: new Date("2024-04-15T13:15:00Z"),
+            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"]
         },
         {
             id: "5",
-            name: "Sports",
+            format: "Sports",
             year: 2023,
-            created_at: new Date("2023-09-10T16:00:00Z"),
-            created_by: "user5",
-            updated_at: new Date("2023-11-25T10:00:00Z"),
-            updated_by: "user1",
-            is_active: true
+            createdAt: new Date("2023-09-10T16:00:00Z"),
+            updatedAt: new Date("2023-11-25T10:00:00Z"),
+            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"]
         }
     ]
 }
 
 
+function createId(): string {
+    let id = '';
+    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for (let i = 0; i < 24; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    return id;
+};

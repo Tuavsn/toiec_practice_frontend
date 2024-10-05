@@ -4,52 +4,69 @@ import { DataTable, DataTableSelectionMultipleChangeEvent, DataTableValue } from
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
-import React, { Dispatch, ReactElement, RefObject, SetStateAction } from "react";
+import React, { Dispatch, ReactElement, RefObject, SetStateAction ,useCallback} from "react";
 
 type ColumnElement = ReactElement<typeof Column>;
-export default function GenericTable(
+export default function GenericTable<Model extends DataTableValue>(
     columns: ColumnElement[],
-    dt: RefObject<DataTable<DataTableValue[]>>,
-    rows: DataTableValue[],
+    dt: RefObject<DataTable<Model[]>>,
+    rows: Model[],
     isAddActionButtons: boolean,
-    selectedRows: DataTableValue[],
+    selectedRows: Model[],
     globalFilter:string,
     setGlobalFilter: Dispatch<SetStateAction<string>>,
-    setSelectedRows:Dispatch<SetStateAction<DataTableValue[]>>,
-    editRow?:(a:DataTableValue)=>void,
-    confirmDeleteRow?:(rowData:DataTableValue)=>void,
+    setSelectedRows:Dispatch<SetStateAction<Model[]>>,
+    editRow?:(a:Model)=>void,
+    confirmDeleteRow?:(rowData:Model)=>void,
 ) {
-    const handleSelectionChange = (e: DataTableSelectionMultipleChangeEvent<DataTableValue[]>) => {
+    const handleSelectionChange = useCallback((e: DataTableSelectionMultipleChangeEvent<Model[]>) => {
         if (Array.isArray(e.value)) {
             setSelectedRows(e.value);
         }
-    };
-
-    const header = (
+    }, [setSelectedRows]); 
+    const header = React.useMemo((): JSX.Element => (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
             <h4 className="m-0">Manage Rows</h4>
             <IconField iconPosition="left">
                 <InputIcon className="pi pi-search" />
-                <InputText type="search" placeholder="Search..." onInput={(e) => { const target = e.target as HTMLInputElement; setGlobalFilter(target.value); }} />
+                <InputText
+                    type="search"
+                    placeholder="Search..."
+                    onInput={(e) => {
+                        const target = e.target as HTMLInputElement;
+                        setGlobalFilter(target.value);
+                    }}
+                />
             </IconField>
         </div>
-    );
+    ), [setGlobalFilter]);
 
-    if (isAddActionButtons && editRow && confirmDeleteRow) {
-        columns.push(
-            <Column key="col-action" body={(rowData) => actionBodyTemplate(rowData, editRow, confirmDeleteRow)} exportable={false} style={{ minWidth: '12rem' }} />
+    const renderColumns = React.useMemo(() => {
+        const colCopy = [...columns]; // Copy to avoid mutating props
 
-        );
-    }
+        if (isAddActionButtons && editRow && confirmDeleteRow) {
+            colCopy.push(
+                <Column
+                    key="col-action"
+                    body={(rowData) => actionBodyTemplate(rowData, editRow, confirmDeleteRow)}
+                    exportable={false}
+                    style={{ minWidth: '12rem' }}
+                />
+            );
+        }
+
+        return colCopy; 
+    }, [columns, isAddActionButtons, editRow, confirmDeleteRow]);
 
     return (
         <DataTable
             showGridlines
+            
             ref={dt}
             value={rows}
             selection={selectedRows}
             onSelectionChange={(e) => handleSelectionChange(e)}
-            dataKey="id"
+            dataKey="_id"
             paginator
             rows={10}
             rowsPerPageOptions={[5, 10, 25]}
@@ -59,7 +76,7 @@ export default function GenericTable(
             header={header}
             selectionMode="multiple"
         >
-            {columns}
+            {renderColumns}
         </DataTable>
     )
 }
@@ -73,7 +90,8 @@ confirmDeleteRow:(rowData:Model)=>void ) {
         </React.Fragment>
     );
 };
-// const onInputChange = (e: any, field: keyof DataTableValue) => {
+
+// const onInputChange = (e: any, field: keyof Model) => {
 //     const value = e.target.value ?? ''; // Ensuring fallback to an empty string if value is undefined
 //     setRow((prevRow) => ({
 //         ...prevRow,

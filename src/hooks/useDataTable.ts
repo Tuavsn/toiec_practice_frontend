@@ -3,8 +3,7 @@ import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { Toast } from "primereact/toast";
 import { useState, useEffect, useRef } from "react";
 
-type Model = DataTableValue;
-export function useDataTable(
+export function useDataTable<Model extends DataTableValue>(
     inputData: Model[],
     defaultValues: Model,
     overrides: (state: any) => Partial<any> = () => ({})
@@ -46,28 +45,28 @@ export function useDataTable(
 
     const saveRow = (() => {
         setSubmitted(true);
+        toast.current?.show({ severity: 'success', summary: 'Cần quá tải hàm saveRow', detail: 'Row Updated', life: 3000 });
+        // if (row.name.trim()) {
+        //     let _rows = [...rows];
+        //     let _row = { ...row };
 
-        if (row.name.trim()) {
-            let _rows = [...rows];
-            let _row = { ...row };
+        //     if (row.id) {
+        //         const index = findIndexById(row.id);
 
-            if (row.id) {
-                const index = findIndexById(row.id);
+        //         _rows[index] = _row;
+        //         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Updated', life: 3000 });
+        //     } else {
+        //         (_row as any).id = createId();
 
-                _rows[index] = _row;
-                toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Updated', life: 3000 });
-            } else {
-                (_row as any).id = createId();
+        //         _rows.push(_row);
+        //         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
+        //     }
 
-                _rows.push(_row);
-                toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
-            }
-
-            setRows(_rows);
-            console.log(_rows);
-            setRowDialog(false);
-            setRow(defaultValues);
-        }
+        //     setRows(_rows);
+        //     console.log(_rows);
+        //     setRowDialog(false);
+        //     setRow(defaultValues);
+        // }
     });
 
     const editRow = ((row: Model) => {
@@ -102,16 +101,7 @@ export function useDataTable(
         return index;
     });
 
-    const createId = (): string => {
-        let id = '';
-        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-        for (let i = 0; i < 24; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-
-        return id;
-    };
 
     const exportCSV = (() => {
         dt.current?.exportCSV();
