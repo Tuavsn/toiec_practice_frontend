@@ -1,15 +1,14 @@
 import { InputText } from "primereact/inputtext"
 import Logo from "../../../assets/Header-Logo.png"
-import { Avatar } from "primereact/avatar"
 import { Menubar } from "primereact/menubar"
-import { Button } from "primereact/button"
+import LoginDialog from "../LoginDialog/LoginDialog"
 
 export default function Header() {
 
     const HeaderItems = [
         { label:'Trang chủ' , icon: 'pi pi-home', url: '/home'},
+        { label:'Khóa học' , icon: 'pi pi-book', url: '/course'},
         { label:'Đề thi' , icon: 'pi pi-folder', url: '/test'},
-        { label:'Flash Card' , icon: 'pi pi-bookmark', url: '/flash-card'},
         { label:'Dashboard' , icon: 'pi pi-cog', url: '/dashboard'},
     ]
 
@@ -18,8 +17,7 @@ export default function Header() {
     const HeaderEnd = (
         <div className="flex align-items-center gap-2">
             <InputText placeholder="Search" type="text" className="w-8rem sm:w-auto" />
-            <Button label="Đăng nhập" onClick={() =>  window.open('/login', '_self')} />
-            {/* <Avatar image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png" shape="circle" /> */}
+            <LoginDialog />
         </div>
     )
 

@@ -9,15 +9,6 @@ export function useDataTable(
     defaultValues: Model,
     overrides: (state: any) => Partial<any> = () => ({})
 ) {
-    // const [rows, setRows] = useState<Model[]>([]);
-    // const [rowDialog, setRowDialog] = useState<boolean>(false);
-    // const [deleteRowDialog, setDeleteRowDialog] = useState<boolean>(false);
-    // const [deleteRowsDialog, setDeleteRowsDialog] = useState<boolean>(false);
-    // const [row, setRow] = useState<Model>(defaultValues);
-    // const [selectedRows, setSelectedRows] = useState<Model[]>([]);
-    // const [submitted, setSubmitted] = useState<boolean>(false);
-    // const [globalFilter, setGlobalFilter] = useState<string>('');
-
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<Model[]>>(null);
     const [rows, setRows] = useState<Model[]>([]);
@@ -145,16 +136,6 @@ export function useDataTable(
             created_by: e.value
         }));
     };
-
-
-
-
-
-    // const renderDialogs = [
-    //     renderRowDialog,
-    //     renderDeleteRowDialog,
-    //     renderDeleteRowsDialog
-    // ]
 
     // The state object to pass to the override functions
     const state = {

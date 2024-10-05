@@ -20,18 +20,11 @@ export default function GenericTable(
     editRow?:(a:DataTableValue)=>void,
     confirmDeleteRow?:(rowData:DataTableValue)=>void,
 ) {
-   
-
-
-
-
     const handleSelectionChange = (e: DataTableSelectionMultipleChangeEvent<DataTableValue[]>) => {
         if (Array.isArray(e.value)) {
             setSelectedRows(e.value);
         }
     };
-
-
 
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
@@ -43,8 +36,6 @@ export default function GenericTable(
         </div>
     );
 
-
-
     if (isAddActionButtons && editRow && confirmDeleteRow) {
         columns.push(
             <Column key="col-action" body={actionBodyTemplate(row,editRow,confirmDeleteRow)} exportable={false} style={{ minWidth: '12rem' }} />
@@ -52,29 +43,26 @@ export default function GenericTable(
     }
 
     return (
- 
-                <DataTable
-                    ref={dt}
-                    value={rows}
-                    selection={selectedRows}
-                    onSelectionChange={(e) => handleSelectionChange(e)}
-                    dataKey="id"
-                    paginator
-                    rows={10}
-                    rowsPerPageOptions={[5, 10, 25]}
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} categories"
-                    globalFilter={globalFilter}
-                    header={header}
-                    selectionMode="multiple"
-                >
-                    {columns}
-                </DataTable>
-
+        <DataTable
+            showGridlines
+            ref={dt}
+            value={rows}
+            selection={selectedRows}
+            onSelectionChange={(e) => handleSelectionChange(e)}
+            dataKey="id"
+            paginator
+            rows={10}
+            rowsPerPageOptions={[5, 10, 25]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} categories"
+            globalFilter={globalFilter}
+            header={header}
+            selectionMode="multiple"
+        >
+            {columns}
+        </DataTable>
     )
-
 }
-
 
 function actionBodyTemplate<Model> (rowData: Model, editRow:(a:Model)=>void,
 confirmDeleteRow:(rowData:Model)=>void ) {

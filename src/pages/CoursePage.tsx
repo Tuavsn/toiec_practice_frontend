@@ -1,10 +1,10 @@
 import UserLayout from "../components/Layout/UserLayout";
 
-export default function FlashCardPage() {
+export default function CoursePage() {
     return (
         <UserLayout>
             <div>
-                FlashCard Content
+             CoursePage Content
             </div>
         </UserLayout>
     )

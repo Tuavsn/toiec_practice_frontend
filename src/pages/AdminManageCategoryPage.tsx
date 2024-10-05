@@ -74,7 +74,7 @@ export function AdminManageCategoryPage() {
 
     const renderColumns = [
         <Column key="col-selection" selectionMode="multiple" exportable={false} />,
-        <Column key="col-id" field="id" header="ID" sortable style={{ minWidth: '12rem' }} />,
+        <Column key="col-id" field="id" header="ID" sortable style={{ minWidth: '12rem'}} />,
         <Column key="col-name" field="name" header="Name" sortable style={{ minWidth: '16rem' }} />,
         <Column key="col-created_at" field="created_at" header="Created At" body={createdAtBodyTemplate} sortable style={{ minWidth: '14rem' }} />,
         <Column key="col-updated_at" field="updated_at" header="Updated At" body={updatedAtBodyTemplate} sortable style={{ minWidth: '14rem' }} />,

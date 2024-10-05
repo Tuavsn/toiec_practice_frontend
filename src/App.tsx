@@ -7,7 +7,6 @@ import 'primeicons/primeicons.css'; //icons
 import 'primeflex/primeflex.css'; // flex
 
 import {
-  LoginPage,
   HomePage,
   AdminDashboardPage,
   UserProfilePage,
@@ -15,7 +14,7 @@ import {
   TestDetailPage,
   TestReviewPage,
   NotFoundPage,
-  FlashCardPage
+  CoursePage
 } from './pages/Index';
 import { AdminManageCategoryPage } from './pages/AdminManageCategoryPage';
 
@@ -38,9 +37,7 @@ function App() {
         {/* Test Review Page */}
         <Route path="/test/:id/review" element={<TestReviewPage />} />
         {/* Flash Card Page */}
-        <Route path="/flash-card" element={<FlashCardPage />} />
-        {/* Login Page */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/course" element={<CoursePage />} />
         {/* NotFound Page */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
