@@ -6,6 +6,7 @@ import TestDetailPage from "./TestDetailPage"
 import TestReviewPage from "./TestReviewPage"
 import CoursePage from "./CoursePage"
 import NotFoundPage from "./NotFoundPage"
+import AdminManageCategoryPage from "./AdminManageCategoryPage"
 
 export {
     HomePage,
@@ -15,5 +16,6 @@ export {
     TestDetailPage,
     TestReviewPage,
     CoursePage,
-    NotFoundPage
+    NotFoundPage,
+    AdminManageCategoryPage
 }
