@@ -77,6 +77,7 @@ function Info() {
                     </div>
                 </div>
             </div>
+            
             <div className="py-6 px-4 bg-gray-50">
                 <div className="grid nested-grid">
                     <div className="col-4">

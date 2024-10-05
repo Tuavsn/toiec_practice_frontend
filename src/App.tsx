@@ -26,7 +26,8 @@ function App() {
         <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/home" element={<HomePage />} />
         {/* Admin Page */}
-        <Route path="/dashboard" element={<AdminManageCategoryPage />} />
+        <Route path="/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/dashboard/category" element={<AdminManageCategoryPage />} />
         {/* User Profile */}
         <Route path="/profile" element={<UserProfilePage />} />
         {/* Test Page */}
