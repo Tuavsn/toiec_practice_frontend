@@ -4,6 +4,7 @@ import { Dialog } from "primereact/dialog";
 import { useState } from "react";
 import Logo from "../../../assets/Header-Logo.png"
 import GoogleLogo from "../../../assets/google-logo.png"
+import FacebookLogo from "../../../assets/facebook-logo.png"
 
 export default function LoginDialog() {
 
@@ -27,9 +28,13 @@ export default function LoginDialog() {
                             )} 
                             className="relative max-w-30rem text-center mx-auto p-6"
                         >
-                            <Button type="button" outlined>
+                            <Button type="button" outlined className="mb-4 w-full flex justify-content-center">
                                 <img src={GoogleLogo} className="w-2rem" />
                                 <p className="my-0 ml-2 font-bold text-lg text-gray-500">Đăng nhập với Google</p>
+                            </Button>
+                            <Button type="button" outlined className="w-full flex justify-content-center">
+                                <img src={FacebookLogo} className="w-2rem" />
+                                <p className="my-0 ml-2 font-bold text-lg text-gray-500">Đăng nhập với Facebook</p>
                             </Button>
                             <Button 
                                 type="button" outlined className="absolute top-0 right-0 m-2 border-none" 
