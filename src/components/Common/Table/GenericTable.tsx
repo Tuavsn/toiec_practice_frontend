@@ -12,7 +12,6 @@ export default function GenericTable(
     dt: RefObject<DataTable<DataTableValue[]>>,
     rows: DataTableValue[],
     isAddActionButtons: boolean,
-    row:DataTableValue,
     selectedRows: DataTableValue[],
     globalFilter:string,
     setGlobalFilter: Dispatch<SetStateAction<string>>,
@@ -38,7 +37,8 @@ export default function GenericTable(
 
     if (isAddActionButtons && editRow && confirmDeleteRow) {
         columns.push(
-            <Column key="col-action" body={actionBodyTemplate(row,editRow,confirmDeleteRow)} exportable={false} style={{ minWidth: '12rem' }} />
+            <Column key="col-action" body={(rowData) => actionBodyTemplate(rowData, editRow, confirmDeleteRow)} exportable={false} style={{ minWidth: '12rem' }} />
+
         );
     }
 
