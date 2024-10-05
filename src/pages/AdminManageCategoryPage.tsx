@@ -1,20 +1,17 @@
 import AdminLayout from "../components/Layout/AdminLayout";
-import { CustomBreadCrumb } from "../components/Common/Index";
 import { Card } from "primereact/card";
 import { memo } from "react";
 import { Column } from "primereact/column";
 import { Tag } from "primereact/tag";
 import { Calendar } from "primereact/calendar";
 
-import  GenericTable  from "../components/Common/Table/GenericTable";
+import GenericTable from "../components/Common/Table/GenericTable";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
 import { DataTableValue } from "primereact/datatable";
 import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
-import { RadioButton, RadioButtonChangeEvent } from "primereact/radiobutton";
 import { classNames } from "primereact/utils";
-import React from "react";
 import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { useDataTable } from "../hooks/useDataTable";
 
@@ -44,13 +41,12 @@ export function AdminManageCategoryPage() {
     };
 
     const {
-        row, rows,
+        row,setRow ,rows,
         selectedRows,
         globalFilter,
         dt, toast,
         hideDeleteRowsDialog,
         deleteRowsDialog,
-        onRowCreatedByChange,
         rowDialog,
         deleteSelectedRows,
         saveRow,
@@ -65,7 +61,6 @@ export function AdminManageCategoryPage() {
         editRow,
         confirmDeleteRow,
         setSelectedRows,
-        setRow,
         setGlobalFilter
     } = useDataTable(GetFakeData(), emptyCategory);
 
@@ -74,7 +69,7 @@ export function AdminManageCategoryPage() {
 
     const renderColumns = [
         <Column key="col-selection" selectionMode="multiple" exportable={false} />,
-        <Column key="col-id" field="id" header="ID" sortable style={{ minWidth: '12rem'}} />,
+        <Column key="col-id" field="id" header="ID" sortable style={{ minWidth: '12rem' }} />,
         <Column key="col-name" field="name" header="Name" sortable style={{ minWidth: '16rem' }} />,
         <Column key="col-created_at" field="created_at" header="Created At" body={createdAtBodyTemplate} sortable style={{ minWidth: '14rem' }} />,
         <Column key="col-updated_at" field="updated_at" header="Updated At" body={updatedAtBodyTemplate} sortable style={{ minWidth: '14rem' }} />,
@@ -89,7 +84,7 @@ export function AdminManageCategoryPage() {
     return (
         <AdminLayout>
             <div key={'b'}>
-                <CustomBreadCrumb />
+
                 <Card className="my-2">
                     <div key={'a'}>
                         <Toast ref={toast} />
@@ -97,10 +92,10 @@ export function AdminManageCategoryPage() {
                             <Toolbar className="mb-4"
                                 start={leftToolbarTemplate(openNew, confirmDeleteSelected, selectedRows)}
                                 end={rightToolbarTemplate(exportCSV)} />
-                            {GenericTable(renderColumns, dt, rows, true, row, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, editRow, confirmDeleteRow)}
+                            {GenericTable(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, editRow, confirmDeleteRow)}
                         </div>
                         {SimpleDialog(
-                            dialogBody(onRowCreatedByChange, row, setRow, submitted),
+                            dialogBody( row,setRow ,submitted),
                             rowDialog,
                             hideDialog,
                             saveRow,
@@ -183,7 +178,7 @@ function rightToolbarTemplate(exportCSV: () => void) {
 
 //------------------------for dialog-------------------------------------
 
-function dialogBody(onRowCreatedByChange: (e: RadioButtonChangeEvent) => void, row: DataTableValue, setRow: (value: React.SetStateAction<DataTableValue>) => void, submitted: boolean) {
+function dialogBody(row: DataTableValue,setRow: (value: React.SetStateAction<DataTableValue>) => void ,submitted: boolean) {
     const onInputChange = (e: any, field: keyof DataTableValue) => {
         const value = e.target.value ?? ''; // Ensuring fallback to an empty string if value is undefined
         setRow((prevRow) => ({
@@ -191,66 +186,22 @@ function dialogBody(onRowCreatedByChange: (e: RadioButtonChangeEvent) => void, r
             [field]: value
         }));
     };
-    const renderRowRadioButtons = () => {
-        const rowsOptions = [
-            { label: 'Accessories', value: 'Accessories' },
-            { label: 'Clothing', value: 'Clothing' },
-            { label: 'Electronics', value: 'Electronics' },
-            { label: 'Fitness', value: 'Fitness' }
-        ];
-
-        return (
-            <div className="field">
-                <label className="mb-3 font-bold">Row Type</label>
-                <div className="formgrid grid">
-                    {rowsOptions.map((option, index) => (
-                        <div key={option.value} className="field-radiobutton col-6">
-                            <RadioButton
-                                inputId={`row${index}`}
-                                name="row"
-                                value={option.value}
-                                onChange={onRowCreatedByChange}
-                                checked={row.created_by === option.value}
-                            />
-                            <label htmlFor={`row${index}`}>{option.label}</label>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    };
-
 
     return (
-        <React.Fragment>
-            <div className="field">
-                <label htmlFor="name" className="font-bold">Name</label>
-                <InputText
-                    id="name"
-                    value={row.name}
-                    onChange={(e) => onInputChange(e, 'name')}
-                    required
-                    autoFocus
-                    className={classNames({ 'p-invalid': submitted && !row.name })}
-                />
-                {submitted && !row.name && <small className="p-error">Name is required.</small>}
-            </div>
 
-            {renderRowRadioButtons()}
+        <div className="field">
+            <label htmlFor="name" className="font-bold">Name</label>
+            <InputText
+                id="name"
+                value={row.name}
+                onChange={(e)=>onInputChange(e,'name')}
+                required
+                autoFocus
+                className={classNames({ 'p-invalid': submitted && !row.name })}
+            />
+            {submitted && !row.name && <small className="p-error">Name is required.</small>}
+        </div>
 
-            <div className="formgrid grid">
-                <div className="field col">
-                    <label htmlFor="createdAt" className="font-bold">Created At</label>
-                    <Calendar
-                        id="createdAt"
-                        value={row.created_at ? new Date(row.created_at) : new Date()}
-                        onChange={(e) => onInputChange(e, 'created_at')} // Adjusted to match the Calendar's output
-                        dateFormat="dd/mm//yy" // Format as needed
-                        showIcon
-                    />
-                </div>
-            </div>
-        </React.Fragment>
     )
 }
 
