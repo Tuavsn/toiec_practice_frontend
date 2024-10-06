@@ -1,5 +1,4 @@
 import { Card } from "primereact/card";
-import UserLayout from "../components/Layout/UserLayout";
 import {
     Banner
 } from "../components/User/index";
@@ -17,25 +16,25 @@ import { Steps } from "primereact/steps";
 export default function HomePage() {
 
     return (
-        <UserLayout >
+        <>
             <Banner />
             <HomeContent />
-        </UserLayout>
+        </>
     )
 }
 
 function HomeContent() {
     return (
-        <div>
+        <>
             <Info />
             <News />
-        </div>
+        </>
     )
 }
 
 function Info() {
     return (
-        <div>
+        <>
             <div className="py-6">
                 <h2 className="text-center">Chỉ có tại <a href="/home"><span style={{color: "#004B8D"}}>UTE TOIEC</span> <span style={{color: "#FF5757"}}>Practice</span></a></h2>
                 <div className="grid">
@@ -134,13 +133,13 @@ function Info() {
                     <img src={roadmappic} className="w-full"/>
                 </Card>
             </div>
-        </div>
+        </>
     )
 }
 
 function News() {
     return (
-        <div>
+        <>
             <div className="py-6">
                 <h2 className="text-center"><a href="/course" style={{color: "#004B8D"}}>Bài giảng mới</a></h2>
                 <div className="grid">
@@ -224,6 +223,6 @@ function News() {
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }

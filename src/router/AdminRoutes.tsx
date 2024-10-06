@@ -15,7 +15,6 @@ export default function AdminRoutes() {
             <Route path="user-analyst" element={TempAdminPage("thống kê người dùng")} />
             <Route path="notify" element={TempAdminPage("notify")} />
             <Route path="chat" element={TempAdminPage("chat")} />
-
         </Routes>
     );
 }

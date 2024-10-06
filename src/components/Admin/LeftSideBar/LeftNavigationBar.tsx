@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Menu } from 'primereact/menu';
 
 export default function LeftNavigationBar() {
+    
     const navigate = useNavigate(); // Use the hook to get the navigate function
 
     const MenuItems = [

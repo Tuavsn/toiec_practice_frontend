@@ -13,6 +13,7 @@ import { classNames } from "primereact/utils";
 import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { useDataTable } from "../hooks/useDataTable";
 import React from "react";
+import { CustomBreadCrumb } from "../components/Common/Index";
 
 
 interface Category {
@@ -26,6 +27,10 @@ interface Category {
     is_active: boolean
 }
 
+const breadCrumbItems = [
+    { label: 'Trang chủ', icon: 'pi pi-home', url: '/' },
+    { label: 'Dashboard', icon: 'pi pi-cog', url: '/dashboard' },
+];
 
 export function AdminManageCategoryPage() {
     let emptyCategory: Category = {
@@ -83,7 +88,7 @@ export function AdminManageCategoryPage() {
     return (
         <React.Fragment>
             <div key={'b'}>
-
+                <CustomBreadCrumb items={breadCrumbItems} />
                 <Card className="my-2">
                     <div key={'a'}>
                         <Toast ref={toast} />
