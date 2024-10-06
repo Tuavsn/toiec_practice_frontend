@@ -128,7 +128,7 @@ export interface User {
     refreshToken: string;
     testAttemptHistory: Attempt[];
     learningProgress: Learning[];
-    role: Role;
+    role_id: string;
 
     // Injecting BaseEntity properties directly
     createdAt: Date;
@@ -142,10 +142,10 @@ export interface Attempt {
     averageScore: number;
     averageTime: number;
     highestScore: number;
-    resultId: string;
+    result_id: string;
 }
 
 export interface Learning {
-    courseId: string;
+    course_id: string;
     isCompleted: boolean;
 }
