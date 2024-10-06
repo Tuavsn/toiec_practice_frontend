@@ -6,7 +6,8 @@ import { useState, useEffect, useRef } from "react";
 export function useDataTable<Model extends DataTableValue>(
     inputData: Model[],
     defaultValues: Model,
-    overrides: (state: any) => Partial<any> = () => ({})
+    overrides: (state: any) => Partial<any> = () => ({}),
+    searchValue:string = ''
 ) {
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<Model[]>>(null);
@@ -17,7 +18,7 @@ export function useDataTable<Model extends DataTableValue>(
     const [row, setRow] = useState<Model>(defaultValues);
     const [selectedRows, setSelectedRows] = useState<Model[]>([]);
     const [submitted, setSubmitted] = useState<boolean>(false);
-    const [globalFilter, setGlobalFilter] = useState<string>('');
+    const [globalFilter, setGlobalFilter] = useState<string>(searchValue);
 
     useEffect(() => {
         setRows(inputData);

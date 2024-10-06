@@ -11,8 +11,9 @@ import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { useDataTable } from "../hooks/useDataTable";
 import React from "react";
 import { CustomBreadCrumb } from "../components/Common/Index";
-import { VirtualScroller, VirtualScrollerTemplateOptions } from "primereact/virtualscroller";
 import { TestCategory } from "../utils/types/type";
+import { Tag } from "primereact/tag";
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -30,7 +31,7 @@ export function AdminManageCategoryPage() {
         createdAt: new Date(),
         updatedAt: new Date(),
         tests: [],
-        isActive: false
+        isActive: true
     };
 
     const {
@@ -89,11 +90,12 @@ export function AdminManageCategoryPage() {
 
     const renderColumns = [
         <Column key="col-selection" selectionMode="multiple" exportable={false} />,
-        <Column key="col-id" field="id" header="ID" sortable style={{ minWidth: '12rem' }} />,
-        <Column key="col-format" field="format" header="Format" sortable style={{ minWidth: '16rem' }} />,
+        <Column key="col-id" field="id" header="ID" sortable filter style={{ minWidth: '12rem' }} />,
+        <Column key="col-format" field="format" header="Format" sortable filter style={{ minWidth: '16rem' }} />,
         <Column key="col-year" field="year" header="Year" sortable />,
         <Column key="col-timestamp" header="Time stamp" body={timeStampBodyTemplate} sortable style={{ minWidth: '10rem' }} />,
-        <Column key="col-tests" field="tests" header="Tests" body={TestsBodyTemplate} style={{ minWidth: '17ream' }} />
+        <Column key="col-tests" field="tests" header="Tests" body={TestsBodyTemplate} style={{ minWidth: '17ream' }} />,
+        <Column key="col-isActive" field="isActive" header="status" sortable body={statusBodyTemplate} />,
     ];
 
 
@@ -162,53 +164,31 @@ function formatDate(date: Date): string {
     return `${day}/${month}/${year}`;
 }
 
-// function getSeverity(category: TestCategory) {
-//     switch (category.is_active) {
-//         case true:
-//             return 'success';
+function getSeverity(category: TestCategory) {
+    switch (category.isActive) {
+        case true:
+            return 'success';
 
-//         case false:
-//             return 'warning';
-//         default:
-//             return null;
-//     }
-// };
+        case false:
+            return 'warning';
+        default:
+            return null;
+    }
+};
 
-// function statusBodyTemplate(rowData: TestCategory) {
-//     return <Tag value={(rowData.is_active) + ""} severity={getSeverity(rowData)}></Tag>;
-// };
+function statusBodyTemplate(rowData: TestCategory) {
+    return <Tag value={(rowData.isActive) + ""} severity={getSeverity(rowData)}></Tag>;
+};
 
 
 function TestsBodyTemplate(rowData: TestCategory) {
-
-    const handleClick = (testId: string) => {
-        // Handle the click event
-        alert(`You clicked on: ${testId}`);
-    };
-
-    const itemTemplate = (item: string, options: VirtualScrollerTemplateOptions) => {
-        const className = classNames('flex align-items-center p-2', {
-            'surface-hover': options.odd
-        });
-        return (
-            <button
-                className={className}
-                style={{ height: options.props.itemSize + 'px', width: '100%', border: 'none', background: '#f0000055', textAlign: 'left', cursor: 'pointer' }}
-                onClick={() => handleClick(item)}
-            >
-                {item}
-            </button>
-        );
+    const navigate = useNavigate();
+    const handleClick = () => {
+        navigate('/dashboard/test?category_id=' + rowData.id)
     };
 
     return (
-        <VirtualScroller
-            items={rowData.tests}
-            itemSize={50}
-            itemTemplate={itemTemplate}
-            className="border-1 surface-border border-round"
-            style={{ minWidth: '200px', height: '200px' }}
-        />
+        <Button severity="info" onClick={handleClick}>Chi tiết</Button>
     )
 }
 
