@@ -66,7 +66,7 @@ export default function GenericTable<Model extends DataTableValue>(
             value={rows}
             selection={selectedRows}
             onSelectionChange={(e) => handleSelectionChange(e)}
-            dataKey="_id"
+            dataKey="id"
             paginator
             rows={10}
             rowsPerPageOptions={[5, 10, 25]}

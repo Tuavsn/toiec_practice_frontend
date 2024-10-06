@@ -1,7 +1,6 @@
 import { Card } from "primereact/card";
 import { memo } from "react";
 import { Column } from "primereact/column";
-import { Calendar } from "primereact/calendar";
 import GenericTable from "../components/Common/Table/GenericTable";
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
@@ -30,7 +29,8 @@ export function AdminManageCategoryPage() {
         year: -9999,
         createdAt: new Date(),
         updatedAt: new Date(),
-        tests: []
+        tests: [],
+        isActive: false
     };
 
     const {
@@ -56,25 +56,25 @@ export function AdminManageCategoryPage() {
         setSelectedRows,
         setGlobalFilter
     } = useDataTable<TestCategory>(GetFakeData(), emptyCategory
-        , (state)=> ({
+        , (state) => ({
             saveRow: () => {
                 state.setSubmitted(true);
                 if (state.row.format.trim()) {
                     let _rows = [...state.rows];
                     let _row = { ...state.row };
-        
+
                     if (state.row.id) {
                         const index = state.findIndexById(state.row.id);
-        
+
                         _rows[index] = _row;
                         state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Updated', life: 3000 });
                     } else {
                         (_row as any).id = createId();
-        
+
                         _rows.push(_row);
                         state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
                     }
-        
+
                     state.setRows(_rows);
                     console.log(_rows);
                     state.setRowDialog(false);
@@ -91,9 +91,8 @@ export function AdminManageCategoryPage() {
         <Column key="col-selection" selectionMode="multiple" exportable={false} />,
         <Column key="col-id" field="id" header="ID" sortable style={{ minWidth: '12rem' }} />,
         <Column key="col-format" field="format" header="Format" sortable style={{ minWidth: '16rem' }} />,
-        <Column key="col-year" field="year" header="Year" sortable style={{ minWidth: '8rem' }} />,
-        <Column key="col-createdAt" field="createdAt" header="Created At" body={createdAtBodyTemplate} sortable style={{ minWidth: '12rem' }} />,
-        <Column key="col-updatedAt" field="updatedAt" header="Updated At" body={updatedAtBodyTemplate} sortable style={{ minWidth: '12rem' }} />,
+        <Column key="col-year" field="year" header="Year" sortable />,
+        <Column key="col-timestamp" header="Time stamp" body={timeStampBodyTemplate} sortable style={{ minWidth: '10rem' }} />,
         <Column key="col-tests" field="tests" header="Tests" body={TestsBodyTemplate} style={{ minWidth: '17ream' }} />
     ];
 
@@ -139,16 +138,29 @@ export default memo(AdminManageCategoryPage);
 // ------------------------------------- helper function---------------------------------------------------
 
 //--------------------- def columns---------------------------------
-function createdAtBodyTemplate(rowData: TestCategory) {
+function timeStampBodyTemplate(rowData: TestCategory) {
     return (
-        <Calendar
-            value={new Date(rowData.createdAt)}
-            dateFormat="dd/mm/yy"
-            showIcon
-            disabled
-        />
+        <Card className="flex align-items-center justify-content-start">
+            <div className="flex align-items-center">
+                <i className="pi pi-calendar-plus mr-2" style={{ color: 'slateblue' }}></i>
+                {formatDate(rowData.createdAt)}
+            </div>
+            <div className="flex align-items-center">
+                <i className="pi pi-pencil mr-2" style={{ color: 'red' }}></i>
+                {formatDate(rowData.updatedAt)}
+            </div>
+        </Card>
+
+
     );
 };
+
+function formatDate(date: Date): string {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth() is zero-based
+    const year = date.getFullYear().toString().slice(-2); // Get the last two digits of the year
+    return `${day}/${month}/${year}`;
+}
 
 // function getSeverity(category: TestCategory) {
 //     switch (category.is_active) {
@@ -166,16 +178,6 @@ function createdAtBodyTemplate(rowData: TestCategory) {
 //     return <Tag value={(rowData.is_active) + ""} severity={getSeverity(rowData)}></Tag>;
 // };
 
-function updatedAtBodyTemplate(rowData: TestCategory) {
-    return (
-        <Calendar
-            value={new Date(rowData.updatedAt)}
-            dateFormat="dd/mm/yy"
-            showIcon
-            disabled
-        />
-    );
-};
 
 function TestsBodyTemplate(rowData: TestCategory) {
 
@@ -269,7 +271,8 @@ function GetFakeData(): TestCategory[] {
             year: 2024,
             createdAt: new Date("2024-01-15T10:00:00Z"),
             updatedAt: new Date("2024-03-10T12:30:00Z"),
-            tests: ["11119999999999999999999999999999", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"]
+            tests: ["11119999999999999999999999999999", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"],
+            isActive: false
         },
         {
             id: "2",
@@ -277,7 +280,8 @@ function GetFakeData(): TestCategory[] {
             year: 2023,
             createdAt: new Date("2023-06-22T09:15:00Z"),
             updatedAt: new Date("2024-01-05T11:00:00Z"),
-            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"]
+            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"],
+            isActive: false
         },
         {
             id: "3",
@@ -285,7 +289,8 @@ function GetFakeData(): TestCategory[] {
             year: 2022,
             createdAt: new Date("2022-05-10T14:45:00Z"),
             updatedAt: new Date("2023-12-30T08:30:00Z"),
-            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"]
+            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"],
+            isActive: false
         },
         {
             id: "4",
@@ -293,7 +298,8 @@ function GetFakeData(): TestCategory[] {
             year: 2024,
             createdAt: new Date("2024-02-01T07:20:00Z"),
             updatedAt: new Date("2024-04-15T13:15:00Z"),
-            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"]
+            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"],
+            isActive: false
         },
         {
             id: "5",
@@ -301,7 +307,8 @@ function GetFakeData(): TestCategory[] {
             year: 2023,
             createdAt: new Date("2023-09-10T16:00:00Z"),
             updatedAt: new Date("2023-11-25T10:00:00Z"),
-            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"]
+            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"],
+            isActive: false
         }
     ]
 }
