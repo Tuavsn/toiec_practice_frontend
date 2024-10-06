@@ -2,14 +2,17 @@ import { InputText } from "primereact/inputtext"
 import Logo from "../../../assets/Header-Logo.png"
 import { Menubar } from "primereact/menubar"
 import LoginDialog from "../LoginDialog/LoginDialog"
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
 
+    const navigate = useNavigate();
+
     const HeaderItems = [
-        { label:'Trang chủ' , icon: 'pi pi-home', url: '/home'},
-        { label:'Khóa học' , icon: 'pi pi-book', url: '/course'},
-        { label:'Đề thi' , icon: 'pi pi-folder', url: '/test'},
-        { label:'Dashboard' , icon: 'pi pi-cog', url: '/dashboard'},
+        { label:'Trang chủ' , icon: 'pi pi-home', command: () => navigate('/home')},
+        { label:'Khóa học' , icon: 'pi pi-book', command: () => navigate('/course')},
+        { label:'Đề thi' , icon: 'pi pi-folder', command: () => navigate('/test')},
+        { label:'Dashboard' , icon: 'pi pi-cog', command: () => navigate('/dashboard')},
     ]
 
     const HeaderStart = <img src={Logo} height={70} alt="Logo" />
