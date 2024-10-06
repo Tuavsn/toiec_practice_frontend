@@ -3,7 +3,6 @@ import { memo } from "react";
 import { Column } from "primereact/column";
 import GenericTable from "../components/Common/Table/GenericTable";
 import { Button } from "primereact/button";
-import { Toolbar } from "primereact/toolbar";
 import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
@@ -14,6 +13,7 @@ import { CustomBreadCrumb } from "../components/Common/Index";
 import { TestCategory } from "../utils/types/type";
 import { Tag } from "primereact/tag";
 import { useNavigate } from 'react-router-dom';
+import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar";
 
 
 
@@ -65,7 +65,7 @@ export function AdminManageCategoryPage() {
                     let _row = { ...state.row };
 
                     if (state.row.id) {
-                        const index = state.findIndexById(state.row.id);
+                        const index = _rows.findIndex(item => item.id === state.row.id)
 
                         _rows[index] = _row;
                         state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Updated', life: 3000 });
@@ -109,9 +109,12 @@ export function AdminManageCategoryPage() {
                     <div key={'a'}>
                         <Toast ref={toast} />
                         <div className="card">
-                            <Toolbar className="mb-4"
-                                start={leftToolbarTemplate(openNew, confirmDeleteSelected, selectedRows)}
-                                end={rightToolbarTemplate(exportCSV)} />
+                            <SimpleToolBar
+                                openNew={openNew}
+                                confirmDeleteSelected={confirmDeleteSelected}
+                                selectedRows={selectedRows}
+                                exportCSV={exportCSV}
+                            />
                             {GenericTable<TestCategory>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, editRow, confirmDeleteRow)}
                         </div>
                         {SimpleDialog(
@@ -193,22 +196,7 @@ function TestsBodyTemplate(rowData: TestCategory) {
 }
 
 //---------------------- for tool bar ----------------------------------
-function leftToolbarTemplate(
-    openNew: () => void,
-    confirmDeleteSelected: () => void,
-    selectedRows: TestCategory[]) {
 
-    return (
-        <div className="flex flex-wrap gap-2">
-            <Button label="New" icon="pi pi-plus" severity="success" onClick={openNew} />
-            <Button label="Delete" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedRows || !selectedRows.length} />
-        </div>
-    );
-}
-
-function rightToolbarTemplate(exportCSV: () => void) {
-    return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
-}
 
 //------------------------for dialog-------------------------------------
 

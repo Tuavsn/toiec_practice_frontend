@@ -89,21 +89,6 @@ export function useDataTable<Model extends DataTableValue>(
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Deleted', life: 3000 });
     });
 
-    const findIndexById = ((id: string): number => {
-        let index = -1;
-
-        for (let i = 0; i < rows.length; i++) {
-            if (rows[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    });
-
-
-
     const exportCSV = (() => {
         dt.current?.exportCSV();
     });
@@ -149,7 +134,6 @@ export function useDataTable<Model extends DataTableValue>(
         editRow: overrides(state).editRow || editRow,
         confirmDeleteRow: overrides(state).confirmDeleteRow || confirmDeleteRow,
         deleteRow: overrides(state).deleteRow || deleteRow,
-        findIndexById: overrides(state).findIndexById || findIndexById,
         exportCSV: overrides(state).exportCSV || exportCSV,
         confirmDeleteSelected: overrides(state).confirmDeleteSelected || confirmDeleteSelected,
         deleteSelectedRows: overrides(state).deleteSelectedRows || deleteSelectedRows,
