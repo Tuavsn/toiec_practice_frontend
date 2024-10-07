@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
-import { DataTable, DataTableSelectionMultipleChangeEvent, DataTableValue } from "primereact/datatable";
+import { DataTable, DataTablePageEvent, DataTableSelectionMultipleChangeEvent, DataTableValue } from "primereact/datatable";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
@@ -16,6 +16,9 @@ export default function GenericTable<Model extends DataTableValue>(
     globalFilter:string,
     setGlobalFilter: Dispatch<SetStateAction<string>>,
     setSelectedRows:Dispatch<SetStateAction<Model[]>>,
+    totalRecords: number,
+    page: { first: number, rows: number },
+    handleOnPage: (event: DataTablePageEvent) => void,
     editRow?:(a:Model)=>void,
     confirmDeleteRow?:(rowData:Model)=>void,
 ) {
@@ -68,7 +71,10 @@ export default function GenericTable<Model extends DataTableValue>(
             onSelectionChange={(e) => handleSelectionChange(e)}
             dataKey="id"
             paginator
-            rows={10}
+            rows={page.rows}
+            first={page.first}
+            onPage={handleOnPage}
+            totalRecords={totalRecords}
             rowsPerPageOptions={[5, 10, 25]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} categories"

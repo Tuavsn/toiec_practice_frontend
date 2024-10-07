@@ -14,6 +14,7 @@ import { TestCategory } from "../utils/types/type";
 import { Tag } from "primereact/tag";
 import { useNavigate } from 'react-router-dom';
 import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar";
+import formatDate from "../utils/formatDateToString";
 
 
 
@@ -50,13 +51,14 @@ export function AdminManageCategoryPage() {
         submitted,
         deleteRowDialog,
         openNew,
+        page, totalRecords, handleOnPage,
         confirmDeleteSelected,
         exportCSV,
         editRow,
         confirmDeleteRow,
         setSelectedRows,
         setGlobalFilter
-    } = useDataTable<TestCategory>(GetFakeData(), emptyCategory
+    } = useDataTable<TestCategory>("https://dummyjson.com/c/5667-8045-46d4-a86d", emptyCategory
         , (state) => ({
             saveRow: () => {
                 state.setSubmitted(true);
@@ -115,7 +117,7 @@ export function AdminManageCategoryPage() {
                                 selectedRows={selectedRows}
                                 exportCSV={exportCSV}
                             />
-                            {GenericTable<TestCategory>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, editRow, confirmDeleteRow)}
+                            {GenericTable<TestCategory>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, totalRecords, page, handleOnPage, editRow, confirmDeleteRow)}
                         </div>
                         {SimpleDialog(
                             dialogBody(row, setRow, submitted),
@@ -159,13 +161,6 @@ function timeStampBodyTemplate(rowData: TestCategory) {
 
     );
 };
-
-function formatDate(date: Date): string {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // getMonth() is zero-based
-    const year = date.getFullYear().toString().slice(-2); // Get the last two digits of the year
-    return `${day}/${month}/${year}`;
-}
 
 function getSeverity(category: TestCategory) {
     switch (category.isActive) {
@@ -227,59 +222,6 @@ function dialogBody(row: TestCategory, setRow: (value: React.SetStateAction<Test
     )
 }
 
-
-
-
-
-function GetFakeData(): TestCategory[] {
-    return [
-        {
-            id: "1",
-            format: "Electronics",
-            year: 2024,
-            createdAt: new Date("2024-01-15T10:00:00Z"),
-            updatedAt: new Date("2024-03-10T12:30:00Z"),
-            tests: ["11119999999999999999999999999999", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"],
-            isActive: false
-        },
-        {
-            id: "2",
-            format: "Books",
-            year: 2023,
-            createdAt: new Date("2023-06-22T09:15:00Z"),
-            updatedAt: new Date("2024-01-05T11:00:00Z"),
-            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"],
-            isActive: false
-        },
-        {
-            id: "3",
-            format: "Fashion",
-            year: 2022,
-            createdAt: new Date("2022-05-10T14:45:00Z"),
-            updatedAt: new Date("2023-12-30T08:30:00Z"),
-            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"],
-            isActive: false
-        },
-        {
-            id: "4",
-            format: "Home & Kitchen",
-            year: 2024,
-            createdAt: new Date("2024-02-01T07:20:00Z"),
-            updatedAt: new Date("2024-04-15T13:15:00Z"),
-            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"],
-            isActive: false
-        },
-        {
-            id: "5",
-            format: "Sports",
-            year: 2023,
-            createdAt: new Date("2023-09-10T16:00:00Z"),
-            updatedAt: new Date("2023-11-25T10:00:00Z"),
-            tests: ["1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222", "1111", "2222"],
-            isActive: false
-        }
-    ]
-}
 
 
 function createId(): string {

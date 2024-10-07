@@ -7,7 +7,7 @@ export interface TestCategory extends DataTableValue {
     createdAt: Date;
     updatedAt: Date;
     tests: string[];
-    isActive:boolean;
+    isActive: boolean;
 }
 
 export interface Lecture {
@@ -26,7 +26,7 @@ export interface Course {
     content: string;
     description: string;
     questionIds: string[];
-    
+
     // Including BaseEntity properties directly
     createdAt: Date;
     updatedAt: Date;
@@ -46,7 +46,7 @@ export interface Question {
     difficulty: string;
     transcript: string;
     answers: Answer[];
-    
+
     // Injecting BaseEntity properties directly
     createdAt: Date;
     updatedAt: Date;
@@ -134,6 +134,15 @@ export interface User {
     createdAt: Date;
     updatedAt: Date;
     isActive: boolean;
+}
+
+export interface BasicUser {
+    id: string,
+    email: string,
+    role: string,
+    createdAt: Date,
+    updatedAt: Date,
+    isActive: boolean
 }
 
 export interface Attempt {

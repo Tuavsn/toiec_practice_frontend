@@ -1,13 +1,13 @@
-import { DataTable, DataTableValue } from "primereact/datatable";
+import { DataTable, DataTablePageEvent, DataTableValue } from "primereact/datatable";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { Toast } from "primereact/toast";
 import { useState, useEffect, useRef } from "react";
 
 export function useDataTable<Model extends DataTableValue>(
-    inputData: Model[],
+    urlApi: string,
     defaultValues: Model,
     overrides: (state: any) => Partial<any> = () => ({}),
-    searchValue:string = ''
+    searchValue: string = ''
 ) {
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<Model[]>>(null);
@@ -19,9 +19,11 @@ export function useDataTable<Model extends DataTableValue>(
     const [selectedRows, setSelectedRows] = useState<Model[]>([]);
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [globalFilter, setGlobalFilter] = useState<string>(searchValue);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [page, setPage] = useState({ first: 0, rows: 20 });
 
     useEffect(() => {
-        setRows(inputData);
+        fetchData(0, page.rows);
 
     }, []);
 
@@ -70,6 +72,25 @@ export function useDataTable<Model extends DataTableValue>(
         // }
     });
 
+    // Fetch data from server
+    const fetchData = async (pageNumber: number, _pageSize: number) => {
+        try {
+            const response = await fetch(urlApi);
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data: { data: Model[], totalRecords: number } = await response.json();  // Parse the JSON response
+            setRows(data.data); // Update with server data
+            setTotalRecords(data.totalRecords);
+            return data;  // Return the data
+        } catch (error) {
+            console.error('There has been a problem with your fetch operation:', error);
+            return null;  // Handle the error, returning null or an appropriate value
+        }
+    };
+
     const editRow = ((row: Model) => {
         setRow({ ...row });
         setRowDialog(true);
@@ -112,7 +133,13 @@ export function useDataTable<Model extends DataTableValue>(
             created_by: e.value
         }));
     };
+    const handleOnPage = (event: DataTablePageEvent) => {
+        setPage({ first: event.first, rows: event.rows });
 
+        // Calculate the page number based on event.first and event.rows
+        const pageNumber = event.first / event.rows;
+        fetchData(pageNumber, event.rows);
+    }
     // The state object to pass to the override functions
     const state = {
         rows, setRows,
@@ -123,7 +150,7 @@ export function useDataTable<Model extends DataTableValue>(
         selectedRows, setSelectedRows,
         submitted, setSubmitted,
         globalFilter, setGlobalFilter,
-        toast, dt
+        toast, dt, page, totalRecords
     };
     const actions = {
         openNew: overrides(state).openNew || openNew,
@@ -137,7 +164,8 @@ export function useDataTable<Model extends DataTableValue>(
         exportCSV: overrides(state).exportCSV || exportCSV,
         confirmDeleteSelected: overrides(state).confirmDeleteSelected || confirmDeleteSelected,
         deleteSelectedRows: overrides(state).deleteSelectedRows || deleteSelectedRows,
-        onRowCreatedByChange: overrides(state).onRowCreatedByChange || onRowCreatedByChange
+        onRowCreatedByChange: overrides(state).onRowCreatedByChange || onRowCreatedByChange,
+        handleOnPage: overrides(state).handleOnPage || handleOnPage,
     }
     return {
         ...state,
