@@ -10,7 +10,7 @@ import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { useDataTable } from "../hooks/useDataTable";
 import React from "react";
 import { CustomBreadCrumb } from "../components/Common/Index";
-import { TestCategory } from "../utils/types/type";
+import { Category } from "../utils/types/type";
 import { Tag } from "primereact/tag";
 import { useNavigate } from 'react-router-dom';
 import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar";
@@ -25,14 +25,14 @@ const breadCrumbItems = [
 ];
 
 export function AdminManageCategoryPage() {
-    const emptyCategory: TestCategory = {
+    const emptyCategory: Category = {
         id: "",
         format: "vô danh",
         year: -9999,
         createdAt: new Date(),
         updatedAt: new Date(),
-        tests: [],
-        isActive: true
+        isActive: true,
+        testIds: []
     };
 
     const {
@@ -58,7 +58,7 @@ export function AdminManageCategoryPage() {
         confirmDeleteRow,
         setSelectedRows,
         setGlobalFilter
-    } = useDataTable<TestCategory>("https://dummyjson.com/c/5667-8045-46d4-a86d", emptyCategory
+    } = useDataTable<Category>("https://dummyjson.com/c/5667-8045-46d4-a86d", emptyCategory
         , (state) => ({
             saveRow: () => {
                 state.setSubmitted(true);
@@ -101,7 +101,7 @@ export function AdminManageCategoryPage() {
     ];
 
 
-    console.log("render ");
+    // console.log("render ");
 
     return (
         <React.Fragment>
@@ -117,7 +117,7 @@ export function AdminManageCategoryPage() {
                                 selectedRows={selectedRows}
                                 exportCSV={exportCSV}
                             />
-                            {GenericTable<TestCategory>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, totalRecords, page, handleOnPage, editRow, confirmDeleteRow)}
+                            {GenericTable<Category>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, totalRecords, page, handleOnPage, editRow, confirmDeleteRow)}
                         </div>
                         {SimpleDialog(
                             dialogBody(row, setRow, submitted),
@@ -145,7 +145,7 @@ export default memo(AdminManageCategoryPage);
 // ------------------------------------- helper function---------------------------------------------------
 
 //--------------------- def columns---------------------------------
-function timeStampBodyTemplate(rowData: TestCategory) {
+function timeStampBodyTemplate(rowData: Category) {
     return (
         <Card className="flex align-items-center justify-content-start">
             <div className="flex align-items-center">
@@ -162,7 +162,7 @@ function timeStampBodyTemplate(rowData: TestCategory) {
     );
 };
 
-function getSeverity(category: TestCategory) {
+function getSeverity(category: Category) {
     switch (category.isActive) {
         case true:
             return 'success';
@@ -174,12 +174,12 @@ function getSeverity(category: TestCategory) {
     }
 };
 
-function statusBodyTemplate(rowData: TestCategory) {
+function statusBodyTemplate(rowData: Category) {
     return <Tag value={(rowData.isActive) + ""} severity={getSeverity(rowData)}></Tag>;
 };
 
 
-function TestsBodyTemplate(rowData: TestCategory) {
+function TestsBodyTemplate(rowData: Category) {
     const navigate = useNavigate();
     const handleClick = () => {
         navigate('/dashboard/test?category_id=' + rowData.id)
@@ -195,8 +195,8 @@ function TestsBodyTemplate(rowData: TestCategory) {
 
 //------------------------for dialog-------------------------------------
 
-function dialogBody(row: TestCategory, setRow: (value: React.SetStateAction<TestCategory>) => void, submitted: boolean) {
-    const onInputChange = (e: any, field: keyof TestCategory) => {
+function dialogBody(row: Category, setRow: (value: React.SetStateAction<Category>) => void, submitted: boolean) {
+    const onInputChange = (e: any, field: keyof Category) => {
         const value = e.target.value ?? ''; // Ensuring fallback to an empty string if value is undefined
         setRow((prevRow) => ({
             ...prevRow,

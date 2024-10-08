@@ -4,7 +4,7 @@ import AdminManageTestPage from "./AdminManageTestPage";
 import { Toast } from "primereact/toast";
 import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { GenericTable } from "../components/Common/Index";
-import { BasicUser } from "../utils/types/type";
+import { User } from "../utils/types/type";
 import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar"
 import { useDataTable } from "../hooks/useDataTable";
 import { Column } from "primereact/column";
@@ -14,13 +14,17 @@ import { classNames } from "primereact/utils";
 import formatDate from "../utils/formatDateToString";
 export function AdminManageAccountPage() {
 
-    const emptyAccount: BasicUser = {
+    const emptyAccount: User = {
         id: "",
         email: "aaa@",
-        role: "m",
         createdAt: new Date(),
         updatedAt: new Date(),
-        isActive: true
+        isActive: true,
+        refreshToken: "",
+        roleId: "roleid",
+        target: 0,
+        testAttemptHistory: [],
+        learningProgress: []
     }
 
     const {
@@ -48,7 +52,7 @@ export function AdminManageAccountPage() {
         setSelectedRows,
         setGlobalFilter,
         handleOnPage
-    } = useDataTable<BasicUser>("https://dummyjson.com/c/cba1-c411-488b-9200", emptyAccount
+    } = useDataTable<User>("https://dummyjson.com/c/cba1-c411-488b-9200", emptyAccount
         , (state) => ({
             saveRow: () => {
                 state.setSubmitted(true);
@@ -100,7 +104,7 @@ export function AdminManageAccountPage() {
                                 selectedRows={selectedRows}
                                 exportCSV={exportCSV}
                             />
-                            {GenericTable<BasicUser>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, totalRecords, page, handleOnPage, editRow, confirmDeleteRow)}
+                            {GenericTable<User>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, totalRecords, page, handleOnPage, editRow, confirmDeleteRow)}
                         </div>
                         {SimpleDialog(
                             dialogBody(row, setRow, submitted),
@@ -129,7 +133,7 @@ export default memo(AdminManageTestPage);
 // ------------------------------------- helper function---------------------------------------------------
 
 //--------------------- def columns---------------------------------
-function timeStampBodyTemplate(rowData: BasicUser) {
+function timeStampBodyTemplate(rowData: User) {
     return (
         <Card className="flex align-items-center justify-content-start">
             <div className="flex align-items-center">
@@ -147,7 +151,7 @@ function timeStampBodyTemplate(rowData: BasicUser) {
 };
 
 
-function getSeverity(category: BasicUser) {
+function getSeverity(category: User) {
     switch (category.isActive) {
         case true:
             return 'success';
@@ -159,14 +163,14 @@ function getSeverity(category: BasicUser) {
     }
 };
 
-function statusBodyTemplate(rowData: BasicUser) {
+function statusBodyTemplate(rowData: User) {
     return <Tag value={(rowData.isActive) + ""} severity={getSeverity(rowData)}></Tag>;
 };
 
 //------------------------for dialog-------------------------------------
 
-function dialogBody(row: BasicUser, setRow: (value: React.SetStateAction<BasicUser>) => void, submitted: boolean) {
-    const onInputChange = (e: any, field: keyof BasicUser) => {
+function dialogBody(row: User, setRow: (value: React.SetStateAction<User>) => void, submitted: boolean) {
+    const onInputChange = (e: any, field: keyof User) => {
         const value = e.target.value ?? ''; // Ensuring fallback to an empty string if value is undefined
         setRow((prevRow) => ({
             ...prevRow,
