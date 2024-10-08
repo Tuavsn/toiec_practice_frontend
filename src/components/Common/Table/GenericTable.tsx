@@ -1,10 +1,8 @@
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
-import { DataTable, DataTableSelectionMultipleChangeEvent, DataTableValue } from "primereact/datatable";
-import { IconField } from "primereact/iconfield";
-import { InputIcon } from "primereact/inputicon";
-import { InputText } from "primereact/inputtext";
-import React, { Dispatch, ReactElement, RefObject, SetStateAction ,useCallback} from "react";
+import { DataTable, DataTablePageEvent, DataTableSelectionMultipleChangeEvent, DataTableValue } from "primereact/datatable";
+import React, { Dispatch, ReactElement, RefObject, SetStateAction, useCallback } from "react";
+import { SearchInput } from "./SearchInput";
 
 type ColumnElement = ReactElement<typeof Column>;
 export default function GenericTable<Model extends DataTableValue>(
@@ -13,31 +11,24 @@ export default function GenericTable<Model extends DataTableValue>(
     rows: Model[],
     isAddActionButtons: boolean,
     selectedRows: Model[],
-    globalFilter:string,
+    globalFilter: string,
     setGlobalFilter: Dispatch<SetStateAction<string>>,
-    setSelectedRows:Dispatch<SetStateAction<Model[]>>,
-    editRow?:(a:Model)=>void,
-    confirmDeleteRow?:(rowData:Model)=>void,
+    setSelectedRows: Dispatch<SetStateAction<Model[]>>,
+    totalRecords: number,
+    page: { first: number, rows: number },
+    handleOnPage: (event: DataTablePageEvent) => void,
+    editRow?: (a: Model) => void,
+    confirmDeleteRow?: (rowData: Model) => void,
 ) {
     const handleSelectionChange = useCallback((e: DataTableSelectionMultipleChangeEvent<Model[]>) => {
         if (Array.isArray(e.value)) {
             setSelectedRows(e.value);
         }
-    }, [setSelectedRows]); 
+    }, [setSelectedRows]);
     const header = React.useMemo((): JSX.Element => (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
             <h4 className="m-0">Manage Rows</h4>
-            <IconField iconPosition="left">
-                <InputIcon className="pi pi-search" />
-                <InputText
-                    type="search"
-                    placeholder="Search..."
-                    onInput={(e) => {
-                        const target = e.target as HTMLInputElement;
-                        setGlobalFilter(target.value);
-                    }}
-                />
-            </IconField>
+            <SearchInput setGlobalFilter={setGlobalFilter} /> 
         </div>
     ), [setGlobalFilter]);
 
@@ -55,20 +46,23 @@ export default function GenericTable<Model extends DataTableValue>(
             );
         }
 
-        return colCopy; 
+        return colCopy;
     }, [columns, isAddActionButtons, editRow, confirmDeleteRow]);
 
     return (
         <DataTable
             showGridlines
-            
+
             ref={dt}
             value={rows}
             selection={selectedRows}
             onSelectionChange={(e) => handleSelectionChange(e)}
             dataKey="id"
             paginator
-            rows={10}
+            rows={page.rows}
+            first={page.first}
+            onPage={handleOnPage}
+            totalRecords={totalRecords}
             rowsPerPageOptions={[5, 10, 25]}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} categories"
@@ -81,8 +75,8 @@ export default function GenericTable<Model extends DataTableValue>(
     )
 }
 
-function actionBodyTemplate<Model> (rowData: Model, editRow:(a:Model)=>void,
-confirmDeleteRow:(rowData:Model)=>void ) {
+function actionBodyTemplate<Model>(rowData: Model, editRow: (a: Model) => void,
+    confirmDeleteRow: (rowData: Model) => void) {
     return (
         <React.Fragment>
             <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editRow(rowData)} />

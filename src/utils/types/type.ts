@@ -1,151 +1,126 @@
 import { DataTableValue } from "primereact/datatable";
 
-export interface TestCategory extends DataTableValue {
-    id: string;
+export interface Category extends DataTableValue {
+    id: string;  // ObjectId as a string
     format: string;
     year: number;
-    createdAt: Date;
-    updatedAt: Date;
-    tests: string[];
-    isActive:boolean;
-}
-
-export interface Lecture {
-    title: string;
-    content: string;
-    description: string;
-}
-
-export interface Course {
-    id: string;
+    testIds: string[];  // Array of test IDs as strings
+  }
+  
+  export interface Test extends DataTableValue {
+    id: string;  // ObjectId as a string
     name: string;
-    topic: string;
-    format: string;
-    difficulty: string;
-    lecture: Lecture;
-    content: string;
-    description: string;
-    questionIds: string[];
-    
-    // Including BaseEntity properties directly
-    createdAt: Date;
-    updatedAt: Date;
     isActive: boolean;
-}
-
-export interface Answer {
-    answerOption: string;
-    content: string;
-    isCorrect: boolean;
-}
-
-export interface Question {
-    id: string;
-    number: string;
-    content: string;
-    difficulty: string;
-    transcript: string;
-    answers: Answer[];
-    
-    // Injecting BaseEntity properties directly
-    createdAt: Date;
-    updatedAt: Date;
-    isActive: boolean;
-}
-
-export interface Permission {
-    name: string;
-    apiPath: string;
-    method: string;
-    module: string;
-}
-
-export interface Role {
-    id: string;
-    name: string;
-    description: string;
-    permissions: Permission[];
-    users: User[];
-
-    // Injecting BaseEntity properties directly
-    createdAt: Date;
-    updatedAt: Date;
-    isActive: boolean;
-}
-
-export interface QuestionGroup {
-    audioUrl: string;
-    imageUrls: string[];
-    paragraphs: string[];
-    questionIds: string[];
-    transcript: string;
-}
-
-export interface Part {
-    number: string;
-    questionGroups: QuestionGroup[];
-}
-
-export interface Test {
-    id: string;
-    name: string;
-    format: string;
-    totalUserAttempt: string;
+    totalUserAttempt: number;
     totalQuestion: number;
     totalScore: number;
-    timeLimit: string;
-    fullTestAudioUrl: string;
-    parts: Part[];
-
-    // Injecting BaseEntity properties directly
-    createdAt: Date;
-    updatedAt: Date;
-    isActive: boolean;
-}
-
-export interface TestResult {
-    id: string;
-    totalScore: number;
-    totalTime: string;
+    limitTime: number;
+    questions: string[];  // Array of question IDs
+  }
+  
+  export interface Question extends DataTableValue {
+    id: string;  // ObjectId as a string
+    questionNum: number;
+    partNum: number;
+    type: 'single' | 'group' | 'subquestion';  // Question types
+    subQuestions?: string[];  // Optional array of subquestion IDs
+    content: string;
+    difficulty: number;
+    topic: string[];  // Array of topic names
+    resources: Resource[];  // Array of resources
+    transcript?: string;
+    explanation?: string;
+    answers: string[];  // Array of answers
+    correctAnswer: string;
+  }
+  
+  export interface Resource extends DataTableValue {
+    type: 'paragraph' | 'image' | 'audio';  // Resource types
+    content: string;
+  }
+  
+  
+  export interface Result extends DataTableValue {
+    id: string;  // ObjectId as a string
+    testId: string;  // Reference to Test
+    userId: string;  // Reference to User
+    totalTime: number;
     totalReadingScore: number;
     totalListeningScore: number;
-    totalCorrectAnswers: number;
-    totalIncorrectAnswers: number;
-    totalSkipAnswers: number;
-    attemptDate: string;
-    answers: Answer[];
-
-    // Injecting BaseEntity properties directly
-    createdAt: Date;
-    updatedAt: Date;
-    isActive: boolean;
-}
-
-export interface User {
-    id: string;
+    totalCorrectAnswer: number;
+    totalIncorrectAnswer: number;
+    totalSkipAnswer: number;
+    type: 'practice' | 'fulltest';  // Test type
+    parts?: number[];  // Optional array of parts for practice
+    userAnswers: UserAnswer[];  // Array of user's answers
+  }
+  
+  export interface UserAnswer extends DataTableValue {
+    questionId: string;  // Reference to Question
+    answer: string;
+    solution: string;
+  }
+  
+  export interface User extends DataTableValue {
+    id: string;  // ObjectId as a string
     email: string;
-    avatar: string;
     refreshToken: string;
-    testAttemptHistory: Attempt[];
-    learningProgress: Learning[];
-    role_id: string;
-
-    // Injecting BaseEntity properties directly
-    createdAt: Date;
-    updatedAt: Date;
-    isActive: boolean;
-}
-
-export interface Attempt {
-    testId: string;
+    roleId: string;  // Reference to Role
+    target: number;
+    testAttemptHistory: TestAttempt[];  // Array of test attempts
+    learningProgress: LearningProgress[];  // Array of learning progress
+  }
+  
+  export interface TestAttempt extends DataTableValue {
+    testId: string;  // Reference to Test
+    resultIds: string[];  // Array of Result IDs
     totalAttempt: number;
     averageScore: number;
     averageTime: number;
     highestScore: number;
-    result_id: string;
-}
-
-export interface Learning {
-    course_id: string;
+  }
+  
+  export interface LearningProgress extends DataTableValue {
+    courseId: string;  // Reference to Course
     isCompleted: boolean;
-}
+  }
+  
+  
+  export interface Role extends DataTableValue {
+    id: string;  // ObjectId as a string
+    name: string;
+    description: string;
+    isActive: boolean;
+    permissions: Permission[];  // Array of permissions
+  }
+  
+  export interface Permission extends DataTableValue {
+    name: string;
+    apiPath: string;
+    method: string;
+    module: string;
+  }
+  
+  
+  export interface Course extends DataTableValue {
+    id: string;  // ObjectId as a string
+    name: string;
+    topic: string[];  // Array of topic names
+    format: string;
+    difficulty: number;
+    lecture: Lecture;
+    assignment: Assignment;
+  }
+  
+  export interface Lecture extends DataTableValue {
+    title: string;
+    content: string;
+    description: string;
+  }
+  
+  export interface Assignment extends DataTableValue {
+    required: number;
+    totalQuestion: number;
+    questionIds: string[];  // Array of Question IDs
+  }
+  
