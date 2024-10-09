@@ -6,7 +6,8 @@ import {
     TestDetailPage,
     TestReviewPage,
     CoursePage,
-    NotFoundPage
+    NotFoundPage,
+    CourseDetailsPage
 } from "../pages/Index";
 
 export default function UserRoutes() {
@@ -25,6 +26,8 @@ export default function UserRoutes() {
             <Route path="/test/:id/review" element={<TestReviewPage />} />
             {/* Flash Card Page */}
             <Route path="/course" element={<CoursePage />} />
+            <Route path="/courses/:id" element={<CourseDetailsPage />} />F
+
             {/* NotFound Page */}
             <Route path="*" element={<NotFoundPage />} />
         </Routes>

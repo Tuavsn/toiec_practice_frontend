@@ -4,27 +4,24 @@ import AdminManageTestPage from "./AdminManageTestPage";
 import { Toast } from "primereact/toast";
 import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { GenericTable } from "../components/Common/Index";
-import { User } from "../utils/types/type";
+import { UserRow } from "../utils/types/type";
 import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar"
 import { useDataTable } from "../hooks/useDataTable";
 import { Column } from "primereact/column";
-import { Tag } from "primereact/tag";
 import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
-import formatDate from "../utils/formatDateToString";
+import { timeStampBodyTemplate, statusBodyTemplate } from "../components/Common/Table/CommonColumn";
 export function AdminManageAccountPage() {
 
-    const emptyAccount: User = {
+    const emptyAccount: UserRow = {
         id: "",
-        email: "aaa@",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isActive: true,
-        refreshToken: "",
-        roleId: "roleid",
+        email: "",
+        avatar: "",
+        roleName: "",
         target: 0,
-        testAttemptHistory: [],
-        learningProgress: []
+        isActive: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
     }
 
     const {
@@ -52,7 +49,7 @@ export function AdminManageAccountPage() {
         setSelectedRows,
         setGlobalFilter,
         handleOnPage
-    } = useDataTable<User>("https://dummyjson.com/c/cba1-c411-488b-9200", emptyAccount
+    } = useDataTable<UserRow>("https://dummyjson.com/c/cba1-c411-488b-9200", emptyAccount
         , (state) => ({
             saveRow: () => {
                 state.setSubmitted(true);
@@ -104,7 +101,7 @@ export function AdminManageAccountPage() {
                                 selectedRows={selectedRows}
                                 exportCSV={exportCSV}
                             />
-                            {GenericTable<User>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, totalRecords, page, handleOnPage, editRow, confirmDeleteRow)}
+                            {GenericTable<UserRow>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, totalRecords, page, handleOnPage, editRow, confirmDeleteRow)}
                         </div>
                         {SimpleDialog(
                             dialogBody(row, setRow, submitted),
@@ -132,45 +129,10 @@ export default memo(AdminManageTestPage);
 
 // ------------------------------------- helper function---------------------------------------------------
 
-//--------------------- def columns---------------------------------
-function timeStampBodyTemplate(rowData: User) {
-    return (
-        <Card className="flex align-items-center justify-content-start">
-            <div className="flex align-items-center">
-                <i className="pi pi-calendar-plus mr-2" style={{ color: 'slateblue' }}></i>
-                {formatDate(rowData.createdAt)}
-            </div>
-            <div className="flex align-items-center">
-                <i className="pi pi-pencil mr-2" style={{ color: 'red' }}></i>
-                {formatDate(rowData.updatedAt)}
-            </div>
-        </Card>
-
-
-    );
-};
-
-
-function getSeverity(category: User) {
-    switch (category.isActive) {
-        case true:
-            return 'success';
-
-        case false:
-            return 'warning';
-        default:
-            return null;
-    }
-};
-
-function statusBodyTemplate(rowData: User) {
-    return <Tag value={(rowData.isActive) + ""} severity={getSeverity(rowData)}></Tag>;
-};
-
 //------------------------for dialog-------------------------------------
 
-function dialogBody(row: User, setRow: (value: React.SetStateAction<User>) => void, submitted: boolean) {
-    const onInputChange = (e: any, field: keyof User) => {
+function dialogBody(row: UserRow, setRow: (value: React.SetStateAction<UserRow>) => void, submitted: boolean) {
+    const onInputChange = (e: any, field: keyof UserRow) => {
         const value = e.target.value ?? ''; // Ensuring fallback to an empty string if value is undefined
         setRow((prevRow) => ({
             ...prevRow,

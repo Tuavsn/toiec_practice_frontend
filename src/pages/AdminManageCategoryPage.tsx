@@ -10,11 +10,10 @@ import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { useDataTable } from "../hooks/useDataTable";
 import React from "react";
 import { CustomBreadCrumb } from "../components/Common/Index";
-import { Category } from "../utils/types/type";
-import { Tag } from "primereact/tag";
+import { CategoryRow } from "../utils/types/type";
 import { useNavigate } from 'react-router-dom';
 import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar";
-import formatDate from "../utils/formatDateToString";
+import { timeStampBodyTemplate, statusBodyTemplate } from "../components/Common/Table/CommonColumn";
 
 
 
@@ -25,14 +24,13 @@ const breadCrumbItems = [
 ];
 
 export function AdminManageCategoryPage() {
-    const emptyCategory: Category = {
+    const emptyCategory: CategoryRow = {
         id: "",
         format: "vô danh",
         year: -9999,
         createdAt: new Date(),
         updatedAt: new Date(),
-        isActive: true,
-        testIds: []
+        isActive: true
     };
 
     const {
@@ -58,7 +56,7 @@ export function AdminManageCategoryPage() {
         confirmDeleteRow,
         setSelectedRows,
         setGlobalFilter
-    } = useDataTable<Category>("https://dummyjson.com/c/5667-8045-46d4-a86d", emptyCategory
+    } = useDataTable<CategoryRow>("https://dummyjson.com/c/5667-8045-46d4-a86d", emptyCategory
         , (state) => ({
             saveRow: () => {
                 state.setSubmitted(true);
@@ -117,7 +115,7 @@ export function AdminManageCategoryPage() {
                                 selectedRows={selectedRows}
                                 exportCSV={exportCSV}
                             />
-                            {GenericTable<Category>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, totalRecords, page, handleOnPage, editRow, confirmDeleteRow)}
+                            {GenericTable<CategoryRow>(renderColumns, dt, rows, true, selectedRows, globalFilter, setGlobalFilter, setSelectedRows, totalRecords, page, handleOnPage, editRow, confirmDeleteRow)}
                         </div>
                         {SimpleDialog(
                             dialogBody(row, setRow, submitted),
@@ -145,41 +143,9 @@ export default memo(AdminManageCategoryPage);
 // ------------------------------------- helper function---------------------------------------------------
 
 //--------------------- def columns---------------------------------
-function timeStampBodyTemplate(rowData: Category) {
-    return (
-        <Card className="flex align-items-center justify-content-start">
-            <div className="flex align-items-center">
-                <i className="pi pi-calendar-plus mr-2" style={{ color: 'slateblue' }}></i>
-                {formatDate(rowData.createdAt)}
-            </div>
-            <div className="flex align-items-center">
-                <i className="pi pi-pencil mr-2" style={{ color: 'red' }}></i>
-                {formatDate(rowData.updatedAt)}
-            </div>
-        </Card>
 
 
-    );
-};
-
-function getSeverity(category: Category) {
-    switch (category.isActive) {
-        case true:
-            return 'success';
-
-        case false:
-            return 'warning';
-        default:
-            return null;
-    }
-};
-
-function statusBodyTemplate(rowData: Category) {
-    return <Tag value={(rowData.isActive) + ""} severity={getSeverity(rowData)}></Tag>;
-};
-
-
-function TestsBodyTemplate(rowData: Category) {
+function TestsBodyTemplate(rowData: CategoryRow) {
     const navigate = useNavigate();
     const handleClick = () => {
         navigate('/dashboard/test?category_id=' + rowData.id)
@@ -195,8 +161,8 @@ function TestsBodyTemplate(rowData: Category) {
 
 //------------------------for dialog-------------------------------------
 
-function dialogBody(row: Category, setRow: (value: React.SetStateAction<Category>) => void, submitted: boolean) {
-    const onInputChange = (e: any, field: keyof Category) => {
+function dialogBody(row: CategoryRow, setRow: (value: React.SetStateAction<CategoryRow>) => void, submitted: boolean) {
+    const onInputChange = (e: any, field: keyof CategoryRow) => {
         const value = e.target.value ?? ''; // Ensuring fallback to an empty string if value is undefined
         setRow((prevRow) => ({
             ...prevRow,
