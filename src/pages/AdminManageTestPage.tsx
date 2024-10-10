@@ -1,6 +1,6 @@
 
 import React, { memo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { TestRow } from '../utils/types/type';
 import { Column } from 'primereact/column';
@@ -12,6 +12,7 @@ import { useDataTable } from '../hooks/useDataTable';
 import { timeStampBodyTemplate, statusBodyTemplate } from '../components/Common/Table/CommonColumn';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
+import { Button } from 'primereact/button';
 
 export function AdminManageTestPage() {
     const categoryID: string = new URLSearchParams(useLocation().search).get('category_id') ?? '';
@@ -87,11 +88,11 @@ export function AdminManageTestPage() {
         <Column key="col-selection" selectionMode="multiple" exportable={false} />,
         <Column key="col-id" field="id" header="ID" sortable filter style={{ minWidth: '12rem' }} />,
         <Column key="col-name" field="name" header="Name" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-totalTestAttempt" field="totalTestAttempt" header="total TestRow Attempt" sortable filter style={{ minWidth: '12rem' }} />,
+        <Column key="col-totalTestAttempt" field="totalTestAttempt" header="total Attempt" sortable filter style={{ minWidth: '12rem' }} />,
         <Column key="col-totalQuestion" field="totalQuestion" header="total Question" sortable filter style={{ minWidth: '12rem' }} />,
         <Column key="col-totalScore" field="totalScore" header="total Score" sortable filter style={{ minWidth: '12rem' }} />,
         <Column key="col-limitTime" field="limitTime" header="limit Time" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-questions" header="questions" sortable filter style={{ minWidth: '12rem' }} />,
+        <Column key="col-questions" header="questions" body={questionsBodyTemplate} />,
         <Column key="col-timestamp" header="Time stamp" body={timeStampBodyTemplate} sortable style={{ minWidth: '10rem' }} />,
         <Column key="col-isActive" field="isActive" header="status" sortable body={statusBodyTemplate} />,
     ];
@@ -138,6 +139,18 @@ export default memo(AdminManageTestPage);
 
 
 // ------------------------------------- helper function---------------------------------------------------
+
+
+function questionsBodyTemplate(rowData: TestRow) {
+    const navigate = useNavigate();
+    const handleClick = () => {
+        navigate('/dashboard/test/question?test_id=' + rowData.id)
+    };
+
+    return (
+        <Button severity="info" label='Chi Tiết' className="w-full text-center" onClick={handleClick}></Button>
+    )
+}
 
 //------------------------for dialog-------------------------------------
 
