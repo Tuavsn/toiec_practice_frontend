@@ -21,11 +21,19 @@ export interface Course extends DataTableValue {
   topic: string[];  // Array of topic names
   format: string;
   difficulty: number;
-  lecture: Lecture;
+  lecture: Lecture[];
   assignment: Assignment;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface CourseCard {
+  id: string,
+  name: string,
+  topic: string[],
+  format: string,
+  difficulty: number
 }
 
 export interface Lecture extends DataTableValue {

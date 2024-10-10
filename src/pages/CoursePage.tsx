@@ -5,15 +5,16 @@ import { InputText } from "primereact/inputtext";
 import { Paginator } from "primereact/paginator";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { CourseCard } from "../utils/types/type";
 export default function CoursePage() {
-    const courses = [
+    const courses: CourseCard[] = [
         {
             id: '1',
             name: 'Course Name 1',
             topic: ['Topic1', 'Topic2'],
             format: 'Online',
             difficulty: 4,
-            isActive: true,
+
         },
         {
             id: '2',
@@ -21,7 +22,7 @@ export default function CoursePage() {
             topic: ['Topic1', 'Topic3'],
             format: 'Offline',
             difficulty: 3,
-            isActive: false,
+
         },
         {
             id: '3',
@@ -29,7 +30,7 @@ export default function CoursePage() {
             topic: ['Topic2'],
             format: 'Hybrid',
             difficulty: 3,
-            isActive: true,
+
         },
         {
             id: '4',
@@ -37,7 +38,7 @@ export default function CoursePage() {
             topic: ['Topic4', 'Topic5'],
             format: 'Online',
             difficulty: 5,
-            isActive: true,
+
         },
     ];
 
@@ -122,9 +123,6 @@ export default function CoursePage() {
                             <p>
                                 <strong>Difficulty:</strong> {'★'.repeat(course.difficulty)}
                                 {'☆'.repeat(5 - course.difficulty)}
-                            </p>
-                            <p>
-                                <strong>Status:</strong> <span>{course.isActive ? 'Active' : 'Inactive'}</span>
                             </p>
                             <Button label="View Details" onClick={() => navigate(`/courses/${course.id}`)} />
                         </div>

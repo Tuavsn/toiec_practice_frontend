@@ -4,7 +4,7 @@ import formatDate from "../../../utils/formatDateToString";
 
 export function timeStampBodyTemplate<Model extends { createdAt: Date, updatedAt: Date }>(rowData: Model) {
     return (
-        <Card className="flex align-items-center justify-content-start">
+        <Card className="flex align-items-center justify-content-start p-0">
             <div className="flex align-items-center">
                 <i className="pi pi-calendar-plus mr-2" style={{ color: 'slateblue' }}></i>
                 {formatDate(rowData.createdAt)}
