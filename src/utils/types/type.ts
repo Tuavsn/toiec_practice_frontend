@@ -1,14 +1,5 @@
 import { DataTableValue } from "primereact/datatable";
 
-// Category Collection
-export interface CategoryRow extends DataTableValue {
-  id: string;
-  format: string;
-  year: number;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 export interface Category extends CategoryRow {
   tests: Test[];
@@ -28,13 +19,6 @@ export interface Course extends DataTableValue {
   updatedAt: Date;
 }
 
-export interface CourseCard {
-  id: string,
-  name: string,
-  topic: string[],
-  format: string,
-  difficulty: number
-}
 
 export interface Lecture extends DataTableValue {
   title: string;
@@ -118,35 +102,13 @@ export interface Permission extends DataTableValue {
   module: string;
 }
 
-// Test Collection
-export interface TestRow extends DataTableValue {
-  id: string;
-  name: string;
-  totalUserAttempt: number;
-  totalQuestion: number;
-  totalScore: number;
-  limitTime: number;
-  questions: Question[];  // List of questions
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+
 
 export interface Test extends TestRow {
   category: Category;  // Reference to Category
 }
 
-// User Collection
-export interface UserRow extends DataTableValue {
-  id: string;
-  email: string;
-  avatar: string;
-  roleName: string;
-  target: number;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+
 
 export interface User extends UserRow {
   refreshToken: string;
@@ -162,4 +124,61 @@ export interface TestAttempt extends DataTableValue {
 export interface LearningProgress extends DataTableValue {
   courses: Course[];  // List of Courses
   isCompleted: boolean;
+}
+
+//-----------------------------------------------------------------------------------------------------------------
+
+export interface CourseCard {
+  id: string,
+  name: string,
+  topic: string[],
+  format: string,
+  difficulty: number
+}
+export interface CategoryRow extends DataTableValue {
+  id: string;
+  format: string;
+  year: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Test Collection
+export interface TestRow extends DataTableValue {
+  id: string;
+  name: string;
+  totalUserAttempt: number;
+  totalQuestion: number;
+  totalScore: number;
+  limitTime: number;
+  questions: Question[];  // List of questions
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// User Collection
+export interface UserRow extends DataTableValue {
+  id: string;
+  email: string;
+  avatar: string;
+  roleName: string;
+  target: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface PracticeQuest {
+  questionNum: number,
+  type: 'single' | 'group' | 'subquestion';
+  subQuestions: PracticeQuest[];  // List of subquestions
+  content: string;
+  resources: Resource[];
+  transcript: string;
+  explanation: string;
+  answers: string[];  // Array of answers
+  correctAnswer: string;
+
 }

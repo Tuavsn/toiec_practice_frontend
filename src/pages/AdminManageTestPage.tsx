@@ -1,6 +1,6 @@
 
 import React, { memo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { TestRow } from '../utils/types/type';
 import { Column } from 'primereact/column';
@@ -15,7 +15,8 @@ import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
 
 export function AdminManageTestPage() {
-    const categoryID: string = new URLSearchParams(useLocation().search).get('category_id') ?? '';
+    // const categoryID: string = new URLSearchParams(useLocation().search).get('category_id') ?? '';
+    const { category_id } = useParams<{ category_id: string }>();
     const emptyTest: TestRow = {
         id: '',
         name: '',
