@@ -7,6 +7,7 @@ import { Link, useParams } from 'react-router-dom';
 import { PracticeQuest, Resource } from '../utils/types/type';
 import { Image } from 'primereact/image';
 import { Paginator } from 'primereact/paginator';
+import { Button } from 'primereact/button';
 const CourseDetailsPage: React.FC = () => {
     const { id = "" } = useParams<{ id: string }>(); // Access course ID from URL params
     const [activeIndex, setActiveIndex] = useState<number | number[]>(0);
@@ -65,6 +66,10 @@ const CourseDetailsPage: React.FC = () => {
                                 <span className='m-0'>
                                     {questionElement[first]}
                                 </span>
+                                <div className='flex justify-content-end'>
+                                    
+                                    <Button severity='success' label="Nộp Bài"></Button>
+                                </div>
                                 <Paginator first={first} rows={rows} totalRecords={questionElement.length} onPageChange={onPageChange} />
 
 
