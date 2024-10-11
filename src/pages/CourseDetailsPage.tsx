@@ -12,11 +12,9 @@ const CourseDetailsPage: React.FC = () => {
     const { id = "" } = useParams<{ id: string }>(); // Access course ID from URL params
     const [activeIndex, setActiveIndex] = useState<number | number[]>(0);
     const [first, setFirst] = useState(0);
-    const [rows, setRows] = useState(1);
     const questionElement: JSX.Element[] = ConvertAllToHTML(GetFakeData());
     const onPageChange = (event: { first: React.SetStateAction<number>; rows: React.SetStateAction<number>; }) => {
         setFirst(event.first);
-        setRows(event.rows);
 
     };
 
@@ -67,10 +65,10 @@ const CourseDetailsPage: React.FC = () => {
                                     {questionElement[first]}
                                 </span>
                                 <div className='flex justify-content-end'>
-                                    
+
                                     <Button severity='success' label="Nộp Bài"></Button>
                                 </div>
-                                <Paginator first={first} rows={rows} totalRecords={questionElement.length} onPageChange={onPageChange} />
+                                <Paginator first={first} rows={1} totalRecords={questionElement.length} onPageChange={onPageChange} />
 
 
 
