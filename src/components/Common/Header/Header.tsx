@@ -12,6 +12,7 @@ export default function Header() {
         { label:'Trang chủ' , icon: 'pi pi-home', command: () => navigate('/home')},
         { label:'Khóa học' , icon: 'pi pi-book', command: () => navigate('/course')},
         { label:'Đề thi' , icon: 'pi pi-folder', command: () => navigate('/test')},
+        { label:'Điểm' , icon: 'pi pi-book', command: () => navigate('/score')},
         { label:'Dashboard' , icon: 'pi pi-cog', command: () => navigate('/dashboard')},
     ]
 

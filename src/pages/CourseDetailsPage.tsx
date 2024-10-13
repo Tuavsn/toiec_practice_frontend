@@ -24,7 +24,7 @@ const CourseDetailsPage: React.FC = () => {
             <h2>Course Details for ID: {id}</h2>
             <div className='flex flex-column md:flex-row'>
                 <main className='align-items-center justify-content-center border-round m-2' style={{ minWidth: '70%' }}>
-                    <Card>
+                    <Card className='shadow-8'>
                         <h1>Lý thuyết</h1>
                         <Accordion activeIndex={activeIndex} onTabChange={(e) => {
                             setActiveIndex(e.index); LoadLessons(e.index as number, id);
@@ -57,7 +57,7 @@ const CourseDetailsPage: React.FC = () => {
 
                     </Card>
                     <br></br>
-                    <Card>
+                    <Card className='shadow-7'>
                         <h1>Bài tập</h1>
                         <Accordion activeIndex={0}>
                             <AccordionTab header={headerTemplate}>
@@ -94,7 +94,7 @@ const CourseDetailsPage: React.FC = () => {
                     </Card>
                 </main>
                 <aside className='align-items-center justify-content-center border-round m-2' style={{ minWidth: '28%' }}>
-                    <Card>
+                    <Card className='shadow-6'>
                         <h1 className='text-center'>Một số khóa học khác</h1>
                         {RelateCoursesTemplate()}
                     </Card>
@@ -137,7 +137,7 @@ function LoadLessons(lessonPosition: number | null, course: string): void {
 function RelateCoursesTemplate() {
     return (
         <React.Fragment>
-            <Link to={''}>
+            <Link className='hover:shadow-2' to={''}>
                 Khóa làm chủ ★★★☆☆
             </Link>
             <Divider />
