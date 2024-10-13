@@ -8,6 +8,7 @@ import CoursePage from "./CoursePage"
 import NotFoundPage from "./NotFoundPage"
 import AdminManageCategoryPage from "./AdminManageCategoryPage"
 import CourseDetailsPage from "./CourseDetailsPage"
+import ToeicScorePage from "./ToeicScoreTable"
 export {
     HomePage,
     AdminDashboardPage,
@@ -18,5 +19,6 @@ export {
     CoursePage,
     NotFoundPage,
     AdminManageCategoryPage,
-    CourseDetailsPage
+    CourseDetailsPage,
+    ToeicScorePage
 }

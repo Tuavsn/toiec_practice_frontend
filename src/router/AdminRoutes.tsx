@@ -4,6 +4,7 @@ import { AdminManageCategoryPage } from "../pages/AdminManageCategoryPage";
 import AdminManageTestPage from "../pages/AdminManageTestPage";
 import TempAdminPage from "../pages/TempAdminPage";
 import { AdminManageAccountPage } from "../pages/AdminManageAccount";
+import { AdminManageCoursePage } from "../pages/AdminManageCoursePage";
 
 export default function AdminRoutes() {
     return (
@@ -13,6 +14,7 @@ export default function AdminRoutes() {
             <Route path="category" element={<AdminManageCategoryPage />} />
             <Route path="test" element={<AdminManageTestPage />} />
             <Route path="account" element={<AdminManageAccountPage/>} />
+            <Route path="course" element={<AdminManageCoursePage/>} />
             <Route path="user-analyst" element={TempAdminPage("thống kê người dùng")} />
             <Route path="notify" element={TempAdminPage("notify")} />
             <Route path="chat" element={TempAdminPage("chat")} />

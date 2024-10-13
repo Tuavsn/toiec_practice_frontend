@@ -7,7 +7,8 @@ import {
     TestReviewPage,
     CoursePage,
     NotFoundPage,
-    CourseDetailsPage
+    CourseDetailsPage,
+    ToeicScorePage
 } from "../pages/Index";
 
 export default function UserRoutes() {
@@ -28,6 +29,7 @@ export default function UserRoutes() {
             <Route path="/course" element={<CoursePage />} />
             <Route path="/courses/:id" element={<CourseDetailsPage />} />F
 
+            <Route path="/score" element={<ToeicScorePage />} />
             {/* NotFound Page */}
             <Route path="*" element={<NotFoundPage />} />
         </Routes>

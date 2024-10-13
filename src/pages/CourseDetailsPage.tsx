@@ -7,15 +7,14 @@ import { Link, useParams } from 'react-router-dom';
 import { PracticeQuest, Resource } from '../utils/types/type';
 import { Image } from 'primereact/image';
 import { Paginator } from 'primereact/paginator';
+import { Button } from 'primereact/button';
 const CourseDetailsPage: React.FC = () => {
     const { id = "" } = useParams<{ id: string }>(); // Access course ID from URL params
     const [activeIndex, setActiveIndex] = useState<number | number[]>(0);
     const [first, setFirst] = useState(0);
-    const [rows, setRows] = useState(1);
     const questionElement: JSX.Element[] = ConvertAllToHTML(GetFakeData());
     const onPageChange = (event: { first: React.SetStateAction<number>; rows: React.SetStateAction<number>; }) => {
         setFirst(event.first);
-        setRows(event.rows);
 
     };
 
@@ -25,7 +24,7 @@ const CourseDetailsPage: React.FC = () => {
             <h2>Course Details for ID: {id}</h2>
             <div className='flex flex-column md:flex-row'>
                 <main className='align-items-center justify-content-center border-round m-2' style={{ minWidth: '70%' }}>
-                    <Card>
+                    <Card className='shadow-8'>
                         <h1>Lý thuyết</h1>
                         <Accordion activeIndex={activeIndex} onTabChange={(e) => {
                             setActiveIndex(e.index); LoadLessons(e.index as number, id);
@@ -58,14 +57,18 @@ const CourseDetailsPage: React.FC = () => {
 
                     </Card>
                     <br></br>
-                    <Card>
+                    <Card className='shadow-7'>
                         <h1>Bài tập</h1>
                         <Accordion activeIndex={0}>
                             <AccordionTab header={headerTemplate}>
                                 <span className='m-0'>
                                     {questionElement[first]}
                                 </span>
-                                <Paginator first={first} rows={rows} totalRecords={120} rowsPerPageOptions={[10, 20, 30]} onPageChange={onPageChange} />
+                                <div className='flex justify-content-end'>
+
+                                    <Button severity='success' label="Nộp Bài"></Button>
+                                </div>
+                                <Paginator first={first} rows={1} totalRecords={questionElement.length} onPageChange={onPageChange} />
 
 
 
@@ -91,7 +94,7 @@ const CourseDetailsPage: React.FC = () => {
                     </Card>
                 </main>
                 <aside className='align-items-center justify-content-center border-round m-2' style={{ minWidth: '28%' }}>
-                    <Card>
+                    <Card className='shadow-6'>
                         <h1 className='text-center'>Một số khóa học khác</h1>
                         {RelateCoursesTemplate()}
                     </Card>
@@ -134,7 +137,7 @@ function LoadLessons(lessonPosition: number | null, course: string): void {
 function RelateCoursesTemplate() {
     return (
         <React.Fragment>
-            <Link to={''}>
+            <Link className='hover:shadow-2' to={''}>
                 Khóa làm chủ ★★★☆☆
             </Link>
             <Divider />
