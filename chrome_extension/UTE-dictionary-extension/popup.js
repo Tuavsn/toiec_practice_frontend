@@ -46,6 +46,7 @@ function displayDefinition(data) {
               const audioLink = document.createElement('audio');
               audioLink.controls = true;
               audioLink.src = phonetic.audio;
+              audioLink.style = "width:90%";
               phoneticsElement.appendChild(audioLink);
           }
       });
