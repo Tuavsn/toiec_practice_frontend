@@ -36,7 +36,7 @@ function Info() {
     return (
         <>
             <div className="py-6">
-                <h2 className="text-center">Chỉ có tại <a href="/home"><span style={{color: "#004B8D"}}>UTE TOIEC</span> <span style={{color: "#FF5757"}}>Practice</span></a></h2>
+                <h2 className="text-center">Chỉ có tại <a href="/home"><span style={{color: "#004B8D"}}>UTE TOEIC</span> <span style={{color: "#FF5757"}}>Practice</span></a></h2>
                 <div className="grid">
                     <div className="col">
                         <Card className="p-4 h-full" header={(
@@ -46,7 +46,7 @@ function Info() {
                             </div>
                         )}>
                             <p className="m-0">
-                            Hệ thống bài giảng phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOIEC.
+                            Hệ thống bài giảng phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOEIC.
                             </p>
                         </Card>
                     </div>
@@ -70,7 +70,7 @@ function Info() {
                             </div>
                         )}>
                             <p className="m-0">
-                            ToiecPractice cung cấp hệ thống chấm điểm bài thi chính xác kết hợp với hệ thống phân tích mạnh mẽ.
+                            TOEIC Practice cung cấp hệ thống chấm điểm bài thi chính xác kết hợp với hệ thống phân tích mạnh mẽ.
                             </p>
                         </Card>
                     </div>
@@ -87,7 +87,7 @@ function Info() {
                     <div className="col-8">
                         <div className="grid">
                             <div className="col-12">
-                                <h2><a href="/home"><span style={{color: "#004B8D"}}>UTE TOIEC</span> <span style={{color: "#FF5757"}}>Practice</span></a> đã có mặt trên nhiều nền tảng</h2>
+                                <h2><a href="/home"><span style={{color: "#004B8D"}}>UTE TOEIC</span> <span style={{color: "#FF5757"}}>Practice</span></a> đã có mặt trên nhiều nền tảng</h2>
                             </div>
                             <div className="col-12">
                                 <div className="grid">
@@ -117,7 +117,7 @@ function Info() {
                 <Card className="py-4 px-4">
                     <div className="flex gap-4 justify-content-center mb-4">
                         <img className="max-w-4rem" src={roadmap}/>
-                        <h2>Lộ trình học tập tại <a href="/home"><span style={{color: "#004B8D"}}>UTE TOIEC</span> <span style={{color: "#FF5757"}}>Practice</span></a></h2>
+                        <h2>Lộ trình học tập tại <a href="/home"><span style={{color: "#004B8D"}}>UTE TOEIC</span> <span style={{color: "#FF5757"}}>Practice</span></a></h2>
                     </div>
                     <Steps className="mb-4" model={[
                         {
@@ -151,7 +151,7 @@ function News() {
                             </div>
                         )}>
                             <p className="m-0">
-                            Hệ thống bài giảng phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOIEC.
+                            Hệ thống bài giảng phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOEIC.
                             </p>
                         </Card>
                     </div>
@@ -175,7 +175,7 @@ function News() {
                             </div>
                         )}>
                             <p className="m-0">
-                            ToiecPractice cung cấp hệ thống chấm điểm bài thi chính xác kết hợp với hệ thống phân tích mạnh mẽ.
+                            TOEIC Practice cung cấp hệ thống chấm điểm bài thi chính xác kết hợp với hệ thống phân tích mạnh mẽ.
                             </p>
                         </Card>
                     </div>
@@ -193,7 +193,7 @@ function News() {
                             </div>
                         )}>
                             <p className="m-0">
-                            Hệ thống bài giảng phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOIEC.
+                            Hệ thống bài giảng phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOEIC.
                             </p>
                         </Card>
                     </div>
@@ -217,7 +217,7 @@ function News() {
                             </div>
                         )}>
                             <p className="m-0">
-                            ToiecPractice cung cấp hệ thống chấm điểm bài thi chính xác kết hợp với hệ thống phân tích mạnh mẽ.
+                            TOEIC Practice cung cấp hệ thống chấm điểm bài thi chính xác kết hợp với hệ thống phân tích mạnh mẽ.
                             </p>
                         </Card>
                     </div>
