@@ -14,6 +14,7 @@ import { CategoryRow } from "../utils/types/type";
 import { useNavigate } from 'react-router-dom';
 import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar";
 import { timeStampBodyTemplate, statusBodyTemplate } from "../components/Common/Table/CommonColumn";
+import { Calendar } from "primereact/calendar";
 
 
 
@@ -27,7 +28,7 @@ export function AdminManageCategoryPage() {
     const emptyCategory: CategoryRow = {
         id: "",
         format: "vô danh",
-        year: -9999,
+        year: 2020,
         createdAt: new Date(),
         updatedAt: new Date(),
         isActive: true
@@ -173,9 +174,9 @@ function dialogBody(row: CategoryRow, setRow: (value: React.SetStateAction<Categ
     return (
 
         <div className="field">
-            <label htmlFor="name" className="font-bold">Name</label>
+            <label htmlFor="format" className="font-bold">Format</label>
             <InputText
-                id="name"
+                id="format"
                 value={row.format}
                 onChange={(e) => onInputChange(e, 'format')}
                 required
@@ -183,7 +184,19 @@ function dialogBody(row: CategoryRow, setRow: (value: React.SetStateAction<Categ
                 className={classNames({ 'p-invalid': submitted && !row.format })}
             />
             {submitted && !row.format && <small className="p-error">format is required.</small>}
-        </div>
+            <Calendar
+                value={row.year ? new Date(row.year, 0, 1) : null}  // Convert year number to Date object (Jan 1st)
+                onChange={(e) => {
+                    const selectedYear = e.value?.getFullYear() ?? null;
+                    if (selectedYear !== null) {
+                        row.year = selectedYear;  // Update row.year directly
+                    }
+                }}
+                view="year"
+                dateFormat="yy"
+                placeholder="Select Year"
+            />
+        </div >
 
     )
 }

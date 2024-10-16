@@ -1,6 +1,6 @@
 
 import React, { memo } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { TestRow } from '../utils/types/type';
 import { Column } from 'primereact/column';
@@ -15,17 +15,16 @@ import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
 
 export function AdminManageTestPage() {
-    // const categoryID: string = new URLSearchParams(useLocation().search).get('category_id') ?? '';
-    const { category_id } = useParams<{ category_id: string }>();
+    const { category_id = "no idCategory found" } = useParams<{ category_id: string }>();
     const emptyTest: TestRow = {
         id: '',
         name: '',
         isActive: true,
+        idCategory: category_id,
         totalTestAttempt: 0,
         totalQuestion: 0,
         totalScore: 0,
         limitTime: 0,
-        questions: [],
         totalUserAttempt: 0,
         createdAt: new Date(),
         updatedAt: new Date()

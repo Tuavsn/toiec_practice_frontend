@@ -128,6 +128,11 @@ export interface LearningProgress extends DataTableValue {
 
 //-----------------------------------------------------------------------------------------------------------------
 
+export interface CategoryLabel {
+  format: string;
+  year: number[];
+}
+
 export interface CourseCard {
   id: string,
   name: string,
@@ -135,6 +140,14 @@ export interface CourseCard {
   format: string,
   difficulty: number
 }
+
+export interface TestCard {
+  id: string;
+  format: string;
+  year: number;
+  name: string;
+}
+
 export interface CategoryRow extends DataTableValue {
   id: string;
   format: string;
@@ -151,8 +164,8 @@ export interface TestRow extends DataTableValue {
   totalUserAttempt: number;
   totalQuestion: number;
   totalScore: number;
+  idCategory: string;
   limitTime: number;
-  questions: Question[];  // List of questions
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;

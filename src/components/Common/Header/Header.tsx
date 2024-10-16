@@ -1,4 +1,3 @@
-import { InputText } from "primereact/inputtext"
 import Logo from "../../../assets/Header-Logo.png"
 import { Menubar } from "primereact/menubar"
 import LoginDialog from "../LoginDialog/LoginDialog"
@@ -12,17 +11,16 @@ export default function Header() {
         { label:'Trang chủ' , icon: 'pi pi-home', command: () => navigate('/home')},
         { label:'Khóa học' , icon: 'pi pi-book', command: () => navigate('/course')},
         { label:'Đề thi' , icon: 'pi pi-folder', command: () => navigate('/test')},
-        { label:'Điểm' , icon: 'pi pi-book', command: () => navigate('/score')},
+        { label:'Tra cứu' , icon: 'pi pi-book', command: () => navigate('/lookup')},
         { label:'Dashboard' , icon: 'pi pi-cog', command: () => navigate('/dashboard')},
     ]
 
     const HeaderStart = <img src={Logo} height={70} alt="Logo" />
 
     const HeaderEnd = (
-        <div className="flex align-items-center gap-2">
-            <InputText placeholder="Search" type="text" className="w-8rem sm:w-auto" />
+     
             <LoginDialog />
-        </div>
+    
     )
 
     return (

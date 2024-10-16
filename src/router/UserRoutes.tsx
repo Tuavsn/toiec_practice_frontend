@@ -8,7 +8,7 @@ import {
     CoursePage,
     NotFoundPage,
     CourseDetailsPage,
-    ToeicScorePage
+    LookUpPage
 } from "../pages/Index";
 
 export default function UserRoutes() {
@@ -29,7 +29,7 @@ export default function UserRoutes() {
             <Route path="/course" element={<CoursePage />} />
             <Route path="/courses/:id" element={<CourseDetailsPage />} />F
 
-            <Route path="/score" element={<ToeicScorePage />} />
+            <Route path="/lookup" element={<LookUpPage />} />
             {/* NotFound Page */}
             <Route path="*" element={<NotFoundPage />} />
         </Routes>
