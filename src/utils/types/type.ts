@@ -128,6 +128,11 @@ export interface LearningProgress extends DataTableValue {
 
 //-----------------------------------------------------------------------------------------------------------------
 
+export interface CategoryLabel {
+  format: string;
+  year: number[];
+}
+
 export interface CourseCard {
   id: string,
   name: string,
@@ -135,6 +140,14 @@ export interface CourseCard {
   format: string,
   difficulty: number
 }
+
+export interface TestCard {
+  id: string;
+  format: string;
+  year: number;
+  name: string;
+}
+
 export interface CategoryRow extends DataTableValue {
   id: string;
   format: string;
@@ -151,8 +164,8 @@ export interface TestRow extends DataTableValue {
   totalUserAttempt: number;
   totalQuestion: number;
   totalScore: number;
+  idCategory: string;
   limitTime: number;
-  questions: Question[];  // List of questions
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -170,15 +183,46 @@ export interface UserRow extends DataTableValue {
   updatedAt: Date;
 }
 
-export interface PracticeQuest {
+export interface CheatEntry {
   questionNum: number,
   type: 'single' | 'group' | 'subquestion';
-  subQuestions: PracticeQuest[];  // List of subquestions
+  subQuestions: CheatEntry[];  // List of subquestions
   content: string;
   resources: Resource[];
   transcript: string;
   explanation: string;
   answers: string[];  // Array of answers
   correctAnswer: string;
+}
 
+export interface UserResultRow {
+  id: string,
+  createdAt: Date,
+  totalCorrectAnswer: number,
+  totalTime: number,
+  type: 'practice' | 'fulltest';
+  parts: number[];  // Practice parts
+}
+// ------------------------- tham số truyền
+export interface SimpleTimeCountDownProps {
+  timeLeftInSecond: number;
+  onTimeUp: () => void;
+}
+
+export interface UserAnswerSheetProps {
+  currentPageIndex: number,
+  mappingQuestionsWithPage: number[],
+  setCurrentPageIndex: React.Dispatch<React.SetStateAction<number>>,
+  userAnswerSheet: string[],
+  visible: boolean,
+  setVisible: React.Dispatch<React.SetStateAction<boolean>>,
+  GetButtonColor: (answer: string,isOnPage:boolean) => "info" | "secondary" | "help" | "success" | "warning" | "danger" | "contrast" | undefined
+}
+
+export interface TestAreaProps{
+  parts: string,
+  resourcesElement: JSX.Element[],
+  questionsElement: JSX.Element[],
+  currentPageIndex: number,
+  changePage: (offset: number) => void
 }

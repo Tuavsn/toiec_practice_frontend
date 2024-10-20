@@ -8,7 +8,8 @@ import {
     CoursePage,
     NotFoundPage,
     CourseDetailsPage,
-    ToeicScorePage
+    LookUpPage,
+    DoTestPage
 } from "../pages/Index";
 
 export default function UserRoutes() {
@@ -23,13 +24,15 @@ export default function UserRoutes() {
             <Route path="/test" element={<TestPage />} />
             {/* Test Detail Page */}
             <Route path="/test/:id" element={<TestDetailPage />} />
+             {/* Do Test  Page */}
+             <Route path="/dotest/:id/:parts" element={<DoTestPage />} />
             {/* Test Review Page */}
             <Route path="/test/:id/review" element={<TestReviewPage />} />
             {/* Flash Card Page */}
             <Route path="/course" element={<CoursePage />} />
             <Route path="/courses/:id" element={<CourseDetailsPage />} />F
 
-            <Route path="/score" element={<ToeicScorePage />} />
+            <Route path="/lookup" element={<LookUpPage />} />
             {/* NotFound Page */}
             <Route path="*" element={<NotFoundPage />} />
         </Routes>

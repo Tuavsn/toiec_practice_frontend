@@ -73,7 +73,7 @@ export function useDataTable<Model extends DataTableValue>(
     });
 
     // Fetch data from server
-    const fetchData = async (pageNumber: number, _pageSize: number) => {
+    const fetchData = async (_pageNumber: number, _pageSize: number) => {
         try {
             const response = await fetch(urlApi);
 

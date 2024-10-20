@@ -40,6 +40,76 @@ export default function CoursePage() {
             difficulty: 5,
 
         },
+        {
+            id: '5',
+            name: 'Course Name 5',
+            topic: ['Topic1', 'Topic6'],
+            format: 'Online',
+            difficulty: 2,
+        },
+        {
+            id: '6',
+            name: 'Course Name 6',
+            topic: ['Topic2', 'Topic3'],
+            format: 'Offline',
+            difficulty: 4,
+        },
+        {
+            id: '7',
+            name: 'Course Name 7',
+            topic: ['Topic5'],
+            format: 'Hybrid',
+            difficulty: 3,
+        },
+        {
+            id: '8',
+            name: 'Course Name 8',
+            topic: ['Topic6', 'Topic7'],
+            format: 'Online',
+            difficulty: 5,
+        },
+        {
+            id: '9',
+            name: 'Course Name 9',
+            topic: ['Topic1', 'Topic4'],
+            format: 'Offline',
+            difficulty: 3,
+        },
+        {
+            id: '10',
+            name: 'Course Name 10',
+            topic: ['Topic3', 'Topic7'],
+            format: 'Hybrid',
+            difficulty: 2,
+        },
+        {
+            id: '11',
+            name: 'Course Name 11',
+            topic: ['Topic5'],
+            format: 'Online',
+            difficulty: 4,
+        },
+        {
+            id: '12',
+            name: 'Course Name 12',
+            topic: ['Topic2', 'Topic6'],
+            format: 'Offline',
+            difficulty: 5,
+        },
+        {
+            id: '13',
+            name: 'Course Name 13',
+            topic: ['Topic7', 'Topic3'],
+            format: 'Hybrid',
+            difficulty: 3,
+        },
+        {
+            id: '14',
+            name: 'Course Name 14',
+            topic: ['Topic4', 'Topic1'],
+            format: 'Online',
+            difficulty: 1,
+        },
     ];
 
     const formatOptions = [

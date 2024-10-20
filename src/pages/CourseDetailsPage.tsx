@@ -4,15 +4,16 @@ import { Divider } from 'primereact/divider';
 import { Tag } from 'primereact/tag';
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { PracticeQuest, Resource } from '../utils/types/type';
-import { Image } from 'primereact/image';
+import { CheatEntry } from '../utils/types/type';
+
 import { Paginator } from 'primereact/paginator';
 import { Button } from 'primereact/button';
+import ConvertCheatSheetToHTML from '../utils/convertCheatSheetToHTML';
 const CourseDetailsPage: React.FC = () => {
     const { id = "" } = useParams<{ id: string }>(); // Access course ID from URL params
     const [activeIndex, setActiveIndex] = useState<number | number[]>(0);
     const [first, setFirst] = useState(0);
-    const questionElement: JSX.Element[] = ConvertAllToHTML(GetFakeData());
+    const [resourcesElement, questionElement] = ConvertCheatSheetToHTML(GetFakeData());
     const onPageChange = (event: { first: React.SetStateAction<number>; rows: React.SetStateAction<number>; }) => {
         setFirst(event.first);
 
@@ -62,6 +63,7 @@ const CourseDetailsPage: React.FC = () => {
                         <Accordion activeIndex={0}>
                             <AccordionTab header={headerTemplate}>
                                 <span className='m-0'>
+                                    {resourcesElement[first]}
                                     {questionElement[first]}
                                 </span>
                                 <div className='flex justify-content-end'>
@@ -157,105 +159,9 @@ function RelateCoursesTemplate() {
 
 }
 
-function ConvertAllToHTML(questions: PracticeQuest[]): JSX.Element[] {
-
-    const questionSections: JSX.Element[] = [];
-    let questionNum: number = 1;
-    for (const q of questions) {
-        const elements: JSX.Element[] = [];
-        elements.push(...ResourcesToHTML(q.resources, questionNum));
-        if (q.type !== 'group') {
-            elements.push(<h5 key={"h5" + questionNum}>{questionNum}.{q.content}</h5>);
-            questionNum += 1;
-            elements.push(AnswersToHTML(q.answers, questionNum));
-        }
-        else {
-            elements.push(<h3 key={"group" + questionNum}>{q.content}</h3>);
-            for (const sq of q.subQuestions) {
-                elements.push(<h5 key={"h5" + questionNum}>{questionNum}.{sq.content}</h5>);
-                questionNum += 1;
-                elements.push(...ResourcesToHTML(sq.resources, questionNum));
-                elements.push(AnswersToHTML(sq.answers, questionNum));
-            }
-        }
-        questionSections.push(
-            <section key={"question" + questionNum}>
-                {elements}
-            </section>
-        )
-    }
-
-    // elements.forEach((element, index) => {
-    //     console.log(`Element ${index} key:`, element.key ?? "is"+JSON.stringify(element.type));
-    // });
 
 
-    return questionSections;
-
-}
-
-
-
-function AnswersToHTML(answers: string[], qNum: number): JSX.Element {
-    return (
-        <div key={"answer" + qNum} className="flex flex-column gap-3 my-3">
-            {answers.map((answer, index) => {
-                return (
-                    <div key={"answerbox" + index} className="flex align-items-center">
-                        <input
-                            style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }}
-                            type="radio"
-                            id={"id" + qNum + index} // Unique ID for each radio button
-                            name={`answer-${qNum}`}   // Use a unique name for grouping per question
-                            value={answer}            // Value of the radio button
-                            onChange={() => alert("Chọn phương án: " + answer)} // Change event
-                        />
-                        <label htmlFor={"id" + qNum + index} style={{ marginLeft: '8px' }}>
-                            {answer}
-                        </label>
-                    </div>
-                );
-            })}
-            <div hidden key={"default"} className="flex align-items-center" style={{ display: 'none' }}>
-                <input type="radio" id={"default" + qNum} name={`answer-${qNum}`} hidden />
-            </div>
-        </div>
-    );
-}
-
-
-function ResourcesToHTML(resources: Resource[], qNum: number): JSX.Element[] {
-    const resourcesElement: JSX.Element[] = [];
-    resources.forEach(
-        (r, index) => {
-            switch (r.type) {
-                case 'paragraph':
-                    resourcesElement.push(<Card key={"para" + qNum.toString() + index} style={{ borderStyle: 'dotted', borderColor: 'lavender' }} ><p >{r.content}</p></Card>)
-                    break;
-                case 'image':
-                    resourcesElement.push(
-                        <div key={"img" + qNum.toString() + index} className="p-3 text-center"> <Image src={r.content} indicatorIcon={<i className="pi pi-search"></i>} alt="Image" preview loading='lazy' /> </div>
-                    )
-                    break;
-                case 'audio':
-                    resourcesElement.unshift(
-                        <audio key={"audio" + qNum + index.toString()} className='w-full' controls autoPlay={false}>
-                            <source src={r.content} type="audio/mpeg" />
-                            Your browser does not support the audio element.
-                        </audio>
-                    )
-                    break;
-                default:
-                    console.error("not have that: ", r.type);
-                    break;
-            }
-        }
-    )
-
-    return resourcesElement;
-}
-
-function GetFakeData(): PracticeQuest[] {
+function GetFakeData(): CheatEntry[] {
     return [
         {
             questionNum: 1,

@@ -6,7 +6,7 @@ import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { GenericTable } from "../components/Common/Index";
 import { UserRow } from "../utils/types/type";
 import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar"
-import { useDataTable } from "../hooks/useDataTable";
+import { useDataTable } from "../hooks/GenericDataTableHook";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
