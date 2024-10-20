@@ -80,7 +80,7 @@ export default function TestPage() {
                                 <strong>Năm:</strong> {testCard.year}
                             </p>
 
-                            <Button label="View Details" onClick={() => navigate(`/courses/${testCard.id}`)} />
+                            <Button label="View Details" onClick={() => navigate(`/test/${testCard.id}`)} />
                         </div>
                     </Card>
 

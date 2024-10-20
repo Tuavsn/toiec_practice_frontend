@@ -183,15 +183,46 @@ export interface UserRow extends DataTableValue {
   updatedAt: Date;
 }
 
-export interface PracticeQuest {
+export interface CheatEntry {
   questionNum: number,
   type: 'single' | 'group' | 'subquestion';
-  subQuestions: PracticeQuest[];  // List of subquestions
+  subQuestions: CheatEntry[];  // List of subquestions
   content: string;
   resources: Resource[];
   transcript: string;
   explanation: string;
   answers: string[];  // Array of answers
   correctAnswer: string;
+}
 
+export interface UserResultRow {
+  id: string,
+  createdAt: Date,
+  totalCorrectAnswer: number,
+  totalTime: number,
+  type: 'practice' | 'fulltest';
+  parts: number[];  // Practice parts
+}
+// ------------------------- tham số truyền
+export interface SimpleTimeCountDownProps {
+  timeLeftInSecond: number;
+  onTimeUp: () => void;
+}
+
+export interface UserAnswerSheetProps {
+  currentPageIndex: number,
+  mappingQuestionsWithPage: number[],
+  setCurrentPageIndex: React.Dispatch<React.SetStateAction<number>>,
+  userAnswerSheet: string[],
+  visible: boolean,
+  setVisible: React.Dispatch<React.SetStateAction<boolean>>,
+  GetButtonColor: (answer: string,isOnPage:boolean) => "info" | "secondary" | "help" | "success" | "warning" | "danger" | "contrast" | undefined
+}
+
+export interface TestAreaProps{
+  parts: string,
+  resourcesElement: JSX.Element[],
+  questionsElement: JSX.Element[],
+  currentPageIndex: number,
+  changePage: (offset: number) => void
 }

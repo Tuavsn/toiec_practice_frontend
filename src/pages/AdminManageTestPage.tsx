@@ -8,7 +8,7 @@ import { Toast } from 'primereact/toast';
 import { SimpleDialog } from '../components/Common/Dialog/SimpleDialog';
 import { GenericTable } from '../components/Common/Index';
 import { SimpleToolBar } from '../components/Common/ToolBar/ToolBar';
-import { useDataTable } from '../hooks/useDataTable';
+import { useDataTable } from '../hooks/GenericDataTableHook';
 import { timeStampBodyTemplate, statusBodyTemplate } from '../components/Common/Table/CommonColumn';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';

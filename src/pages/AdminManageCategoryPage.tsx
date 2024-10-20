@@ -7,7 +7,7 @@ import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
 import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
-import { useDataTable } from "../hooks/useDataTable";
+import { useDataTable } from "../hooks/GenericDataTableHook";
 import React from "react";
 import { CustomBreadCrumb } from "../components/Common/Index";
 import { CategoryRow } from "../utils/types/type";

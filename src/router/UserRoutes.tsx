@@ -8,7 +8,8 @@ import {
     CoursePage,
     NotFoundPage,
     CourseDetailsPage,
-    LookUpPage
+    LookUpPage,
+    DoTestPage
 } from "../pages/Index";
 
 export default function UserRoutes() {
@@ -23,6 +24,8 @@ export default function UserRoutes() {
             <Route path="/test" element={<TestPage />} />
             {/* Test Detail Page */}
             <Route path="/test/:id" element={<TestDetailPage />} />
+             {/* Do Test  Page */}
+             <Route path="/dotest/:id/:parts" element={<DoTestPage />} />
             {/* Test Review Page */}
             <Route path="/test/:id/review" element={<TestReviewPage />} />
             {/* Flash Card Page */}

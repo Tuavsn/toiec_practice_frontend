@@ -1,0 +1,15 @@
+/* CustomScrollPanel.css */
+
+.custom-scrollpanel .p-scrollpanel.custombar1 .p-scrollpanel-wrapper {
+    border-right: 10px solid var(--surface-ground);
+}
+
+.custom-scrollpanel .p-scrollpanel.custombar1 .p-scrollpanel-bar {
+    background-color: var(--primary-300);
+    opacity: 1;
+    transition: background-color 0.3s;
+}
+
+.custom-scrollpanel .p-scrollpanel.custombar1 .p-scrollpanel-bar:hover {
+    background-color: var(--primary-400);
+}

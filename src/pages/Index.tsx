@@ -9,6 +9,7 @@ import NotFoundPage from "./NotFoundPage"
 import AdminManageCategoryPage from "./AdminManageCategoryPage"
 import CourseDetailsPage from "./CourseDetailsPage"
 import LookUpPage from "./LookUpPage"
+import DoTestPage from "./DoTestPage"
 export {
     HomePage,
     AdminDashboardPage,
@@ -21,4 +22,5 @@ export {
     AdminManageCategoryPage,
     CourseDetailsPage,
     LookUpPage,
+    DoTestPage
 }

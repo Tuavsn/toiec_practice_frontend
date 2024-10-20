@@ -24,7 +24,7 @@ export default function Header() {
     )
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-1">
+        <div className="fixed top-0 left-0 right-0 z-5">
             <Menubar model={HeaderItems} start={HeaderStart} end={HeaderEnd} />
         </div>
     )
