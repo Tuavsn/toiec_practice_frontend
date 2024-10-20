@@ -126,7 +126,13 @@ export interface LearningProgress extends DataTableValue {
   isCompleted: boolean;
 }
 
-//-----------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------REQUEST RESPONE OBJECT----------------------------------------------------------------
+export interface ApiResponse<T> {
+  statusCode: number,
+  message: any,
+  data: T,
+  error: string,
+}
 
 export interface CategoryLabel {
   format: string;
@@ -183,16 +189,12 @@ export interface UserRow extends DataTableValue {
   updatedAt: Date;
 }
 
-export interface CheatEntry {
-  questionNum: number,
+export interface MultipleChoiceQuestion {
   type: 'single' | 'group' | 'subquestion';
-  subQuestions: CheatEntry[];  // List of subquestions
+  subQuestions: MultipleChoiceQuestion[];
   content: string;
   resources: Resource[];
-  transcript: string;
-  explanation: string;
-  answers: string[];  // Array of answers
-  correctAnswer: string;
+  answers: string[];
 }
 
 export interface UserResultRow {
@@ -203,6 +205,36 @@ export interface UserResultRow {
   type: 'practice' | 'fulltest';
   parts: number[];  // Practice parts
 }
+
+export interface TestPaper {
+  totalQuestions: number,
+  questionList: MultipleChoiceQuestion[]
+}
+
+export interface TestResultSummary {
+  createdAt: Date;
+  totalTime: number;
+  totalReadingScore: number;
+  totalListeningScore: number;
+  totalCorrectAnswer: number;
+  totalIncorrectAnswer: number;
+  totalSkipAnswer: number;
+  type: 'practice' | 'fulltest';
+  parts: number[];
+  questionRecords: QuestionDetailRecord[];
+}
+
+export interface QuestionDetailRecord {
+  type: 'single' | 'group' | 'subquestion';
+  subQuestions: QuestionDetailRecord[];
+  content: string;
+  resources: Resource[];
+  transcript: string;
+  explanation: string;
+  answers: string[];
+  correctAnswer: string;
+  userAnswer: string;
+}
 // ------------------------- tham số truyền
 export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;
@@ -210,16 +242,12 @@ export interface SimpleTimeCountDownProps {
 }
 
 export interface UserAnswerSheetProps {
-  currentPageIndex: number,
-  mappingQuestionsWithPage: number[],
-  setCurrentPageIndex: React.Dispatch<React.SetStateAction<number>>,
-  userAnswerSheet: string[],
   visible: boolean,
   setVisible: React.Dispatch<React.SetStateAction<boolean>>,
-  GetButtonColor: (answer: string,isOnPage:boolean) => "info" | "secondary" | "help" | "success" | "warning" | "danger" | "contrast" | undefined
+  ButtonListElement: JSX.Element[],
 }
 
-export interface TestAreaProps{
+export interface TestAreaProps {
   parts: string,
   resourcesElement: JSX.Element[],
   questionsElement: JSX.Element[],

@@ -4,16 +4,16 @@ import { Divider } from 'primereact/divider';
 import { Tag } from 'primereact/tag';
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { CheatEntry } from '../utils/types/type';
+import { MultipleChoiceQuestion } from '../utils/types/type';
 
 import { Paginator } from 'primereact/paginator';
 import { Button } from 'primereact/button';
-import ConvertCheatSheetToHTML from '../utils/convertCheatSheetToHTML';
+import { ConvertTestQuestionsToHTML } from '../utils/convertToHTML';
 const CourseDetailsPage: React.FC = () => {
     const { id = "" } = useParams<{ id: string }>(); // Access course ID from URL params
     const [activeIndex, setActiveIndex] = useState<number | number[]>(0);
     const [first, setFirst] = useState(0);
-    const [resourcesElement, questionElement] = ConvertCheatSheetToHTML(GetFakeData());
+    const [resourcesElement, questionElement] = ConvertTestQuestionsToHTML(GetFakeData());
     const onPageChange = (event: { first: React.SetStateAction<number>; rows: React.SetStateAction<number>; }) => {
         setFirst(event.first);
 
@@ -161,7 +161,7 @@ function RelateCoursesTemplate() {
 
 
 
-function GetFakeData(): CheatEntry[] {
+function GetFakeData(): MultipleChoiceQuestion[] {
     return [
         {
             questionNum: 1,

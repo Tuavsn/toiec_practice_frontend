@@ -3,11 +3,15 @@ import Footer from "./Footer/Footer";
 import CustomBreadCrumb from "./BreadCrumb/BreadCrumb";
 import ToolBar from "./ToolBar/ToolBar";
 import GenericTable from "./Table/GenericTable";
+import { TestArea } from "./MultipleChoiceQuestion/TestArea";
+import { UserAnswerSheet } from "./MultipleChoiceQuestion/UserAnswerSheet";
 
 export {
     Header,
     Footer,
     CustomBreadCrumb,
     ToolBar,
-    GenericTable
+    GenericTable,
+    TestArea,
+    UserAnswerSheet
 }

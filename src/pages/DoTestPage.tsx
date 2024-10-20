@@ -1,17 +1,19 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import React, { memo, useEffect, useState } from "react";
 import { Toolbar } from "primereact/toolbar";
 import { Button } from "primereact/button";
-import { ScrollPanel } from "primereact/scrollpanel";
 import '../App.css'
 import { Card } from "primereact/card";
-import { Sidebar } from "primereact/sidebar";
-import { SimpleTimeCountDownProps, TestAreaProps, UserAnswerSheetProps } from "../utils/types/type";
-import { useDoTest } from "../hooks/DoTestHook";
+import { ApiResponse, SimpleTimeCountDownProps, TestPaper } from "../utils/types/type";
+import { useTest } from "../hooks/TestHook";
+import { TestArea, UserAnswerSheet } from "../components/Common/Index";
+import { ConvertTestQuestionsToHTML } from "../utils/convertToHTML";
 
 function DoTestPage() {
+    const navigate = useNavigate();
     const { id = "", parts = "" } = useParams<{ id: string, parts: string }>();
-
+    const [userAnswerSheet, setUserAnswerSheet] = useState<string[]>([]);
+    
     const {
         resourcesElement,
         questionsElement,
@@ -20,32 +22,84 @@ function DoTestPage() {
         changePage,
         isUserAnswerSheetVisible,
         setIsUserAnswerSheetVisible,
-        mappingQuestionsWithPage
-    } = useDoTest();
-    const userAnswerSheet = Array<string>(mappingQuestionsWithPage.length).fill('');
+        mappingQuestionsWithPage,
+        setMappingQuestionsWithPage,
+        setQuestionsElement,
+        setResourcesElement
+    } = useTest();
+
+    useEffect(() => {
+        const chooseAnswer = (index: number, answer: string) => {
+            setUserAnswerSheet((prevUserAnswerSheet) => {
+                const newUserAnswerSheet = [...prevUserAnswerSheet];
+                newUserAnswerSheet[index] = answer;
+                return newUserAnswerSheet;
+            });
+        }
+        const fetchData = async () => {
+            try {
+                const { questionList, totalQuestions } = await fetchQuestionsData();
+                setUserAnswerSheet(Array<string>(totalQuestions).fill(''));
+                const [resources, questions, mappingQuestionsPage] = ConvertTestQuestionsToHTML(questionList, chooseAnswer);
+                setResourcesElement(resources);
+                setQuestionsElement(questions);
+                setMappingQuestionsWithPage(mappingQuestionsPage);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const onEndTest = () => {
+
+        navigate(`/test/${~~(Math.random() * 1_000_000)}/review`);
+    }
+
+    const ButtonListElement =
+        userAnswerSheet.map((answer, index) => {
+            const isOnPage = currentPageIndex === mappingQuestionsWithPage[index];
+            return (
+                <Button
+                    key={"answer_" + index}
+                    style={{ width: '60px', aspectRatio: '1/1' }}
+                    className={"border-round-md border-solid text-center p-2"}
+                    label={(index + 1).toString()}
+                    severity={getColorButtonOnAnswerSheet(answer, isOnPage)} // The color is updated based on the "isOnPage" value
+                    onClick={() => {
+                        if (!isOnPage) {
+                            setCurrentPageIndex(mappingQuestionsWithPage[index]);
+                            // When the page changes, the component re-renders and updates the button color.
+                        }
+                    }}
+                />
+            );
+        })
 
 
-    return (
+    return ( userAnswerSheet &&
         <main className="pt-8 w-full">
-
+            <h1 className="text-center"> Đề {id} với các phần {parts}</h1>
             <UserAnswerSheet
-                currentPageIndex={currentPageIndex}
-                userAnswerSheet={userAnswerSheet}
                 visible={isUserAnswerSheetVisible}
                 setVisible={setIsUserAnswerSheetVisible}
-                GetButtonColor={getColorButtonOnAnswerSheet}
-                mappingQuestionsWithPage={mappingQuestionsWithPage}
-                setCurrentPageIndex={setCurrentPageIndex} />
-            <h1 className="text-center"> Đề {id} với các phần {parts}</h1>
+                ButtonListElement={ButtonListElement} />
+
             <Toolbar
                 start={currentStatusBodyTemplate(userAnswerSheet, setIsUserAnswerSheetVisible)}
-                center={currentPartBodyTemplate}
-                end={<Button severity="success" label="Nộp bài" />}
+                center={
+                    <SimpleTimeCountDown
+                        onTimeUp={() => onEndTest()}
+                        timeLeftInSecond={40} />
+                }
+                end={<Button severity="success" label="Nộp bài" onClick={() => onEndTest()} />}
             />
+
+
             <Card>
-                <SimpleTimeCountDown
-                    onTimeUp={() => console.log("hết")}
-                    timeLeftInSecond={40} />
+
 
                 <div className="flex flex-column md:flex-row justify-content-between p-5 gap-4 custom-scrollpanel">
                     <TestArea changePage={changePage}
@@ -73,17 +127,29 @@ function DoTestPage() {
 export default memo(DoTestPage);
 //--------------------------------- helpper function for main component
 
-function getColorButtonOnAnswerSheet(answer: string, isOnPage: boolean): 'info' | 'secondary' | 'warning' {
-    const returnString = answer ? 'info' : 'secondary';
-    return isOnPage ? 'warning' : returnString;
+async function fetchQuestionsData(): Promise<TestPaper> {
+    try {
+        const response = await fetch("https://dummyjson.com/c/37e5-04ab-47d5-b7ac");
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        // Get the full response and cast it to ApiResponse<TestPaper>
+        const apiResponse: ApiResponse<TestPaper> = await response.json();
+
+        // Return the data part of the response
+        return apiResponse.data;
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+        return { questionList: [], totalQuestions: 0 }; // Return empty arrays in case of an error
+    }
 }
 
 
-
-function currentPartBodyTemplate() {
-    return (
-        <h1 className="text-blue-300">PART 4</h1>
-    );
+function getColorButtonOnAnswerSheet(answer: string, isOnPage: boolean): 'info' | 'secondary' | 'warning' {
+    const returnString = answer ? 'info' : 'secondary';
+    return isOnPage ? 'warning' : returnString;
 }
 
 function currentStatusBodyTemplate(userAnswers: string[], setVisible: React.Dispatch<React.SetStateAction<boolean>>) {
@@ -137,77 +203,7 @@ const SimpleTimeCountDown: React.FC<SimpleTimeCountDownProps> = React.memo(
 )
 
 
-const UserAnswerSheet: React.FC<UserAnswerSheetProps> = React.memo(
-    ({ userAnswerSheet, visible, setVisible, GetButtonColor, setCurrentPageIndex, mappingQuestionsWithPage, currentPageIndex }) => {
-        return (
-            <Sidebar header={<h2 className="text-center">Câu trả lời</h2>} visible={visible} onHide={() => setVisible(false)}>
-                <div className="flex flex-wrap gap-2 justify-content-center">
-                    {userAnswerSheet.map((answer, index) => {
-                        const isOnPage = currentPageIndex === mappingQuestionsWithPage[index];
-                        return (
-                            <Button
-                                key={"answer_" + index}
-                                style={{ width: '60px', aspectRatio: '1/1' }}
-                                className={"border-round-md border-solid text-center p-2"}
-                                label={(index + 1).toString()}
-                                severity={GetButtonColor(answer, isOnPage)} // The color is updated based on the "isOnPage" value
-                                onClick={() => {
-                                    if (!isOnPage) {
-                                        setCurrentPageIndex(mappingQuestionsWithPage[index]);
-                                        // When the page changes, the component re-renders and updates the button color.
-                                    }
-                                }}
-                            />
-                        );
-                    })}
-                </div>
-            </Sidebar>
-        );
-    },
-    (prevProps, nextProps) => {
-        return (
-            prevProps.visible === nextProps.visible &&
-            prevProps.userAnswerSheet.length === nextProps.userAnswerSheet.length &&
-            prevProps.userAnswerSheet.every((answer, index) => answer === nextProps.userAnswerSheet[index]) &&
-            prevProps.currentPageIndex === nextProps.currentPageIndex // Add this condition to allow re-renders when the page changes.
-        );
-    }
-);
 
-
-
-const TestArea: React.FC<TestAreaProps> = React.memo(
-    ({ changePage, currentPageIndex, questionsElement, resourcesElement, parts }) => {
-        return (
-            <React.Fragment>
-                <ScrollPanel
-                    className="flex-1 custombar1  border-round m-2 shadow-2"
-                    style={{ minHeight: '50px', overflowY: 'auto', maxHeight: '700px' }}
-                >
-                    {resourcesElement[currentPageIndex]}
-                </ScrollPanel>
-
-                <div className="flex-1 ">
-                    {
-                        parts != "0" &&
-                        <div className="flex justify-content-end gap-3 pr-3">
-                            <Button icon="pi pi-angle-double-left" onClick={() => changePage(-1)}></Button>
-                            <Button icon="pi pi-angle-double-right" onClick={() => changePage(1)}></Button>
-                        </div>
-                    }
-                    <ScrollPanel
-                        className="custombar1  border-round m-2 shadow-2"
-                        style={{ minHeight: '50px', overflowY: 'auto', maxHeight: '700px' }}
-                    >
-                        {questionsElement[currentPageIndex]}
-
-
-                    </ScrollPanel>
-                </div>
-            </React.Fragment>
-        )
-    }
-)
 /* <Accordion>
                             <AccordionTab header="Dịch nghĩa">
                                 <div className="card">
