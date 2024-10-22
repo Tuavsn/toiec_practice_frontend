@@ -9,7 +9,7 @@ export interface Category extends CategoryRow {
 export interface Course extends DataTableValue {
   id: string;
   name: string;
-  topic: string[];  // Array of topic names
+  topic: string[];
   format: string;
   difficulty: number;
   lecture: Lecture[];
@@ -23,7 +23,6 @@ export interface Course extends DataTableValue {
 export interface Lecture extends DataTableValue {
   title: string;
   content: string;
-  description: string;
 }
 
 export interface Assignment extends DataTableValue {
@@ -134,6 +133,16 @@ export interface ApiResponse<T> {
   error: string,
 }
 
+export interface CourseOutLine {
+  lectureTitles: string[];
+  practiceTitles: PracticeTitle[];
+}
+
+export interface PracticeTitle {
+  title: string;
+  isCompleted: boolean
+}
+
 export interface CategoryLabel {
   format: string;
   year: number[];
@@ -211,6 +220,11 @@ export interface TestPaper {
   questionList: MultipleChoiceQuestion[]
 }
 
+export interface PracticePaper {
+  totalQuestions: number,
+  questionList: PracticeQuestion[]
+}
+
 export interface TestResultSummary {
   createdAt: Date;
   totalTime: number;
@@ -224,6 +238,22 @@ export interface TestResultSummary {
   questionRecords: QuestionDetailRecord[];
 }
 
+export interface PracticeQuestion {
+  type: 'single' | 'group' | 'subquestion';
+  subQuestions: PracticeQuestion[];
+  content: string;
+  resources: Resource[];
+  transcript: string;
+  explanation: string;
+  answers: string[];
+  correctAnswer: string;
+}
+
+export interface PracticeTest {
+  totalQuestions: number;
+  practiceQuestion: PracticeQuestion[];
+}
+
 export interface QuestionDetailRecord {
   type: 'single' | 'group' | 'subquestion';
   subQuestions: QuestionDetailRecord[];
@@ -235,6 +265,8 @@ export interface QuestionDetailRecord {
   correctAnswer: string;
   userAnswer: string;
 }
+
+
 // ------------------------- tham số truyền
 export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;

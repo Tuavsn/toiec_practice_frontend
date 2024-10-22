@@ -121,9 +121,9 @@ export default function TestReviewPage() {
 
 //-----------------------helper function
 
-function getColorButtonOnAnswerSheet(isCorrect: boolean, isOnPage: boolean): "success" | "danger" | 'warning' {
+function getColorButtonOnAnswerSheet(isCorrect: boolean, isOnPage: boolean): "success" | "danger" | "info" {
     const returnString = isCorrect ? 'success' : 'danger';
-    return isOnPage ? 'warning' : returnString;
+    return isOnPage ? 'info' : returnString;
 }
 
 async function fetchQuestionsData(defaultValue: TestResultSummary): Promise<TestResultSummary> {

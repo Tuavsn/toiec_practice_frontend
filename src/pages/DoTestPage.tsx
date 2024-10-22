@@ -201,21 +201,3 @@ const SimpleTimeCountDown: React.FC<SimpleTimeCountDownProps> = React.memo(
         );
     }
 )
-
-
-
-/* <Accordion>
-                            <AccordionTab header="Dịch nghĩa">
-                                <div className="card">
-                               
-                                </div>
-                            </AccordionTab>
-                        </Accordion>
-
-                        <Accordion>
-                            <AccordionTab header="Giải thích đáp án">
-                                <div className="card">
-                                   
-                                </div>
-                            </AccordionTab>
-                        </Accordion> */

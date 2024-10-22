@@ -1,6 +1,8 @@
 import { Card } from "primereact/card";
-import { MultipleChoiceQuestion, QuestionDetailRecord, Resource } from "./types/type";
+import { MultipleChoiceQuestion, PracticeQuestion, QuestionDetailRecord, Resource } from "./types/type";
 import { Image } from 'primereact/image';
+import { Accordion, AccordionTab } from "primereact/accordion";
+import React, { useState } from "react";
 export function ConvertTestQuestionsToHTML(cheatSheet: MultipleChoiceQuestion[], chooseAnswer: (index: number, answer: string) => void): [JSX.Element[], JSX.Element[], number[]] {
     const resoursesSection: JSX.Element[] = [];
     const questionsSection: JSX.Element[] = [];
@@ -64,7 +66,7 @@ export function ConvertTestRecordToHTML(questionRecords: QuestionDetailRecord[])
             questionsElement.push(
                 <h5 key={"h5" + questionNum} > {questionNum}.{quest.content} </h5>
             );
-            questionsElement.push(UserAnswerToHTML(quest.answers, quest.userAnswer, quest.correctAnswer, questionNum));
+            questionsElement.push(UserAnswerToHTML(quest, questionNum));
         }
         else {
             questionsElement.push(<h3 key={"group" + questionNum} > {quest.content} </h3>);
@@ -76,7 +78,7 @@ export function ConvertTestRecordToHTML(questionRecords: QuestionDetailRecord[])
 
                 questionsElement.push(<h5 key={"h5" + questionNum} > {questionNum}.{subQuest.content} </h5>);
                 resoursesElement.push(...ResourcesToHTML(subQuest.resources, questionNum));
-                questionsElement.push(UserAnswerToHTML(subQuest.answers, subQuest.userAnswer, subQuest.correctAnswer, questionNum));
+                questionsElement.push(UserAnswerToHTML(subQuest, questionNum));
             }
         }
         questionsSection.push(
@@ -92,6 +94,60 @@ export function ConvertTestRecordToHTML(questionRecords: QuestionDetailRecord[])
         page += 1;
     }
     return [resoursesSection, questionsSection, mappingQuestionsWithPage, isCorrect];
+}
+
+export function ConvertPracticeQuestionToHTML(
+    practiceQuestions: PracticeQuestion[],
+    setUserAnswerSheet: React.Dispatch<React.SetStateAction<string[]>>
+): [JSX.Element[], JSX.Element[], number] {
+
+    const resoursesSection: JSX.Element[] = [];
+    const questionsSection: JSX.Element[] = [];
+    let questionNum: number = 0;
+
+    for (const pQuestion of practiceQuestions) {
+        const resoursesElement: JSX.Element[] = [];
+        const questionsElement: JSX.Element[] = [];
+        resoursesElement.push(...ResourcesToHTML(pQuestion.resources, questionNum));
+        if (pQuestion.type !== 'group') {
+            questionNum += 1;
+
+            questionsElement.push(
+                <h5 key={"h5" + questionNum} > {questionNum}.{pQuestion.content} </h5>
+            );
+            questionsElement.push(
+                <PracticeAnswerToHTML key={"pracAns" + questionNum} question={pQuestion} questionNum={questionNum} setUserAnswerSheet={setUserAnswerSheet} />
+            )
+
+        }
+        else {
+            questionsElement.push(<h3 key={"group" + questionNum} > {pQuestion.content} </h3>);
+            for (const subPQuestion of pQuestion.subQuestions) {
+                questionNum += 1;
+
+                questionsElement.push(<h5 key={"h5" + questionNum} > {questionNum}.{subPQuestion.content} </h5>);
+                resoursesElement.push(...ResourcesToHTML(subPQuestion.resources, questionNum));
+                questionsElement.push(
+                    <PracticeAnswerToHTML key={"pracAns" + questionNum} question={subPQuestion} questionNum={questionNum} setUserAnswerSheet={setUserAnswerSheet} />
+                )
+            }
+        }
+
+
+        questionsSection.push(
+            <section className="p-3" key={"qSection" + questionNum} >
+                {questionsElement}
+            </section>
+        );
+        resoursesSection.push(
+            <section key={"resouresSection" + questionNum} >
+                {resoursesElement}
+            </section>
+        );
+
+    }
+
+    return [resoursesSection, questionsSection, questionNum]
 }
 
 function ResourcesToHTML(resources: Resource[], qNum: number): JSX.Element[] {
@@ -153,17 +209,17 @@ function AnswerToHTML(answers: string[], qNum: number, chooseAnswer: (index: num
     );
 }
 
-function UserAnswerToHTML(answers: string[], userAnswer: string, correctAnswer: string, questionNum: number): JSX.Element {
+function UserAnswerToHTML(question: QuestionDetailRecord, questionNum: number): JSX.Element {
 
-    
+
     return (
         <div key={"answer" + questionNum} className="flex flex-column gap-3 my-3">
-            {answers.map((answer, index) => {
+            {question.answers.map((answer, index) => {
                 let colorBackground = '';
-                if (answer === correctAnswer) {
+                if (answer === question.correctAnswer) {
                     colorBackground = 'bg-green-500';
 
-                } else if ( answer === userAnswer) {
+                } else if (answer === question.userAnswer) {
                     colorBackground = 'bg-red-500';
                 }
                 return (
@@ -175,14 +231,97 @@ function UserAnswerToHTML(answers: string[], userAnswer: string, correctAnswer: 
                             name={`answer-${questionNum}`}   // Use a unique name for grouping per question
                             value={answer}            // Value of the radio button
                             readOnly
-                            checked={userAnswer === answer}
+                            checked={question.userAnswer === answer}
                         />
                         <label htmlFor={"id" + questionNum + index} style={{ marginLeft: '8px' }}>
                             {answer}
                         </label>
                     </div>
                 );
-            })}
+
+            })
+            }
+            <Accordion>
+                <AccordionTab header="Dịch nghĩa">
+                    <div className="card">
+                        {question.transcript}
+                    </div>
+                </AccordionTab>
+            </Accordion>
+
+            <Accordion>
+                <AccordionTab header="Giải thích đáp án">
+                    <div className="card">
+                        {question.explanation}
+                    </div>
+                </AccordionTab>
+            </Accordion>
+
         </div>
     );
 }
+
+const PracticeAnswerToHTML: React.FC<{ question: PracticeQuestion, questionNum: number, setUserAnswerSheet: React.Dispatch<React.SetStateAction<string[]>> }> = React.memo(
+    ({ question, questionNum, setUserAnswerSheet }) => {
+        const pos = questionNum - 1;
+        const [userAnswer, setUserAnswer] = useState<string>("");
+        return (
+            <div key={"panswer" + questionNum} className={"flex flex-column gap-3 my-3"}>
+                {question.answers.map((answer, index) => {
+                    let colorBackground = '';
+                    if (userAnswer && answer === question.correctAnswer) {
+                        colorBackground = 'bg-green-500';
+                    } else if (answer === userAnswer) {
+                        colorBackground = 'bg-red-500';
+                    }
+
+                    return (
+                        <div key={"answerbox" + index} className={"flex align-items-center py-3 " + colorBackground}>
+                            <input
+                                key={index + "radio" + questionNum}
+                                style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }}
+                                type="radio"
+                                id={"id" + questionNum + index}
+                                name={`answer-${questionNum}`}
+                                value={answer}
+                                checked={userAnswer === answer}
+                                onChange={() => {
+                                    setUserAnswer(answer)
+
+                                    setUserAnswerSheet((prevUserAnswerSheet) => {
+                                        const newUserAnswerSheet = [...prevUserAnswerSheet];
+                                        newUserAnswerSheet[pos] = answer;
+                                        console.log(answer);
+                                        return newUserAnswerSheet;
+                                    });
+                                }}
+                            />
+                            <label key={index + "label" + questionNum} htmlFor={"id" + questionNum + index} style={{ marginLeft: '8px' }}>
+                                {answer}
+                            </label>
+                        </div>
+                    );
+                })}
+                {userAnswer &&
+                    <React.Fragment>
+                        <Accordion>
+                            <AccordionTab header="Dịch nghĩa">
+                                <div className="card">
+                                    {question.transcript}
+                                </div>
+                            </AccordionTab>
+                        </Accordion>
+
+                        <Accordion>
+                            <AccordionTab header="Giải thích đáp án">
+                                <div className="card">
+                                    {question.explanation}
+                                </div>
+                            </AccordionTab>
+                        </Accordion>
+                    </React.Fragment>
+                }
+            </div>
+        );
+    }
+);
