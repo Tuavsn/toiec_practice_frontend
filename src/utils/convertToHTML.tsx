@@ -96,56 +96,70 @@ export function ConvertTestRecordToHTML(questionRecords: QuestionDetailRecord[])
     return [resoursesSection, questionsSection, mappingQuestionsWithPage, isCorrect];
 }
 
-export function ConvertPracticeQuestionToHTML(
-    practiceQuestions: PracticeQuestion[],
-    setUserAnswerSheet: React.Dispatch<React.SetStateAction<string[]>>
-): [JSX.Element[], JSX.Element[], number] {
+export function MappingPageWithQuestion(practiceQuestion: PracticeQuestion[]): number[] {
+    var page = 0;
+    const mappingQuestionsWithPage: number[] = [];
+    for (const pQuestion of practiceQuestion) {
+        if (pQuestion.type !== 'group') {
+            mappingQuestionsWithPage.push(page);
+        }
+        else {
+            mappingQuestionsWithPage.push(...Array<number>(pQuestion.subQuestions.length).fill(page));
+        }
+        page += 1;
+    }
+    return mappingQuestionsWithPage;
+}
 
+export function ConvertQuestionPageToHTML(
+    pQuestion: PracticeQuestion,
+    userAnswerSheet: string[]
+): [JSX.Element[], JSX.Element[], number] {
+    generate
     const resoursesSection: JSX.Element[] = [];
     const questionsSection: JSX.Element[] = [];
     let questionNum: number = 0;
 
-    for (const pQuestion of practiceQuestions) {
-        const resoursesElement: JSX.Element[] = [];
-        const questionsElement: JSX.Element[] = [];
-        resoursesElement.push(...ResourcesToHTML(pQuestion.resources, questionNum));
-        if (pQuestion.type !== 'group') {
+
+    const resoursesElement: JSX.Element[] = [];
+    const questionsElement: JSX.Element[] = [];
+    resoursesElement.push(...ResourcesToHTML(pQuestion.resources, questionNum));
+    if (pQuestion.type !== 'group') {
+        questionNum += 1;
+
+        questionsElement.push(
+            <h5 key={"h5" + questionNum} > {questionNum}.{pQuestion.content} </h5>
+        );
+        questionsElement.push(
+            PracticeAnswerToFunction(pQuestion, questionNum, userAnswerSheet, setCompletePracticeTest)
+        )
+    }
+    else {
+        questionsElement.push(<h3 key={"group" + questionNum} > {pQuestion.content} </h3>);
+        for (const subPQuestion of pQuestion.subQuestions) {
             questionNum += 1;
 
+            questionsElement.push(<h5 key={"h5" + questionNum} > {questionNum}.{subPQuestion.content} </h5>);
+            resoursesElement.push(...ResourcesToHTML(subPQuestion.resources, questionNum));
             questionsElement.push(
-                <h5 key={"h5" + questionNum} > {questionNum}.{pQuestion.content} </h5>
-            );
-            questionsElement.push(
-                <PracticeAnswerToHTML key={"pracAns" + questionNum} question={pQuestion} questionNum={questionNum} setUserAnswerSheet={setUserAnswerSheet} />
+                PracticeAnswerToFunction(subPQuestion, questionNum, userAnswerSheet, setCompletePracticeTest)
             )
-
         }
-        else {
-            questionsElement.push(<h3 key={"group" + questionNum} > {pQuestion.content} </h3>);
-            for (const subPQuestion of pQuestion.subQuestions) {
-                questionNum += 1;
-
-                questionsElement.push(<h5 key={"h5" + questionNum} > {questionNum}.{subPQuestion.content} </h5>);
-                resoursesElement.push(...ResourcesToHTML(subPQuestion.resources, questionNum));
-                questionsElement.push(
-                    <PracticeAnswerToHTML key={"pracAns" + questionNum} question={subPQuestion} questionNum={questionNum} setUserAnswerSheet={setUserAnswerSheet} />
-                )
-            }
-        }
-
-
-        questionsSection.push(
-            <section className="p-3" key={"qSection" + questionNum} >
-                {questionsElement}
-            </section>
-        );
-        resoursesSection.push(
-            <section key={"resouresSection" + questionNum} >
-                {resoursesElement}
-            </section>
-        );
-
     }
+
+
+    questionsSection.push(
+        <section className="p-3" key={"qSection" + questionNum} >
+            {questionsElement}
+        </section>
+    );
+    resoursesSection.push(
+        <section key={"resouresSection" + questionNum} >
+            {resoursesElement}
+        </section>
+    );
+
+
 
     return [resoursesSection, questionsSection, questionNum]
 }
@@ -261,17 +275,16 @@ function UserAnswerToHTML(question: QuestionDetailRecord, questionNum: number): 
     );
 }
 
-const PracticeAnswerToHTML: React.FC<{ question: PracticeQuestion, questionNum: number, setUserAnswerSheet: React.Dispatch<React.SetStateAction<string[]>> }> = React.memo(
-    ({ question, questionNum, setUserAnswerSheet }) => {
+function PracticeAnswerToFunction(question: PracticeQuestion, questionNum: number): (userAnswerSheet: string[]) => JSX.Element {
+    return (userAnswerSheet: string[]) => {
         const pos = questionNum - 1;
-        const [userAnswer, setUserAnswer] = useState<string>("");
         return (
             <div key={"panswer" + questionNum} className={"flex flex-column gap-3 my-3"}>
                 {question.answers.map((answer, index) => {
                     let colorBackground = '';
-                    if (userAnswer && answer === question.correctAnswer) {
+                    if (userAnswerSheet && answer === question.correctAnswer) {
                         colorBackground = 'bg-green-500';
-                    } else if (answer === userAnswer) {
+                    } else if (answer === userAnswerSheet[pos]) {
                         colorBackground = 'bg-red-500';
                     }
 
@@ -284,16 +297,10 @@ const PracticeAnswerToHTML: React.FC<{ question: PracticeQuestion, questionNum: 
                                 id={"id" + questionNum + index}
                                 name={`answer-${questionNum}`}
                                 value={answer}
-                                checked={userAnswer === answer}
+                                checked={userAnswerSheet[pos] === answer}
                                 onChange={() => {
-                                    setUserAnswer(answer)
+                                    console.log("ok");
 
-                                    setUserAnswerSheet((prevUserAnswerSheet) => {
-                                        const newUserAnswerSheet = [...prevUserAnswerSheet];
-                                        newUserAnswerSheet[pos] = answer;
-                                        console.log(answer);
-                                        return newUserAnswerSheet;
-                                    });
                                 }}
                             />
                             <label key={index + "label" + questionNum} htmlFor={"id" + questionNum + index} style={{ marginLeft: '8px' }}>
@@ -302,7 +309,7 @@ const PracticeAnswerToHTML: React.FC<{ question: PracticeQuestion, questionNum: 
                         </div>
                     );
                 })}
-                {userAnswer &&
+                {userAnswerSheet[pos] &&
                     <React.Fragment>
                         <Accordion>
                             <AccordionTab header="Dịch nghĩa">
@@ -324,4 +331,6 @@ const PracticeAnswerToHTML: React.FC<{ question: PracticeQuestion, questionNum: 
             </div>
         );
     }
-);
+
+
+}
