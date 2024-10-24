@@ -20,8 +20,8 @@ export function timeStampBodyTemplate<Model extends { createdAt: Date, updatedAt
 };
 
 
-export function getSeverity<Model extends { isActive: boolean }>(category: Model) {
-    switch (category.isActive) {
+export function getSeverity<Model extends { active: boolean }>(category: Model) {
+    switch (category.active) {
         case true:
             return 'success';
 
@@ -32,6 +32,6 @@ export function getSeverity<Model extends { isActive: boolean }>(category: Model
     }
 };
 
-export function statusBodyTemplate<Model extends { isActive: boolean }>(rowData: Model) {
-    return <Tag value={(rowData.isActive) + ""} severity={getSeverity(rowData)}></Tag>;
+export function statusBodyTemplate<Model extends { active: boolean }>(rowData: Model) {
+    return <Tag value={(rowData.active) + ""} severity={getSeverity(rowData)}></Tag>;
 };

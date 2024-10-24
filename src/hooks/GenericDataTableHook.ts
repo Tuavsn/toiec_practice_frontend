@@ -2,6 +2,9 @@ import { DataTable, DataTablePageEvent, DataTableValue } from "primereact/datata
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { Toast } from "primereact/toast";
 import { useState, useEffect, useRef } from "react";
+import { ApiResponse, TableData } from "../utils/types/type";
+import { callGetRows } from "../api/api";
+import { AxiosResponse } from "axios";
 
 export function useDataTable<Model extends DataTableValue>(
     urlApi: string,
@@ -46,7 +49,7 @@ export function useDataTable<Model extends DataTableValue>(
         setDeleteRowsDialog(false);
     });
 
-    const saveRow = (() => {
+    const saveRow = (async () => {
         setSubmitted(true);
         toast.current?.show({ severity: 'success', summary: 'Cần quá tải hàm saveRow', detail: 'Row Updated', life: 3000 });
         // if (row.name.trim()) {
@@ -73,20 +76,17 @@ export function useDataTable<Model extends DataTableValue>(
     });
 
     // Fetch data from server
-    const fetchData = async (_pageNumber: number, _pageSize: number) => {
+    const fetchData = async (_pageNumber: number = 1, _pageSize: number = 10) => {
         try {
-            const response = await fetch(urlApi);
+            const response: ApiResponse<TableData<Model>> = await callGetRows<Model>(urlApi);
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+            setRows(response.data.result)
 
-            const data: { data: Model[], totalRecords: number } = await response.json();  // Parse the JSON response
-            setRows(data.data); // Update with server data
-            setTotalRecords(data.totalRecords);
-            return data;  // Return the data
-        } catch (error) {
-            console.error('There has been a problem with your fetch operation:', error);
+            setTotalRecords(response.data.meta.totalItems);
+
+            return response;  // Return the data
+        } catch (error:any) {
+            state.toast.current?.show({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 5000 });
             return null;  // Handle the error, returning null or an appropriate value
         }
     };

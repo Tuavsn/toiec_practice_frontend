@@ -9,7 +9,7 @@ interface AccessTokenResponse {
  */
 
 const instance = axiosClient.create({
-    baseURL: import.meta.env.BASE_URL,
+    baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true
 });
 
@@ -23,7 +23,7 @@ const NO_RETRY_HEADER = 'x-no-retry';
 //     });
 // };
 
-instance.interceptors.request.use(function (config) {
+instance.interceptors.request.use(function (config: any) {
     if (typeof window !== "undefined" && window && window.localStorage && window.localStorage.getItem('access_token')) {
         config.headers.Authorization = 'Bearer ' + window.localStorage.getItem('access_token');
     }
@@ -39,23 +39,27 @@ instance.interceptors.request.use(function (config) {
  * for requests, but it is omitted here for brevity.
  */
 instance.interceptors.response.use(
-    (res) => res.data,
+    (res) => res,
     async (error) => {
-        if (error.config && error.response
-            && +error.response.status === 401
-            && !error.config.headers[NO_RETRY_HEADER]
-        ) {
-            // const access_token = await handleRefreshToken();
-            const access_token = "";
-            error.config.headers[NO_RETRY_HEADER] = 'true'
-            if (access_token) {
-                error.config.headers['Authorization'] = `Bearer ${access_token}`;
-                localStorage.setItem('access_token', access_token)
-                return instance.request(error.config);
-            }
-        }
 
-        return instance.request(error.config);
+
+        // if (error.config && error.response
+        //     && +error.response.status === 401
+        //     && !error.config.headers[NO_RETRY_HEADER]
+        // ) {
+        //     // const access_token = await handleRefreshToken();
+        //     const access_token = "";
+        //     error.config.headers[NO_RETRY_HEADER] = 'true'
+        //     if (access_token) {
+        //         error.config.headers['Authorization'] = `Bearer ${access_token}`;
+        //         localStorage.setItem('access_token', access_token)
+        //         return instance.request(error.config);
+        //     }
+        //     console.log("58", error);
+
+        // }
+        console.log("61", error);
+        return error?.response?.data ?? Promise.reject(error);
     }
 );
 

@@ -4,9 +4,9 @@ import { Divider } from 'primereact/divider';
 import { Tag } from 'primereact/tag';
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ApiResponse, PracticeTitle, CourseOutLine, PracticeTest, PracticeQuestion } from '../utils/types/type';
+import { ApiResponse, PracticeTitle, CourseOutLine, PracticeTest } from '../utils/types/type';
 import { Paginator } from 'primereact/paginator';
-import { ConvertQuestionPageToHTML } from '../utils/convertToHTML';
+import { ConvertPracticeQuestionToHTML } from '../utils/convertToHTML';
 
 const CourseDetailsPage: React.FC = () => {
     const { id = "" } = useParams<{ id: string }>(); // Access course ID from URL params
@@ -118,29 +118,30 @@ function RelateCoursesTemplate() {
 
 const PracticeSection: React.FC<{ practiceTitles: PracticeTitle[], courseID: string }> = React.memo(
     ({ practiceTitles, courseID }) => {
-
-        const [activePracticeIndex, setActivePracticeIndex] = useState<number | number[]>([]);
-        const [questionPage, setQuestionPage] = useState<PracticeQuestion[]>([]);
-        const [first, setFirst] = useState<number>(0);
         const [userAnswerSheet, setUserAnswerSheet] = useState<string[]>([]);
+        const [activePracticeIndex, setActivePracticeIndex] = useState<number | number[]>([]);
+        const [questionElementList, setQuestionElementList] = useState<JSX.Element[]>([]);
+        const [first, setFirst] = useState<number>(0);
 
+
+        
         return (
             practiceTitles &&
             <Card className='shadow-7'>
                 <h1>Bài tập</h1>
                 <Accordion activeIndex={activePracticeIndex} onTabChange={(e) => {
                     setActivePracticeIndex(e.index as number);
-                    LoadPractice(e.index as number, courseID, setQuestionPage, setFirst, setUserAnswerSheet);
+                    LoadPractice(e.index as number, courseID, setQuestionElementList, setFirst, setUserAnswerSheet);
                 }}>
                     {
                         practiceTitles.map((practiceDetail, index) => {
                             return (
                                 <AccordionTab key={"homeworkNo_" + index} header={headerTemplate(practiceDetail.title, practiceDetail.isCompleted)} >
                                     {
-                                        (index === activePracticeIndex) && (questionPage.length) && (
+                                        (index === activePracticeIndex) && (questionElementList.length) && (
                                             <React.Fragment>
-                                                {ConvertQuestionPageToHTML(questionPage[first], userAnswerSheet)}
-                                                < Paginator first={first} rows={1} totalRecords={questionPage.length} onPageChange={(event) => setFirst(event.first)} template={{ layout: 'PrevPageLink CurrentPageReport NextPageLink' }} />
+                                                {questionElementList[first]}
+                                                < Paginator first={first} rows={1} totalRecords={questionElementList.length} onPageChange={(event) => setFirst(event.first)} template={{ layout: 'PrevPageLink CurrentPageReport NextPageLink' }} />
                                             </React.Fragment>
                                         )
                                     }
@@ -176,9 +177,9 @@ async function fetchQuestionsData(): Promise<CourseOutLine> {
 
 async function LoadPractice(practicePosition: number | null,
     courseID: string,
-    setQuestionPage: React.Dispatch<React.SetStateAction<PracticeQuestion[]>>,
+    setCurrentQuestionElementList: React.Dispatch<React.SetStateAction<JSX.Element[]>>,
     setFirst: React.Dispatch<React.SetStateAction<number>>,
-    setUserAnswerSheet: React.Dispatch<React.SetStateAction<string[]>>,
+    setUserAnswerSheet: React.Dispatch<React.SetStateAction<string[]>>
 ): Promise<void> {
     if (!practicePosition && typeof practicePosition != 'number' || !courseID) {
         return;
@@ -188,9 +189,6 @@ async function LoadPractice(practicePosition: number | null,
         "https://dummyjson.com/c/4275-12d6-4591-8afb",
         "https://dummyjson.com/c/8a4e-90e2-4124-937d"
     ]
-
-
-
 
     try {
         const response = await fetch(apiPath.at(practicePosition) ?? apiPath[0]);
@@ -202,13 +200,30 @@ async function LoadPractice(practicePosition: number | null,
         // Assuming the response structure matches your LessonDetail type
         const apiResponse: ApiResponse<PracticeTest> = await response.json();
         setUserAnswerSheet(Array<string>(apiResponse.data.totalQuestions).fill(''));
-        setQuestionPage(apiResponse.data.practiceQuestion);
+        const [resources, questions] = ConvertPracticeQuestionToHTML(apiResponse.data.practiceQuestion, setUserAnswerSheet);
         setFirst(0);
 
 
+        setCurrentQuestionElementList(
+            resources.map((resource, index) => {
+                return (
+                    <div key={practicePosition + "practiceQuestionElement" + index}>
+                        <Card>
+                            {resource}
+                        </Card>
+                        <br />
+                        <Card>
+                            {questions[index]}
+                        </Card>
+                    </div>
+                )
+            }
+            )
+        )
 
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
+        setCurrentQuestionElementList([<>Lỗi Rồi</>]);
     }
 }
 

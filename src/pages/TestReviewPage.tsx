@@ -1,91 +1,82 @@
-import { useParams } from "react-router-dom";
-import { useTest } from "../hooks/TestHook";
-import { TestArea, UserAnswerSheet } from "../components/Common/Index";
-import { Button } from "primereact/button";
-import { Card } from "primereact/card";
-import { Toolbar } from "primereact/toolbar";
-import { useEffect, useState } from "react";
-import { ConvertTestRecordToHTML } from "../utils/convertToHTML";
 import { ApiResponse, TestResultSummary } from "../utils/types/type";
-import formatDate from "../utils/formatDateToString";
 
 export default function TestReviewPage() {
-    const { id = "" } = useParams<{ id: string }>();
+    // const { id = "" } = useParams<{ id: string }>();
 
-    const emptyTestResultSummary: TestResultSummary = {
-        createdAt: new Date(),
-        parts: [0],
-        questionRecords: [],
-        totalCorrectAnswer: 999,
-        totalIncorrectAnswer: 999,
-        totalListeningScore: 999,
-        totalReadingScore: 999,
-        totalSkipAnswer: 999,
-        totalTime: 9999,
-        type: "fulltest"
-    }
+    // const emptyTestResultSummary: TestResultSummary = {
+    //     createdAt: new Date(),
+    //     parts: [0],
+    //     questionRecords: [],
+    //     totalCorrectAnswer: 999,
+    //     totalIncorrectAnswer: 999,
+    //     totalListeningScore: 999,
+    //     totalReadingScore: 999,
+    //     totalSkipAnswer: 999,
+    //     totalTime: 9999,
+    //     type: "fulltest"
+    // }
 
-    const [testResultSummary, setTestResultSummary] = useState<TestResultSummary>(emptyTestResultSummary);
-    const [isQuestionCorrect, setIsQuestionCorrect] = useState<boolean[]>([]);
-    const {
-        resourcesElement,
-        questionsElement,
-        currentPageIndex,
-        setCurrentPageIndex,
-        changePage,
-        isUserAnswerSheetVisible,
-        setIsUserAnswerSheetVisible,
-        mappingQuestionsWithPage,
-        setMappingQuestionsWithPage,
-        setQuestionsElement,
-        setResourcesElement
-    } = useTest();
+    // const [testResultSummary, setTestResultSummary] = useState<TestResultSummary>(emptyTestResultSummary);
+    // const [isQuestionCorrect, setIsQuestionCorrect] = useState<boolean[]>([]);
+    // const {
+    //     resourcesElement,
+    //     questionsElement,
+    //     currentPageIndex,
+    //     setCurrentPageIndex,
+    //     changePage,
+    //     isUserAnswerSheetVisible,
+    //     setIsUserAnswerSheetVisible,
+    //     mappingQuestionsWithPage,
+    //     setMappingQuestionsWithPage,
+    //     setQuestionsElement,
+    //     setResourcesElement
+    // } = useTest();
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        const fetchData = async () => {
-            try {
-                const newTestResultSummary = await fetchQuestionsData(emptyTestResultSummary);
-                // const totalQuestions = newTestResultSummary.totalCorrectAnswer + newTestResultSummary.totalIncorrectAnswer + newTestResultSummary.totalSkipAnswer;
-                setTestResultSummary(newTestResultSummary)
-                const [resources, questions, mappingQuestionsPage, isCorrect] = ConvertTestRecordToHTML(newTestResultSummary.questionRecords);
-                setResourcesElement(resources);
-                setQuestionsElement(questions);
-                setMappingQuestionsWithPage(mappingQuestionsPage);
-                setIsQuestionCorrect(isCorrect)
+    //     const fetchData = async () => {
+    //         try {
+    //             const newTestResultSummary = await fetchQuestionsData(emptyTestResultSummary);
+    //             // const totalQuestions = newTestResultSummary.totalCorrectAnswer + newTestResultSummary.totalIncorrectAnswer + newTestResultSummary.totalSkipAnswer;
+    //             setTestResultSummary(newTestResultSummary)
+    //             const [resources, questions, mappingQuestionsPage, isCorrect] = ConvertTestRecordToHTML(newTestResultSummary.questionRecords);
+    //             setResourcesElement(resources);
+    //             setQuestionsElement(questions);
+    //             setMappingQuestionsWithPage(mappingQuestionsPage);
+    //             setIsQuestionCorrect(isCorrect)
 
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
+    //         } catch (error) {
+    //             console.error('Error fetching data:', error);
+    //         }
+    //     };
 
-        fetchData();
-    }, []);
+    //     fetchData();
+    // }, []);
 
-    const ButtonListElement =
-        isQuestionCorrect.map((isCorrect, index) => {
-            const isOnPage = currentPageIndex === mappingQuestionsWithPage[index];
-            return (
-                <Button
-                    key={"answer_" + index}
-                    style={{ width: '60px', aspectRatio: '1/1' }}
-                    className={"border-round-md border-solid text-center p-2"}
-                    label={(index + 1).toString()}
-                    severity={getColorButtonOnAnswerSheet(isCorrect, isOnPage)}
-                    onClick={() => {
-                        if (!isOnPage) {
-                            setCurrentPageIndex(mappingQuestionsWithPage[index]);
-                        }
-                    }}
-                />
-            );
-        })
+    // const ButtonListElement =
+    //     isQuestionCorrect.map((isCorrect, index) => {
+    //         const isOnPage = currentPageIndex === mappingQuestionsWithPage[index];
+    //         return (
+    //             <Button
+    //                 key={"answer_" + index}
+    //                 style={{ width: '60px', aspectRatio: '1/1' }}
+    //                 className={"border-round-md border-solid text-center p-2"}
+    //                 label={(index + 1).toString()}
+    //                 severity={getColorButtonOnAnswerSheet(isCorrect, isOnPage)}
+    //                 onClick={() => {
+    //                     if (!isOnPage) {
+    //                         setCurrentPageIndex(mappingQuestionsWithPage[index]);
+    //                     }
+    //                 }}
+    //             />
+    //         );
+    //     })
 
 
-    return (isQuestionCorrect &&
+    return (
         <main className="pt-8 w-full">
 
-            <UserAnswerSheet
+            {/* <UserAnswerSheet
                 visible={isUserAnswerSheetVisible}
                 setVisible={setIsUserAnswerSheetVisible}
                 ButtonListElement={ButtonListElement} />
@@ -110,7 +101,7 @@ export default function TestReviewPage() {
 
 
 
-            </Card>
+            </Card> */}
 
 
 
