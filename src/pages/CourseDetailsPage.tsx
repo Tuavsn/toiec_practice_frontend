@@ -155,6 +155,7 @@ const PracticeSection: React.FC<{ practiceTitles: PracticeTitle[], courseID: str
     }
 )
 
+
 async function fetchQuestionsData(): Promise<CourseOutLine> {
     try {
         const response = await fetch("https://dummyjson.com/c/2cd9-9ec9-42c8-a1e7");
@@ -184,10 +185,11 @@ async function LoadPractice(practicePosition: number | null,
         return;
     }
     const apiPath: string[] = [
-        "https://dummyjson.com/c/8620-9685-4355-9b53",
+        "https://dummyjson.com/c/82d4-66d0-4dea-9e64",
         "https://dummyjson.com/c/4275-12d6-4591-8afb",
         "https://dummyjson.com/c/8a4e-90e2-4124-937d"
     ]
+
     try {
         const response = await fetch(apiPath.at(practicePosition) ?? apiPath[0]);
 

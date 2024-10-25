@@ -126,6 +126,23 @@ export interface LearningProgress extends DataTableValue {
 }
 
 //-------------------------------------------------REQUEST RESPONE OBJECT----------------------------------------------------------------
+export interface TableData<T> {
+  meta: {
+    current: number;
+    pageSize: number;
+    totalPages: number;
+    totalItems: number;
+  };
+  result: T[];
+}
+
+export interface Meta {
+  current: number;
+  pageSize: number;
+  totalPages: number;
+  totalItems: number;
+}
+
 export interface ApiResponse<T> {
   statusCode: number,
   message: any,
@@ -167,7 +184,7 @@ export interface CategoryRow extends DataTableValue {
   id: string;
   format: string;
   year: number;
-  isActive: boolean;
+  active: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -198,9 +215,9 @@ export interface UserRow extends DataTableValue {
   updatedAt: Date;
 }
 
-export interface MultipleChoiceQuestion {
+export interface MultipleChoiceQuest {
   type: 'single' | 'group' | 'subquestion';
-  subQuestions: MultipleChoiceQuestion[];
+  subQuestions: MultipleChoiceQuest[];
   content: string;
   resources: Resource[];
   answers: string[];
@@ -216,14 +233,21 @@ export interface UserResultRow {
 }
 
 export interface TestPaper {
-  totalQuestions: number,
-  questionList: MultipleChoiceQuestion[]
+  totalQuestion: number,
+  listMultipleChoiceQuestions: MultipleChoiceQuestion[]
 }
 
 export interface PracticePaper {
   totalQuestions: number,
   questionList: PracticeQuestion[]
 }
+
+export interface QuestionPage {
+  questionNum: number,
+  page: number,
+}
+
+export type TestAnswerSheet = Map<number, string>;
 
 export interface TestResultSummary {
   createdAt: Date;
@@ -266,7 +290,17 @@ export interface QuestionDetailRecord {
   userAnswer: string;
 }
 
-
+export interface MultipleChoiceQuestion {
+  id: string;
+  questionNum: number;
+  type: string;
+  partNum: number
+  subQuestions: MultipleChoiceQuestion[];
+  content: string;
+  resources: Resource[];
+  answers: string[];
+  userAnswer: string;
+}
 // ------------------------- tham số truyền
 export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;
@@ -281,8 +315,8 @@ export interface UserAnswerSheetProps {
 
 export interface TestAreaProps {
   parts: string,
-  resourcesElement: JSX.Element[],
-  questionsElement: JSX.Element[],
-  currentPageIndex: number,
+  question: MultipleChoiceQuestion,
+  userAnswerSheet: TestAnswerSheet,
+  setTestAnswerSheet: (questionNumber: number, answer: string) => void
   changePage: (offset: number) => void
 }

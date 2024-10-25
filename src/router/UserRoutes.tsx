@@ -11,12 +11,14 @@ import {
     LookUpPage,
     DoTestPage
 } from "../pages/Index";
+import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
 
 export default function UserRoutes() {
     return (
         <Routes>
             {/* Home Page */}
             <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
             <Route path="/home" element={<HomePage />} />
             {/* User Profile */}
             <Route path="/profile" element={<UserProfilePage />} />

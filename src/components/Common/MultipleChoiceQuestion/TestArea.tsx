@@ -2,36 +2,40 @@ import { Button } from "primereact/button"
 import { ScrollPanel } from "primereact/scrollpanel"
 import React from "react"
 import { TestAreaProps } from "../../../utils/types/type"
+import { ConvertThisTestQuestionToHTML } from "../../../utils/convertToHTML"
 
 export const TestArea: React.FC<TestAreaProps> = React.memo(
-    ({ changePage, currentPageIndex, questionsElement, resourcesElement, parts }) => {
+    ({ changePage, question, userAnswerSheet, parts,
+        setTestAnswerSheet
+    }) => {
+        const [resourcesElement, questionsElement]: [JSX.Element[], JSX.Element[]] = ConvertThisTestQuestionToHTML(question, userAnswerSheet, setTestAnswerSheet, parts, changePage);
         return (
-            <React.Fragment>
+            <div className="flex xl:flex-row lg:flex-row flex-wrap md:flex-column sm:flex-column justify-content-between p-5 gap-4 custom-scrollpanel w-full px-0 py-0">
                 <ScrollPanel
-                    className="flex-1 custombar1  border-round m-2 shadow-2"
-                    style={{ minHeight: '50px', overflowY: 'auto', maxHeight: '700px' }}
+                    className="flex-1 custombar1 border-round m-2 shadow-2"
+                    style={{ minHeight: '50px', overflowY: 'auto', minWidth: '600px', maxHeight: '700px' }}
                 >
-                    {resourcesElement[currentPageIndex]}
+                    {resourcesElement}
                 </ScrollPanel>
 
-                <div className="flex-1 ">
-                    {
-                        parts != "0" &&
-                        <div className="flex justify-content-end gap-3 pr-3">
-                            <Button icon="pi pi-angle-double-left" onClick={() => changePage(-1)}></Button>
-                            <Button icon="pi pi-angle-double-right" onClick={() => changePage(1)}></Button>
+                <div className="flex-1" style={{ minWidth: '600px' }}>
+                    {parts != "0" &&
+                        <div className="flex justify-content-end px-3">
+                            <b className="py-0 m-auto text-blue-300">Phần {question.partNum}</b>
+                            <span>
+                                <Button icon="pi pi-angle-double-left" onClick={() => changePage(-1)}></Button>
+                                <Button icon="pi pi-angle-double-right" onClick={() => changePage(1)}></Button>
+                            </span>
                         </div>
                     }
                     <ScrollPanel
-                        className="custombar1  border-round m-2 shadow-2"
-                        style={{ minHeight: '50px', overflowY: 'auto', maxHeight: '700px' }}
+                        className="custombar1 border-round m-2 shadow-2 pl-2"
+                        style={{ minHeight: '50px', overflowY: 'auto', maxHeight: '700px', flex: '1 1 auto' }}
                     >
-                        {questionsElement[currentPageIndex]}
-
-
+                        {questionsElement}
                     </ScrollPanel>
                 </div>
-            </React.Fragment>
-        )
+            </div>
+        );
     }
 )

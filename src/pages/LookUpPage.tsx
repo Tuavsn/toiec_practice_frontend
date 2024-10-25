@@ -4,7 +4,6 @@ import ToeicScorePage from '../components/User/ToeicScoreTable/ToeicScoreTable';
 
 
 const LookUpPage = () => {
-    console.log('Rendering Greeting component');
     
     return (
         <React.Fragment>
