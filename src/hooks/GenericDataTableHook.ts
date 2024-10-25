@@ -4,7 +4,6 @@ import { Toast } from "primereact/toast";
 import { useState, useEffect, useRef } from "react";
 import { ApiResponse, TableData } from "../utils/types/type";
 import { callGetRows } from "../api/api";
-import { AxiosResponse } from "axios";
 
 export function useDataTable<Model extends DataTableValue>(
     urlApi: string,

@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { Toast } from 'primereact/toast';
 import { DataTable, DataTableValue } from 'primereact/datatable';
 
-export const useTable = <T extends { id: string }>() => {
+export const useTable = () => {
     const [selectedItems, setSelectedItems] = useState<DataTableValue[]>([]);
     const [itemCreateDialog, setItemCreateDialog] = useState(false)
     const [itemEditDialog, setItemEditDialog] = useState(false)

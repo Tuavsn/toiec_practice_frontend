@@ -1,8 +1,6 @@
 import axiosClient from "axios";
 
-interface AccessTokenResponse {
-    access_token: string;
-}
+
 
 /**
  * Creates an initial 'axios' instance with custom settings.
@@ -13,7 +11,7 @@ const instance = axiosClient.create({
     withCredentials: true
 });
 
-const NO_RETRY_HEADER = 'x-no-retry';
+
 
 // const handleRefreshToken = async (): Promise<string | null> => {
 //     return await mutex.runExclusive(async () => {

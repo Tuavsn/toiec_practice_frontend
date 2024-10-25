@@ -4,7 +4,7 @@ import { Editor, EditorTextChangeEvent } from "primereact/editor";
 
 export default function EditCourseRichTextBox(props: { content: string }) {
     const [text, setText] = useState<string>('');
-    const [dirty,setDirty] = useState<boolean>(false);
+    const [_dirty,setDirty] = useState<boolean>(false);
     useEffect(() => {
         setText(props.content);
         setDirty(false);

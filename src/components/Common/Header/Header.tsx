@@ -2,8 +2,7 @@ import Logo from "../../../assets/Header-Logo.png"
 import { Menubar } from "primereact/menubar"
 import LoginDialog from "../LoginDialog/LoginDialog"
 import { useNavigate } from "react-router-dom";
-import React, { useRef } from "react";
-import { SpeedDial } from "primereact/speeddial";
+import { useRef } from "react";
 import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
 

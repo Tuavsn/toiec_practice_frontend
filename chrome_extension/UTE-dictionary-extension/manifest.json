@@ -1,14 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "Dictionary App",
+  "name": "UTE App",
   "version": "1.0",
-  "description": "A simple dictionary app for quick lookups.",
+  "description": "A simple app for quick lookups.",
   "permissions": [
-    "activeTab"
+    "contextMenus",
+    "activeTab",
+    "scripting"
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Quick Dictionary"
+    "default_title": "Quick App"
+  },
+  "background": {
+    "service_worker": "background.js"
   },
   "icons": {
     "16": "icons/icon16.png",

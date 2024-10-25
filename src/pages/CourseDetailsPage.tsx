@@ -118,7 +118,7 @@ function RelateCoursesTemplate() {
 
 const PracticeSection: React.FC<{ practiceTitles: PracticeTitle[], courseID: string }> = React.memo(
     ({ practiceTitles, courseID }) => {
-        const [userAnswerSheet, setUserAnswerSheet] = useState<string[]>([]);
+        const [_userAnswerSheet, setUserAnswerSheet] = useState<string[]>([]);
         const [activePracticeIndex, setActivePracticeIndex] = useState<number | number[]>([]);
         const [questionElementList, setQuestionElementList] = useState<JSX.Element[]>([]);
         const [first, setFirst] = useState<number>(0);
