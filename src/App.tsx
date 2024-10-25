@@ -5,7 +5,7 @@ import 'primereact/resources/themes/lara-light-blue/theme.css'; //theme
 import 'primereact/resources/primereact.min.css'; //core css
 import 'primeicons/primeicons.css'; //icons
 import 'primeflex/primeflex.css'; // flex
-import React, { Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react';
 // Lazy load your layouts and routes
 const AdminLayout = lazy(() => import('./components/Layout/AdminLayout'));
 const AdminRoutes = lazy(() => import('./router/AdminRoutes'));

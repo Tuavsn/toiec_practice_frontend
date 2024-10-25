@@ -1,4 +1,3 @@
-import { ApiResponse, TestResultSummary } from "../utils/types/type";
 
 export default function TestReviewPage() {
     // const { id = "" } = useParams<{ id: string }>();
@@ -112,26 +111,26 @@ export default function TestReviewPage() {
 
 //-----------------------helper function
 
-function getColorButtonOnAnswerSheet(isCorrect: boolean, isOnPage: boolean): "success" | "danger" | "info" {
-    const returnString = isCorrect ? 'success' : 'danger';
-    return isOnPage ? 'info' : returnString;
-}
+// function getColorButtonOnAnswerSheet(isCorrect: boolean, isOnPage: boolean): "success" | "danger" | "info" {
+//     const returnString = isCorrect ? 'success' : 'danger';
+//     return isOnPage ? 'info' : returnString;
+// }
 
-async function fetchQuestionsData(defaultValue: TestResultSummary): Promise<TestResultSummary> {
-    try {
-        const response = await fetch("https://dummyjson.com/c/a600-c342-4b74-8f2d");
+// async function fetchQuestionsData(defaultValue: TestResultSummary): Promise<TestResultSummary> {
+//     try {
+//         const response = await fetch("https://dummyjson.com/c/a600-c342-4b74-8f2d");
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+//         if (!response.ok) {
+//             throw new Error('Network response was not ok');
+//         }
 
-        // Get the full response and cast it to ApiResponse<TestPaper>
-        const apiResponse: ApiResponse<TestResultSummary> = await response.json();
+//         // Get the full response and cast it to ApiResponse<TestPaper>
+//         const apiResponse: ApiResponse<TestResultSummary> = await response.json();
 
-        // Return the data part of the response
-        return apiResponse.data;
-    } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
-        return defaultValue;
-    }
-}
+//         // Return the data part of the response
+//         return apiResponse.data;
+//     } catch (error) {
+//         console.error('There was a problem with the fetch operation:', error);
+//         return defaultValue;
+//     }
+// }

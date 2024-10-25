@@ -219,16 +219,3 @@ function dialogBody(row: CategoryRow, setRow: (value: React.SetStateAction<Categ
 
     )
 }
-
-
-
-function createId(): string {
-    let id = '';
-    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (let i = 0; i < 24; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-
-    return id;
-};
