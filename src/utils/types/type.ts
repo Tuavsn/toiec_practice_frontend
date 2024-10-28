@@ -224,7 +224,7 @@ export interface MultipleChoiceQuest {
 }
 
 export interface UserResultRow {
-  id: string,
+  id: ResultID,
   createdAt: Date,
   totalCorrectAnswer: number,
   totalTime: number,
@@ -237,20 +237,14 @@ export interface TestPaper {
   listMultipleChoiceQuestions: MultipleChoiceQuestion[]
 }
 
-export interface PracticePaper {
-  totalQuestions: number,
-  questionList: PracticeQuestion[]
-}
-
 export interface QuestionPage {
-  questionNum: number,
+  questionNum: QuestionNumber,
   page: number,
 }
 
-export type TestAnswerSheet = Map<number, AnswerPair>;
 
 export interface AnswerPair {
-  questionId: string,
+  questionId: QuestionID,
   userAnswer: string
 }
 
@@ -261,6 +255,8 @@ export type TestRecord = {
   parts: string
   type: 'fulltest' | 'practice'
 }
+
+
 
 export interface TestResultSummary {
   createdAt: Date;
@@ -275,8 +271,14 @@ export interface TestResultSummary {
   questionRecords: QuestionDetailRecord[];
 }
 
+export interface PracticePaper {
+  totalQuestions: number,
+  practiceQuestions: PracticeQuestion[]
+}
+
 export interface PracticeQuestion {
-  type: 'single' | 'group' | 'subquestion';
+  id: QuestionID;
+  type: 'single' | 'group' | 'subquestion' | 'ABCD';
   subQuestions: PracticeQuestion[];
   content: string;
   resources: Resource[];
@@ -284,11 +286,6 @@ export interface PracticeQuestion {
   explanation: string;
   answers: string[];
   correctAnswer: string;
-}
-
-export interface PracticeTest {
-  totalQuestions: number;
-  practiceQuestion: PracticeQuestion[];
 }
 
 export interface QuestionDetailRecord {
@@ -304,7 +301,7 @@ export interface QuestionDetailRecord {
 }
 
 export interface MultipleChoiceQuestion {
-  id: string;
+  id: QuestionID;
   questionNum: number;
   type: string;
   partNum: number
@@ -332,3 +329,12 @@ export interface TestAreaProps {
   setTestAnswerSheet: (questionNumber: number, questionID: string, answer: string) => void
   changePage: (offset: number) => void
 }
+
+//---------------------------- tên gọi khác
+export type TestAnswerSheet = Map<QuestionNumber, AnswerPair>;
+export type ResultID = string;
+export type QuestionID = string;
+export type QuestionNumber = number;
+export type TestID = string;
+export type CourseID = string;
+export type PracticeAnswerSheet = Map<QuestionID,string>;

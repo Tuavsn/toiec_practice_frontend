@@ -4,7 +4,7 @@ import { Toolbar } from "primereact/toolbar";
 import { Button } from "primereact/button";
 import '../App.css'
 import { Card } from "primereact/card";
-import { AnswerPair, SimpleTimeCountDownProps, TestAnswerSheet } from "../utils/types/type";
+import { AnswerPair, QuestionID, QuestionNumber, SimpleTimeCountDownProps, TestAnswerSheet, TestID } from "../utils/types/type";
 import { TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useTestPage from "../hooks/TestHook";
 
@@ -13,10 +13,10 @@ function DoTestPage() {
     const navigate = useNavigate();
 
     // Lấy tham số từ URL (id và parts)
-    const { id = "", parts = "" } = useParams<{ id: string, parts: string }>();
+    const { id = "", parts = "" } = useParams<{ id: TestID, parts: string }>();
 
     // Khai báo state để lưu phiếu trả lời của người dùng (Map câu hỏi và câu trả lời)
-    const [userAnswerSheet, setUserAnswerSheet] = useState<TestAnswerSheet>(new Map<number, AnswerPair>());
+    const [userAnswerSheet, setUserAnswerSheet] = useState<TestAnswerSheet>(new Map<QuestionNumber, AnswerPair>());
 
     // Khai báo state để theo dõi trang hiện tại
     const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
@@ -27,11 +27,11 @@ function DoTestPage() {
     // State để bắt đầu bài thi
     const [start, setStart] = useState<boolean>(false);
 
-    // Gọi hook tùy chỉnh để lấy danh sách câu hỏi, bộ ánh xạ trang, và tổng số câu hỏi
+    // Gọi hook tùy chỉnh để lấy danh sách câu hỏi, bộ ánh xạ trang, và tổng số câu hỏi , hàm mở khóa trạng thái IS ON TEST
     const { questionList, pageMapper, totalQuestions, setIsOnTest } = useTestPage(id, parts);
 
     // Hàm cập nhật phiếu trả lời của người dùng
-    const setTestAnswerSheet = (qNum: number, qID: string, answer: string) => {
+    const setTestAnswerSheet = (qNum: QuestionNumber, qID: QuestionID, answer: string) => {
         const newMap = new Map(userAnswerSheet);
         newMap.set(qNum, { questionId: qID, userAnswer: answer });
         setUserAnswerSheet(newMap);
