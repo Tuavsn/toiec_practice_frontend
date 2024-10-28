@@ -1,5 +1,5 @@
 import axios from "./axios-customize";
-import { ApiResponse, CategoryRow, TableData, TestPaper } from "../utils/types/type";
+import { ApiResponse, CategoryRow, TableData, TestPaper, TestRecord } from "../utils/types/type";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
 export const loginUrl = `${host}/oauth2/authorize/google`;
@@ -26,8 +26,13 @@ export const callGetRows = async <Model>(urlApi: string, _pageNumber: number = 1
     return response.data;
 }
 
-export const callGetTestPaper = async (testId: string,parts:string): Promise<ApiResponse<TestPaper>> => {
-    const postfix = parts==='0' ? 'full-test' : `practice?parts=${parts}`;
-    const response = await axios.get<ApiResponse<TestPaper>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}` );
+export const callGetTestPaper = async (testId: string, parts: string): Promise<ApiResponse<TestPaper>> => {
+    const postfix = parts === '0' ? 'full-test' : `practice?parts=${parts}`;
+    const response = await axios.get<ApiResponse<TestPaper>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}`);
+    return response.data;
+}
+
+export const callPostTestRecord = async (testRecord: TestRecord): Promise<ApiResponse<boolean>> => {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/tests/submit`, testRecord)
     return response.data;
 }

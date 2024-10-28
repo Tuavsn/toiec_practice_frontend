@@ -4,81 +4,75 @@ import { Divider } from 'primereact/divider';
 import { Tag } from 'primereact/tag';
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ApiResponse, PracticeTitle, CourseOutLine, PracticeTest } from '../utils/types/type';
+import { ApiResponse, PracticeTitle, CourseOutLine, CourseID, PracticeQuestion, PracticeAnswerSheet, QuestionID, PracticePaper } from '../utils/types/type';
 import { Paginator } from 'primereact/paginator';
-import { ConvertPracticeQuestionToHTML } from '../utils/convertToHTML';
+import { ConvertThisPracticeQuestionToHTML } from '../utils/convertToHTML';
 
+
+// Component chi tiết khóa học
 const CourseDetailsPage: React.FC = () => {
-    const { id = "" } = useParams<{ id: string }>(); // Access course ID from URL params
+    // Lấy ID của khóa học từ tham số URL
+    const { id = "" } = useParams<{ id: CourseID }>();
 
-    const [activeLessonIndex, setActiveLessionIndex] = useState<number | number[]>([]);
+    // Trạng thái lưu danh sách tiêu đề bài giảng
+    const [lectureTitles, setLectureTitles] = useState<string[]>([]);
 
-    const [lectureTitles, setLectureTitles] = useState<string[]>([])
-    const [practiceTitles, setPracticeTitles] = useState<PracticeTitle[]>([])
-    const [currentLesson, setCurrentLesson] = useState<string>("");
+    // Trạng thái lưu danh sách tiêu đề bài tập
+    const [practiceTitles, setPracticeTitles] = useState<PracticeTitle[]>([]);
 
+    // Hook useEffect chạy khi component mount
     useEffect(() => {
-        const fetchCourseOutLine = async () => {
+        // Hàm lấy dữ liệu outline của khóa học
+        const fetchCourseOutline = async () => {
             try {
-                const { lectureTitles, practiceTitles: practiceTitles } = await fetchQuestionsData();
+                // Gọi API lấy tiêu đề bài giảng và bài tập
+                const { lectureTitles, practiceTitles: practiceTitles } = await fetchCourseOutLine();
+                // Lưu tiêu đề bài tập vào state
                 setPracticeTitles([...practiceTitles]);
+                // Lưu tiêu đề bài giảng vào state
                 setLectureTitles([...lectureTitles]);
-
             } catch (error) {
-                console.error('Error fetching Course outline:', error);
+                // Bắt lỗi khi không lấy được dữ liệu
+                console.error('Error fetching course outline:', error);
             }
         };
 
-        fetchCourseOutLine();
+        // Gọi hàm fetchCourseOutline
+        fetchCourseOutline();
     }, []);
 
-
-
-
-
+    // Phần giao diện của component
     return (
         <div>
+            {/* Hiển thị tiêu đề khóa học */}
             <h2>Course Details for ID: {id}</h2>
-            <div className='flex flex-column md:flex-row'>
+            <div className='flex-1 flex-column md:flex-row'>
+                {/* Nội dung chính của khóa học */}
                 <main className='align-items-center justify-content-center border-round m-2' style={{ minWidth: '70%' }}>
-                    {lectureTitles &&
-                        <Card className='shadow-8'>
-                            <h1>Lý thuyết</h1>
-                            <Accordion activeIndex={activeLessonIndex}
-                                onTabChange={(e) => {
-                                    setActiveLessionIndex(e.index as number);
-                                    LoadLessons(e.index as number, id, setCurrentLesson);
-                                }}>
-                                {
-                                    lectureTitles.map((lectureTitle, index) => {
-                                        return (
-                                            <AccordionTab key={"lectureNo_" + index} header={lectureTitle}>
-                                                {
-                                                    (index === activeLessonIndex) &&
-                                                    <div dangerouslySetInnerHTML={{ __html: currentLesson }} />
-                                                }
-                                            </AccordionTab>
-                                        )
-                                    })
-                                }
-                            </Accordion>
-                        </Card>
-                    }
-                    <br></br>
+                    <div className='flex flex-row flex-wrap pb-5'>
+                        <LectureSection lectureTitles={lectureTitles} courseId={id} />
+                        {/* Phần hiển thị các khóa học liên quan */}
+                        <aside className='align-items-center justify-content-center border-round m-2' style={{ minWidth: '28%' }}>
+                            <Card className='shadow-6'>
+                                <h1 className='text-center'>Một số khóa học khác</h1>
+                                {RelateCoursesTemplate()}
+                            </Card>
+                        </aside>
+                    </div>
+
+
+                    <br />
+                    {/* Phần hiển thị các bài tập */}
                     <PracticeSection practiceTitles={practiceTitles} courseID={id} />
                 </main>
-                <aside className='align-items-center justify-content-center border-round m-2' style={{ minWidth: '28%' }}>
-                    <Card className='shadow-6'>
-                        <h1 className='text-center'>Một số khóa học khác</h1>
-                        {RelateCoursesTemplate()}
-                    </Card>
-                </aside>
+
             </div>
-        </div >
+        </div>
     );
 };
 
 export default CourseDetailsPage;
+
 
 
 function headerTemplate(title: string, iscompleted: boolean) {
@@ -115,48 +109,117 @@ function RelateCoursesTemplate() {
 
 }
 
+const LectureSection: React.FC<{ lectureTitles: string[], courseId: CourseID }> = React.memo(
+    ({ lectureTitles, courseId }) => {
+        // Trạng thái lưu vị trí bài học hiện tại
+        const [activeLessonIndex, setActiveLessonIndex] = useState<number | number[]>([]);
+        // Trạng thái lưu nội dung bài học hiện tại
+        const [currentLesson, setCurrentLesson] = useState<string>("");
 
-const PracticeSection: React.FC<{ practiceTitles: PracticeTitle[], courseID: string }> = React.memo(
-    ({ practiceTitles, courseID }) => {
-        const [_userAnswerSheet, setUserAnswerSheet] = useState<string[]>([]);
-        const [activePracticeIndex, setActivePracticeIndex] = useState<number | number[]>([]);
-        const [questionElementList, setQuestionElementList] = useState<JSX.Element[]>([]);
-        const [first, setFirst] = useState<number>(0);
-
-
-        
-        return (
-            practiceTitles &&
-            <Card className='shadow-7'>
-                <h1>Bài tập</h1>
-                <Accordion activeIndex={activePracticeIndex} onTabChange={(e) => {
-                    setActivePracticeIndex(e.index as number);
-                    LoadPractice(e.index as number, courseID, setQuestionElementList, setFirst, setUserAnswerSheet);
-                }}>
-                    {
-                        practiceTitles.map((practiceDetail, index) => {
-                            return (
-                                <AccordionTab key={"homeworkNo_" + index} header={headerTemplate(practiceDetail.title, practiceDetail.isCompleted)} >
-                                    {
-                                        (index === activePracticeIndex) && (questionElementList.length) && (
-                                            <React.Fragment>
-                                                {questionElementList[first]}
-                                                < Paginator first={first} rows={1} totalRecords={questionElementList.length} onPageChange={(event) => setFirst(event.first)} template={{ layout: 'PrevPageLink CurrentPageReport NextPageLink' }} />
-                                            </React.Fragment>
-                                        )
-                                    }
-                                </AccordionTab>
-                            )
-                        })
-                    }
+        return lectureTitles && (
+            <Card className='shadow-8 flex-1' style={{flexBasis:'900', minWidth:'700px'}}>
+                <h1>Lý thuyết</h1>
+                {/* Accordion hiển thị các bài giảng */}
+                <Accordion
+                    activeIndex={activeLessonIndex}
+                    onTabChange={(e) => {
+                        // Cập nhật bài giảng đang chọn và tải nội dung bài học
+                        setActiveLessonIndex(e.index as number);
+                        LoadLessons(e.index as number, courseId, setCurrentLesson);
+                    }}>
+                    {lectureTitles.map((lectureTitle, index) => (
+                        // Tab cho từng bài giảng
+                        <AccordionTab key={"lectureNo_" + index} header={lectureTitle}>
+                            {(index === activeLessonIndex) && (
+                                // Nội dung bài giảng hiện tại
+                                <div dangerouslySetInnerHTML={{ __html: currentLesson }} />
+                            )}
+                        </AccordionTab>
+                    ))}
                 </Accordion>
             </Card>
         )
     }
 )
 
+// Component PracticeSection dùng để hiển thị các bài tập của khóa học
+const PracticeSection: React.FC<{ practiceTitles: PracticeTitle[], courseID: CourseID }> = React.memo(
+    ({ practiceTitles, courseID }) => {
+        // Trạng thái lưu câu trả lời của người dùng
+        const [userAnswerSheet, setUserAnswerSheet] = useState<PracticeAnswerSheet>(new Map<QuestionID, string>());
 
-async function fetchQuestionsData(): Promise<CourseOutLine> {
+        // Trạng thái lưu vị trí bài tập hiện tại
+        const [activePracticeIndex, setActivePracticeIndex] = useState<number | number[]>([]);
+
+        // Trạng thái lưu danh sách các câu hỏi hiển thị
+        const [questionPage, setQuestionPage] = useState<PracticeQuestion[]>([]);
+
+        // Trạng thái lưu vị trí câu hỏi đầu tiên được hiển thị trong paginator
+        const [first, setFirst] = useState<number>(0);
+
+        // tổng số câu hỏi cần phải trả lời để tính hoàn thành bài tập
+        const [totalQuestions, setToTalQuestions] = useState<number>(0);
+
+        // cập nhật vào danh sách các câu trả lời của người dùng. nếu trả lời đủ số câu thì coi như kết thúc 
+        const updateUserAnswerSheet = (qID: QuestionID, answer: string) => {
+            const newAnswerSheet = new Map(userAnswerSheet);
+            newAnswerSheet.set(qID, answer);
+            setUserAnswerSheet(newAnswerSheet);
+            if (newAnswerSheet.size >= totalQuestions) {
+                alert("làm xong");
+                console.log(JSON.stringify(newAnswerSheet, null, 2));
+
+            }
+        }
+        // điều hướng sang trang mới / cũ
+        const paginator: JSX.Element =
+            <Paginator
+                className='inline mr-3'
+                first={first}
+                rows={1}
+                totalRecords={questionPage.length}
+                onPageChange={(event) => setFirst(event.first)}
+                template={{ layout: 'PrevPageLink CurrentPageReport NextPageLink' }} />
+
+        // Trả về phần giao diện của component
+        return (
+            practiceTitles && (
+                // Thẻ chứa danh sách bài tập
+                <Card className='shadow-7'>
+                    <h1>Bài tập</h1>
+                    {/* Accordion hiển thị danh sách bài tập */}
+                    <Accordion
+                        activeIndex={activePracticeIndex}
+                        onTabChange={(e) => {
+                            // Cập nhật vị trí bài tập hiện tại và tải dữ liệu bài tập
+                            setActivePracticeIndex(e.index as number);
+                            LoadPractice(e.index as number, courseID, setQuestionPage, setFirst, setUserAnswerSheet, setToTalQuestions);
+                        }}>
+                        {practiceTitles.map((practiceDetail, index) => (
+                            // Tab hiển thị thông tin từng bài tập
+                            <AccordionTab
+                                key={"homeworkNo_" + index}
+                                header={headerTemplate(practiceDetail.title, practiceDetail.isCompleted)}>
+                                {/* Hiển thị câu hỏi nếu đang ở bài tập hiện tại */}
+                                {(index === activePracticeIndex) && questionPage.length > 0 && (
+                                    <React.Fragment>
+
+                                        {ConvertThisPracticeQuestionToHTML(questionPage[first], userAnswerSheet, updateUserAnswerSheet, paginator) /* Hiển thị câu hỏi hiện tại */}
+                                        {/* Paginator cho phép chuyển câu hỏi */}
+
+                                    </React.Fragment>
+                                )}
+                            </AccordionTab>
+                        ))}
+                    </Accordion>
+                </Card>
+            )
+        );
+    }
+);
+
+
+async function fetchCourseOutLine(): Promise<CourseOutLine> {
     try {
         const response = await fetch("https://dummyjson.com/c/2cd9-9ec9-42c8-a1e7");
 
@@ -177,17 +240,19 @@ async function fetchQuestionsData(): Promise<CourseOutLine> {
 
 async function LoadPractice(practicePosition: number | null,
     courseID: string,
-    setCurrentQuestionElementList: React.Dispatch<React.SetStateAction<JSX.Element[]>>,
+    setCurrentQuestionList: React.Dispatch<React.SetStateAction<PracticeQuestion[]>>,
     setFirst: React.Dispatch<React.SetStateAction<number>>,
-    setUserAnswerSheet: React.Dispatch<React.SetStateAction<string[]>>
+    setUserAnswerSheet: React.Dispatch<React.SetStateAction<PracticeAnswerSheet>>,
+    setToTalQuestions: React.Dispatch<React.SetStateAction<number>>
 ): Promise<void> {
     if (!practicePosition && typeof practicePosition != 'number' || !courseID) {
         return;
     }
     const apiPath: string[] = [
-        "https://dummyjson.com/c/82d4-66d0-4dea-9e64",
-        "https://dummyjson.com/c/4275-12d6-4591-8afb",
-        "https://dummyjson.com/c/8a4e-90e2-4124-937d"
+        "https://dummyjson.com/c/e6c2-181c-4ceb-86b1",
+        "https://dummyjson.com/c/f192-bdf5-4f29-b409",
+        "https://dummyjson.com/c/66ae-8554-4737-b4f7",
+
     ]
 
     try {
@@ -198,32 +263,14 @@ async function LoadPractice(practicePosition: number | null,
         }
 
         // Assuming the response structure matches your LessonDetail type
-        const apiResponse: ApiResponse<PracticeTest> = await response.json();
-        setUserAnswerSheet(Array<string>(apiResponse.data.totalQuestions).fill(''));
-        const [resources, questions] = ConvertPracticeQuestionToHTML(apiResponse.data.practiceQuestion, setUserAnswerSheet);
+        const apiResponse: ApiResponse<PracticePaper> = await response.json();
+        setUserAnswerSheet(new Map<QuestionID, string>());
+        setToTalQuestions(apiResponse.data.totalQuestions)
+        setCurrentQuestionList(apiResponse.data.practiceQuestions);
         setFirst(0);
-
-
-        setCurrentQuestionElementList(
-            resources.map((resource, index) => {
-                return (
-                    <div key={practicePosition + "practiceQuestionElement" + index}>
-                        <Card>
-                            {resource}
-                        </Card>
-                        <br />
-                        <Card>
-                            {questions[index]}
-                        </Card>
-                    </div>
-                )
-            }
-            )
-        )
 
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
-        setCurrentQuestionElementList([<>Lỗi Rồi</>]);
     }
 }
 

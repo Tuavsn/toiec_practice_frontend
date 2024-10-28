@@ -1,8 +1,10 @@
 import { Card } from "primereact/card";
-import { MultipleChoiceQuestion, PracticeQuestion, QuestionDetailRecord, QuestionPage, Resource, TestAnswerSheet } from "./types/type";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionDetailRecord, QuestionID, QuestionNumber, QuestionPage, Resource, TestAnswerSheet } from "./types/type";
 import { Image } from 'primereact/image';
 import { Accordion, AccordionTab } from "primereact/accordion";
-import React, { useState } from "react";
+import React from "react";
+import { ScrollPanel } from "primereact/scrollpanel";
+import { Divider } from "primereact/divider";
 
 export function ConvertTestRecordToHTML(questionRecords: QuestionDetailRecord[]): [JSX.Element[], JSX.Element[], number[], boolean[]] {
     const resoursesSection: JSX.Element[] = [];
@@ -70,58 +72,70 @@ export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[
     return questionPages;
 }
 
-export function ConvertPracticeQuestionToHTML(
-    practiceQuestions: PracticeQuestion[],
-    setUserAnswerSheet: React.Dispatch<React.SetStateAction<string[]>>
-): [JSX.Element[], JSX.Element[], number] {
+export function ConvertThisPracticeQuestionToHTML(
+    practiceQuestion: PracticeQuestion,
+    userAnswerSheet: PracticeAnswerSheet,
+    updateUserAnswerSheet: (qID: QuestionID, answer: string) => void,
+    paginator: JSX.Element
+): JSX.Element {
 
-    const resoursesSection: JSX.Element[] = [];
-    const questionsSection: JSX.Element[] = [];
-    let questionNum: number = 0;
 
-    for (const pQuestion of practiceQuestions) {
-        const resoursesElement: JSX.Element[] = [];
-        const questionsElement: JSX.Element[] = [];
-        resoursesElement.push(...ResourcesToHTML(pQuestion.resources, questionNum));
-        if (pQuestion.type !== 'group') {
-            questionNum += 1;
+    const resourcesElement: JSX.Element[] = [];
+    const questionsElement: JSX.Element[] = [];
+    let qNum: QuestionNumber = 0;
+    if (practiceQuestion.resources) {
+        resourcesElement.push(...ResourcesToHTML(practiceQuestion.resources, qNum));
+    }
+    if (practiceQuestion.subQuestions) {
 
+
+        questionsElement.push(
+            <h3 key={"group" + qNum} > {practiceQuestion.content} </h3>
+        );
+        for (const subpq of practiceQuestion.subQuestions) {
+            qNum += 1;
+            questionsElement.push(<h5 key={"h5" + qNum} > {qNum}.{subpq.content} </h5>)
+            resourcesElement.push(...ResourcesToHTML(subpq.resources, qNum));
             questionsElement.push(
-                <h5 key={"h5" + questionNum} > {questionNum}.{pQuestion.content} </h5>
-            );
-            questionsElement.push(
-                <PracticeAnswerToHTML key={"pracAns" + questionNum} question={pQuestion} questionNum={questionNum} setUserAnswerSheet={setUserAnswerSheet} />
+                PracticeAnswerToHTML(subpq, userAnswerSheet.get(subpq.id) ?? "", updateUserAnswerSheet),
+                <Divider key={"divider" + subpq.id} />
             )
 
         }
-        else {
-            questionsElement.push(<h3 key={"group" + questionNum} > {pQuestion.content} </h3>);
-            for (const subPQuestion of pQuestion.subQuestions) {
-                questionNum += 1;
-
-                questionsElement.push(<h5 key={"h5" + questionNum} > {questionNum}.{subPQuestion.content} </h5>);
-                resoursesElement.push(...ResourcesToHTML(subPQuestion.resources, questionNum));
-                questionsElement.push(
-                    <PracticeAnswerToHTML key={"pracAns" + questionNum} question={subPQuestion} questionNum={questionNum} setUserAnswerSheet={setUserAnswerSheet} />
-                )
-            }
-        }
-
-
-        questionsSection.push(
-            <section className="p-3" key={"qSection" + questionNum} >
-                {questionsElement}
-            </section>
-        );
-        resoursesSection.push(
-            <section key={"resouresSection" + questionNum} >
-                {resoursesElement}
-            </section>
-        );
 
     }
+    else {
+        qNum += 1;
+        questionsElement.push(<h5 key={"group" + qNum} > {qNum}. {practiceQuestion.content} </h5>);
+        questionsElement.push(
+            PracticeAnswerToHTML(practiceQuestion, userAnswerSheet.get(practiceQuestion.id) ?? "", updateUserAnswerSheet),
+            <Divider key={"divider" + practiceQuestion.id} />
+        )
 
-    return [resoursesSection, questionsSection, questionNum]
+    }
+    return (
+        <div className="flex xl:flex-row lg:flex-row flex-wrap md:flex-row sm:flex-row justify-content-between p-5 gap-4 custom-scrollpanel w-full px-0 py-0 text-sm">
+            <ScrollPanel
+                className="flex-1 custombar1 border-round m-2 shadow-2"
+                style={{ minHeight: '50px', overflowY: 'auto', minWidth: '400px', maxHeight: '100%' }}
+            >
+                {resourcesElement}
+            </ScrollPanel>
+
+            <div className="flex-1" style={{ minWidth: '600px' }}>
+                <div className="flex justify-content-around">
+                    <p className="inline m-auto bg-blue-200 p-2">trang này có {qNum} câu</p>
+                    {paginator}
+                </div>
+                <ScrollPanel
+                    className="custombar1 border-round m-2 shadow-2 pl-2"
+                    style={{ minHeight: '50px', overflowY: 'auto', maxHeight: '400px', flex: '1 1 auto' }}
+                >
+                    {questionsElement}
+                </ScrollPanel>
+            </div>
+        </div>
+    )
 }
 
 function ResourcesToHTML(resources: Resource[], qNum: number): JSX.Element[] {
@@ -158,7 +172,7 @@ function ResourcesToHTML(resources: Resource[], qNum: number): JSX.Element[] {
     return resourcesElement;
 }
 
-function TestResourcesToHTML(resources: Resource[], qNum: number, parts: string, changePage: (offset: number) => void): JSX.Element[] {
+function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, parts: string, changePage: (offset: number) => void): JSX.Element[] {
     if (!resources) {
         return [<h1 key={"res_" + qNum}>Cố lên</h1>]
     }
@@ -272,76 +286,74 @@ function UserAnswerToHTML(question: QuestionDetailRecord, questionNum: number): 
     );
 }
 
-const PracticeAnswerToHTML: React.FC<{ question: PracticeQuestion, questionNum: number, setUserAnswerSheet: React.Dispatch<React.SetStateAction<string[]>> }> = React.memo(
-    ({ question, questionNum, setUserAnswerSheet }) => {
-        const pos = questionNum - 1;
-        const [userAnswer, setUserAnswer] = useState<string>("");
-        return (
-            <div key={"panswer" + questionNum} className={"flex flex-column gap-3 my-3"}>
-                {question.answers.map((answer, index) => {
-                    let colorBackground = '';
-                    if (userAnswer && answer === question.correctAnswer) {
-                        colorBackground = 'bg-green-500';
-                    } else if (answer === userAnswer) {
-                        colorBackground = 'bg-red-500';
-                    }
+function PracticeAnswerToHTML(question: PracticeQuestion, userAnswer: string, updateUserAnswerSheet: (qID: QuestionID, answer: string) => void) {
+    const answerTexts: string[] = (question.type === 'ABCD') ? ['A', 'B', 'C', 'D'] : question.answers;
+    return (
+        <div key={"panswer" + question.id} className={"flex flex-column gap-3 mb-3 pb-7"}>
+            {question.answers.map((answer, index) => {
+                let colorBackground = '';
+                if (userAnswer && answer === question.correctAnswer) {
+                    colorBackground = 'bg-green-500';
+                } else if (answer === userAnswer) {
+                    colorBackground = 'bg-red-500';
+                }
 
-                    return (
-                        <div key={"answerbox" + index} className={"flex align-items-center py-3 " + colorBackground}>
-                            <input
-                                key={index + "radio" + questionNum}
-                                style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }}
-                                type="radio"
-                                id={"id" + questionNum + index}
-                                name={`answer-${questionNum}`}
-                                value={answer}
-                                checked={userAnswer === answer}
-                                onChange={() => {
-                                    setUserAnswer(answer)
-
-                                    setUserAnswerSheet((prevUserAnswerSheet) => {
-                                        const newUserAnswerSheet = [...prevUserAnswerSheet];
-                                        newUserAnswerSheet[pos] = answer;
-                                        console.log(answer);
-                                        return newUserAnswerSheet;
-                                    });
-                                }}
-                            />
-                            <label key={index + "label" + questionNum} htmlFor={"id" + questionNum + index} style={{ marginLeft: '8px' }}>
-                                {answer}
-                            </label>
-                        </div>
-                    );
-                })}
-                {userAnswer &&
-                    <React.Fragment>
-                        <Accordion>
+                return (
+                    <div key={"answerbox" + index} className={"flex align-items-center py-3 " + colorBackground}>
+                        <input
+                            key={index + "radio" + question.id}
+                            style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }}
+                            type="radio"
+                            id={"id" + question.id + index}
+                            name={`answer-${question.id}`}
+                            value={answer}
+                            checked={userAnswer === answer}
+                            onChange={() => {
+                                updateUserAnswerSheet(question.id, answer);
+                            }}
+                        />
+                        <label key={index + "label" + question.id} htmlFor={"id" + question.id + index} style={{ marginLeft: '8px' }}>
+                            {answerTexts[index]}
+                        </label>
+                    </div>
+                );
+            })}
+            {userAnswer &&
+                <React.Fragment>
+                    <Accordion>
+                        {
+                            question.transcript !== "" &&
                             <AccordionTab header="Dịch nghĩa">
                                 <div className="card">
                                     {question.transcript}
                                 </div>
                             </AccordionTab>
-                        </Accordion>
 
-                        <Accordion>
+                        }
+
+                    </Accordion>
+
+                    <Accordion>
+                        {
+                            question.explanation !== "" &&
                             <AccordionTab header="Giải thích đáp án">
                                 <div className="card">
                                     {question.explanation}
                                 </div>
                             </AccordionTab>
-                        </Accordion>
-                    </React.Fragment>
-                }
-            </div>
-        );
-    }
-);
+                        }
+                    </Accordion>
+                </React.Fragment>
+            }
+        </div>
+    );
+}
 
 // Hàm chuyển đổi câu hỏi trắc nghiệm thành HTML
 export function ConvertThisTestQuestionToHTML(
     question: MultipleChoiceQuestion,            // Đối tượng câu hỏi trắc nghiệm
     userAnswerSheet: TestAnswerSheet,            // Phiếu trả lời của người dùng (Map câu hỏi - câu trả lời)
-    setTestAnswerSheet: (questionNumber: number, questionId: string, answer: string) => void,  // Hàm cập nhật phiếu trả lời
+    setTestAnswerSheet: (questionNumber: QuestionNumber, questionId: QuestionID, answer: string) => void,  // Hàm cập nhật phiếu trả lời
     parts: string,                               // Phần của bài thi (vd: listening, reading)
     changePage: (offset: number) => void         // Hàm thay đổi trang
 ): [JSX.Element[], JSX.Element[]] {              // Trả về hai mảng phần tử JSX: tài nguyên và câu hỏi
