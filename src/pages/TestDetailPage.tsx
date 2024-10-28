@@ -12,7 +12,7 @@ import { Button } from "primereact/button";
 
 function TestDetailPage() {
     const navigate = useNavigate();
-    const { id = "" } = useParams<{ id: string }>(); // Access course ID from URL params
+    const { id = "671a25094dbe5f4c165c31dc" } = useParams<{ id: string }>(); // Access course ID from URL params
     const data = GetFakeUserResult();
     const topics = GetFakeTopics();
     const { parts, onPartSelectChange } = useCheckBox();

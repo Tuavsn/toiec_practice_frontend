@@ -69,9 +69,9 @@ export default function TestPage() {
             }
 
             <div className="flex flex-wrap row-gap-4 align-items-stretch mt-4" >
-                {currentTestCards.map((testCard) => (
+                {currentTestCards.map((testCard,index) => (
 
-                    <Card style={{ flex: "1 1 0px" }} key={testCard.id} title={<p className="text-center">{testCard.name}</p>} className="flex align-items-left justify-content-center border-round m-2 shadow-2 min-h-full">
+                    <Card style={{ flex: "1 1 0px" }} key={testCard.id+ index} title={<p className="text-center">{testCard.name}</p>} className="flex align-items-left justify-content-center border-round m-2 shadow-2 min-h-full">
                         <div>
                             <p>
                                 <strong>Format:</strong> {testCard.format}
@@ -148,61 +148,61 @@ function GetLabel(): CategoryLabel[] {
 function GetFakeData(): TestCard[] {
     return [
         {
-            id: "cat001",
+            id: "671a25094dbe5f4c165c31dc",
             format: "Video",
             year: 2023,
             name: 'đề',
         },
         {
-            id: "cat002",
+            id: "671a25094dbe5f4c165c31dc",
             format: "Audio",
             year: 2022,
             name: 'đề',
         },
         {
-            id: "cat003",
+            id: "671a25094dbe5f4c165c31dc",
             format: "PDF",
             year: 2024,
             name: 'đề',
         },
         {
-            id: "cat004",
+            id: "671a25094dbe5f4c165c31dc",
             format: "E-book",
             year: 2021,
             name: 'đề',
         },
         {
-            id: "cat005",
+            id: "671a25094dbe5f4c165c31dc",
             format: "Webinar",
             year: 2023,
             name: 'đề',
         },
         {
-            id: "cat006",
+            id: "671a25094dbe5f4c165c31dc",
             format: "Interactive Course",
             year: 2024,
             name: 'đề',
         },
         {
-            id: "cat007",
+            id: "671a25094dbe5f4c165c31dc",
             format: "Article",
             year: 2020,
             name: 'đề',
         },
         {
-            id: "cat008",
+            id: "671a25094dbe5f4c165c31dc",
             format: "Tutorial",
             year: 2023,
             name: 'đề',
         },
         {
-            id: "cat009",
+            id: "671a25094dbe5f4c165c31dc",
             format: "Podcast",
             year: 2022,
             name: 'đề',
         },
         {
-            id: "cat010",
+            id: "671a25094dbe5f4c165c31dc",
             format: "Workshop",
             year: 2024,
             name: 'đề',

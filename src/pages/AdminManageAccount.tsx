@@ -1,6 +1,5 @@
 import { Card } from "primereact/card";
 import React, { memo } from "react";
-import AdminManageTestPage from "./AdminManageTestPage";
 import { Toast } from "primereact/toast";
 import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { GenericTable } from "../components/Common/Index";
@@ -11,7 +10,7 @@ import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
 import { timeStampBodyTemplate, statusBodyTemplate } from "../components/Common/Table/CommonColumn";
-export function AdminManageAccountPage() {
+function AdminManageAccountPage() {
 
     const emptyAccount: UserRow = {
         id: "",
@@ -124,7 +123,7 @@ export function AdminManageAccountPage() {
 }
 
 
-export default memo(AdminManageTestPage);
+export default memo(AdminManageAccountPage);
 
 
 // ------------------------------------- helper function---------------------------------------------------

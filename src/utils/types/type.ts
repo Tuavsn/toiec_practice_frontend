@@ -247,7 +247,20 @@ export interface QuestionPage {
   page: number,
 }
 
-export type TestAnswerSheet = Map<number, string>;
+export type TestAnswerSheet = Map<number, AnswerPair>;
+
+export interface AnswerPair {
+  questionId: string,
+  userAnswer: string
+}
+
+export type TestRecord = {
+  answerPair: AnswerPair[],
+  totalSeconds: number,
+  testId: string,
+  parts: string
+  type: 'fulltest' | 'practice'
+}
 
 export interface TestResultSummary {
   createdAt: Date;
@@ -299,7 +312,6 @@ export interface MultipleChoiceQuestion {
   content: string;
   resources: Resource[];
   answers: string[];
-  userAnswer: string;
 }
 // ------------------------- tham số truyền
 export interface SimpleTimeCountDownProps {
@@ -317,6 +329,6 @@ export interface TestAreaProps {
   parts: string,
   question: MultipleChoiceQuestion,
   userAnswerSheet: TestAnswerSheet,
-  setTestAnswerSheet: (questionNumber: number, answer: string) => void
+  setTestAnswerSheet: (questionNumber: number, questionID: string, answer: string) => void
   changePage: (offset: number) => void
 }

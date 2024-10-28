@@ -4,7 +4,7 @@ import { Toolbar } from "primereact/toolbar";
 import { Button } from "primereact/button";
 import '../App.css'
 import { Card } from "primereact/card";
-import { SimpleTimeCountDownProps, TestAnswerSheet } from "../utils/types/type";
+import { AnswerPair, SimpleTimeCountDownProps, TestAnswerSheet } from "../utils/types/type";
 import { TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useTestPage from "../hooks/TestHook";
 
@@ -16,7 +16,7 @@ function DoTestPage() {
     const { id = "", parts = "" } = useParams<{ id: string, parts: string }>();
 
     // Khai báo state để lưu phiếu trả lời của người dùng (Map câu hỏi và câu trả lời)
-    const [userAnswerSheet, setUserAnswerSheet] = useState<TestAnswerSheet>(new Map<number, string>());
+    const [userAnswerSheet, setUserAnswerSheet] = useState<TestAnswerSheet>(new Map<number, AnswerPair>());
 
     // Khai báo state để theo dõi trang hiện tại
     const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
@@ -28,17 +28,19 @@ function DoTestPage() {
     const [start, setStart] = useState<boolean>(false);
 
     // Gọi hook tùy chỉnh để lấy danh sách câu hỏi, bộ ánh xạ trang, và tổng số câu hỏi
-    const { questionList, pageMapper, totalQuestions } = useTestPage(id, parts);
+    const { questionList, pageMapper, totalQuestions, setIsOnTest } = useTestPage(id, parts);
 
     // Hàm cập nhật phiếu trả lời của người dùng
-    const setTestAnswerSheet = (qNum: number, answer: string) => {
+    const setTestAnswerSheet = (qNum: number, qID: string, answer: string) => {
         const newMap = new Map(userAnswerSheet);
-        newMap.set(qNum, answer);
+        newMap.set(qNum, { questionId: qID, userAnswer: answer });
         setUserAnswerSheet(newMap);
     }
 
     // Hàm kết thúc bài thi và điều hướng tới trang xem lại
     const onEndTest = () => {
+        setIsOnTest(false);
+        localStorage.setItem("userAnswer", JSON.stringify([...userAnswerSheet.values()]))
         navigate(`/test/${~~(Math.random() * 1_000_000)}/review`);
     }
 
@@ -60,7 +62,7 @@ function DoTestPage() {
                     style={{ width: '60px', aspectRatio: '1/1' }}
                     className={"border-round-md border-solid text-center p-2"}
                     label={(pq.questionNum).toString()}
-                    severity={getColorButtonOnAnswerSheet(userAnswerSheet.get(pq.questionNum) ?? "", isOnPage)} // Màu sắc cập nhật dựa trên giá trị "isOnPage"
+                    severity={getColorButtonOnAnswerSheet(userAnswerSheet.get(pq.questionNum)?.userAnswer ?? "", isOnPage)} // Màu sắc cập nhật dựa trên giá trị "isOnPage"
                     onClick={() => {
                         if (!isOnPage) {
                             setCurrentPageIndex(pq.page);
@@ -76,8 +78,8 @@ function DoTestPage() {
             <h1 className="text-center"> Đề {id} với các phần {parts}</h1>
             {!start &&
                 <div className="flex justify-content-center">
-                 <Button label="bắt đầu" onClick={() => setStart(true)}></Button>
-                
+                    <Button label="bắt đầu" onClick={() => setStart(true)}></Button>
+
                 </div>
             }
             {start &&
@@ -96,13 +98,13 @@ function DoTestPage() {
                         end={<Button severity="success" label="Nộp bài" onClick={() => onEndTest()} />}
                     />
                     <Card className="max-w-screen">
-                        
-                            <TestArea changePage={changePage}
-                                parts={parts}
-                                question={questionList[currentPageIndex]}
-                                setTestAnswerSheet={setTestAnswerSheet}
-                                userAnswerSheet={userAnswerSheet} />
-                        
+
+                        <TestArea changePage={changePage}
+                            parts={parts}
+                            question={questionList[currentPageIndex]}
+                            setTestAnswerSheet={setTestAnswerSheet}
+                            userAnswerSheet={userAnswerSheet} />
+
                     </Card>
                 </React.Fragment>
             }

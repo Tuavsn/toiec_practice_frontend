@@ -13,7 +13,7 @@ const banners = [
 const bannerTemplate = (banner: any) => {
     return (
         <div className="banner-item">
-            <img src={banner.image} alt={banner.title} style={{ width: '100%', maxHeight: '600px', objectFit: 'contain' }} />
+            <img loading="lazy" src={banner.image} alt={banner.title} style={{ width: '100%', maxHeight: '600px', objectFit: 'contain' }} />
         </div>
     );
 };

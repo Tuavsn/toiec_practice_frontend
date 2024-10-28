@@ -1,7 +1,7 @@
 import { Card } from "primereact/card";
 import React from "react";
 
-export default function TempAdminPage(text: string) {
+export default function TempAdminPage({ text }: { text: string }) {
 
     return (
         <React.Fragment>

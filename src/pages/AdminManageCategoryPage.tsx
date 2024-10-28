@@ -25,7 +25,7 @@ const breadCrumbItems = [
     { label: 'Dashboard', icon: 'pi pi-cog', url: '/dashboard' },
 ];
 
-export function AdminManageCategoryPage() {
+function AdminManageCategoryPage() {
     const emptyCategory: CategoryRow = {
         id: "",
         format: "vô danh",
