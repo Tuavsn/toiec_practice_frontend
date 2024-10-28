@@ -165,23 +165,38 @@ function TestResourcesToHTML(resources: Resource[], qNum: number, parts: string,
     const resourcesElement: JSX.Element[] = [];
     resources.forEach(
         (r, index) => {
+            const keyPrefix = r.type + qNum.toString() + index;
             switch (r.type) {
                 case 'paragraph':
-                    resourcesElement.push(<Card key={"para" + qNum.toString() + index} style={{ borderStyle: 'dotted', borderColor: 'lavender' }} ><p >{r.content}</p></Card>)
+                    resourcesElement.push(<Card key={keyPrefix} style={{ borderStyle: 'dotted', borderColor: 'lavender' }} ><p >{r.content}</p></Card>)
                     break;
                 case 'image':
                     resourcesElement.push(
                         // nếu audio chạy hết mà người dùng vẫn đang trong chế độ phóng to ảnh. web sẽ không cuộn được nữa
-                        <div key={"img" + qNum.toString() + index} className="p-3 text-center"> <Image src={r.content} width="80%" height="auto" indicatorIcon={<i className="pi pi-search"></i>} alt="Image" preview loading='lazy' /> </div>
+                        <div key={keyPrefix} className="p-3 text-center"> <Image src={r.content} width="80%" height="auto" indicatorIcon={<i className="pi pi-search"></i>} alt="Image" preview loading='lazy' /> </div>
                     )
+
                     break;
                 case 'audio':
-                    resourcesElement.unshift(
-                        <audio key={"audio" + qNum + index.toString()} className='w-full' controls autoPlay={true} onEnded={parts === '0' ? () => changePage(1) : undefined} hidden={parts === '0'}>
-                            <source src={r.content} type="audio/mpeg" />
-                            Your browser does not support the audio element.
-                        </audio>
-                    )
+                    if (parts === '0') {
+                        resourcesElement.unshift(
+                            <div key={"div" + keyPrefix}>
+                                <h5 className="text-center pt-1">Listen . . .🔊</h5>
+                                <audio key={keyPrefix} className='w-full' autoPlay={true} onPause={(e) => e.currentTarget.play()} onEnded={() => changePage(1)} hidden>
+                                    <source src={r.content} type="audio/mpeg" />
+                                    Your browser does not support the audio element.
+                                </audio>
+
+                            </div>
+                        )
+                    } else {
+                        resourcesElement.unshift(
+                            <audio key={keyPrefix} className='w-full' controls autoPlay={true} >
+                                <source src={r.content} type="audio/mpeg" />
+                                Your browser does not support the audio element.
+                            </audio>
+                        )
+                    }
                     break;
                 default:
                     console.error("not have that: ", r.type);
@@ -191,6 +206,18 @@ function TestResourcesToHTML(resources: Resource[], qNum: number, parts: string,
     )
 
     return resourcesElement;
+}
+
+async function fetchResourceAsBlob(url: string): Promise<void> {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch resource: ${url}`);
+        }
+        // trình duyệt đưa tài nguyên vào bộ nhớ đệm
+    } catch (error) {
+        console.error("Error fetching resource:", error);
+    }
 }
 
 function UserAnswerToHTML(question: QuestionDetailRecord, questionNum: number): JSX.Element {
@@ -314,7 +341,7 @@ const PracticeAnswerToHTML: React.FC<{ question: PracticeQuestion, questionNum: 
 export function ConvertThisTestQuestionToHTML(
     question: MultipleChoiceQuestion,            // Đối tượng câu hỏi trắc nghiệm
     userAnswerSheet: TestAnswerSheet,            // Phiếu trả lời của người dùng (Map câu hỏi - câu trả lời)
-    setTestAnswerSheet: (questionNumber: number, answer: string) => void,  // Hàm cập nhật phiếu trả lời
+    setTestAnswerSheet: (questionNumber: number, questionId: string, answer: string) => void,  // Hàm cập nhật phiếu trả lời
     parts: string,                               // Phần của bài thi (vd: listening, reading)
     changePage: (offset: number) => void         // Hàm thay đổi trang
 ): [JSX.Element[], JSX.Element[]] {              // Trả về hai mảng phần tử JSX: tài nguyên và câu hỏi
@@ -345,7 +372,7 @@ export function ConvertThisTestQuestionToHTML(
 
             // Xây dựng phần tử HTML cho từng câu hỏi con
             questionsElement.push(
-                BuildTestQuestionHTML(subq, userAnswerSheet.get(subq.questionNum) ?? "", setTestAnswerSheet)
+                BuildTestQuestionHTML(subq, userAnswerSheet.get(subq.questionNum)?.userAnswer ?? "", setTestAnswerSheet)
             );
         }
     } else {
@@ -356,7 +383,7 @@ export function ConvertThisTestQuestionToHTML(
 
         // Xây dựng phần tử HTML cho câu hỏi
         questionsElement.push(
-            BuildTestQuestionHTML(question, userAnswerSheet.get(question.questionNum) ?? "", setTestAnswerSheet)
+            BuildTestQuestionHTML(question, userAnswerSheet.get(question.questionNum)?.userAnswer ?? "", setTestAnswerSheet)
         );
     }
 
@@ -371,7 +398,7 @@ export function ConvertThisTestQuestionToHTML(
 function BuildTestQuestionHTML(
     question: MultipleChoiceQuestion,             // Đối tượng câu hỏi trắc nghiệm
     userAnswer: string,                           // Câu trả lời hiện tại của người dùng
-    setTestAnswerSheet: (questionNumber: number, answer: string) => void // Hàm cập nhật phiếu trả lời
+    setTestAnswerSheet: (questionNumber: number, questionId: string, answer: string) => void // Hàm cập nhật phiếu trả lời
 ): JSX.Element {
 
     // Lấy số câu hỏi hiện tại
@@ -397,7 +424,7 @@ function BuildTestQuestionHTML(
                             value={answerTexts[index]}             // Giá trị của mỗi đáp án
                             checked={userAnswer === answer}        // Kiểm tra đáp án nào đang được chọn
                             onChange={() => {                     // Khi người dùng chọn, cập nhật phiếu trả lời
-                                setTestAnswerSheet(currentQuestionNumber, answer);
+                                setTestAnswerSheet(currentQuestionNumber, question.id, answer);
                             }}
                         />
                         <label key={index + "label" + currentQuestionNumber} htmlFor={"id" + currentQuestionNumber + index} style={{ marginLeft: '8px' }}>

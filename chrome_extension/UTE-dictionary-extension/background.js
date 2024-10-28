@@ -63,14 +63,14 @@ function translateSelectedText(tabId, text, lang) {
 
 // Hàm để hiển thị văn bản đã dịch
 function showTranslatedText(text, selectedText) {
-    const existingPopup = document.getElementById('translation-popup'); // Kiểm tra xem popup đã tồn tại chưa
+    const existingPopup = document.getElementById('translation-popup_for_extension_ute_app'); // Kiểm tra xem popup đã tồn tại chưa
     if (existingPopup) {
         existingPopup.remove(); // Nếu tồn tại, xóa popup hiện tại
     }
 
     const popup = document.createElement('div');                // Tạo phần tử div cho popup
     popup.id = 'translation-popup';                             // Đặt ID cho popup
-    popup.style.position = 'fixed';                             // Đặt popup ở vị trí cố định
+    popup.style.position = 'absolute';                             // Đặt popup ở vị trí cố định
     popup.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';   // Đặt nền trắng bán trong suốt
     popup.style.border = '1px solid #ccc';                      // Đặt viền màu xám nhạt
     popup.style.borderRadius = '8px';                           // Thêm góc bo tròn
@@ -81,7 +81,7 @@ function showTranslatedText(text, selectedText) {
     popup.style.maxWidth = '300px';                             // Đặt chiều rộng tối đa cho popup
     popup.style.fontFamily = 'Arial, sans-serif';               // Đặt font chữ sạch sẽ
     popup.style.fontSize = '14px';                              // Đặt kích thước font chữ dễ đọc
-
+    popup.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
 
     // Định vị popup gần với văn bản đã chọn

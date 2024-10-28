@@ -1,26 +1,27 @@
-import HomePage from "./HomePage"
-import AdminDashboardPage from "./AdminDashboardPage"
-import UserProfilePage from "./UserProfilePage"
-import TestPage from "./TestPage"
-import TestDetailPage from "./TestDetailPage"
-import TestReviewPage from "./TestReviewPage"
-import CoursePage from "./CoursePage"
-import NotFoundPage from "./NotFoundPage"
-import AdminManageCategoryPage from "./AdminManageCategoryPage"
-import CourseDetailsPage from "./CourseDetailsPage"
-import LookUpPage from "./LookUpPage"
-import DoTestPage from "./DoTestPage"
+import React from "react";
+
+
+const HomePage = React.lazy(() => import("./HomePage"));
+const UserProfilePage = React.lazy(() => import("./UserProfilePage"));
+const TestPage = React.lazy(() => import("./TestPage"));
+const TestDetailPage = React.lazy(() => import("./TestDetailPage"));
+const TestReviewPage = React.lazy(() => import("./TestReviewPage"));
+const CoursePage = React.lazy(() => import("./CoursePage"));
+const NotFoundPage = React.lazy(() => import("./NotFoundPage"));
+const CourseDetailsPage = React.lazy(() => import("./CourseDetailsPage"));
+const LookUpPage = React.lazy(() => import("./LookUpPage"));
+const DoTestPage = React.lazy(() => import("./DoTestPage"));
+
+
 export {
     HomePage,
-    AdminDashboardPage,
     UserProfilePage,
     TestPage,
     TestDetailPage,
     TestReviewPage,
     CoursePage,
     NotFoundPage,
-    AdminManageCategoryPage,
     CourseDetailsPage,
     LookUpPage,
     DoTestPage
-}
+};

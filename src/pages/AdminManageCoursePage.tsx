@@ -9,7 +9,7 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { Card } from "primereact/card";
 import EditCourseRichTextBox from "../components/Common/richTextBox/richTextBox";
 
-export function AdminManageCoursePage() {
+function AdminManageCoursePage() {
 
     const [courses, setCourses] = useState<Course[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableExpandedRows | DataTableValueArray | undefined>(undefined);
