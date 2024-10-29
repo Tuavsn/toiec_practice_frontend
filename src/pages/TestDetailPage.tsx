@@ -1,14 +1,14 @@
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { UserResultRow } from "../utils/types/type";
-import { Tag } from "primereact/tag";
-import React, { memo } from "react";
+import { memo } from "react";
 import formatDate from "../utils/formatDateToString";
 import { Checkbox } from "primereact/checkbox";
 import { useCheckBox } from "../hooks/TestDetailPapeHook";
 import { Chip } from "primereact/chip";
 import { Button } from "primereact/button";
+import { UserResultTemplate } from "../components/Common/Table/CommonColumn";
 
 function TestDetailPage() {
     const navigate = useNavigate();
@@ -20,8 +20,8 @@ function TestDetailPage() {
         <Column key="col-createdAt" field="createdAt" header="Ngày làm" body={(rowData: UserResultRow) => formatDate(rowData.createdAt)} sortable filter />,
         <Column key="col-correct_count" field="totalCorrectAnswer" header="Kết quả" sortable filter />,
         <Column key="col-time" field="totalTime" header="Thời gian làm bài" sortable filter />,
-        <Column key="col-type" header="Loại" body={typeBodyTemplate} />,
-        <Column key="col-detail" body={detailBodyTemplate} />,
+        <Column key="col-type" header="Loại" body={UserResultTemplate.typeUserResultRowBodyTemplate} />,
+        <Column key="col-detail" body={UserResultTemplate.detailUserResultRowBodyTemplate} />,
     ];
 
     const checkboxes = Array.from({ length: 8 }, (_, index) => {
@@ -95,7 +95,7 @@ function TestDetailPage() {
             </section>
             <section>
                 <h3>Kết quả làm bài của bạn:</h3>
-                <DataTable value={data} showGridlines stripedRows scrollable scrollHeight="600px">
+                <DataTable  size={'small'} value={data} showGridlines stripedRows scrollable scrollHeight="600px">
                     {columns}
                 </DataTable>
             </section>
@@ -120,41 +120,7 @@ function TestDetailPage() {
 
 export default memo(TestDetailPage);
 
-function detailBodyTemplate(row: UserResultRow) {
-    return (
-        <Link className="text-blue-500" to={"/" + row.id}>Xem chi tiết</Link>
-    )
-}
 
-function getSeverity(row: UserResultRow) {
-    switch (row.type) {
-        case "fulltest":
-            return 'success';
-
-        case "practice":
-            return 'warning';
-        default:
-            return null;
-    }
-};
-
-function typeBodyTemplate(rowData: UserResultRow) {
-    return (
-        <React.Fragment>
-            {rowData.type === "fulltest" &&
-                <Tag value={"Thi thử"} severity={getSeverity(rowData)}></Tag>
-            }
-            {rowData.type === "practice" &&
-                rowData.parts.map((part, index) => {
-                    return (
-                        <Tag key={"tag" + index} value={(part) + ""} severity={getSeverity(rowData)}></Tag>
-                    )
-                })
-
-            }
-        </React.Fragment>
-    );
-};
 
 function DecodeCheckBoxesToUrl(parts: boolean[]): string {
 
