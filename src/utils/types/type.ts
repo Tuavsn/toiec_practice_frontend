@@ -126,6 +126,10 @@ export interface LearningProgress extends DataTableValue {
 }
 
 //-------------------------------------------------REQUEST RESPONE OBJECT----------------------------------------------------------------
+export interface RandomQutote {
+  content: string,
+  author: string,
+}
 export interface TableData<T> {
   meta: {
     current: number;
@@ -230,6 +234,15 @@ export interface UserResultRow {
   totalTime: number,
   type: 'practice' | 'fulltest';
   parts: number[];  // Practice parts
+}
+
+export type UserDetailResultRow = UserResultRow & {
+  testFormatAndYear: string,
+  totalReadingScore: number,
+  totalListeningScore: number,
+  totalIncorrectAnswer: number,
+  totalSkipAnswer: number,
+
 }
 
 export interface TestPaper {
@@ -337,4 +350,6 @@ export type QuestionID = string;
 export type QuestionNumber = number;
 export type TestID = string;
 export type CourseID = string;
-export type PracticeAnswerSheet = Map<QuestionID,string>;
+export type PracticeAnswerSheet = Map<QuestionID, string>;
+export type CategoryID = string;
+export type ResponseUserResultList = ApiResponse<TableData<UserDetailResultRow>>;

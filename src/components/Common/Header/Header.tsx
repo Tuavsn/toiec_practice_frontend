@@ -15,9 +15,12 @@ export default function Header() {
     const navigate = useNavigate();
     // Sử dụng useRef để tham chiếu đến OverlayPanel
     const op = useRef<OverlayPanel>(null);
-    
+
     // Lấy giá trị isOnTest từ context
-    const { isOnTest } = useTestState(); 
+    const { isOnTest } = useTestState();
+
+    // Định nghĩa logo hiển thị ở đầu header
+    const HeaderStart = <img src={Logo} height={70} alt="Logo" />;
 
     // Định nghĩa danh sách các mục trong header
     const HeaderItems = [
@@ -31,27 +34,26 @@ export default function Header() {
     if (localStorage.getItem('role') === 'ADMIN') {
         HeaderItems.push({ label: 'Dashboard', icon: 'pi pi-cog', command: () => handleCommand('/dashboard') });
     }
-
-    // Định nghĩa logo hiển thị ở đầu header
-    const HeaderStart = <img src={Logo} height={70} alt="Logo" />;
+    // tắt bảng hiển thị khi nhấn vào biểu tượng người dùng
+    const toggleOverlayPanel = (e: any) => {
+        // Khi nhấn vào nút, toggle OverlayPanel
+        if (op.current) {
+            op.current.toggle(e);
+        }
+    }
 
     // Định nghĩa nội dung hiển thị ở cuối header
     const HeaderEnd = localStorage.getItem('access_token') ? (
         <div className="card flex justify-content-center pr-3">
             <div className="m-auto pr-2">
-                {localStorage.getItem('email') /* Hiển thị email người dùng */} 
+                {localStorage.getItem('email') /* Hiển thị email người dùng */}
             </div>
             <Button icon="pi pi-user" rounded text raised severity="info" aria-label="User"
-                onClick={(e) => {
-                    // Khi nhấn vào nút, toggle OverlayPanel
-                    if (op.current) {
-                        op.current.toggle(e);
-                    }
-                }} 
+                onClick={toggleOverlayPanel}
             />
             <OverlayPanel ref={op}>
                 <div className="block">
-                    <Button className="block" link>hả</Button>
+                    <Button className="block" link onClick={(e) => { toggleOverlayPanel(e); navigate('/profile') }}>Cá nhân</Button>
                     <Button className="block" link>đọc cái gì</Button>
                     <Button className="block" link>mất 5 giây cuộc đời</Button>
                 </div>
@@ -66,7 +68,7 @@ export default function Header() {
         // Kiểm tra trạng thái kiểm tra
         if (isOnTest) {
             // Hiển thị cảnh báo nếu đang trong trạng thái kiểm tra
-            alert('Bạn không thể điều hướng trong khi đang làm bài kiểm tra!'); 
+            alert('Bạn không thể điều hướng trong khi đang làm bài kiểm tra!');
         } else {
             navigate(path); // Điều hướng đến đường dẫn nếu không phải là trạng thái kiểm tra
         }

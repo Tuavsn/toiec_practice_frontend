@@ -60,52 +60,9 @@ function AdminManageCategoryPage() {
         setGlobalFilter
     } = useDataTable<CategoryRow>('categories', emptyCategory
         , (state) => ({
-            saveRow: async () => {
-                state.setSubmitted(true);
-                if (state.row.format.trim()) {
-                    let _rows = [...state.rows];
-                    let _row = { ...state.row };
-                    // call api
-                    try {
-
-                        const createResponse = await callCreateCateogry(_row.format, _row.year);
-                        if (createResponse) {
-                            console.log(createResponse.statusCode);
-
-                            if (createResponse.statusCode === 201) {
-                                state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
-                                const getResponse = await callGetCategory();
-                                if (getResponse.data.statusCode === 200) {
-                                    state.setRows(...getResponse.data.data)
-                                }
-                            }
-                        }
-                    }
-                    catch (error: any) {
-                        state.toast.current?.show({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 5000 });
-                    }
-                    finally {
-                        state.setRows(_rows);
-                        console.log(_rows);
-                        state.setRowDialog(false);
-                        state.setRow(emptyCategory);
-                    }
-
-
-
-
-
-
-
-
-
-
-                }
-            },
+            saveRow: async () => await customSaveRowFunction(state, emptyCategory)
         })
     );
-
-    // "https://dummyjson.com/c/5667-8045-46d4-a86d"
 
 
     const renderColumns = [
@@ -117,9 +74,6 @@ function AdminManageCategoryPage() {
         <Column key="col-tests" field="tests" header="Tests" body={TestsBodyTemplate} style={{ minWidth: '17ream' }} />,
         <Column key="col-isActive" field="isActive" header="status" sortable body={statusBodyTemplate} />,
     ];
-
-
-    // console.log("render ");
 
     return (
         <React.Fragment>
@@ -161,7 +115,37 @@ export default memo(AdminManageCategoryPage);
 
 
 // ------------------------------------- helper function---------------------------------------------------
+async function customSaveRowFunction(state: any, emptyCategory: CategoryRow) {
 
+    state.setSubmitted(true);
+    if (state.row.format.trim()) {
+        let _rows: CategoryRow[] = [...state.rows];
+        let _row: CategoryRow = { ...state.row };
+        // call api
+        try {
+
+            const createResponse = await callCreateCateogry(_row.format, _row.year);
+            if (createResponse) {
+                console.log(createResponse.statusCode);
+
+                if (createResponse.statusCode === 201) {
+                    state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
+                    _rows.push(createResponse.data);
+                }
+            }
+        }
+        catch (error: any) {
+            state.toast.current?.show({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 5000 });
+        }
+        finally {
+            state.setRows(_rows);
+            console.log(_rows);
+            state.setRowDialog(false);
+            state.setRow(emptyCategory);
+        }
+    }
+
+}
 //--------------------- def columns---------------------------------
 
 
@@ -203,6 +187,7 @@ function dialogBody(row: CategoryRow, setRow: (value: React.SetStateAction<Categ
                 className={classNames({ 'p-invalid': submitted && !row.format })}
             />
             {submitted && !row.format && <small className="p-error">format is required.</small>}
+            <h3>Năm phát hành</h3>
             <Calendar
                 value={row.year ? new Date(row.year, 0, 1) : null}  // Convert year number to Date object (Jan 1st)
                 onChange={(e) => {

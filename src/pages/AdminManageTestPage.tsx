@@ -2,7 +2,7 @@
 import React, { memo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from 'primereact/card';
-import { TestRow } from '../utils/types/type';
+import { CategoryID, TestRow } from '../utils/types/type';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { SimpleDialog } from '../components/Common/Dialog/SimpleDialog';
@@ -15,7 +15,7 @@ import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
 
 export function AdminManageTestPage() {
-    const { category_id = "no idCategory found" } = useParams<{ category_id: string }>();
+    const { category_id = "no idCategory found" } = useParams<{ category_id: CategoryID }>();
     const emptyTest: TestRow = {
         id: '',
         name: '',
