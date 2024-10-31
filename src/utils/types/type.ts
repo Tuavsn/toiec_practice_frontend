@@ -323,6 +323,11 @@ export interface MultipleChoiceQuestion {
   resources: Resource[];
   answers: string[];
 }
+
+export interface SuggestionsForUser {
+  title: string;
+  content: string;
+}
 // ------------------------- tham số truyền
 export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;

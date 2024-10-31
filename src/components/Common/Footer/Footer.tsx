@@ -1,7 +1,10 @@
 import Logo from "../../../assets/Header-Logo.png"
+import { useTestState } from "../../../context/TestStateProvider";
 
 export default function Footer() {
-    return (
+    // Lấy giá trị isOnTest từ context
+    const { isOnTest } = useTestState();
+    return ( !isOnTest &&
         <div className="mt-5 pb-2 flex justify-content-between align-items-center">
             <img src={Logo} height={60} alt="Logo" />
             <div>

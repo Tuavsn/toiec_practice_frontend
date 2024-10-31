@@ -13,3 +13,26 @@
 .custom-scrollpanel .p-scrollpanel.custombar1 .p-scrollpanel-bar:hover {
     background-color: var(--primary-400);
 }
+
+.custom-box {
+    border: 2px dashed;
+    border-color: var(--surface-border);
+    background-color: var(--surface-ground);
+    border-radius: var(--border-round);
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 500;
+    padding-left: 10px;
+    text-align: start;
+}
+
+/* .custom-container:has(#do-test-page) {
+    
+ 
+} */
+
+#user-layout:has(#do-test-page) {
+    margin: 20px auto !important;
+}

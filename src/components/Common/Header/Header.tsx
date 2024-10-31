@@ -75,7 +75,7 @@ export default function Header() {
     };
 
     // Trả về giao diện của header
-    return (
+    return ( !isOnTest &&
         <div className="fixed top-0 left-0 right-0 z-5">
             <Menubar model={HeaderItems} start={HeaderStart} end={HeaderEnd} /> {/* Hiển thị Menubar với các mục */}
         </div>

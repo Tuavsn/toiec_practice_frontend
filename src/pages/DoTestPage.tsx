@@ -3,7 +3,6 @@ import React, { memo, useCallback, useEffect, useState } from "react";
 import { Toolbar } from "primereact/toolbar";
 import { Button } from "primereact/button";
 import '../App.css'
-import { Card } from "primereact/card";
 import { AnswerPair, QuestionID, QuestionNumber, SimpleTimeCountDownProps, TestAnswerSheet, TestID } from "../utils/types/type";
 import { TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useTestPage from "../hooks/TestHook";
@@ -74,8 +73,7 @@ function DoTestPage() {
 
     // Render giao diện bài thi
     return (totalQuestions &&
-        <main className="pt-8 w-full">
-            <h1 className="text-center"> Đề {id} với các phần {parts}</h1>
+        <main id="do-test-page" className="w-full">
             {!start &&
                 <div className="flex justify-content-center">
                     <Button label="bắt đầu" onClick={() => setStart(true)}></Button>
@@ -83,12 +81,13 @@ function DoTestPage() {
                 </div>
             }
             {start &&
-                <React.Fragment>
+                <section className=" flex flex-column justify-content-center">
                     <UserAnswerSheet
                         visible={isUserAnswerSheetVisible}
                         setVisible={setIsUserAnswerSheetVisible}
                         ButtonListElement={ButtonListElement} />
                     <Toolbar
+                     className="py-1"
                         start={currentStatusBodyTemplate(userAnswerSheet, totalQuestions, setIsUserAnswerSheetVisible)}
                         center={
                             <SimpleTimeCountDown
@@ -97,7 +96,7 @@ function DoTestPage() {
                         }
                         end={<Button severity="success" label="Nộp bài" onClick={() => onEndTest()} />}
                     />
-                    <Card className="max-w-screen">
+                    <div id="test-area-container" className="max-w-screen p-0">
 
                         <TestArea changePage={changePage}
                             parts={parts}
@@ -105,8 +104,8 @@ function DoTestPage() {
                             setTestAnswerSheet={setTestAnswerSheet}
                             userAnswerSheet={userAnswerSheet} />
 
-                    </Card>
-                </React.Fragment>
+                    </div>
+                </section>
             }
         </main >
     );
@@ -161,9 +160,9 @@ const SimpleTimeCountDown: React.FC<SimpleTimeCountDownProps> = React.memo(
         const bgColorClass = secondsLeft <= 30 ? 'bg-red-200' : 'bg-blue-200';
 
         return (
-            <div className={` text-center  flex-1 
+            <div className={` text-center
     align-items-center justify-content-center`}>
-                <h5 className={`px-3 inline py-3 ${bgColorClass} border-dashed border-round-md`}>
+                <h5 className={`px-1 inline py-1 ${bgColorClass} border-dashed border-round-md`}>
                     {minutes} phút và {seconds < 10 ? `0${seconds}` : seconds} giây
                 </h5>
             </div>
