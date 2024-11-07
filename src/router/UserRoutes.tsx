@@ -13,10 +13,11 @@ import {
 } from "../pages/Index";
 import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
 import { Suspense } from "react";
+import { LoadingSpinner } from "../components/Common/Index";
 
 export default function UserRoutes() {
     return (
-        <Suspense fallback={<div className='text-center m-8'>Trang Người dùng đang tải xin chờ...</div>}>
+        <Suspense fallback={<LoadingSpinner text="Trang người dùng đang tải...."/>}>
             <Routes>
                 {/* Home Page */}
                 <Route path="/" element={<Navigate to="/home" />} />
@@ -29,7 +30,7 @@ export default function UserRoutes() {
                 {/* Test Detail Page */}
                 <Route path="/test/:id" element={<TestDetailPage />} />
                 {/* Do Test  Page */}
-                <Route path="/dotest/:id/:parts" element={<DoTestPage />} />
+                <Route path="/dotest/:id/:type/:parts" element={<DoTestPage />} />
                 {/* Test Review Page */}
                 <Route path="/test/:id/review" element={<TestReviewPage />} />
                 {/* Flash Card Page */}

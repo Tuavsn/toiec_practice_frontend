@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from 'react';
+import { LoadingSpinner } from "../components/Common/Index";
 const TempAdminPage = lazy(() => import("../pages/TempAdminPage"))
 const AdminDashboardPage = lazy(() => import("../pages/AdminDashboardPage"))
 const AdminManageAccountPage = lazy(() => import("../pages/AdminManageAccount"))
@@ -9,7 +10,7 @@ const AdminManageCoursePage = lazy(() => import("../pages/AdminManageCoursePage"
 
 export default function AdminRoutes() {
     return (
-        <Suspense fallback={<div className='text-center m-8'>Trang Quản trị đang tải xin chờ...</div>}>
+        <Suspense fallback={<LoadingSpinner text="Trang quản trị đang tải...."/>}>
             <Routes>
                 <Route path="/" element={<AdminDashboardPage />} /> {/* Default Admin Page */}
                 <Route path="test-analyst" element={<TempAdminPage text="phân tích bài thi" />} />

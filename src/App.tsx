@@ -12,13 +12,14 @@ const AdminRoutes = lazy(() => import('./router/AdminRoutes'));
 const UserLayout = lazy(() => import('./components/Layout/UserLayout'));
 const UserRoutes = lazy(() => import('./router/UserRoutes'));
 import Container from './components/Layout/Container';
+import { LoadingSpinner } from './components/Common/Index';
 
 
 
 function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div className='text-center m-8'>Trang Toeic đang tải xin chờ...</div>}>
+      <Suspense fallback={<LoadingSpinner text="Trang Toeic đang tải...." />}>
         <Container>
           <Routes>
             {localStorage.getItem('role') === 'ADMIN' &&
@@ -29,7 +30,7 @@ function App() {
           </Routes>
         </Container>
       </Suspense>
-    </BrowserRouter>
+    </BrowserRouter >
   );
 }
 

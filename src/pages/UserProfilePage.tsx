@@ -1,19 +1,19 @@
 import { Card } from "primereact/card";
-import { Chart as PrimeChart } from "primereact/chart";
 import { Doughnut, Pie } from "react-chartjs-2";
 import 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart as ChartJS, registerables, Plugin } from 'chart.js';
 import { useActiveLog, useProfilePage } from "../hooks/ProfileHook";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Column } from "primereact/column";
-import { SuggestionsForUser, UserDetailResultRow } from "../utils/types/type";
+import { SkillInsightsProps, SuggestionsForUser, TopicRecord, UserDetailResultRow } from "../utils/types/type";
 import formatDate from "../utils/formatDateToString";
 import { UserResultTemplate } from "../components/Common/Table/CommonColumn";
 import { DataTable } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Stepper, StepperRefAttributes } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
+import { SelectButton } from "primereact/selectbutton";
 // Đăng ký các phần tử Chart.js cần thiết
 ChartJS.register(...registerables);
 // Đăng ký plugin DataLabels
@@ -32,21 +32,21 @@ export default function UserProfilePage() {
 
     return (
         <main className="pt-8 flex gap-3 flex-column">
-            <div>
-            <Card className='shadow-7' title="1. Mục tiêu bản thân"><UserGoal /></Card>
-            <Card className='shadow-7' title="2. Đang diễn ra"><CurrentCourse/></Card>
+            <div key="area-1">
+                <Card key="user-goal" className='shadow-7' title="1. Mục tiêu bản thân"><UserGoal /></Card>
+                <Card key="current-course" className='shadow-7' title="2. Đang diễn ra"><CurrentCourse /></Card>
             </div>
-            <div className="flex gap-3 flex-wrap">
-                <Card className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="3. Tổng quan tiến độ ">{ProgressOverview(averageListeningScore, averageReadingScore)}</Card>
-                <Card className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="4. Thông tin chi tiết kỹ năng">{SkillInsights(toeicPartsInsightView)}</Card>
+            <div key="area-2" className="flex gap-3 flex-wrap">
+                <Card key="progress-overview" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="3. Tổng quan tiến độ ">{ProgressOverview(averageListeningScore, averageReadingScore)}</Card>
+                <Card key="skill-insight" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="4. Thông tin chi tiết kỹ năng"><SkillInsights parts={toeicPartsInsightView} /></Card>
             </div>
-            <Card className='shadow-7' title="5. Nhật ký học tập"><ActivityLog /></Card>
-            <div className="flex gap-3 flex-wrap">
-                <Card className="shadow-7 flex-1" style={{ minWidth: "590px" }} title="6. Thời gian học tập theo kỹ năng">{TimeSpent(timeSpentOnParts, smallestAmount)}</Card>
-                <Card className='shadow-7 flex-1' title="7. Đề xuất cải thiện">{Suggestions(suggestionsForCurrentUser)}</Card>
+            <Card key="activity-log" className='shadow-7' title="5. Nhật ký học tập"><ActivityLog /></Card>
+            <div key="area-3" className="flex gap-3 flex-wrap">
+                <Card key="time-spent" className="shadow-7 flex-1" style={{ minWidth: "590px" }} title="6. Thời gian học tập theo kỹ năng">{TimeSpent(timeSpentOnParts, smallestAmount)}</Card>
+                <Card key="suggestion" className='shadow-7 flex-1' title="7. Đề xuất cải thiện">{Suggestions(suggestionsForCurrentUser)}</Card>
 
             </div>
-            <Card className='shadow-7' title="7. Thống kê"></Card>
+            <Card key="stat" className='shadow-7' title="7. Thống kê"></Card>
         </main>
     );
 }
@@ -56,8 +56,6 @@ export default function UserProfilePage() {
 //---[1]-------------------------------------------------------------------------------------------------------------------------------------------
 const UserGoal: React.FC = React.memo(
     () => {
-        // Lấy dữ liệu cho bảng từ hook useActiveLog
-        const { dataForTable } = useActiveLog();
 
         return (
             <main>
@@ -69,9 +67,6 @@ const UserGoal: React.FC = React.memo(
 //---[2]-------------------------------------------------------------------------------------------------------------------------------------------
 const CurrentCourse: React.FC = React.memo(
     () => {
-        // Lấy dữ liệu cho bảng từ hook useActiveLog
-        const { dataForTable } = useActiveLog();
-
         return (
             <main>
             </main>
@@ -118,23 +113,23 @@ function ProgressOverview(averageListeningScore: number, averageReadingScore: nu
         <main>
             <div className="flex flex-wrap justify-content-around">
                 <section className="shadow-4 p-3 border-round-xs">
-                    <h1>Điểm phân bổ theo kỹ năng</h1> {/* Tiêu đề cho phần thông tin */}
+                    <h1>Điểm phân bổ theo kỹ năng</h1>
                     <table style={{ borderSpacing: '30px' }}>
                         <tbody>
                             <tr>
                                 <td>Điểm nghe trung bình</td>
-                                <td>{averageListeningScore}</td> {/* Hiển thị điểm nghe trung bình */}
+                                <td>{averageListeningScore}</td>
                             </tr>
                             <tr>
                                 <td>Điểm đọc trung bình</td>
-                                <td>{averageReadingScore}</td> {/* Hiển thị điểm đọc trung bình */}
+                                <td>{averageReadingScore}</td>
                             </tr>
                             <tr>
-                                <td><hr></hr></td>
+                                <td colSpan={2}><hr /></td>
                             </tr>
                             <tr>
                                 <td><b>Tổng điểm trung bình</b></td>
-                                <td><b>{averageListeningScore + averageReadingScore} / 990</b></td> {/* Tổng điểm trung bình */}
+                                <td><b>{averageListeningScore + averageReadingScore} / 990</b></td>
                             </tr>
                         </tbody>
                     </table>
@@ -150,11 +145,9 @@ function ProgressOverview(averageListeningScore: number, averageReadingScore: nu
 }
 
 //---[4]-------------------------------------------------------------------------------------------------------------------------------------------
-function SkillInsights(toeicParts: number[]) {
-    // Khởi tạo dữ liệu cho biểu đồ radar
-    const data = {
-        labels: [
-            "", // Nhãn đầu tiên để lấp chỗ trống
+const SkillInsights: React.FC<SkillInsightsProps> = React.memo(
+    ({ parts }) => {
+        const partNames = [
             "Nghe hình ảnh", // Kỹ năng nghe hình ảnh
             "Nghe câu hỏi và trả lời", // Kỹ năng nghe câu hỏi và trả lời
             "Nghe hội thoại", // Kỹ năng nghe hội thoại
@@ -162,75 +155,26 @@ function SkillInsights(toeicParts: number[]) {
             "Đọc câu", // Kỹ năng đọc câu
             "Đọc đoạn văn", // Kỹ năng đọc đoạn văn
             "Đọc hiểu" // Kỹ năng đọc hiểu
-        ],
-        datasets: [
-            {
-                label: 'Kỹ năng', // Nhãn cho bộ dữ liệu
-                borderColor: "#ff0000", // Màu viền của đường biểu diễn
-                pointBackgroundColor: "#aa0000", // Màu nền cho các điểm
-                pointBorderColor: "#880000", // Màu viền cho các điểm
-                pointHoverBackgroundColor: "#550000", // Màu nền khi di chuột qua điểm
-                pointHoverBorderColor: "#990000", // Màu viền khi di chuột qua điểm
-                pointRadius: 8, // Bán kính điểm
-                pointHoverRadius: 10, // Bán kính điểm khi di chuột
-                data: [0, ...toeicParts] // Dữ liệu điểm số của các kỹ năng
-            }
         ]
-    };
-
-    // --Tùy chọn cho biểu đồ radar-------------------------------------------------------------------------------------
-    const options = {
-        plugins: {
-            legend: {
-                labels: {
-                    color: "#000000", // Màu chữ cho legend
-                    font: {
-                        size: 17 // Kích thước chữ cho legend
-                    }
-                }
-            },
-            tooltip: {
-                callbacks: {
-                    label: function (tooltipItem: { label: any; raw: any; }) {
-                        const label = tooltipItem.label; // Lấy nhãn
-                        const value = tooltipItem.raw; // Lấy giá trị
-                        return `${label}: ${value}`; // Trả về chuỗi định dạng
-                    }
-                }
-            }
-        },
-        scales: {
-            r: {
-                grid: {
-                    color: "#343434" // Màu lưới
-                },
-                angleLines: {
-                    color: '#000000' // Màu của các đường góc
-                },
-                ticks: {
-                    display: true, // Hiện thị ticks nếu cần
-                    suggestedMin: 0, // Giá trị tối thiểu gợi ý
-                    suggestedMax: 100, // Giá trị tối đa gợi ý là 100
-                },
-                pointLabels: { // Thay đổi kích thước phông chữ cho nhãn
-                    font: {
-                        size: 14, // Kích thước phông chữ cho nhãn
-                        family: "Arial", // Phông chữ nếu cần
-                        weight: "bold" // Làm đậm chữ nếu cần
-                    },
-                    color: "#000000" // Màu chữ cho nhãn
-                }
-            }
-        }
-    };
-
-    // --Trả về cấu trúc HTML cho giao diện-------------------------------------------------------------------------------------
-    return (
-        <div className="card flex justify-content-center">
-            <PrimeChart type="radar" data={data} options={options} width="500px" height="500px" /> {/* Hiển thị biểu đồ radar */}
-        </div>
-    )
-}
+        const [value, setValue] = useState(partNames[0]);
+        // --Trả về cấu trúc HTML cho giao diện-------------------------------------------------------------------------------------
+        return (
+            <div className="card">
+                <div className="flex justify-content-center pb-7">
+                    <SelectButton value={value} onChange={(e) => setValue(e.value)} options={partNames} />
+                </div>
+                <div className="shadow-7">
+                    <DataTable value={parts[partNames.indexOf(value)]}>
+                        <Column key="col-topic" field="topic" header="Phân loại câu hỏi"/>
+                        <Column key="col-correctCount" field="correctCount" header="Số câu đúng" />
+                        <Column key="col-wrongCount" field="wrongCount" header="Số câu sai" />
+                        <Column key="col-correctPercent" field="correctPercent" header="Độ chính xác" body={correctPercentTemplate} />
+                    </DataTable>
+                </div>
+            </div>
+        )
+    }
+);
 
 //---[5]-------------------------------------------------------------------------------------------------------------------------------------------
 // Component ActivityLog sử dụng React.memo để chỉ render lại khi props thay đổi, giúp tối ưu hiệu suất
@@ -363,7 +307,7 @@ function Suggestions(suggestionOnParts: SuggestionsForUser[]) {
                     // Duyệt qua từng phần gợi ý trong suggestionOnParts
                     suggestionOnParts.map((suggestion, index) => {
                         return (
-                            <StepperPanel header={suggestion.title}>
+                            <StepperPanel key={"step" + index} header={suggestion.title}>
                                 {/* Hiển thị nội dung gợi ý */}
                                 <div className="flex flex-column h-12rem">
                                     <div className="custom-box">{suggestion.content}</div>
@@ -385,4 +329,20 @@ function Suggestions(suggestionOnParts: SuggestionsForUser[]) {
             </Stepper>
         </main>
     )
+}
+
+function correctPercentTemplate(rowData: TopicRecord) {
+    const colorString = getColorBasedOnValue(rowData.correctPercent);
+    return (
+        <p className="text-center" style={{ backgroundColor: colorString }}>{rowData.correctPercent}%</p>
+    )
+}
+
+function getColorBasedOnValue(value: number): string {
+    if (value < 0) value = 0;
+    if (value > 100) value = 100;
+
+    // Map value (0–100) to hue (0–120), where 0 is red and 120 is green
+    const hue = (value / 100) * 120;
+    return `hsl(${hue}, 100%, 50%)`; // Saturation 100%, Lightness 50%
 }
