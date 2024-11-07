@@ -1,115 +1,132 @@
 import { useNavigate, useParams } from "react-router-dom";
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Toolbar } from "primereact/toolbar";
 import { Button } from "primereact/button";
 import '../App.css'
-import { Card } from "primereact/card";
-import { AnswerPair, QuestionID, QuestionNumber, SimpleTimeCountDownProps, TestAnswerSheet, TestID } from "../utils/types/type";
-import { TestArea, UserAnswerSheet } from "../components/Common/Index";
+import { SimpleTimeCountDownProps, TestAnswerSheet, TestID, TestType } from "../utils/types/type";
+import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useTestPage from "../hooks/TestHook";
 
 function DoTestPage() {
     // Sử dụng hook điều hướng
     const navigate = useNavigate();
 
-    // Lấy tham số từ URL (id và parts)
-    const { id = "", parts = "" } = useParams<{ id: TestID, parts: string }>();
-
-    // Khai báo state để lưu phiếu trả lời của người dùng (Map câu hỏi và câu trả lời)
-    const [userAnswerSheet, setUserAnswerSheet] = useState<TestAnswerSheet>(new Map<QuestionNumber, AnswerPair>());
-
-    // Khai báo state để theo dõi trang hiện tại
-    const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
+    // Lấy tham số từ URL (id của bài thi và các phần của bài thi)
+    const { id = "", parts = "", type = "fulltest" } = useParams<{ id: TestID, parts: string, type: TestType }>();
 
     // State để kiểm soát việc hiển thị phiếu trả lời của người dùng
     const [isUserAnswerSheetVisible, setIsUserAnswerSheetVisible] = useState(false);
 
-    // State để bắt đầu bài thi
+    // State để kiểm soát trạng thái bắt đầu bài thi
     const [start, setStart] = useState<boolean>(false);
 
-    // Gọi hook tùy chỉnh để lấy danh sách câu hỏi, bộ ánh xạ trang, và tổng số câu hỏi , hàm mở khóa trạng thái IS ON TEST
-    const { questionList, pageMapper, totalQuestions, setIsOnTest } = useTestPage(id, parts);
 
-    // Hàm cập nhật phiếu trả lời của người dùng
-    const setTestAnswerSheet = (qNum: QuestionNumber, qID: QuestionID, answer: string) => {
-        const newMap = new Map(userAnswerSheet);
-        newMap.set(qNum, { questionId: qID, userAnswer: answer });
-        setUserAnswerSheet(newMap);
-    }
+    // Gọi hook tùy chỉnh để lấy danh sách câu hỏi, ánh xạ trang, tổng số câu hỏi và các hàm điều khiển trạng thái
+    const {
+        questionList,
+        pageMapper,
+        totalQuestions,
+        setIsOnTest,
+        userAnswerSheet,
+        setTestAnswerSheet,
+        setCurrentPageIndex,
+        currentPageIndex,
+        changePage,
+        timeDoTest,
+        sendFinalResultToServer
+    } = useTestPage(id, parts, type);
 
-    // Hàm kết thúc bài thi và điều hướng tới trang xem lại
+    // Hàm kết thúc bài thi và điều hướng đến trang xem lại
     const onEndTest = () => {
         setIsOnTest(false);
-        localStorage.setItem("userAnswer", JSON.stringify([...userAnswerSheet.values()]))
+        sendFinalResultToServer();
         navigate(`/test/${~~(Math.random() * 1_000_000)}/review`);
-    }
+    };
 
-    // Hàm chuyển trang khi người dùng nhấn nút điều hướng
-    const changePage = useCallback((offset: number) => {
-        const newPageIndex = currentPageIndex + offset;
-        if (newPageIndex >= 0 && newPageIndex < questionList.length) {
-            setCurrentPageIndex(newPageIndex);
-        }
-    }, [currentPageIndex, questionList.length]);
+    // Tạo danh sách nút điều hướng dựa trên pageMapper
+    const ButtonListElement = userAnswerSheet.size > 0 ? pageMapper.map((pq, index) => {
+        const isOnPage = currentPageIndex === pq.page;
 
-    // Tạo danh sách nút để điều hướng câu hỏi dựa trên pageMapper
-    const ButtonListElement =
-        pageMapper.map((pq, index) => {
-            const isOnPage = currentPageIndex === pq.page;
-            return (
-                <Button
-                    key={"answer_" + index}
-                    style={{ width: '60px', aspectRatio: '1/1' }}
-                    className={"border-round-md border-solid text-center p-2"}
-                    label={(pq.questionNum).toString()}
-                    severity={getColorButtonOnAnswerSheet(userAnswerSheet.get(pq.questionNum)?.userAnswer ?? "", isOnPage)} // Màu sắc cập nhật dựa trên giá trị "isOnPage"
-                    onClick={() => {
-                        if (!isOnPage) {
-                            setCurrentPageIndex(pq.page);
-                        }
-                    }}
-                />
-            );
-        })
 
-    // Render giao diện bài thi
-    return (totalQuestions &&
-        <main className="pt-8 w-full">
-            <h1 className="text-center"> Đề {id} với các phần {parts}</h1>
-            {!start &&
-                <div className="flex justify-content-center">
-                    <Button label="bắt đầu" onClick={() => setStart(true)}></Button>
+        const text = userAnswerSheet.get(pq.questionNum)?.userAnswer ?? "";
+        return (
+            <Button
+                key={"answer_" + index}
+                style={{ width: '60px', aspectRatio: '1/1' }}
+                className={"border-round-md border-solid text-center p-2"}
+                label={pq.questionNum.toString()}
+                severity={getColorButtonOnAnswerSheet(text, isOnPage)} // Cập nhật màu sắc nút theo câu trả lời
+                onClick={() => {
+                    if (!isOnPage) {
+                        setCurrentPageIndex(pq.page);
+                    }
+                }}
+            />
 
+        );
+    })
+        : [<h1 key={"error-button-list"}>Lỗi rồi</h1>]
+
+    // Render giao diện chính của trang thi
+    return totalQuestions > 0 ? (
+        <main id="do-test-page" className="w-full">
+            {/* Nút bắt đầu bài thi */}
+            {!start && (
+                <div className="flex justify-content-center h-full align-content-center">
+                    <Button label="Bắt đầu" onClick={() => {
+                        // bắt đầu tính giờ đếm số giây đã trôi qua
+                        timeDoTest.current = Date.now();
+                        // mở giao diện làm bài
+                        setStart(true)
+                    }} />
                 </div>
-            }
-            {start &&
-                <React.Fragment>
+            )}
+
+            {/* Giao diện làm bài thi */}
+            {start && (
+                <section className="flex flex-column justify-content-center">
+                    {/* Phiếu trả lời của người dùng */}
                     <UserAnswerSheet
                         visible={isUserAnswerSheetVisible}
                         setVisible={setIsUserAnswerSheetVisible}
-                        ButtonListElement={ButtonListElement} />
+                        ButtonListElement={ButtonListElement}
+                    />
+
+                    {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */}
                     <Toolbar
+                        className="py-1"
                         start={currentStatusBodyTemplate(userAnswerSheet, totalQuestions, setIsUserAnswerSheetVisible)}
                         center={
                             <SimpleTimeCountDown
                                 onTimeUp={() => onEndTest()}
-                                timeLeftInSecond={900} />
+                                timeLeftInSecond={900}
+                            />
                         }
-                        end={<Button severity="success" label="Nộp bài" onClick={() => onEndTest()} />}
+                        end={
+                            <Button
+                                severity="success"
+                                label="Nộp bài"
+                                onClick={() => onEndTest()}
+                            />
+                        }
                     />
-                    <Card className="max-w-screen">
 
-                        <TestArea changePage={changePage}
+                    {/* Khu vực chính để hiển thị câu hỏi và các nút điều hướng */}
+                    <div id="test-area-container" className="max-w-screen p-0">
+                        <TestArea
+                            changePage={changePage}
                             parts={parts}
                             question={questionList[currentPageIndex]}
                             setTestAnswerSheet={setTestAnswerSheet}
-                            userAnswerSheet={userAnswerSheet} />
+                            userAnswerSheet={userAnswerSheet}
+                        />
+                    </div>
+                </section>
+            )}
+        </main>
+    ) : <LoadingSpinner text="Bài kiểm tra đang được khởi tạo...." />
 
-                    </Card>
-                </React.Fragment>
-            }
-        </main >
-    );
+
 }
 
 
@@ -127,12 +144,11 @@ function getColorButtonOnAnswerSheet(answer: string, isOnPage: boolean): 'info' 
 }
 
 function currentStatusBodyTemplate(userAnswers: TestAnswerSheet, totalQuestions: number, setVisible: React.Dispatch<React.SetStateAction<boolean>>) {
-
+    const answeredCount = Array.from(userAnswers.values()).filter(
+        (answerPair) => answerPair.userAnswer !== ""
+    ).length;
     return (
-
-
-        <Button severity="help" label={`Số câu đã trả lời: ${userAnswers.size} / ${totalQuestions}`} icon="pi pi-arrow-right" onClick={() => setVisible(true)} />
-
+        <Button severity="help" label={`Số câu đã trả lời: ${answeredCount} / ${totalQuestions}`} icon="pi pi-arrow-right" onClick={() => setVisible(true)} />
     )
 }
 
@@ -161,9 +177,9 @@ const SimpleTimeCountDown: React.FC<SimpleTimeCountDownProps> = React.memo(
         const bgColorClass = secondsLeft <= 30 ? 'bg-red-200' : 'bg-blue-200';
 
         return (
-            <div className={` text-center  flex-1 
+            <div className={` text-center
     align-items-center justify-content-center`}>
-                <h5 className={`px-3 inline py-3 ${bgColorClass} border-dashed border-round-md`}>
+                <h5 className={`px-1 inline py-1 ${bgColorClass} border-dashed border-round-md`}>
                     {minutes} phút và {seconds < 10 ? `0${seconds}` : seconds} giây
                 </h5>
             </div>

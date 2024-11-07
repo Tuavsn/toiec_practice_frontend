@@ -258,15 +258,15 @@ export interface QuestionPage {
 
 export interface AnswerPair {
   questionId: QuestionID,
-  userAnswer: string
+  userAnswer: string,
 }
 
 export type TestRecord = {
-  answerPair: AnswerPair[],
-  totalSeconds: number,
-  testId: string,
-  parts: string
-  type: 'fulltest' | 'practice'
+  totalSeconds: number;
+  testId: string;
+  parts: string;
+  userAnswer: AnswerRecord[];
+  type: TestType
 }
 
 
@@ -279,7 +279,7 @@ export interface TestResultSummary {
   totalCorrectAnswer: number;
   totalIncorrectAnswer: number;
   totalSkipAnswer: number;
-  type: 'practice' | 'fulltest';
+  type: TestType;
   parts: number[];
   questionRecords: QuestionDetailRecord[];
 }
@@ -323,6 +323,11 @@ export interface MultipleChoiceQuestion {
   resources: Resource[];
   answers: string[];
 }
+
+export interface SuggestionsForUser {
+  title: string;
+  content: string;
+}
 // ------------------------- tham số truyền
 export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;
@@ -343,13 +348,30 @@ export interface TestAreaProps {
   changePage: (offset: number) => void
 }
 
+export interface TopicRecord extends DataTableValue {
+  topic: string,
+  correctCount: number,
+  wrongCount: number,
+  correctPercent: number,
+}
+
+export interface SkillInsightsProps {
+  parts: TopicRecord[][]
+}
+export type AnswerRecord = AnswerPair & {
+  timeSpent: milisecond;
+}
+
 //---------------------------- tên gọi khác
 export type TestAnswerSheet = Map<QuestionNumber, AnswerPair>;
 export type ResultID = string;
 export type QuestionID = string;
 export type QuestionNumber = number;
+export type milisecond = number;
 export type TestID = string;
 export type CourseID = string;
 export type PracticeAnswerSheet = Map<QuestionID, string>;
 export type CategoryID = string;
 export type ResponseUserResultList = ApiResponse<TableData<UserDetailResultRow>>;
+export type UserAnswerTimeCounter = Map<QuestionNumber, milisecond>
+export type TestType = 'fulltest' | 'practice' | 'survival'

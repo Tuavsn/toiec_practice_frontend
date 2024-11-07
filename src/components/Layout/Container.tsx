@@ -9,8 +9,8 @@ export default function Container({ children }: { children: ReactNode }) {
                 <TestStateProvider>
                     <Header />
                     {children}
+                    <Footer />
                 </TestStateProvider>
-                <Footer />
             </div>
         </div>
     )

@@ -95,7 +95,7 @@ function TestDetailPage() {
             </section>
             <section>
                 <h3>Kết quả làm bài của bạn:</h3>
-                <DataTable  size={'small'} value={data} showGridlines stripedRows scrollable scrollHeight="600px">
+                <DataTable size={'small'} value={data} showGridlines stripedRows scrollable scrollHeight="600px">
                     {columns}
                 </DataTable>
             </section>
@@ -125,7 +125,7 @@ export default memo(TestDetailPage);
 function DecodeCheckBoxesToUrl(parts: boolean[]): string {
 
     if (parts[0] === true) {
-        return "0";
+        return "fulltest/0";
     }
     let returnString = "";
     for (let i = 1; i <= 7; ++i) {
@@ -133,7 +133,7 @@ function DecodeCheckBoxesToUrl(parts: boolean[]): string {
             returnString += i;
         }
     }
-    return returnString;
+    return "practice/" + returnString;
 }
 
 function GetFakeUserResult(): UserResultRow[] {

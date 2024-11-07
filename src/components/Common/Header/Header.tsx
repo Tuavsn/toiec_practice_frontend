@@ -55,7 +55,7 @@ export default function Header() {
                 <div className="block">
                     <Button className="block" link onClick={(e) => { toggleOverlayPanel(e); navigate('/profile') }}>Cá nhân</Button>
                     <Button className="block" link>đọc cái gì</Button>
-                    <Button className="block" link>mất 5 giây cuộc đời</Button>
+                    <Button className="block" link onClick={() => { localStorage.clear(); navigate('/home'); }}>Thoát</Button>
                 </div>
             </OverlayPanel>
         </div>
@@ -75,7 +75,7 @@ export default function Header() {
     };
 
     // Trả về giao diện của header
-    return (
+    return (!isOnTest &&
         <div className="fixed top-0 left-0 right-0 z-5">
             <Menubar model={HeaderItems} start={HeaderStart} end={HeaderEnd} /> {/* Hiển thị Menubar với các mục */}
         </div>

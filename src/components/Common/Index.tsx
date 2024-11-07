@@ -5,6 +5,7 @@ import ToolBar from "./ToolBar/ToolBar";
 import GenericTable from "./Table/GenericTable";
 import { TestArea } from "./MultipleChoiceQuestion/TestArea";
 import { UserAnswerSheet } from "./MultipleChoiceQuestion/UserAnswerSheet";
+import LoadingSpinner from "./Loading/LoadingSpinner";
 
 export {
     Header,
@@ -13,5 +14,6 @@ export {
     ToolBar,
     GenericTable,
     TestArea,
-    UserAnswerSheet
+    UserAnswerSheet,
+    LoadingSpinner
 }

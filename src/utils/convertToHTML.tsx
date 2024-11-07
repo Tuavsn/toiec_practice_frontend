@@ -222,17 +222,17 @@ function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, parts:
     return resourcesElement;
 }
 
-async function fetchResourceAsBlob(url: string): Promise<void> {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch resource: ${url}`);
-        }
-        // trình duyệt đưa tài nguyên vào bộ nhớ đệm
-    } catch (error) {
-        console.error("Error fetching resource:", error);
-    }
-}
+// async function fetchResourceAsBlob(url: string): Promise<void> {
+//     try {
+//         const response = await fetch(url);
+//         if (!response.ok) {
+//             throw new Error(`Failed to fetch resource: ${url}`);
+//         }
+//         // trình duyệt đưa tài nguyên vào bộ nhớ đệm
+//     } catch (error) {
+//         console.error("Error fetching resource:", error);
+//     }
+// }
 
 function UserAnswerToHTML(question: QuestionDetailRecord, questionNum: number): JSX.Element {
 

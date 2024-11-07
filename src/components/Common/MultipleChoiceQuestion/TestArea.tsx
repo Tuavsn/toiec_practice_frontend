@@ -10,7 +10,8 @@ export const TestArea: React.FC<TestAreaProps> = React.memo(
     }) => {
         const [resourcesElement, questionsElement]: [JSX.Element[], JSX.Element[]] = ConvertThisTestQuestionToHTML(question, userAnswerSheet, setTestAnswerSheet, parts, changePage);
         return (
-            <div className="flex xl:flex-row lg:flex-row flex-wrap md:flex-column sm:flex-column justify-content-between p-5 gap-4 custom-scrollpanel w-full px-0 py-0">
+            <div className="flex xl:flex-row lg:flex-row flex-wrap md:flex-column sm:flex-column justify-content-between gap-1 custom-scrollpanel px-0 py-0"
+            >
                 <ScrollPanel
                     className="flex-1 custombar1 border-round m-2 shadow-2"
                     style={{ minHeight: '50px', overflowY: 'auto', minWidth: '600px', maxHeight: '700px' }}
@@ -23,8 +24,8 @@ export const TestArea: React.FC<TestAreaProps> = React.memo(
                         <div className="flex justify-content-end px-3">
                             <b className="py-0 m-auto text-blue-300">Phần {question.partNum}</b>
                             <span>
-                                <Button icon="pi pi-angle-double-left" onClick={() => changePage(-1)}></Button>
-                                <Button icon="pi pi-angle-double-right" onClick={() => changePage(1)}></Button>
+                                <Button className="py-0 mr-1" icon="pi pi-angle-double-left" onClick={() => changePage(-1)}></Button>
+                                <Button className="py-0" icon="pi pi-angle-double-right" onClick={() => changePage(1)}></Button>
                             </span>
                         </div>
                     }
