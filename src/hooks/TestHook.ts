@@ -11,7 +11,7 @@ import { useMultipleQuestion } from './MultipleQuestionHook';
 const useTestPage = () => {
 
     // Lấy tham số từ URL (id của bài thi và các phần của bài thi)
-    const { id = "", parts = "", type = "fulltest" } = useParams<{ id: TestID, parts: string, type: TestType }>();
+    const { id = "", parts = "", testType = "fulltest" } = useParams<{ id: TestID, parts: string, testType: TestType }>();
     const {
         updateTimeSpentOnEachQuestionInCurrentPage,
         setIsUserAnswerSheetVisible,
@@ -19,6 +19,7 @@ const useTestPage = () => {
         setCurrentPageIndex,
         setUserAnswerSheet,
         setTestAnswerSheet,
+        abortControllerRef,
         setTotalQuestions,
         timeSpentListRef,
         currentPageIndex,
@@ -50,7 +51,7 @@ const useTestPage = () => {
             totalSeconds: (Date.now() - timeDoTest.current) / 1000, // khép lại thời gian làm bài ( đơn vị giây)
             testId: id,
             parts: parts,
-            type: type,
+            type: testType,
             userAnswer: prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current)
         }
         console.dir(resultBodyObject);
@@ -58,6 +59,15 @@ const useTestPage = () => {
     }
     // Gọi API để lấy dữ liệu bài thi khi component được mount
     useEffect(() => {
+        // Nếu đã có một yêu cầu đang thực hiện, thì hủy nó
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+
+        // Tạo một AbortController mới và lưu nó vào ref
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
         const fetchData = async () => {
             try {
                 setIsOnTest(true);
@@ -70,8 +80,13 @@ const useTestPage = () => {
                 prepareForTest.prepareAnswerSheet(responseData.data.listMultipleChoiceQuestions, setUserAnswerSheet, timeSpentListRef);
                 setPageMapper(newPageMapper);
                 setQuestionList(responseData.data.listMultipleChoiceQuestions);
-            } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu:', error);
+            } catch (error: any) {
+                // Kiểm tra nếu lỗi là do yêu cầu bị hủy
+                if (error.name === "CanceledError") {
+                    console.log("Yêu cầu đã bị hủy");
+                } else {
+                    console.error("Lỗi khi lấy dữ liệu:", error);
+                }
             }
         };
         fetchData();
@@ -95,8 +110,8 @@ const useTestPage = () => {
         onEndTest,
         isOnTest,
         setStart,
+        testType,
         start,
-        parts
     };
 };
 

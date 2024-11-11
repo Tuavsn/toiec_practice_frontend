@@ -46,11 +46,11 @@ export const callGetUserDetailResultList = async (_pageNumber: number = 1, _page
 export const callGetExercisePaper = async (parts: string): Promise<ApiResponse<TestPaper>> => {
     alert("viết api cho callGetExercisePaper")
     const postfix = `practice?parts=${parts}`;
-    const response = await axios.get<ApiResponse<TestPaper>>(`${import.meta.env.VITE_API_URL}/tests/671a25094dbe5f4c165c31dc/${postfix}`);
+    const response = await axios.get<ApiResponse<TestPaper>>(`${import.meta.env.VITE_API_URL}/tests/671a25094dbe5f4c165c31dc/${postfix}`,);
     return response.data;
 }
 
-export const callGetQuestionRows = async (testId: TestID, currentPageIndex: number, pageSize: number = 8): Promise<ApiResponse<TableData<QuestionRow>>> => {
+export const callGetQuestionRows = async (testId: TestID, currentPageIndex: number, pageSize: number = 5): Promise<ApiResponse<TableData<QuestionRow>>> => {
     const response = await axios.get<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/questions?current=${currentPageIndex + 1}&pageSize=${pageSize}`)
     return response.data;
 }

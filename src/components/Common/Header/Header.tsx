@@ -27,7 +27,7 @@ export default function Header() {
         { label: 'Trang chủ', icon: 'pi pi-home', command: () => handleCommand('/home') },
         { label: 'Khóa học', icon: 'pi pi-book', command: () => handleCommand('/course') },
         { label: 'Đề thi', icon: 'pi pi-folder', command: () => handleCommand('/test') },
-        { label: 'Luyện tập', icon: 'pi pi-book', command: () => handleCommand('/practice') },
+        { label: 'Luyện tập', icon: 'pi pi-book', command: () => handleCommand('/exercise') },
     ];
 
     // Nếu người dùng có vai trò ADMIN, thêm mục Dashboard vào danh sách

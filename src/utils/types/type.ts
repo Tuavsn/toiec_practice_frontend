@@ -373,7 +373,7 @@ export interface UserAnswerSheetProps {
 }
 
 export interface TestAreaProps {
-  parts: string,
+  testType: TestType,
   question: MultipleChoiceQuestion,
   userAnswerSheet: TestAnswerSheet,
   setTestAnswerSheet: (questionNumber: number, questionID: string, answer: string) => void

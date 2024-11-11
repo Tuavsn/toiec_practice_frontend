@@ -24,6 +24,8 @@ export function useMultipleQuestion() {
     // thời gian người dùng đã tốn 
     const timeDoTest = useRef<number>(0);
     const timeSpentListRef = useRef<UserAnswerTimeCounter>(new Map<QuestionNumber, milisecond>());
+    const abortControllerRef = useRef<AbortController | null>(null); // Tạo một ref để lưu trữ AbortController
+
     // ---------------- Hàm Xử Lý và Tiện Ích ---------------- //
 
     // Hàm chuyển trang khi người dùng nhấn nút điều hướng
@@ -79,6 +81,7 @@ export function useMultipleQuestion() {
         // Xóa sự kiện khi component được unmount
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
+            setIsOnTest(false);
         };
     }, []);
 
@@ -88,6 +91,7 @@ export function useMultipleQuestion() {
         isUserAnswerSheetVisible,
         setCurrentPageIndex,
         setUserAnswerSheet,
+        abortControllerRef,
         setTestAnswerSheet,
         setTotalQuestions,
         timeSpentListRef,

@@ -1,5 +1,5 @@
 import { Card } from "primereact/card";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionDetailRecord, QuestionID, QuestionNumber, QuestionPage, Resource, TestAnswerSheet } from "./types/type";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionDetailRecord, QuestionID, QuestionNumber, QuestionPage, Resource, TestAnswerSheet, TestType } from "./types/type";
 import { Image } from 'primereact/image';
 import { Accordion, AccordionTab } from "primereact/accordion";
 import React from "react";
@@ -172,7 +172,7 @@ function ResourcesToHTML(resources: Resource[], qNum: number): JSX.Element[] {
     return resourcesElement;
 }
 
-function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, parts: string, changePage: (offset: number) => void): JSX.Element[] {
+function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, testType: TestType, changePage: (offset: number) => void): JSX.Element[] {
     if (!resources) {
         return [<h1 key={"res_" + qNum}>Cố lên</h1>]
     }
@@ -192,7 +192,7 @@ function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, parts:
 
                     break;
                 case 'audio':
-                    if (parts === '0') {
+                    if (testType === 'fulltest') {
                         resourcesElement.unshift(
                             <div key={"div" + keyPrefix}>
                                 <h5 className="text-center pt-1">Listen . . .🔊</h5>
@@ -354,7 +354,7 @@ export function ConvertThisTestQuestionToHTML(
     question: MultipleChoiceQuestion,            // Đối tượng câu hỏi trắc nghiệm
     userAnswerSheet: TestAnswerSheet,            // Phiếu trả lời của người dùng (Map câu hỏi - câu trả lời)
     setTestAnswerSheet: (questionNumber: QuestionNumber, questionId: QuestionID, answer: string) => void,  // Hàm cập nhật phiếu trả lời
-    parts: string,                               // Phần của bài thi (vd: listening, reading)
+    testType: TestType,                               // Phần của bài thi (vd: listening, reading)
     changePage: (offset: number) => void         // Hàm thay đổi trang
 ): [JSX.Element[], JSX.Element[]] {              // Trả về hai mảng phần tử JSX: tài nguyên và câu hỏi
 
@@ -366,7 +366,7 @@ export function ConvertThisTestQuestionToHTML(
 
     // Nếu câu hỏi có tài nguyên đi kèm (hình ảnh, audio,...)
     if (question.resources) {
-        resoursesElement.push(...TestResourcesToHTML(question.resources, question.questionNum, parts, changePage));
+        resoursesElement.push(...TestResourcesToHTML(question.resources, question.questionNum, testType, changePage));
     }
 
     // Nếu câu hỏi có các câu hỏi con (subQuestions)
@@ -380,7 +380,7 @@ export function ConvertThisTestQuestionToHTML(
             questionsElement.push(<h5 key={"h5" + subq.questionNum} > {subq.questionNum}.{subq.content} </h5>);
 
             // Nếu câu hỏi con có tài nguyên, thêm chúng vào
-            resoursesElement.push(...TestResourcesToHTML(subq.resources, subq.questionNum, parts, changePage));
+            resoursesElement.push(...TestResourcesToHTML(subq.resources, subq.questionNum, testType, changePage));
 
             // Xây dựng phần tử HTML cho từng câu hỏi con
             questionsElement.push(

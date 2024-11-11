@@ -4,7 +4,7 @@ import React, { memo, useCallback, useEffect, useState } from "react";
 import '../App.css';
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useTestPage from "../hooks/TestHook";
-import { MultipleChoiceQuestion, SimpleTimeCountDownProps, TestAnswerSheet } from "../utils/types/type";
+import { MultipleChoiceQuestion, SimpleTimeCountDownProps, TestAnswerSheet, TestType } from "../utils/types/type";
 
 function DoTestPage() {
 
@@ -25,21 +25,21 @@ function DoTestPage() {
         onEndTest,
         isOnTest,
         setStart,
+        testType,
         start,
-        parts
     } = useTestPage();
 
 
 
     // Tạo danh sách nút điều hướng dựa trên pageMapper
-    const createButtonListElement = useCallback((): JSX.Element[] => {
+    const createButtonListElement = (): JSX.Element[] => {
         if (userAnswerSheet.size <= 0) {
             return [<h1 key={"error-button-list"}>Lỗi rồi</h1>];
         }
         return pageMapper.map((pq, index) => {
             const isOnPage = currentPageIndex === pq.page;
             const text = userAnswerSheet.get(pq.questionNum)?.userAnswer ?? "";
-            const isDisabled = checkIsAllowToChangePage(parts, questionList, pq.page, currentPageIndex);
+            const isDisabled = checkIsAllowToChangePage(testType, questionList, pq.page, currentPageIndex);
 
             return (
                 <Button
@@ -58,7 +58,7 @@ function DoTestPage() {
 
             );
         })
-    }, [userAnswerSheet.size])
+    }
 
 
     // Render giao diện chính của trang thi
@@ -112,7 +112,7 @@ function DoTestPage() {
                     <div id="test-area-container" className="max-w-screen p-0">
                         <TestArea
                             changePage={changePage}
-                            parts={parts}
+                            testType={testType}
                             question={questionList[currentPageIndex]}
                             setTestAnswerSheet={setTestAnswerSheet}
                             userAnswerSheet={userAnswerSheet}
@@ -133,8 +133,8 @@ function DoTestPage() {
 export default memo(DoTestPage);
 //--------------------------------- helpper function for main component
 
-function checkIsAllowToChangePage(parts: string, questionList: MultipleChoiceQuestion[], page: number, currentPageIndex: number): boolean {
-    return parts === "0" &&
+function checkIsAllowToChangePage(testType: TestType, questionList: MultipleChoiceQuestion[], page: number, currentPageIndex: number): boolean {
+    return testType === "fulltest" &&
         (questionList[currentPageIndex].partNum <= 4 || questionList[page].partNum <= 4);
 }
 

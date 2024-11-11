@@ -93,7 +93,7 @@ function DoExercisePage() {
                     <div id="test-area-container" className="max-w-screen p-0">
                         <TestArea
                             changePage={changePage}
-                            parts={practiceType}
+                            testType={"practice"}
                             question={questionList[currentPageIndex]}
                             setTestAnswerSheet={setTestAnswerSheet}
                             userAnswerSheet={userAnswerSheet}

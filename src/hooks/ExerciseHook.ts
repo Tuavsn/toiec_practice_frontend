@@ -1,15 +1,15 @@
 import { useCallback, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { callGetExercisePaper, callPostTestRecord } from "../api/api";
 import { MappingPageWithQuestionNum } from "../utils/convertToHTML";
 import prepareForTest from "../utils/prepareForTest";
-import { ExerciseType, milisecond, QuestionNumber, ResultID, TestRecord } from "../utils/types/type";
+import { milisecond, QuestionNumber, ResultID, TestRecord } from "../utils/types/type";
 import { useMultipleQuestion } from "./MultipleQuestionHook";
-import { useParams } from "react-router-dom";
 
 const useExercisePage = () => {
 
     // Lấy tham số từ URL (loại của bài tập)
-    const { parts = "" } = useParams<{ parts: string }>();
+    const { exerciseType = "" } = useParams<{ exerciseType: string }>();
     const {
         updateTimeSpentOnEachQuestionInCurrentPage,
         setIsUserAnswerSheetVisible,
@@ -17,6 +17,7 @@ const useExercisePage = () => {
         setCurrentPageIndex,
         setUserAnswerSheet,
         setTestAnswerSheet,
+        abortControllerRef,
         setTotalQuestions,
         timeSpentListRef,
         currentPageIndex,
@@ -47,7 +48,7 @@ const useExercisePage = () => {
         const resultBodyObject: TestRecord = {
             totalSeconds: (Date.now() - timeDoTest.current) / 1000, // khép lại thời gian làm bài ( đơn vị giây)
             testId: "671a25094dbe5f4c165c31dc",
-            parts: parts,
+            parts: exerciseType,
             type: "practice",
             userAnswer: prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current)
         }
@@ -56,11 +57,19 @@ const useExercisePage = () => {
     }
     // Gọi API để lấy dữ liệu bài thi khi component được mount
     useEffect(() => {
+        // Nếu đã có một yêu cầu đang thực hiện, thì hủy nó
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+
+        // Tạo một AbortController mới và lưu nó vào ref
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
         const fetchData = async () => {
             try {
                 setIsOnTest(true);
                 localStorage.removeItem('userAnswerSheet');
-                const responseData = await callGetExercisePaper(parts);
+                const responseData = await callGetExercisePaper(exerciseType);
 
                 const newPageMapper = MappingPageWithQuestionNum(responseData.data.listMultipleChoiceQuestions);
                 setTotalQuestions(responseData.data.totalQuestion);
@@ -68,11 +77,21 @@ const useExercisePage = () => {
                 prepareForTest.prepareAnswerSheet(responseData.data.listMultipleChoiceQuestions, setUserAnswerSheet, timeSpentListRef);
                 setPageMapper(newPageMapper);
                 setQuestionList(responseData.data.listMultipleChoiceQuestions);
-            } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu:', error);
+            } catch (error: any) {
+                // Kiểm tra nếu lỗi là do yêu cầu bị hủy
+                if (error.name === "CanceledError") {
+                    console.log("Yêu cầu đã bị hủy");
+                } else {
+                    console.error("Lỗi khi lấy dữ liệu:", error);
+                }
             }
         };
         fetchData();
+
+        // Dọn dẹp để hủy yêu cầu nếu component unmount hoặc khi dependencies thay đổi
+        return () => {
+            controller.abort();
+        };
     }, []);
 
 
