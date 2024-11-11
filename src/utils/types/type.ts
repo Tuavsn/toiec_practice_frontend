@@ -1,4 +1,6 @@
 import { DataTableValue } from "primereact/datatable";
+import { Toast } from "primereact/toast";
+import { TreeNode } from "primereact/treenode";
 
 
 export interface Category extends CategoryRow {
@@ -19,6 +21,15 @@ export interface Course extends DataTableValue {
   updatedAt: Date;
 }
 
+export interface Topic {
+  createdAt: Date,
+  updatedAt: Date,
+  id: TopicID,
+  name: string,
+  solution: string,
+  overallSkill: "Từ vựng" | "Ngữ pháp",
+  active: boolean
+}
 
 export interface Lecture extends DataTableValue {
   title: string;
@@ -32,22 +43,23 @@ export interface Assignment extends DataTableValue {
 }
 
 // Question Collection
-export interface Question extends DataTableValue {
-  id: string;
-  testId: string;  // Reference to Test
+export interface QuestionRow extends DataTableValue {
+  id: QuestionID;
+  testId: TestID;
+  practiceId: string | null;
   questionNum: number;
   partNum: number;
-  type: 'single' | 'group' | 'subquestion';
-  subQuestions: Question[];  // List of subquestions
+  type: QuestionType;
+  subQuestions: QuestionRow[];  // List of subquestions
   content: string;
   difficulty: number;
-  topic: string[];  // Array of topics
+  topic: Topic[];  // Array of topics
   resources: Resource[];
   transcript?: string;
   explanation?: string;
   answers: string[];  // Array of answers
   correctAnswer: string;
-  isActive: boolean;
+  active: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -70,13 +82,13 @@ export interface Result extends DataTableValue {
   totalSkipAnswer: number;
   type: 'practice' | 'fulltest';
   parts: number[];  // Practice parts
-  userAnswers: UserAnswer[];
+  userAnswers: UserAnswerResult[];
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface UserAnswer extends DataTableValue {
+export interface UserAnswerResult extends DataTableValue {
   questionId: string;
   answer: string;
   solution: string;
@@ -126,10 +138,7 @@ export interface LearningProgress extends DataTableValue {
 }
 
 //-------------------------------------------------REQUEST RESPONE OBJECT----------------------------------------------------------------
-export interface RandomQutote {
-  content: string,
-  author: string,
-}
+
 export interface TableData<T> {
   meta: {
     current: number;
@@ -219,20 +228,13 @@ export interface UserRow extends DataTableValue {
   updatedAt: Date;
 }
 
-export interface MultipleChoiceQuest {
-  type: 'single' | 'group' | 'subquestion';
-  subQuestions: MultipleChoiceQuest[];
-  content: string;
-  resources: Resource[];
-  answers: string[];
-}
 
 export interface UserResultRow {
   id: ResultID,
   createdAt: Date,
   totalCorrectAnswer: number,
   totalTime: number,
-  type: 'practice' | 'fulltest';
+  type: TestType;
   parts: number[];  // Practice parts
 }
 
@@ -255,6 +257,13 @@ export interface QuestionPage {
   page: number,
 }
 
+export interface UserAnswerResult {
+  questionId: QuestionID;
+  answer: string;
+  solution: string;
+  timeSpent: number;
+  correct: boolean;
+}
 
 export interface AnswerPair {
   questionId: QuestionID,
@@ -272,16 +281,17 @@ export type TestRecord = {
 
 
 export interface TestResultSummary {
-  createdAt: Date;
+  id: ResultID;
+  testId: TestID;
   totalTime: number;
   totalReadingScore: number;
   totalListeningScore: number;
   totalCorrectAnswer: number;
   totalIncorrectAnswer: number;
   totalSkipAnswer: number;
-  type: TestType;
-  parts: number[];
-  questionRecords: QuestionDetailRecord[];
+  type: TestType;  // if "type" has specific possible values, you can use union types
+  parts: string;
+  userAnswers: UserAnswerResult[];
 }
 
 export interface PracticePaper {
@@ -291,7 +301,7 @@ export interface PracticePaper {
 
 export interface PracticeQuestion {
   id: QuestionID;
-  type: 'single' | 'group' | 'subquestion' | 'ABCD';
+  type: QuestionType;
   subQuestions: PracticeQuestion[];
   content: string;
   resources: Resource[];
@@ -302,7 +312,7 @@ export interface PracticeQuestion {
 }
 
 export interface QuestionDetailRecord {
-  type: 'single' | 'group' | 'subquestion';
+  type: QuestionType;
   subQuestions: QuestionDetailRecord[];
   content: string;
   resources: Resource[];
@@ -328,10 +338,34 @@ export interface SuggestionsForUser {
   title: string;
   content: string;
 }
+
+export interface UpdateQuestionForm {
+  id: QuestionID;
+  testId: TestID;
+  practiceId: string;
+  content: string;
+  difficulty: number;
+  listTopicIds: TopicID[];
+  transcript: string;
+  explanation: string;
+  answers: string[];
+  correctAnswer: string;
+}
+
 // ------------------------- tham số truyền
 export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;
   onTimeUp: () => void;
+}
+
+export interface DialogActionProps {
+  isVisible: boolean,
+  title: string,
+  topicList: React.MutableRefObject<Topic[]>,
+  toast: React.MutableRefObject<Toast | null>,
+  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
+  currentSelectedQuestion: React.MutableRefObject<TreeNode>,
+
 }
 
 export interface UserAnswerSheetProps {
@@ -362,6 +396,41 @@ export type AnswerRecord = AnswerPair & {
   timeSpent: milisecond;
 }
 
+export interface QuestionTableProps {
+  toast: React.MutableRefObject<Toast | null>,
+  setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
+  setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
+  setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
+}
+
+export interface QuestionActionButtonProps {
+  questionNode: TreeNode,
+  toast: React.MutableRefObject<Toast | null>,
+  topicList: React.MutableRefObject<Topic[]>,
+  setTitle: React.Dispatch<React.SetStateAction<string>>,
+  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
+  currentSelectedQuestion: React.MutableRefObject<TreeNode>,
+}
+
+export interface UpdateQuestionDialogProps {
+  currentSelectedQuestion: React.MutableRefObject<TreeNode>,
+  topicList: React.MutableRefObject<Topic[]>,
+  toast: React.MutableRefObject<Toast | null>,
+}
+
+export interface QuestionContext {
+  ask?: string
+  choices?: string[]
+  correctChoice?: string
+  transcript?: string
+  explanation?: string
+}
+
+export interface DialogQuestionPageProps {
+  setIsDialogVisible: React.Dispatch<React.SetStateAction<JSX.Element | null>>
+  dialogBodyVisible: JSX.Element | null,
+  title: string
+}
 //---------------------------- tên gọi khác
 export type TestAnswerSheet = Map<QuestionNumber, AnswerPair>;
 export type ResultID = string;
@@ -372,6 +441,9 @@ export type TestID = string;
 export type CourseID = string;
 export type PracticeAnswerSheet = Map<QuestionID, string>;
 export type CategoryID = string;
+export type TopicID = string;
 export type ResponseUserResultList = ApiResponse<TableData<UserDetailResultRow>>;
 export type UserAnswerTimeCounter = Map<QuestionNumber, milisecond>
-export type TestType = 'fulltest' | 'practice' | 'survival'
+export type TestType = 'fulltest' | 'practice' | 'survival';
+export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
+export type PracticeType = "part1" | "part2" | "part3" | "part4" | "part5" | "part6" | "part7" | "grammar" | "vocabulary";

@@ -20,8 +20,8 @@ export const TestArea: React.FC<TestAreaProps> = React.memo(
                 </ScrollPanel>
 
                 <div className="flex-1" style={{ minWidth: '600px' }}>
-                    {parts != "0" &&
-                        <div className="flex justify-content-end px-3">
+                    {(parts != "0" || question.partNum > 4 )&&
+                        <div className="flex justify-content-end px-3 pt-2">
                             <b className="py-0 m-auto text-blue-300">Phần {question.partNum}</b>
                             <span>
                                 <Button className="py-0 mr-1" icon="pi pi-angle-double-left" onClick={() => changePage(-1)}></Button>

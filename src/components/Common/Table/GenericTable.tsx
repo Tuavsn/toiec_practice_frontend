@@ -52,7 +52,7 @@ export default function GenericTable<Model extends DataTableValue>(
     return (
         <DataTable
             showGridlines
-
+            size="small"
             ref={dt}
             value={rows}
             selection={selectedRows}
