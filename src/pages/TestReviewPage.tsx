@@ -1,8 +1,7 @@
+import { Badge } from "primereact/badge";
 import { Card } from "primereact/card";
 import { useTestReview } from "../hooks/TestReviewHook";
 import convertSecondsToString from "../utils/convertSecondsToString";
-import { Badge } from "primereact/badge";
-import React from "react";
 
 export default function TestReviewPage() {
 

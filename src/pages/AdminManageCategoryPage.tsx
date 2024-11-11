@@ -1,21 +1,20 @@
-import { Card } from "primereact/card";
-import { memo } from "react";
-import { Column } from "primereact/column";
-import GenericTable from "../components/Common/Table/GenericTable";
 import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
-import { InputText } from "primereact/inputtext";
-import { classNames } from "primereact/utils";
-import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
-import { useDataTable } from "../hooks/GenericDataTableHook";
-import React from "react";
-import { CustomBreadCrumb, LoadingSpinner } from "../components/Common/Index";
-import { CategoryRow } from "../utils/types/type";
-import { useNavigate } from 'react-router-dom';
-import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar";
-import { timeStampBodyTemplate, statusBodyTemplate } from "../components/Common/Table/CommonColumn";
 import { Calendar } from "primereact/calendar";
-import { callCreateCateogry, callGetCategory } from "../api/api";
+import { Card } from "primereact/card";
+import { Column } from "primereact/column";
+import { InputText } from "primereact/inputtext";
+import { Toast } from "primereact/toast";
+import { classNames } from "primereact/utils";
+import React, { memo } from "react";
+import { useNavigate } from 'react-router-dom';
+import { callCreateCateogry } from "../api/api";
+import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
+import { CustomBreadCrumb } from "../components/Common/Index";
+import { statusBodyTemplate, timeStampBodyTemplate } from "../components/Common/Table/CommonColumn";
+import GenericTable from "../components/Common/Table/GenericTable";
+import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar";
+import { useDataTable } from "../hooks/GenericDataTableHook";
+import { CategoryRow } from "../utils/types/type";
 
 
 

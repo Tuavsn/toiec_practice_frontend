@@ -16,7 +16,6 @@ const QuestionTreeTable: React.FC<QuestionTableProps> = React.memo(
         setContextDialogBody,
         setResourceDialogBody,
         setTopicDialogBody,
-        toast
     }) => {
 
         const {
@@ -43,11 +42,11 @@ const QuestionTreeTable: React.FC<QuestionTableProps> = React.memo(
         return (
             <React.Fragment>
                 {/* Dialog dùng để hiển thị nội dung xác nhận xóa hoặc cập nhật câu hỏi. */}
-                <DialogActionButton isVisible={isVisible} title={title} topicList={topics} toast={toast} setIsVisible={setIsVisible} currentSelectedQuestion={currentSelectedQuestion} />
+                <DialogActionButton isVisible={isVisible} title={title} topicList={topics} setIsVisible={setIsVisible} currentSelectedQuestion={currentSelectedQuestion} />
 
                 <TreeTable value={nodes} rows={5} scrollable rowClassName={rowClassName}>
 
-                    {RenderColumnsForTable(setContextDialogBody, setResourceDialogBody, setTopicDialogBody, topics, toast, setTitle, setIsVisible,currentSelectedQuestion)}
+                    {RenderColumnsForTable(setContextDialogBody, setResourceDialogBody, setTopicDialogBody, topics,  setTitle, setIsVisible,currentSelectedQuestion)}
 
                 </TreeTable>
 

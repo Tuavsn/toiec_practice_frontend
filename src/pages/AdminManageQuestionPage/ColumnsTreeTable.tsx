@@ -8,10 +8,9 @@ import { TreeNode } from "primereact/treenode";
 import React from "react";
 import { timeStampBodyTemplate } from "../../components/Common/Table/CommonColumn";
 import { QuestionActionButtonProps, QuestionContext, Resource, Topic } from "../../utils/types/type";
-import { Toast } from "primereact/toast";
 
 
-export function RenderColumnsForTable(setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, topics: React.MutableRefObject<Topic[]>, toast: React.MutableRefObject<Toast | null>, setTitle: React.Dispatch<React.SetStateAction<string>>, setIsVisible: React.Dispatch<React.SetStateAction<boolean>>, currentSelectedQuestion: React.MutableRefObject<TreeNode>): JSX.Element[] {
+export function RenderColumnsForTable(setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, topics: React.MutableRefObject<Topic[]>, setTitle: React.Dispatch<React.SetStateAction<string>>, setIsVisible: React.Dispatch<React.SetStateAction<boolean>>, currentSelectedQuestion: React.MutableRefObject<TreeNode>): JSX.Element[] {
     return [
         /* Cột hiển thị loại câu hỏi, cho phép mở rộng */
         < Column key="col-type" headerClassName='text-center' field="type" header="Loại" body={ExpandTypeBodyTemplate} expander />,
@@ -34,7 +33,7 @@ export function RenderColumnsForTable(setContextDialogBody: React.Dispatch<React
         /* Cột hiển thị thời gian tạo và cập nhật */
         <Column key="col-time" bodyStyle={{ width: "220px" }} headerClassName='text-center' header="Thời gian" body={QuestionTimeStampBodyTemplate} />,
         /* Cột hiển thị nút sửa và xóa */
-        <Column key="col-action" headerClassName='text-center' header="" body={(data) => <ActionBodyTemplate questionNode={data} setTitle={setTitle} setIsVisible={setIsVisible} toast={toast} topicList={topics} currentSelectedQuestion={currentSelectedQuestion} />} />,
+        <Column key="col-action" headerClassName='text-center' header="" body={(data) => <ActionBodyTemplate questionNode={data} setTitle={setTitle} setIsVisible={setIsVisible} topicList={topics} currentSelectedQuestion={currentSelectedQuestion} />} />,
     ]
 }
 

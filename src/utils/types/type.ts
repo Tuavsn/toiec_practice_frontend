@@ -1,5 +1,4 @@
 import { DataTableValue } from "primereact/datatable";
-import { Toast } from "primereact/toast";
 import { TreeNode } from "primereact/treenode";
 
 
@@ -362,7 +361,6 @@ export interface DialogActionProps {
   isVisible: boolean,
   title: string,
   topicList: React.MutableRefObject<Topic[]>,
-  toast: React.MutableRefObject<Toast | null>,
   setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
   currentSelectedQuestion: React.MutableRefObject<TreeNode>,
 
@@ -397,7 +395,6 @@ export type AnswerRecord = AnswerPair & {
 }
 
 export interface QuestionTableProps {
-  toast: React.MutableRefObject<Toast | null>,
   setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
   setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
   setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
@@ -405,7 +402,6 @@ export interface QuestionTableProps {
 
 export interface QuestionActionButtonProps {
   questionNode: TreeNode,
-  toast: React.MutableRefObject<Toast | null>,
   topicList: React.MutableRefObject<Topic[]>,
   setTitle: React.Dispatch<React.SetStateAction<string>>,
   setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
@@ -415,7 +411,6 @@ export interface QuestionActionButtonProps {
 export interface UpdateQuestionDialogProps {
   currentSelectedQuestion: React.MutableRefObject<TreeNode>,
   topicList: React.MutableRefObject<Topic[]>,
-  toast: React.MutableRefObject<Toast | null>,
 }
 
 export interface QuestionContext {
@@ -446,4 +441,4 @@ export type ResponseUserResultList = ApiResponse<TableData<UserDetailResultRow>>
 export type UserAnswerTimeCounter = Map<QuestionNumber, milisecond>
 export type TestType = 'fulltest' | 'practice' | 'survival';
 export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
-export type PracticeType = "part1" | "part2" | "part3" | "part4" | "part5" | "part6" | "part7" | "grammar" | "vocabulary";
+export type ExerciseType = "part1" | "part2" | "part3" | "part4" | "part5" | "part6" | "part7" | "grammar" | "vocabulary";
