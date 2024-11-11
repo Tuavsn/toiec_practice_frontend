@@ -1,31 +1,17 @@
-import { Dispatch, MutableRefObject, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
-import { callGetTestPaper, callPostTestRecord } from '../api/api';
-import { MappingPageWithQuestionNum } from '../utils/convertToHTML';
-import { AnswerPair, milisecond, MultipleChoiceQuestion, QuestionID, QuestionNumber, QuestionPage, AnswerRecord, TestAnswerSheet, TestID, UserAnswerTimeCounter, TestRecord, TestType, ResultID } from '../utils/types/type';
-import { useTestState } from '../context/TestStateProvider';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AnswerPair, milisecond, MultipleChoiceQuestion, PracticeType, QuestionID, QuestionNumber, QuestionPage, TestAnswerSheet, TestRecord, UserAnswerTimeCounter } from "../utils/types/type";
+import { callPostTestRecord, callGetTestPaper } from "../api/api";
+import { MappingPageWithQuestionNum } from "../utils/convertToHTML";
 
-//------------------ Custom Hook: useTestPage ------------------//
-
-const useTestPage = () => {
+const usePracticePage = (practiceType: PracticeType) => {
     // ---------------- Khởi tạo State và Context ---------------- //
     const [questionList, setQuestionList] = useState<MultipleChoiceQuestion[]>([]);
     const [pageMapper, setPageMapper] = useState<QuestionPage[]>([]);
     const [totalQuestions, setTotalQuestions] = useState<number>(0);
     const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
     const [userAnswerSheet, setUserAnswerSheet] = useState<TestAnswerSheet>(new Map<QuestionNumber, AnswerPair>());
-    const { isOnTest, setIsOnTest } = useTestState();
-    // Sử dụng hook điều hướng
-    const navigate = useNavigate();
 
-    // Lấy tham số từ URL (id của bài thi và các phần của bài thi)
-    const { id = "", parts = "", type = "fulltest" } = useParams<{ id: TestID, parts: string, type: TestType }>();
 
-    // State để kiểm soát việc hiển thị phiếu trả lời của người dùng
-    const [isUserAnswerSheetVisible, setIsUserAnswerSheetVisible] = useState(false);
-
-    // State để kiểm soát trạng thái bắt đầu bài thi
-    const [start, setStart] = useState<boolean>(false);
     // Ref dùng để ghi lại thời gian
     const lastTimeStampRef = useRef(Date.now());
     // thời gian người dùng đã tốn 
@@ -43,19 +29,11 @@ const useTestPage = () => {
         }
     }, [currentPageIndex, questionList.length]);
 
-    // Hàm kết thúc bài thi và điều hướng đến trang xem lại
-    const onEndTest = useCallback(async () => {
-        setIsOnTest(false);
-        sendFinalResultToServer().then((resultId: ResultID) => navigate(`/test/${resultId}/review`));
-    }, [userAnswerSheet]);
-
     // Hàm cập nhật câu trả lời của người dùng
     const setTestAnswerSheet = (qNum: QuestionNumber, qID: QuestionID, answer: string) => {
-        setUserAnswerSheet((prevMap) => {
-            const newMap = new Map(prevMap);
-            newMap.set(qNum, { questionId: qID, userAnswer: answer });
-            return newMap;
-        });
+        const newMap = new Map(userAnswerSheet);
+        newMap.set(qNum, { questionId: qID, userAnswer: answer });
+        setUserAnswerSheet(newMap);
 
     };
 
@@ -75,17 +53,14 @@ const useTestPage = () => {
     };
     // hàm gửi dữ liệu bài  làm kết thúc của người dùng về server
     const sendFinalResultToServer = async () => {
-        // tính thời gian làm trang cuối cùng
-        updateTimeSpentOnEachQuestionInCurrentPage();
         const resultBodyObject: TestRecord = {
-            totalSeconds: (Date.now() - timeDoTest.current) / 1000, // khép lại thời gian làm bài ( đơn vị giây)
-            testId: id,
-            parts: parts,
-            type: type,
+            totalSeconds: timeDoTest.current,
+            testId: "",
+            parts: "",
+            type: "survival",
             userAnswer: GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current)
         }
-        console.dir(resultBodyObject);
-        return (await callPostTestRecord(resultBodyObject)).data.resultId;
+        callPostTestRecord(resultBodyObject);
     }
     // ---------------- useEffect Khởi Tạo và Cleanup ---------------- //
 
@@ -93,9 +68,8 @@ const useTestPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setIsOnTest(true);
                 localStorage.removeItem('userAnswerSheet');
-                const responseData = await callGetTestPaper(id, parts);
+                const responseData = await callGetExercisePaper(id, parts);
 
                 const newPageMapper = MappingPageWithQuestionNum(responseData.data.listMultipleChoiceQuestions);
                 setTotalQuestions(responseData.data.totalQuestion);
@@ -130,13 +104,6 @@ const useTestPage = () => {
     // ---------------- Trả Về Giá Trị từ Hook ---------------- //
 
     return {
-        onEndTest,
-        parts,
-        start,
-        setStart,
-        isUserAnswerSheetVisible,
-        setIsUserAnswerSheetVisible,
-        isOnTest,
         questionList,
         pageMapper,
         totalQuestions,
@@ -153,37 +120,4 @@ const useTestPage = () => {
     };
 };
 
-export default useTestPage;
-
-// ---------------- Hàm Chuẩn Bị Phiếu Trả Lời Rỗng ---------------- //
-
-function prepareAnswerSheet(
-    listMultipleChoiceQuestions: MultipleChoiceQuestion[],
-    setUserAnswerSheet: Dispatch<SetStateAction<TestAnswerSheet>>,
-    timeSpentListRef: MutableRefObject<UserAnswerTimeCounter>
-) {
-    const testAnswerSheet: TestAnswerSheet = new Map<QuestionNumber, AnswerPair>();
-
-    for (const question of listMultipleChoiceQuestions) {
-        if (question.subQuestions.length !== 0) {
-            for (const subQuestion of question.subQuestions) {
-                testAnswerSheet.set(subQuestion.questionNum, ({ questionId: subQuestion.id, userAnswer: "" }));
-                timeSpentListRef.current.set(subQuestion.questionNum, 0);
-            }
-        } else {
-            testAnswerSheet.set(question.questionNum, { questionId: question.id, userAnswer: "" });
-            timeSpentListRef.current.set(question.questionNum, 0);
-        }
-    }
-
-    setUserAnswerSheet(testAnswerSheet);
-}
-
-function GroupUserAnswerSheetAndTimeSpent(userAnswerSheet: TestAnswerSheet, timeSpentList: UserAnswerTimeCounter): AnswerRecord[] {
-    const resultRecords: AnswerRecord[] = [];
-    userAnswerSheet.forEach((answerPair, questionNumber) => {
-        const time = timeSpentList.get(questionNumber) || 0;
-        resultRecords.push({ ...answerPair, timeSpent: ~~(time / 1000) });// đổi từ mili giây sang giây (chỉ lấy phần nguyên)
-    })
-    return resultRecords;
-}
+export default usePracticePage;

@@ -55,7 +55,7 @@ export function AdminManageTestPage() {
         setSelectedRows,
         setGlobalFilter,
         handleOnPage
-    } = useDataTable<TestRow>("https://dummyjson.com/c/00ac-df9c-4a5b-8e4a", emptyTest
+    } = useDataTable<TestRow>(`categories/${category_id}/tests`, emptyTest
         , (state) => ({
             saveRow: () => {
                 state.setSubmitted(true);
@@ -88,13 +88,13 @@ export function AdminManageTestPage() {
         <Column key="col-selection" selectionMode="multiple" exportable={false} />,
         <Column key="col-id" field="id" header="ID" sortable filter style={{ minWidth: '12rem' }} />,
         <Column key="col-name" field="name" header="Name" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-totalTestAttempt" field="totalTestAttempt" header="total Attempt" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-totalQuestion" field="totalQuestion" header="total Question" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-totalScore" field="totalScore" header="total Score" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-limitTime" field="limitTime" header="limit Time" sortable filter style={{ minWidth: '12rem' }} />,
+        <Column key="col-totalTestAttempt" field="totalUserAttempt" header="Total Attempt" sortable filter style={{ minWidth: '12rem' }} />,
+        <Column key="col-totalQuestion" field="totalQuestion" header="Total Question" sortable filter style={{ minWidth: '12rem' }} />,
+        <Column key="col-totalScore" field="totalScore" header="Total Score" sortable filter style={{ minWidth: '12rem' }} />,
+        <Column key="col-limitTime" field="limitTime" header="Limit Time" sortable filter style={{ minWidth: '12rem' }} />,
         <Column key="col-questions" header="questions" body={questionsBodyTemplate} />,
         <Column key="col-timestamp" header="Time stamp" body={timeStampBodyTemplate} sortable style={{ minWidth: '10rem' }} />,
-        <Column key="col-isActive" field="isActive" header="status" sortable body={statusBodyTemplate} />,
+        <Column key="col-isActive" field="isActive" header="Active" sortable body={statusBodyTemplate} />,
     ];
 
     return (
@@ -144,7 +144,7 @@ export default memo(AdminManageTestPage);
 function questionsBodyTemplate(rowData: TestRow) {
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate('/dashboard/test/question?test_id=' + rowData.id)
+        navigate(`/dashboard/tests/${rowData.id}/questions`)
     };
 
     return (

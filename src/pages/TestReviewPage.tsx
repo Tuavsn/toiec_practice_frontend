@@ -1,108 +1,67 @@
+import { Card } from "primereact/card";
+import { useTestReview } from "../hooks/TestReviewHook";
+import convertSecondsToString from "../utils/convertSecondsToString";
+import { Badge } from "primereact/badge";
+import React from "react";
 
 export default function TestReviewPage() {
-    // const { id = "" } = useParams<{ id: string }>();
 
-    // const emptyTestResultSummary: TestResultSummary = {
-    //     createdAt: new Date(),
-    //     parts: [0],
-    //     questionRecords: [],
-    //     totalCorrectAnswer: 999,
-    //     totalIncorrectAnswer: 999,
-    //     totalListeningScore: 999,
-    //     totalReadingScore: 999,
-    //     totalSkipAnswer: 999,
-    //     totalTime: 9999,
-    //     type: "fulltest"
-    // }
-
-    // const [testResultSummary, setTestResultSummary] = useState<TestResultSummary>(emptyTestResultSummary);
-    // const [isQuestionCorrect, setIsQuestionCorrect] = useState<boolean[]>([]);
-    // const {
-    //     resourcesElement,
-    //     questionsElement,
-    //     currentPageIndex,
-    //     setCurrentPageIndex,
-    //     changePage,
-    //     isUserAnswerSheetVisible,
-    //     setIsUserAnswerSheetVisible,
-    //     mappingQuestionsWithPage,
-    //     setMappingQuestionsWithPage,
-    //     setQuestionsElement,
-    //     setResourcesElement
-    // } = useTest();
-
-    // useEffect(() => {
-
-    //     const fetchData = async () => {
-    //         try {
-    //             const newTestResultSummary = await fetchQuestionsData(emptyTestResultSummary);
-    //             // const totalQuestions = newTestResultSummary.totalCorrectAnswer + newTestResultSummary.totalIncorrectAnswer + newTestResultSummary.totalSkipAnswer;
-    //             setTestResultSummary(newTestResultSummary)
-    //             const [resources, questions, mappingQuestionsPage, isCorrect] = ConvertTestRecordToHTML(newTestResultSummary.questionRecords);
-    //             setResourcesElement(resources);
-    //             setQuestionsElement(questions);
-    //             setMappingQuestionsWithPage(mappingQuestionsPage);
-    //             setIsQuestionCorrect(isCorrect)
-
-    //         } catch (error) {
-    //             console.error('Error fetching data:', error);
-    //         }
-    //     };
-
-    //     fetchData();
-    // }, []);
-
-    // const ButtonListElement =
-    //     isQuestionCorrect.map((isCorrect, index) => {
-    //         const isOnPage = currentPageIndex === mappingQuestionsWithPage[index];
-    //         return (
-    //             <Button
-    //                 key={"answer_" + index}
-    //                 style={{ width: '60px', aspectRatio: '1/1' }}
-    //                 className={"border-round-md border-solid text-center p-2"}
-    //                 label={(index + 1).toString()}
-    //                 severity={getColorButtonOnAnswerSheet(isCorrect, isOnPage)}
-    //                 onClick={() => {
-    //                     if (!isOnPage) {
-    //                         setCurrentPageIndex(mappingQuestionsWithPage[index]);
-    //                     }
-    //                 }}
-    //             />
-    //         );
-    //     })
-
-
+    const {
+        overallDetail
+    } = useTestReview();
     return (
-        <main className="pt-8 w-full">
+        <main className="pt-8 w-full family-font">
+            <Card title={`Kết quả thi: ${overallDetail.type} phần ${overallDetail.parts}`}>
+                <section className="flex flex-wrap justify-content-around gap-3">
+                    <table className="bg-gray-300 p-2 border-round-md flex-1">
+                        <tbody>
+                            <tr>
+                                <td>Kết quả làm bài:</td>
+                                <td>{overallDetail.totalListeningScore + overallDetail.totalReadingScore}/200</td>
+                            </tr>
+                            <tr>
+                                <td>Thời gian làm bài:</td>
+                                <td>{convertSecondsToString(overallDetail.totalTime)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div className="shadow-4 p-3 text-center border-round-md flex-1">
+                        ✅
+                        <p className="text-green-500">Trả lời đúng</p>
+                        <h1>{overallDetail.totalCorrectAnswer}</h1>
+                        câu hỏi
+                    </div>
+                    <div className="shadow-4 p-3 text-center border-round-md flex-1">
+                        ❌
+                        <p className="text-red-500">Trả lời đúng</p>
+                        <h1>{overallDetail.totalIncorrectAnswer}</h1>
+                        câu hỏi
+                    </div>
+                    <div className="shadow-4 p-3 text-center border-round-md flex-1">
+                        😵
+                        <p className="text-orange-300">Không trả lời</p>
+                        <h1>{overallDetail.totalSkipAnswer}</h1>
+                        câu hỏi
+                    </div>
+                </section>
+                <section>
+                    <h1>Đáp án</h1>
+                    <div className="flex flex-wrap gap-5 justify-content-center">
 
-            {/* <UserAnswerSheet
-                visible={isUserAnswerSheetVisible}
-                setVisible={setIsUserAnswerSheetVisible}
-                ButtonListElement={ButtonListElement} />
+                        {
+                            overallDetail.userAnswers.map((userAnswer, index) => {
 
-            <h1 className="text-center"> Kết quả của {id} {formatDate( testResultSummary.createdAt )}</h1>
-            <Toolbar
-                start={
-                    <Button severity="help" label={`Danh sách trả lời`} icon="pi pi-arrow-right" onClick={() => setIsUserAnswerSheetVisible(true)} />
-                }
-            />
-            <Card>
-
-
-                <div className="flex flex-column md:flex-row justify-content-between p-5 gap-4 custom-scrollpanel">
-                    <TestArea changePage={changePage}
-                        currentPageIndex={currentPageIndex}
-                        parts={""}
-                        questionsElement={questionsElement}
-                        resourcesElement={resourcesElement} />
-
-                </div>
-
-
-
-            </Card> */}
-
-
+                                return (
+                                    <div className="flex-1 align-center shadow-7 p-4" style={{ minWidth: "50vh", maxWidth:"50vh" }} key={index}>
+                                        <Badge className="mr-2" value={index + 1} />
+                                        <div className="pt-2 pl-4">{ConcatLineFromUserAnswerAndIcon(userAnswer.answer, userAnswer.correct)}</div>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                </section>
+            </Card>
 
         </main >
 
@@ -110,6 +69,21 @@ export default function TestReviewPage() {
 }
 
 //-----------------------helper function
+
+function ConcatLineFromUserAnswerAndIcon(userAnswer: string, isCorrect: boolean) {
+    let symbol = '✅';
+    if (!isCorrect) {
+        if (userAnswer) {
+            symbol = '❌';
+        }
+        else {
+            symbol = '😵';
+            userAnswer = "chưa làm"
+        }
+    }
+    const line = `${userAnswer} ${symbol}`;
+    return line;
+}
 
 // function getColorButtonOnAnswerSheet(isCorrect: boolean, isOnPage: boolean): "success" | "danger" | "info" {
 //     const returnString = isCorrect ? 'success' : 'danger';

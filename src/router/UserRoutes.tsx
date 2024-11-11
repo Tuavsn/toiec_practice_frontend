@@ -8,16 +8,17 @@ import {
     CoursePage,
     NotFoundPage,
     CourseDetailsPage,
-    LookUpPage,
-    DoTestPage
+    DoTestPage,
+    ExercisePage
 } from "../pages/Index";
 import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
 import { Suspense } from "react";
 import { LoadingSpinner } from "../components/Common/Index";
 
+
 export default function UserRoutes() {
     return (
-        <Suspense fallback={<LoadingSpinner text="Trang người dùng đang tải...."/>}>
+        <Suspense fallback={<LoadingSpinner text="Trang người dùng đang tải...." />}>
             <Routes>
                 {/* Home Page */}
                 <Route path="/" element={<Navigate to="/home" />} />
@@ -37,7 +38,7 @@ export default function UserRoutes() {
                 <Route path="/course" element={<CoursePage />} />
                 <Route path="/courses/:id" element={<CourseDetailsPage />} />F
 
-                <Route path="/lookup" element={<LookUpPage />} />
+                <Route path="/practice" element={<ExercisePage />} />
                 {/* NotFound Page */}
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>

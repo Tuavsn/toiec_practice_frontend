@@ -36,3 +36,14 @@
 #user-layout:has(#do-test-page) {
     margin: 20px auto !important;
 }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.family-font {
+    font-family: var(--font-family);
+}
+

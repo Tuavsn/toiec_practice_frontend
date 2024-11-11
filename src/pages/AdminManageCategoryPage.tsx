@@ -9,7 +9,7 @@ import { classNames } from "primereact/utils";
 import { SimpleDialog } from "../components/Common/Dialog/SimpleDialog";
 import { useDataTable } from "../hooks/GenericDataTableHook";
 import React from "react";
-import { CustomBreadCrumb } from "../components/Common/Index";
+import { CustomBreadCrumb, LoadingSpinner } from "../components/Common/Index";
 import { CategoryRow } from "../utils/types/type";
 import { useNavigate } from 'react-router-dom';
 import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar";
@@ -64,7 +64,6 @@ function AdminManageCategoryPage() {
         })
     );
 
-
     const renderColumns = [
         <Column key="col-selection" selectionMode="multiple" exportable={false} />,
         <Column key="col-id" field="id" header="ID" sortable filter style={{ minWidth: '12rem' }} />,
@@ -72,7 +71,7 @@ function AdminManageCategoryPage() {
         <Column key="col-year" field="year" header="Year" sortable />,
         <Column key="col-timestamp" header="Time stamp" body={timeStampBodyTemplate} sortable style={{ minWidth: '10rem' }} />,
         <Column key="col-tests" field="tests" header="Tests" body={TestsBodyTemplate} style={{ minWidth: '17ream' }} />,
-        <Column key="col-isActive" field="isActive" header="status" sortable body={statusBodyTemplate} />,
+        <Column key="col-isActive" field="isActive" header="Active" sortable body={statusBodyTemplate} />,
     ];
 
     return (
@@ -108,6 +107,7 @@ function AdminManageCategoryPage() {
                 </Card>
             </div>
         </React.Fragment>
+
     )
 }
 
@@ -152,7 +152,7 @@ async function customSaveRowFunction(state: any, emptyCategory: CategoryRow) {
 function TestsBodyTemplate(rowData: CategoryRow) {
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate('/dashboard/test?category_id=' + rowData.id)
+        navigate(`/dashboard/categories/${rowData.id}/tests`)
     };
 
     return (
