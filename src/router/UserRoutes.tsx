@@ -9,7 +9,8 @@ import {
     NotFoundPage,
     CourseDetailsPage,
     DoTestPage,
-    ExercisePage
+    ExercisePage,
+    DoExercisePage
 } from "../pages/Index";
 import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
 import { Suspense } from "react";
@@ -31,14 +32,16 @@ export default function UserRoutes() {
                 {/* Test Detail Page */}
                 <Route path="/test/:id" element={<TestDetailPage />} />
                 {/* Do Test  Page */}
-                <Route path="/dotest/:id/:type/:parts" element={<DoTestPage />} />
+                <Route path="/dotest/:id/:testType/:parts" element={<DoTestPage />} />
                 {/* Test Review Page */}
                 <Route path="/test/:id/review" element={<TestReviewPage />} />
-                {/* Flash Card Page */}
+                {/* Course Page */}
                 <Route path="/course" element={<CoursePage />} />
                 <Route path="/courses/:id" element={<CourseDetailsPage />} />F
-
-                <Route path="/practice" element={<ExercisePage />} />
+                {/* Exercise page */}
+                <Route path="/exercise" element={<ExercisePage />} />
+                {/* Do Exercise  Page */}
+                <Route path="/doexercise/:exerciseType" element={<DoExercisePage />} />
                 {/* NotFound Page */}
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>

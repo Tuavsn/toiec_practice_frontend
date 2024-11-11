@@ -5,10 +5,10 @@ import { TestAreaProps } from "../../../utils/types/type"
 import { ConvertThisTestQuestionToHTML } from "../../../utils/convertToHTML"
 
 export const TestArea: React.FC<TestAreaProps> = React.memo(
-    ({ changePage, question, userAnswerSheet, parts,
+    ({ changePage, question, userAnswerSheet, testType,
         setTestAnswerSheet
     }) => {
-        const [resourcesElement, questionsElement]: [JSX.Element[], JSX.Element[]] = ConvertThisTestQuestionToHTML(question, userAnswerSheet, setTestAnswerSheet, parts, changePage);
+        const [resourcesElement, questionsElement]: [JSX.Element[], JSX.Element[]] = ConvertThisTestQuestionToHTML(question, userAnswerSheet, setTestAnswerSheet, testType, changePage);
         return (
             <div className="flex xl:flex-row lg:flex-row flex-wrap md:flex-column sm:flex-column justify-content-between gap-1 custom-scrollpanel px-0 py-0"
             >
@@ -20,7 +20,7 @@ export const TestArea: React.FC<TestAreaProps> = React.memo(
                 </ScrollPanel>
 
                 <div className="flex-1" style={{ minWidth: '600px' }}>
-                    {(parts != "0" || question.partNum > 4 )&&
+                    {(testType != "fulltest" || question.partNum > 4 )&&
                         <div className="flex justify-content-end px-3 pt-2">
                             <b className="py-0 m-auto text-blue-300">Phần {question.partNum}</b>
                             <span>

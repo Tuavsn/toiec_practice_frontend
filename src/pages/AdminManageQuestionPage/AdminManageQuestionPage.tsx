@@ -1,6 +1,5 @@
 
 import { Card } from 'primereact/card';
-import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import React, { memo } from 'react';
 import { useQuestion } from '../../hooks/QuestionHook';
@@ -19,7 +18,6 @@ export function AdminManageQuestionPage() {
         setTopicDialogBodyVisible,
         contextDialogBodyVisible,
         topicDialogBodyVisible,
-        toast,
     } = useQuestion()
 
     return (
@@ -27,8 +25,6 @@ export function AdminManageQuestionPage() {
             <div key={'b'}>
                 <Card className="my-2">
                     <div key={'a'}>
-                        {/* Thành phần Toast để hiển thị thông báo */}
-                        <Toast ref={toast} />
                         <div className="card pb-5">
                             {/* Thanh công cụ hiển thị tiêu đề */}
                             <Toolbar start={<h1>chưa biết làm gì</h1>} />
@@ -36,7 +32,6 @@ export function AdminManageQuestionPage() {
 
                         {/* Hiển thị bảng cây chứa các câu hỏi có phân trang */}
                         <QuestionTreeTable
-                            toast={toast}
                             setContextDialogBody={setContextDialogBodyVisible}
                             setResourceDialogBody={setResourceDialogBodyVisible}
                             setTopicDialogBody={setTopicDialogBodyVisible}

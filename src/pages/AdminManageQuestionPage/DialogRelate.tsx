@@ -9,21 +9,22 @@ import { MultiSelect } from "primereact/multiselect"
 import React, { useState } from "react"
 import { callPutQuestionUpdate } from "../../api/api"
 import { DialogActionProps, DialogQuestionPageProps, Topic, UpdateQuestionDialogProps, UpdateQuestionForm } from "../../utils/types/type"
+import { useToast } from "../../context/ToastProvider"
 
 // Định nghĩa component DialogForQuestionPage sử dụng React.FC với React.memo để tối ưu hiệu suất
 export const DialogForQuestionPage: React.FC<DialogQuestionPageProps> = React.memo(
     ({ setIsDialogVisible, dialogBodyVisible, title }) => {
-        
+
         // Trả về component Dialog với các thuộc tính và nội dung được truyền vào
         return (
-            <Dialog 
+            <Dialog
                 style={{ maxWidth: "80vw" }}            // Thiết lập chiều rộng tối đa cho Dialog
                 header={title}                          // Tiêu đề của Dialog lấy từ prop title
                 visible={dialogBodyVisible !== null}    // Hiển thị Dialog nếu dialogBodyVisible không phải null
                 modal={false}                           // Đặt Dialog không ở chế độ modal (cho phép tương tác ngoài dialog)
                 onHide={() => setIsDialogVisible(null)} // Đóng Dialog khi sự kiện onHide xảy ra
             >
-                {dialogBodyVisible                      /* Nội dung của Dialog lấy từ prop dialogBodyVisible*/}                     
+                {dialogBodyVisible                      /* Nội dung của Dialog lấy từ prop dialogBodyVisible*/}
             </Dialog>
         );
     }
@@ -32,10 +33,10 @@ export const DialogForQuestionPage: React.FC<DialogQuestionPageProps> = React.me
 
 // Định nghĩa component DialogActionButton sử dụng React.FC với React.memo để tối ưu hiệu suất
 export const DialogActionButton: React.FC<DialogActionProps> = React.memo(
-    ({ setIsVisible, isVisible, title, topicList, toast, currentSelectedQuestion }) => {
+    ({ setIsVisible, isVisible, title, topicList, currentSelectedQuestion }) => {
 
         return (
-            <Dialog 
+            <Dialog
                 onHide={() => setIsVisible(false)}           // Đóng Dialog khi sự kiện onHide xảy ra
                 visible={isVisible}                          // Hiển thị Dialog khi isVisible là true
                 header={title}                               // Tiêu đề của Dialog lấy từ prop title
@@ -43,10 +44,9 @@ export const DialogActionButton: React.FC<DialogActionProps> = React.memo(
             >
                 {title === "Xóa" ?                          // Kiểm tra nếu tiêu đề là "Xóa"
                     <h1 className='text-center'>Bạn có chắc muốn xóa</h1> // Hiển thị nội dung xác nhận xóa
-                    : 
+                    :
                     <RenderUpdateQuestionBody               // Hiển thị nội dung cập nhật câu hỏi
                         topicList={topicList}               // Truyền danh sách chủ đề vào RenderUpdateQuestionBody
-                        toast={toast}                       // Truyền toast vào RenderUpdateQuestionBody để hiển thị thông báo
                         currentSelectedQuestion={currentSelectedQuestion} // Truyền câu hỏi hiện tại vào RenderUpdateQuestionBody
                     />
                 }
@@ -58,8 +58,8 @@ export const DialogActionButton: React.FC<DialogActionProps> = React.memo(
 
 
 const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo(
-    ({ currentSelectedQuestion, topicList, toast }) => {
-
+    ({ currentSelectedQuestion, topicList, }) => {
+        const { toast } = useToast();
         const [formData, setFormData] = useState<UpdateQuestionForm>({
             listTopicIds: (currentSelectedQuestion.current.data.topic as Topic[]).map((t) => t.id),
             correctAnswer: currentSelectedQuestion.current.data.correctChoice as string,

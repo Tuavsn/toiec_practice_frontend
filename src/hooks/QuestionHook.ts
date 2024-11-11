@@ -1,21 +1,19 @@
 import { PaginatorPageChangeEvent } from "primereact/paginator";
-import { Toast } from "primereact/toast";
 import { TreeNode } from "primereact/treenode";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { callGetQuestionRows, callGetTopics } from "../api/api";
 import { QuestionID, QuestionRow, TestID, Topic } from "../utils/types/type";
-import { useParams } from "react-router-dom";
 
 export function useQuestion() {
 
     const [resourceDialogBodyVisible, setResourceDialogBodyVisible] = useState<JSX.Element | null>(null);
     const [topicDialogBodyVisible, setTopicDialogBodyVisible]       = useState<JSX.Element | null>(null);
     const [contextDialogBodyVisible, setContextDialogBodyVisible]   = useState<JSX.Element | null>(null);
-    const toast = useRef<Toast | null>(null);
+
 
 
     return {
-        toast,
         contextDialogBodyVisible,
         resourceDialogBodyVisible,
         topicDialogBodyVisible,

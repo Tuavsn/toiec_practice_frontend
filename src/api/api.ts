@@ -1,6 +1,5 @@
-import axios from "./axios-customize";
 import { ApiResponse, CategoryRow, QuestionRow, ResponseUserResultList, ResultID, TableData, TestID, TestPaper, TestRecord, TestResultSummary, Topic, UpdateQuestionForm } from "../utils/types/type";
-import { parsePath } from "react-router-dom";
+import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
 export const loginUrl = `${host}/oauth2/authorize/google`;
@@ -44,13 +43,14 @@ export const callGetUserDetailResultList = async (_pageNumber: number = 1, _page
     return await response.json() as ResponseUserResultList;
 }
 
-export const callGetExercisePaper = async (testId: string, parts: string): Promise<ApiResponse<TestPaper>> => {
-    const postfix = parts === '0' ? 'full-test' : `practice?parts=${parts}`;
-    const response = await axios.get<ApiResponse<TestPaper>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}`);
+export const callGetExercisePaper = async (parts: string): Promise<ApiResponse<TestPaper>> => {
+    alert("viết api cho callGetExercisePaper")
+    const postfix = `practice?parts=${parts}`;
+    const response = await axios.get<ApiResponse<TestPaper>>(`${import.meta.env.VITE_API_URL}/tests/671a25094dbe5f4c165c31dc/${postfix}`,);
     return response.data;
 }
 
-export const callGetQuestionRows = async (testId: TestID, currentPageIndex: number, pageSize: number = 8): Promise<ApiResponse<TableData<QuestionRow>>> => {
+export const callGetQuestionRows = async (testId: TestID, currentPageIndex: number, pageSize: number = 5): Promise<ApiResponse<TableData<QuestionRow>>> => {
     const response = await axios.get<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/questions?current=${currentPageIndex + 1}&pageSize=${pageSize}`)
     return response.data;
 }

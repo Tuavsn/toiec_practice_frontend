@@ -1,10 +1,10 @@
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import '../App.css';
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useTestPage from "../hooks/TestHook";
-import { MultipleChoiceQuestion, SimpleTimeCountDownProps, TestAnswerSheet } from "../utils/types/type";
+import { MultipleChoiceQuestion, SimpleTimeCountDownProps, TestAnswerSheet, TestType } from "../utils/types/type";
 
 function DoTestPage() {
 
@@ -25,38 +25,41 @@ function DoTestPage() {
         onEndTest,
         isOnTest,
         setStart,
+        testType,
         start,
-        parts
     } = useTestPage();
 
 
 
     // Tạo danh sách nút điều hướng dựa trên pageMapper
-    const ButtonListElement = userAnswerSheet.size > 0 ? pageMapper.map((pq, index) => {
-        const isOnPage = currentPageIndex === pq.page;
+    const createButtonListElement = (): JSX.Element[] => {
+        if (userAnswerSheet.size <= 0) {
+            return [<h1 key={"error-button-list"}>Lỗi rồi</h1>];
+        }
+        return pageMapper.map((pq, index) => {
+            const isOnPage = currentPageIndex === pq.page;
+            const text = userAnswerSheet.get(pq.questionNum)?.userAnswer ?? "";
+            const isDisabled = checkIsAllowToChangePage(testType, questionList, pq.page, currentPageIndex);
 
+            return (
+                <Button
+                    disabled={isDisabled}
+                    key={"answer_" + index}
+                    style={{ width: '60px', aspectRatio: '1/1' }}
+                    className={"border-round-md border-solid text-center p-2"}
+                    label={pq.questionNum.toString()}
+                    severity={getColorButtonOnAnswerSheet(text, isOnPage)} // Cập nhật màu sắc nút theo câu trả lời
+                    onClick={() => {
+                        if (!isOnPage) {
+                            setCurrentPageIndex(pq.page);
+                        }
+                    }}
+                />
 
-        const text = userAnswerSheet.get(pq.questionNum)?.userAnswer ?? "";
-        const isDisabled = checkIsAllowToChangePage(parts, questionList, pq.page, currentPageIndex);
+            );
+        })
+    }
 
-        return (
-            <Button
-                disabled={isDisabled}
-                key={"answer_" + index}
-                style={{ width: '60px', aspectRatio: '1/1' }}
-                className={"border-round-md border-solid text-center p-2"}
-                label={pq.questionNum.toString()}
-                severity={getColorButtonOnAnswerSheet(text, isOnPage)} // Cập nhật màu sắc nút theo câu trả lời
-                onClick={() => {
-                    if (!isOnPage) {
-                        setCurrentPageIndex(pq.page);
-                    }
-                }}
-            />
-
-        );
-    })
-        : [<h1 key={"error-button-list"}>Lỗi rồi</h1>]
 
     // Render giao diện chính của trang thi
     return totalQuestions > 0 && isOnTest ? (
@@ -83,7 +86,7 @@ function DoTestPage() {
                     <UserAnswerSheet
                         visible={isUserAnswerSheetVisible}
                         setVisible={setIsUserAnswerSheetVisible}
-                        ButtonListElement={ButtonListElement}
+                        ButtonListElement={createButtonListElement()}
                     />
 
                     {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */}
@@ -109,7 +112,7 @@ function DoTestPage() {
                     <div id="test-area-container" className="max-w-screen p-0">
                         <TestArea
                             changePage={changePage}
-                            parts={parts}
+                            testType={testType}
                             question={questionList[currentPageIndex]}
                             setTestAnswerSheet={setTestAnswerSheet}
                             userAnswerSheet={userAnswerSheet}
@@ -130,8 +133,8 @@ function DoTestPage() {
 export default memo(DoTestPage);
 //--------------------------------- helpper function for main component
 
-function checkIsAllowToChangePage(parts: string, questionList: MultipleChoiceQuestion[], page: number, currentPageIndex: number): boolean {
-    return parts === "0" &&
+function checkIsAllowToChangePage(testType: TestType, questionList: MultipleChoiceQuestion[], page: number, currentPageIndex: number): boolean {
+    return testType === "fulltest" &&
         (questionList[currentPageIndex].partNum <= 4 || questionList[page].partNum <= 4);
 }
 

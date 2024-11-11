@@ -13,6 +13,7 @@ const UserLayout = lazy(() => import('./components/Layout/UserLayout'));
 const UserRoutes = lazy(() => import('./router/UserRoutes'));
 import Container from './components/Layout/Container';
 import { LoadingSpinner } from './components/Common/Index';
+import { ToastProvider } from './context/ToastProvider';
 
 
 
@@ -20,15 +21,17 @@ function App() {
   return (
     <BrowserRouter>
       <Suspense fallback={<LoadingSpinner text="Trang Toeic đang tải...." />}>
-        <Container>
-          <Routes>
-            {localStorage.getItem('role') === 'ADMIN' &&
-              <Route path="/dashboard/*" element={<AdminLayout><AdminRoutes /></AdminLayout>} />
-            }
-            {/* User Route */}
-            <Route path="/*" element={<UserLayout><UserRoutes /></UserLayout>} />
-          </Routes>
-        </Container>
+        <ToastProvider>
+          <Container>
+            <Routes>
+              {localStorage.getItem('role') === 'ADMIN' &&
+                <Route path="/dashboard/*" element={<AdminLayout><AdminRoutes /></AdminLayout>} />
+              }
+              {/* User Route */}
+              <Route path="/*" element={<UserLayout><UserRoutes /></UserLayout>} />
+            </Routes>
+          </Container>
+        </ToastProvider>
       </Suspense>
     </BrowserRouter >
   );

@@ -12,7 +12,7 @@ const CourseDetailsPage = React.lazy(() => import("./CourseDetailsPage"));
 const LookUpPage = React.lazy(() => import("./LookUpPage"));
 const DoTestPage = React.lazy(() => import("./DoTestPage"));
 const ExercisePage = React.lazy(() => import("./ExercisePage"))
-
+const DoExercisePage = React.lazy(() => import("./DoExercisePage"))
 export {
     HomePage,
     UserProfilePage,
@@ -24,5 +24,6 @@ export {
     CourseDetailsPage,
     LookUpPage,
     DoTestPage,
-    ExercisePage
+    ExercisePage,
+    DoExercisePage,
 };
