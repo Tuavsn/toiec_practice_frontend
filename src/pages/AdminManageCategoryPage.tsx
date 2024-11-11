@@ -3,7 +3,6 @@ import { Calendar } from "primereact/calendar";
 import { Card } from "primereact/card";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
-import { Toast } from "primereact/toast";
 import { classNames } from "primereact/utils";
 import React, { memo } from "react";
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +37,7 @@ function AdminManageCategoryPage() {
         row, setRow, rows,
         selectedRows,
         globalFilter,
-        dt, toast,
+        dt,
         hideDeleteRowsDialog,
         deleteRowsDialog,
         rowDialog,
@@ -79,7 +78,6 @@ function AdminManageCategoryPage() {
                 <CustomBreadCrumb items={breadCrumbItems} />
                 <Card className="my-2">
                     <div key={'a'}>
-                        <Toast ref={toast} />
                         <div className="card">
                             <SimpleToolBar
                                 openNew={openNew}

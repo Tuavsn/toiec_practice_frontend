@@ -1,9 +1,9 @@
 import { DataTable, DataTablePageEvent, DataTableValue } from "primereact/datatable";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
-import { Toast } from "primereact/toast";
-import { useState, useEffect, useRef } from "react";
-import { ApiResponse, TableData } from "../utils/types/type";
+import { useEffect, useRef, useState } from "react";
 import { callGetRows } from "../api/api";
+import { useToast } from "../context/ToastProvider";
+import { ApiResponse, TableData } from "../utils/types/type";
 
 export function useDataTable<Model extends DataTableValue>(
     urlApi: string,
@@ -11,7 +11,7 @@ export function useDataTable<Model extends DataTableValue>(
     overrides: (state: any) => Partial<any> = () => ({}),
     searchValue: string = ''
 ) {
-    const toast = useRef<Toast>(null);
+    const {toast} = useToast();
     const dt = useRef<DataTable<Model[]>>(null);
     const [rows, setRows] = useState<Model[]>([]);
     const [rowDialog, setRowDialog] = useState<boolean>(false);
