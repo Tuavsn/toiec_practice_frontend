@@ -44,12 +44,12 @@ export default function ToeicScorePage() {
 
 
 function GenerateDataForToeicReadingScoreTable(): DataTableValue[] {
-    let row: DataTableValue[] = [
+    const row: DataTableValue[] = [
         { cell: [0, 5, 1, 5, 2, 5] }  // Initial row
     ];
 
     for (let i = 3; i <= 100; ++i) {
-        let index = Math.floor(i / 3);  // Ensure index is an integer
+        const index = Math.floor(i / 3);  // Ensure index is an integer
         if (!row[index]) {
             row[index] = { cell: [] };  // Initialize new row if not already present
         }
@@ -62,12 +62,12 @@ function GenerateDataForToeicReadingScoreTable(): DataTableValue[] {
 
 
 function GenerateDataForToeicListeningScoreTable(): DataTableValue[] {
-    let row: DataTableValue[] = [
+    const row: DataTableValue[] = [
         { cell: [0, 5] }  // Initial row
     ];
     let i = 1;
     for (; i <= 75; ++i) {
-        let index = Math.floor(i / 3);  // Ensure index is an integer
+        const index = Math.floor(i / 3);  // Ensure index is an integer
         if (!row[index]) {
             row[index] = { cell: [] };  // Initialize new row if not already present
         }
@@ -75,7 +75,7 @@ function GenerateDataForToeicListeningScoreTable(): DataTableValue[] {
         row[index].cell[2 * (i % 3) + 1] = (i + 2) * 5;  // Fill the cell with calculated values
     }
     for (; i <= 96; ++i) {
-        let index = Math.floor(i / 3);  // Ensure index is an integer
+        const index = Math.floor(i / 3);  // Ensure index is an integer
         if (!row[index]) {
             row[index] = { cell: [] };  // Initialize new row if not already present
         }
@@ -83,7 +83,7 @@ function GenerateDataForToeicListeningScoreTable(): DataTableValue[] {
         row[index].cell[2 * (i % 3) + 1] = (i + 3) * 5;  // Fill the cell with calculated values
     }
     for (; i <= 100; ++i) {
-        let index = Math.floor(i / 3);  // Ensure index is an integer
+        const index = Math.floor(i / 3);  // Ensure index is an integer
         if (!row[index]) {
             row[index] = { cell: [] };  // Initialize new row if not already present
         }

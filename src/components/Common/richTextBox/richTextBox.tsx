@@ -4,28 +4,28 @@ import { Editor, EditorTextChangeEvent } from "primereact/editor";
 
 export default function EditCourseRichTextBox(props: { content: string }) {
     const [text, setText] = useState<string>('');
-    const [_dirty,setDirty] = useState<boolean>(false);
+    const [dirty, setDirty] = useState<boolean>(false);
     useEffect(() => {
         setText(props.content);
         setDirty(false);
     }, [])
 
 
-    const header = renderHeader();
+    const header = renderHeader(dirty);
 
     return (
         <div className="card">
-            <Editor value={text} onTextChange={(e: EditorTextChangeEvent) => { if(e.htmlValue){setDirty(true);} setText(e.htmlValue ?? "") }} headerTemplate={header} style={{ height: '320px' }} />
+            <Editor value={text} onTextChange={(e: EditorTextChangeEvent) => { if (e.htmlValue) { setDirty(true); } setText(e.htmlValue ?? "") }} headerTemplate={header} style={{ height: '320px' }} />
         </div>
     )
 }
 
 
-const renderHeader = () => {
+const renderHeader = (dirty: boolean) => {
     return (
         <React.Fragment>
             <span className="ql-formats">
-                <button className="bg-yellow-500 min-w-min">Lưu</button>
+                <button className="bg-yellow-500 min-w-min">Lưu {dirty ? '*' : ''}</button>
             </span>
             <span className="ql-formats">
                 <select className="ql-font"></select>

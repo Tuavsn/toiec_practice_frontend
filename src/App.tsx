@@ -7,7 +7,7 @@ import 'primeicons/primeicons.css'; // icons
 import 'primeflex/primeflex.css'; // flex
 import { Suspense, lazy } from 'react';
 // Lazy load your layouts and routes
-const AdminLayout = lazy(() => import('./components/Layout/AdminLayout'));
+
 const AdminRoutes = lazy(() => import('./router/AdminRoutes'));
 const UserLayout = lazy(() => import('./components/Layout/UserLayout'));
 const UserRoutes = lazy(() => import('./router/UserRoutes'));
@@ -24,9 +24,8 @@ function App() {
         <ToastProvider>
           <Container>
             <Routes>
-              {localStorage.getItem('role') === 'ADMIN' &&
-                <Route path="/dashboard/*" element={<AdminLayout><AdminRoutes /></AdminLayout>} />
-              }
+              {/* Admin route*/}
+              <Route path="/dashboard/*" element={<AdminRoutes />} />
               {/* User Route */}
               <Route path="/*" element={<UserLayout><UserRoutes /></UserLayout>} />
             </Routes>

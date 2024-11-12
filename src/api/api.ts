@@ -37,9 +37,9 @@ export const callPostTestRecord = async (testRecord: TestRecord): Promise<ApiRes
     return response.data;
 }
 
-export const callGetUserDetailResultList = async (_pageNumber: number = 1, _pageSize: number = 10): Promise<ResponseUserResultList> => {
+export const callGetUserDetailResultList = async (pageNumber: number = 1, pageSize: number = 10): Promise<ResponseUserResultList> => {
     // const response = await axios.get<ResponseUserResultList>(`${import.meta.env.VITE_API_URL}/result?current=${pageNumber}&pageSize=${pageSize}`);
-    const response = await fetch("https://dummyjson.com/c/f8c9-96e9-4296-bdf6");
+    const response = await fetch(`https://dummyjson.com/c/f8c9-96e9-4296-bdf6/${pageNumber}/${pageSize}`);
     return await response.json() as ResponseUserResultList;
 }
 

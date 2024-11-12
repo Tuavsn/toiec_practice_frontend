@@ -442,3 +442,5 @@ export type UserAnswerTimeCounter = Map<QuestionNumber, milisecond>
 export type TestType = 'fulltest' | 'practice' | 'survival';
 export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
 export type ExerciseType = "part1" | "part2" | "part3" | "part4" | "part5" | "part6" | "part7" | "grammar" | "vocabulary";
+
+export type Name_ID<T extends string> = T;

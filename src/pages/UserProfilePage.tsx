@@ -1,14 +1,14 @@
 import { Card } from "primereact/card";
 import { Doughnut, Pie } from "react-chartjs-2";
 import 'chart.js/auto';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import { Chart as ChartJS, registerables, Plugin } from 'chart.js';
 import { useActiveLog, useProfilePage } from "../hooks/ProfileHook";
 import React, { useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { SkillInsightsProps, SuggestionsForUser, TopicRecord, UserDetailResultRow } from "../utils/types/type";
 import formatDate from "../utils/formatDateToString";
-import { UserResultTemplate } from "../components/Common/Table/CommonColumn";
+import { detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
 import { DataTable } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Stepper, StepperRefAttributes } from 'primereact/stepper';
@@ -99,7 +99,7 @@ function ProgressOverview(averageListeningScore: number, averageReadingScore: nu
                 position: 'bottom' as const, // Vị trí của legend ở phía dưới biểu đồ
             },
             datalabels: {
-                formatter: (_value: number, context: any) => context.chart.data.labels[context.dataIndex], // Định dạng nhãn dữ liệu
+                formatter: (_value: number, context: Context) => context.chart.data.labels?.at(context.dataIndex) || '', // Định dạng nhãn dữ liệu
                 font: {
                     size: 16, // Kích thước chữ cho nhãn
                 },
@@ -201,10 +201,10 @@ const ActivityLog: React.FC = React.memo(
             <Column key="col-time" field="totalTime" header="Thời gian làm" sortable filter />,
 
             // Cột loại bài kiểm tra, dùng template UserResultTemplate để hiển thị thông tin loại
-            <Column key="col-type" header="Loại" body={UserResultTemplate.typeUserResultRowBodyTemplate} />,
+            <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} />,
 
             // Cột chi tiết, hiển thị chi tiết kết quả người dùng qua template UserResultTemplate
-            <Column key="col-detail" body={UserResultTemplate.detailUserResultRowBodyTemplate} />,
+            <Column key="col-detail" body={detailUserResultRowBodyTemplate} />,
         ];
 
         // Trả về giao diện chính với tiêu đề và bảng dữ liệu lịch sử hoạt động-------------------------------------------------------------------------------------

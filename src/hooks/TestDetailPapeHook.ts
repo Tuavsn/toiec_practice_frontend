@@ -6,7 +6,7 @@ export const useCheckBox = () => {
     const [parts, setParts] = useState<boolean[]>([true, ...Array(7).fill(false)]);
     const onPartSelectChange = (event: CheckboxChangeEvent): void => {
         const { value = 0, checked = false } = event;
-        let _parts = [...parts];
+        const _parts = [...parts];
 
         if (value === 0) {
             _parts.fill(false, 1);

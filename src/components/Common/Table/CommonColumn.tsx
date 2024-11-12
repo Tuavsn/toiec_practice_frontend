@@ -38,42 +38,39 @@ export function getSeverity<Model extends { active: boolean }>(category: Model) 
 export function statusBodyTemplate<Model extends { active: boolean }>(rowData: Model) {
     return <Tag value={(rowData.active) + ""} severity={getSeverity(rowData)}></Tag>;
 };
-export namespace UserResultTemplate {
 
-
-    export function detailUserResultRowBodyTemplate(row: UserResultRow) {
-        return (
-            <Link className="text-blue-500" to={"/" + row.id}>Xem chi tiết</Link>
-        )
-    }
-
-    export function getUserResultRowSeverity(row: UserResultRow) {
-        switch (row.type) {
-            case "fulltest":
-                return 'success';
-
-            case "practice":
-                return 'warning';
-            default:
-                return null;
-        }
-    };
-
-    export function typeUserResultRowBodyTemplate(rowData: UserResultRow) {
-        return (
-            <React.Fragment>
-                {rowData.type === "fulltest" &&
-                    <Tag value={"Thi thử"} severity={getUserResultRowSeverity(rowData)}></Tag>
-                }
-                {rowData.type === "practice" &&
-                    rowData.parts.map((part, index) => {
-                        return (
-                            <Tag key={"tag" + index} value={(part) + ""} severity={getUserResultRowSeverity(rowData)}></Tag>
-                        )
-                    })
-
-                }
-            </React.Fragment>
-        );
-    };
+export function detailUserResultRowBodyTemplate(row: UserResultRow) {
+    return (
+        <Link className="text-blue-500" to={"/" + row.id}>Xem chi tiết</Link>
+    )
 }
+
+export function getUserResultRowSeverity(row: UserResultRow) {
+    switch (row.type) {
+        case "fulltest":
+            return 'success';
+
+        case "practice":
+            return 'warning';
+        default:
+            return null;
+    }
+};
+
+export function typeUserResultRowBodyTemplate(rowData: UserResultRow) {
+    return (
+        <React.Fragment>
+            {rowData.type === "fulltest" &&
+                <Tag value={"Thi thử"} severity={getUserResultRowSeverity(rowData)}></Tag>
+            }
+            {rowData.type === "practice" &&
+                rowData.parts.map((part, index) => {
+                    return (
+                        <Tag key={"tag" + index} value={(part) + ""} severity={getUserResultRowSeverity(rowData)}></Tag>
+                    )
+                })
+
+            }
+        </React.Fragment>
+    );
+};

@@ -101,7 +101,7 @@ export function useDataTable<Model extends DataTableValue>(
     });
 
     const deleteRow = (() => {
-        let _rows = rows.filter((val) => val.id !== row.id);
+        const _rows = rows.filter((val) => val.id !== row.id);
 
         setRows(_rows);
         setDeleteRowDialog(false);
@@ -118,7 +118,7 @@ export function useDataTable<Model extends DataTableValue>(
     });
 
     const deleteSelectedRows = (() => {
-        let _rows = rows.filter((val) => !selectedRows.includes(val));
+        const _rows = rows.filter((val) => !selectedRows.includes(val));
 
         setRows(_rows);
         setDeleteRowsDialog(false);

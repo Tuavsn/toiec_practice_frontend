@@ -53,8 +53,8 @@ function AdminManageAccountPage() {
             saveRow: () => {
                 state.setSubmitted(true);
                 if (state.row.format.trim()) {
-                    let _rows = [...state.rows];
-                    let _row = { ...state.row };
+                    const _rows = [...state.rows];
+                    const _row = { ...state.row };
 
                     if (state.row.id) {
                         const index = _rows.findIndex(item => item.id === state.row.id)

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { callGetExercisePaper, callPostTestRecord } from "../api/api";
 import { MappingPageWithQuestionNum } from "../utils/convertToHTML";
@@ -36,10 +36,10 @@ const useExercisePage = () => {
         start,
     } = useMultipleQuestion();
     // Hàm kết thúc bài thi và điều hướng đến trang xem lại
-    const onEndTest = useCallback(async () => {
+    const onEndTest = async () => {
         setIsOnTest(false);
         sendFinalResultToServer().then((resultId: ResultID) => navigate(`/test/${resultId}/review`));
-    }, [userAnswerSheet]);
+    };
 
     // hàm gửi dữ liệu bài  làm kết thúc của người dùng về server
     const sendFinalResultToServer = async () => {

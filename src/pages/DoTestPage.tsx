@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import '../App.css';
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useTestPage from "../hooks/TestHook";

@@ -16,8 +16,7 @@ export default function LeftNavigationBar() {
         {
             label: 'Quản lý đề thi',
             items: [
-                { label: 'Quản lý bộ đề', icon: 'pi pi-folder', command: () => navigate('/dashboard/category') },
-                { label: 'Quản lý đề thi', icon: 'pi pi-file', command: () => navigate('/dashboard/test') },
+                { label: 'Quản lý bộ đề', icon: 'pi pi-folder', command: () => navigate('/dashboard/categories') },
             ]
         },
         {

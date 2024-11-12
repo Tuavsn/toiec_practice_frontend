@@ -21,7 +21,7 @@ const instance = axiosClient.create({
 //     });
 // };
 
-instance.interceptors.request.use(function (config: any) {
+instance.interceptors.request.use(function (config) {
     if (typeof window !== "undefined" && window && window.localStorage && window.localStorage.getItem('access_token')) {
         config.headers.Authorization = 'Bearer ' + window.localStorage.getItem('access_token');
     }
