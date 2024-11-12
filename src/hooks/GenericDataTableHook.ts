@@ -22,7 +22,7 @@ export function useDataTable<Model extends DataTableValue>(
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [globalFilter, setGlobalFilter] = useState<string>(searchValue);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [page, setPage] = useState({ first: 0, rows: 20 });
+    const [page, setPage] = useState({ first: 0, rows: 5 });
 
     useEffect(() => {
         fetchData(0, page.rows);
@@ -75,9 +75,9 @@ export function useDataTable<Model extends DataTableValue>(
     });
 
     // Fetch data from server
-    const fetchData = async (_pageNumber: number = 1, _pageSize: number = 10) => {
+    const fetchData = async (pageNumber: number = 1,pageSize:number=5) => {
         try {
-            const response: ApiResponse<TableData<Model>> = await callGetRows<Model>(urlApi);
+            const response: ApiResponse<TableData<Model>> = await callGetRows<Model>(urlApi,pageNumber || 1,pageSize);
 
             setRows(response.data.result)
 
@@ -136,7 +136,9 @@ export function useDataTable<Model extends DataTableValue>(
         setPage({ first: event.first, rows: event.rows });
 
         // Calculate the page number based on event.first and event.rows
-        const pageNumber = event.first / event.rows;
+        console.log(event.first);
+        
+        const pageNumber = event.first / event.rows+1;
         fetchData(pageNumber, event.rows);
     }
     // The state object to pass to the override functions

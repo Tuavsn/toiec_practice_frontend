@@ -57,6 +57,10 @@ instance.interceptors.response.use(
 
         // }
         console.log("61", error);
+        if(error.status === 401){
+            localStorage.clear();
+            window.location.href = '/home'
+        }
         return error?.response?.data ?? Promise.reject(error);
     }
 );

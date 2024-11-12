@@ -56,12 +56,11 @@ function AdminManageCategoryPage() {
 
     const renderColumns = [
         <Column key="col-selection" selectionMode="multiple" exportable={false} />,
-        <Column key="col-id" field="id" header="ID" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-format" field="format" header="Format" sortable filter style={{ minWidth: '16rem' }} />,
-        <Column key="col-year" field="year" header="Year" sortable />,
+        <Column key="col-format" field="format" header="Dạng đề" sortable filter />,
+        <Column key="col-year" field="year" header="Năm" sortable />,
         <Column key="col-timestamp" header="Time stamp" body={timeStampBodyTemplate} sortable style={{ minWidth: '10rem' }} />,
-        <Column key="col-tests" field="tests" header="Tests" body={TestsBodyTemplate} style={{ minWidth: '17ream' }} />,
-        <Column key="col-isActive" field="isActive" header="Active" sortable body={statusBodyTemplate} />,
+        <Column key="col-tests" field="tests" header="Tests" body={TestsBodyTemplate}/>,
+        <Column key="col-isActive" field="isActive" header="Active" sortable bodyClassName="text-center" body={statusBodyTemplate} />,
     ];
 
     return (

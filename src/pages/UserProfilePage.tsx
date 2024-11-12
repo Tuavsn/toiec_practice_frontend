@@ -14,6 +14,7 @@ import { Button } from "primereact/button";
 import { Stepper, StepperRefAttributes } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
 import { SelectButton } from "primereact/selectbutton";
+import { Paginator } from "primereact/paginator";
 // Đăng ký các phần tử Chart.js cần thiết
 ChartJS.register(...registerables);
 // Đăng ký plugin DataLabels
@@ -181,7 +182,7 @@ const SkillInsights: React.FC<SkillInsightsProps> = React.memo(
 const ActivityLog: React.FC = React.memo(
     () => {
         // Lấy dữ liệu cho bảng từ hook useActiveLog
-        const { dataForTable } = useActiveLog();
+        const { dataForTable,totalItems,currentPageIndex ,onPageChange} = useActiveLog();
 
         // Định nghĩa các cột cho bảng, mỗi cột sẽ hiển thị thông tin cụ thể-------------------------------------------------------------------------------------
         const columns = [
@@ -214,6 +215,8 @@ const ActivityLog: React.FC = React.memo(
                 <DataTable showGridlines size="small" value={dataForTable} dataKey={"id"}>
                     {columns}
                 </DataTable>
+                <Paginator first={currentPageIndex * 5} rows={5} totalRecords={totalItems.current} onPageChange={onPageChange} />
+
             </main>
         )
     }

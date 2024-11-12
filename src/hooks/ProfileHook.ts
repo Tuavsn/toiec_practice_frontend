@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import { SuggestionsForUser, TopicRecord, UserDetailResultRow } from "../utils/types/type";
+import { PaginatorPageChangeEvent } from "primereact/paginator";
+import { useEffect, useRef, useState } from "react";
 import { callGetUserDetailResultList } from "../api/api";
+import { SuggestionsForUser, TestResultSummary, TopicRecord, UserDetailResultRow } from "../utils/types/type";
 
 export const useProfilePage = () => {
     const averageListeningScore = 280;
@@ -22,18 +23,31 @@ export const useProfilePage = () => {
 
 export const useActiveLog = () => {
     const [dataForTable, setDataForTable] = useState<UserDetailResultRow[]>([]);
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const userResultData = await callGetUserDetailResultList();
-                setDataForTable(userResultData.data.result);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
+    const totalItems = useRef<number>(0);
+    const [currentPageIndex, setCurrentPageIndex] = useState(-1);
+    // === Hàm xử lý thay đổi trang ===
+    const onPageChange = async (event: PaginatorPageChangeEvent) => {
+        // Gọi fetchQuestionByPage với trang mới
+        await fetchData(event.page);
+        console.log(currentPageIndex, "-", event.page);
+
+    }
+    const fetchData = async (pageNumber: number) => {
+        try {
+            const userResultData = await callGetUserDetailResultList(pageNumber);
+            const result: UserDetailResultRow[] = tempConvertToActiveLog(userResultData.data.result);
+            setDataForTable(result);
+            totalItems.current = userResultData.data.meta.totalItems;
+            setCurrentPageIndex(pageNumber);
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
-        fetchData();
+    }
+
+    useEffect(() => {
+        fetchData(0);
     }, [])
-    return { dataForTable };
+    return { dataForTable, totalItems, currentPageIndex, onPageChange };
 }
 
 function GetFakeSuggestionData(): SuggestionsForUser[] {
@@ -126,4 +140,26 @@ function GetFakePartsInsightView(): TopicRecord[][] {
         ],
     ]
 
+}
+function tempConvertToActiveLog(results: TestResultSummary[]): UserDetailResultRow[] {
+    function convertTestResultSummaryToUserDetailResultRow(
+        summary: TestResultSummary
+    ): UserDetailResultRow {
+        return {
+            id: summary.id,
+            createdAt: new Date(), // set to current date if missing
+            totalCorrectAnswer: summary.totalCorrectAnswer ?? Math.floor(Math.random() * 100), // random if missing
+            totalTime: summary.totalTime ?? Math.floor(Math.random() * 6000), // random if missing
+            type: summary.type, // assumes TestType is defined
+            parts: summary.parts ? JSON.parse(summary.parts) : Array.from({ length: 5 }, () => Math.floor(Math.random() * 10)), // parse or random array
+            testFormatAndYear: `${summary.type}-${new Date().getFullYear()}`, // example format based on type
+            totalReadingScore: summary.totalReadingScore ?? Math.floor(Math.random() * 50),
+            totalListeningScore: summary.totalListeningScore ?? Math.floor(Math.random() * 50),
+            totalIncorrectAnswer: summary.totalIncorrectAnswer ?? Math.floor(Math.random() * 100),
+            totalSkipAnswer: summary.totalSkipAnswer ?? Math.floor(Math.random() * 50),
+        };
+    }
+    return results.map((result => {
+        return convertTestResultSummaryToUserDetailResultRow(result)
+    }))
 }
