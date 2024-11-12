@@ -57,9 +57,8 @@ export const callGetQuestionRows = async (testId: TestID, currentPageIndex: numb
 }
 
 export const callPutQuestionUpdate = async (formData: UpdateQuestionForm) => {
-    alert(" viết api");
-    console.dir(formData);
-    return;
+    const response = await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/questions`, formData);
+    return response;
 }
 
 export const callGetTopics = async (): Promise<ApiResponse<Topic[]>> => {

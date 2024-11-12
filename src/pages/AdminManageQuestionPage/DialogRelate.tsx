@@ -79,8 +79,20 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
         };
         // khi nhấn nút Lưu
         const handleSave = () => {
-            toast.current?.show({ severity: 'success', content: "Sửa thành công" });
-            callPutQuestionUpdate(formData);
+            console.log("Hello update");
+            // toast.current?.show({ severity: 'success', content: "Sửa thành công" });
+            // callPutQuestionUpdate(formData);
+            const updateQuestion = async() => {
+                const questionUpdatedResponse:any = await callPutQuestionUpdate(formData);
+                if(questionUpdatedResponse) {
+                    if(questionUpdatedResponse.status == 200) {
+                        toast.current?.show({ severity: 'success', content: "Sửa thành công" });
+                    } else {
+                        toast.current?.show({ severity: 'error', content: questionUpdatedResponse.error });
+                    }
+                }
+            }
+            updateQuestion();
         };
 
         return (
