@@ -16,7 +16,7 @@ import { CategoryID, Name_ID, TestRow } from '../utils/types/type';
 import SplitNameIDFromURL from '../utils/splitNameIDFromURL';
 
 export function AdminManageTestPage() {
-    const { category_name_id = "no idCategory found" } = useParams<{ category_name_id: string }>();
+    const { category_name_id = "no idCategory found" } = useParams<{ category_name_id: Name_ID<CategoryID> }>();
     const [, category_id] = SplitNameIDFromURL(category_name_id);
 
     const emptyTest: TestRow = {

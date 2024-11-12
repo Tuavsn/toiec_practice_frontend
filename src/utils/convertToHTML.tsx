@@ -12,7 +12,7 @@ export function ConvertTestRecordToHTML(questionRecords: QuestionDetailRecord[])
     const mappingQuestionsWithPage: number[] = []
     const isCorrect: boolean[] = [];
     let questionNum: number = 0;
-    var page = 0;
+    let page = 0;
     for (const quest of questionRecords) {
         const resoursesElement: JSX.Element[] = [];
         const questionsElement: JSX.Element[] = [];
@@ -56,7 +56,7 @@ export function ConvertTestRecordToHTML(questionRecords: QuestionDetailRecord[])
     return [resoursesSection, questionsSection, mappingQuestionsWithPage, isCorrect];
 }
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
-    var pageNum = 0;
+    let pageNum = 0;
     const questionPages = [];
     for (const q of questionList) {
         if (q.subQuestions.length) {
