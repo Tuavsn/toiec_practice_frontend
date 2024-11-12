@@ -1,21 +1,24 @@
 
+import { Button } from 'primereact/button';
+import { Card } from 'primereact/card';
+import { Column } from 'primereact/column';
+import { InputText } from 'primereact/inputtext';
+import { Toast } from 'primereact/toast';
+import { classNames } from 'primereact/utils';
 import React, { memo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card } from 'primereact/card';
-import { CategoryID, TestRow } from '../utils/types/type';
-import { Column } from 'primereact/column';
-import { Toast } from 'primereact/toast';
 import { SimpleDialog } from '../components/Common/Dialog/SimpleDialog';
-import { GenericTable } from '../components/Common/Index';
+import { CustomBreadCrumb, GenericTable } from '../components/Common/Index';
+import { statusBodyTemplate, timeStampBodyTemplate } from '../components/Common/Table/CommonColumn';
 import { SimpleToolBar } from '../components/Common/ToolBar/ToolBar';
 import { useDataTable } from '../hooks/GenericDataTableHook';
-import { timeStampBodyTemplate, statusBodyTemplate } from '../components/Common/Table/CommonColumn';
-import { InputText } from 'primereact/inputtext';
-import { classNames } from 'primereact/utils';
-import { Button } from 'primereact/button';
+import { CategoryID, Name_ID, TestRow } from '../utils/types/type';
+import SplitNameIDFromURL from '../utils/splitNameIDFromURL';
 
 export function AdminManageTestPage() {
-    const { category_id = "no idCategory found" } = useParams<{ category_id: CategoryID }>();
+    const { category_name_id = "no idCategory found" } = useParams<{ category_name_id: string }>();
+    const [, category_id] = SplitNameIDFromURL(category_name_id);
+
     const emptyTest: TestRow = {
         id: '',
         name: '',
@@ -100,7 +103,7 @@ export function AdminManageTestPage() {
     return (
         <React.Fragment>
             <div key={'b'}>
-                {/* <CustomBreadCrumb items={breadCrumbItems} /> */}
+                <CustomBreadCrumb />
                 <Card className="my-2">
                     <div key={'a'}>
                         <Toast ref={toast} />
@@ -144,7 +147,7 @@ export default memo(AdminManageTestPage);
 function questionsBodyTemplate(rowData: TestRow) {
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate(`/dashboard/tests/${rowData.id}/questions`)
+        navigate(`${rowData.name}___${rowData.id}/questions`)
     };
 
     return (

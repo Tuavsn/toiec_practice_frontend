@@ -3,7 +3,8 @@ import { TreeNode } from "primereact/treenode";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { callGetQuestionRows, callGetTopics } from "../api/api";
-import { QuestionID, QuestionRow, TestID, Topic } from "../utils/types/type";
+import { Name_ID, QuestionID, QuestionRow, TestID, Topic } from "../utils/types/type";
+import SplitNameIDFromURL from "../utils/splitNameIDFromURL";
 
 export function useQuestion() {
 
@@ -27,8 +28,8 @@ export function useQuestion() {
 export function useQuestionTable() {
     // === Lấy test_id từ URL ===
     // Lấy test_id từ URL thông qua hook useParams, nếu không có thì mặc định là "no_idTest_found"
-    const { test_id = "no_idTest_found" } = useParams<{ test_id: TestID }>();
-
+    const { test_name_id = "no_idTest_found" } = useParams<{ test_name_id: Name_ID<TestID> }>();
+    const [,test_id] = SplitNameIDFromURL(test_name_id);
     // === Khởi tạo các trạng thái cần thiết ===
     const [currentPageIndex, setCurrentPageIndex]   = useState(-1);             // Lưu trang hiện tại
     const [isVisible, setIsVisible]                 = useState<boolean>(false); // Trạng thái hiển thị của Dialog

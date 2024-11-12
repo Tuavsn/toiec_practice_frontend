@@ -32,6 +32,7 @@ export function RenderColumnsForTable(setContextDialogBody: React.Dispatch<React
 
         /* Cột hiển thị thời gian tạo và cập nhật */
         <Column key="col-time" bodyStyle={{ width: "220px" }} headerClassName='text-center' header="Thời gian" body={QuestionTimeStampBodyTemplate} />,
+        
         /* Cột hiển thị nút sửa và xóa */
         <Column key="col-action" headerClassName='text-center' header="" body={(data) => <ActionBodyTemplate questionNode={data} setTitle={setTitle} setIsVisible={setIsVisible} topicList={topics} currentSelectedQuestion={currentSelectedQuestion} />} />,
     ]

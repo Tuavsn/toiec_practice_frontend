@@ -2,7 +2,7 @@ import { Button } from "primereact/button";
 import { Menubar } from "primereact/menubar";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTestState } from "../../../context/TestStateProvider";
 import LoginDialog from "../LoginDialog/LoginDialog";
 import Logo from "../../../assets/Header-Logo.png"
@@ -20,11 +20,10 @@ export default function Header() {
     const { isOnTest } = useTestState();
 
     // Định nghĩa logo hiển thị ở đầu header
-    const HeaderStart = <img src={Logo} height={70} alt="Logo" />;
+    const HeaderStart = <a href="#"><img src={Logo} height={70} alt="Logo" onClick={() => handleCommand('/home')}/></a>;
 
     // Định nghĩa danh sách các mục trong header
     const HeaderItems = [
-        { label: 'Trang chủ', icon: 'pi pi-home', command: () => handleCommand('/home') },
         { label: 'Khóa học', icon: 'pi pi-book', command: () => handleCommand('/course') },
         { label: 'Đề thi', icon: 'pi pi-folder', command: () => handleCommand('/test') },
         { label: 'Luyện tập', icon: 'pi pi-book', command: () => handleCommand('/exercise') },

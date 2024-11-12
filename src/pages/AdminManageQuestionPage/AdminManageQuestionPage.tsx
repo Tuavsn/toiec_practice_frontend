@@ -5,6 +5,7 @@ import React, { memo } from 'react';
 import { useQuestion } from '../../hooks/QuestionHook';
 import { DialogForQuestionPage } from './DialogRelate';
 import QuestionTreeTable from './TableQuestion';
+import { CustomBreadCrumb } from '../../components/Common/Index';
 
 // Hàm xuất trang quản lý câu hỏi của Admin
 export function AdminManageQuestionPage() {
@@ -23,6 +24,7 @@ export function AdminManageQuestionPage() {
     return (
         <React.Fragment>
             <div key={'b'}>
+                <CustomBreadCrumb />
                 <Card className="my-2">
                     <div key={'a'}>
                         <div className="card pb-5">

@@ -15,14 +15,6 @@ import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar";
 import { useDataTable } from "../hooks/GenericDataTableHook";
 import { CategoryRow } from "../utils/types/type";
 
-
-
-
-const breadCrumbItems = [
-    { label: 'Trang chủ', icon: 'pi pi-home', url: '/' },
-    { label: 'Dashboard', icon: 'pi pi-cog', url: '/dashboard' },
-];
-
 function AdminManageCategoryPage() {
     const emptyCategory: CategoryRow = {
         id: "",
@@ -75,7 +67,7 @@ function AdminManageCategoryPage() {
     return (
         <React.Fragment>
             <div key={'b'}>
-                <CustomBreadCrumb items={breadCrumbItems} />
+                <CustomBreadCrumb />
                 <Card className="my-2">
                     <div key={'a'}>
                         <div className="card">
@@ -149,7 +141,7 @@ async function customSaveRowFunction(state: any, emptyCategory: CategoryRow) {
 function TestsBodyTemplate(rowData: CategoryRow) {
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate(`/dashboard/categories/${rowData.id}/tests`)
+        navigate(`${rowData.format}-${rowData.year}___${rowData.id}/tests`)
     };
 
     return (
