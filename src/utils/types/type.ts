@@ -279,7 +279,7 @@ export type TestRecord = {
 
 
 
-export interface TestResultSummary {
+export type TestResultSummary ={
   id: ResultID;
   testId: TestID;
   totalTime: number;

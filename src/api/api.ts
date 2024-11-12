@@ -1,4 +1,4 @@
-import { ApiResponse, CategoryRow, QuestionRow, ResponseUserResultList, ResultID, TableData, TestID, TestPaper, TestRecord, TestResultSummary, Topic, UpdateQuestionForm } from "../utils/types/type";
+import { ApiResponse, CategoryRow, QuestionRow, ResponseUserResultList, ResultID, TableData, TestID, TestPaper, TestRecord, TestResultSummary, Topic, UpdateQuestionForm, UserDetailResultRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -37,10 +37,11 @@ export const callPostTestRecord = async (testRecord: TestRecord): Promise<ApiRes
     return response.data;
 }
 
-export const callGetUserDetailResultList = async (pageNumber: number = 1, pageSize: number = 10): Promise<ResponseUserResultList> => {
-    // const response = await axios.get<ResponseUserResultList>(`${import.meta.env.VITE_API_URL}/result?current=${pageNumber}&pageSize=${pageSize}`);
-    const response = await fetch(`https://dummyjson.com/c/f8c9-96e9-4296-bdf6/${pageNumber}/${pageSize}`);
-    return await response.json() as ResponseUserResultList;
+export const callGetUserDetailResultList = async (pageNumber: number = 0, pageSize: number = 5): Promise<ApiResponse<TableData<TestResultSummary>>>=> {
+  
+    const response = await axios.get<ApiResponse<TableData<TestResultSummary>>>(`${import.meta.env.VITE_API_URL}/result?current=${pageNumber + 1}&pageSize=${pageSize}&type=FULL_TEST`);
+
+    return response.data;
 }
 
 export const callGetExercisePaper = async (parts: string): Promise<ApiResponse<TestPaper>> => {
