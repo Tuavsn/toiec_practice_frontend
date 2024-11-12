@@ -3,6 +3,7 @@ import { Column } from "primereact/column";
 import { DataTable, DataTablePageEvent, DataTableSelectionMultipleChangeEvent, DataTableValue } from "primereact/datatable";
 import React, { Dispatch, ReactElement, RefObject, SetStateAction, useCallback } from "react";
 import { SearchInput } from "./SearchInput";
+import { Paginator } from "primereact/paginator";
 
 type ColumnElement = ReactElement<typeof Column>;
 export default function GenericTable<Model extends DataTableValue>(
@@ -28,7 +29,7 @@ export default function GenericTable<Model extends DataTableValue>(
     const header = React.useMemo((): JSX.Element => (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
             <h4 className="m-0">Manage Rows</h4>
-            <SearchInput setGlobalFilter={setGlobalFilter} /> 
+            <SearchInput setGlobalFilter={setGlobalFilter} />
         </div>
     ), [setGlobalFilter]);
 
@@ -41,7 +42,7 @@ export default function GenericTable<Model extends DataTableValue>(
                     key="col-action"
                     body={(rowData) => actionBodyTemplate(rowData, editRow, confirmDeleteRow)}
                     exportable={false}
-                    style={{ minWidth: '12rem' }}
+
                 />
             );
         }
@@ -50,37 +51,34 @@ export default function GenericTable<Model extends DataTableValue>(
     }, [columns, isAddActionButtons, editRow, confirmDeleteRow]);
 
     return (
-        <DataTable
-            showGridlines
-            size="small"
-            ref={dt}
-            value={rows}
-            selection={selectedRows}
-            onSelectionChange={(e) => handleSelectionChange(e)}
-            dataKey="id"
-            paginator
-            rows={page.rows}
-            first={page.first}
-            onPage={handleOnPage}
-            totalRecords={totalRecords}
-            rowsPerPageOptions={[5, 10, 25]}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} categories"
-            globalFilter={globalFilter}
-            header={header}
-            selectionMode="multiple"
-        >
-            {renderColumns}
-        </DataTable>
+        <React.Fragment>
+
+            <DataTable
+                loading={totalRecords <= 0}
+                showGridlines
+                size="small"
+                ref={dt}
+                value={rows}
+                selection={selectedRows}
+                onSelectionChange={(e) => handleSelectionChange(e)}
+                dataKey="id"
+                globalFilter={globalFilter}
+                header={header}
+                selectionMode="multiple"
+            >
+                {renderColumns}
+            </DataTable>
+            <Paginator first={page.first} rows={page.rows} totalRecords={totalRecords} onPageChange={handleOnPage} />
+        </React.Fragment>
     )
 }
 
 function actionBodyTemplate<Model>(rowData: Model, editRow: (a: Model) => void,
     confirmDeleteRow: (rowData: Model) => void) {
     return (
-        <React.Fragment>
-            <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editRow(rowData)} />
-            <Button icon="pi pi-trash" rounded outlined severity="danger" onClick={() => confirmDeleteRow(rowData)} />
-        </React.Fragment>
+        <div className="flex justify-content-around">
+            <Button icon="pi pi-pencil" rounded outlined style={{ width: "50px", height: "50px" }} onClick={() => editRow(rowData)} />
+            <Button icon="pi pi-trash" rounded outlined style={{ width: "50px", height: "50px" }} severity="danger" onClick={() => confirmDeleteRow(rowData)} />
+        </div>
     );
 };
