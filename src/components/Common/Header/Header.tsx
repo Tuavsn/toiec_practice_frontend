@@ -2,10 +2,10 @@ import { Button } from "primereact/button";
 import { Menubar } from "primereact/menubar";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Logo from "../../../assets/Header-Logo.png";
 import { useTestState } from "../../../context/TestStateProvider";
 import LoginDialog from "../LoginDialog/LoginDialog";
-import Logo from "../../../assets/Header-Logo.png"
 
 
 
@@ -27,6 +27,7 @@ export default function Header() {
         { label: 'Khóa học', icon: 'pi pi-book', command: () => handleCommand('/course') },
         { label: 'Đề thi', icon: 'pi pi-folder', command: () => handleCommand('/test') },
         { label: 'Luyện tập', icon: 'pi pi-book', command: () => handleCommand('/exercise') },
+        { label: 'Tra cứu', icon: 'pi pi-book', command: () => handleCommand('/lookup') },
     ];
 
     // Nếu người dùng có vai trò ADMIN, thêm mục Dashboard vào danh sách

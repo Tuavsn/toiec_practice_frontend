@@ -10,7 +10,8 @@ import {
     CourseDetailsPage,
     DoTestPage,
     ExercisePage,
-    DoExercisePage
+    DoExercisePage,
+    LookUpPage
 } from "../pages/Index";
 import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
 import { Suspense } from "react";
@@ -42,6 +43,10 @@ export default function UserRoutes() {
                 <Route path="/exercise" element={<ExercisePage />} />
                 {/* Do Exercise  Page */}
                 <Route path="/doexercise/:exerciseType" element={<DoExercisePage />} />
+                {/* Lookup  Page */}
+                <Route path="/lookup" element={<LookUpPage />} />
+
+
                 {/* NotFound Page */}
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
