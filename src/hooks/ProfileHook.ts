@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { SuggestionsForUser, TestResultSummary, TopicRecord, UserDetailResultRow } from "../utils/types/type";
-import { callGetUserDetailResultList } from "../api/api";
 import { PaginatorPageChangeEvent } from "primereact/paginator";
+import { useEffect, useRef, useState } from "react";
+import { callGetUserDetailResultList } from "../api/api";
+import { SuggestionsForUser, TestResultSummary, TopicRecord, UserDetailResultRow } from "../utils/types/type";
 
 export const useProfilePage = () => {
     const averageListeningScore = 280;

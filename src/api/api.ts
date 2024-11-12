@@ -1,4 +1,4 @@
-import { ApiResponse, CategoryRow, QuestionRow, ResponseUserResultList, ResultID, TableData, TestID, TestPaper, TestRecord, TestResultSummary, Topic, UpdateQuestionForm, UserDetailResultRow } from "../utils/types/type";
+import { ApiResponse, CategoryRow, QuestionRow, ResultID, TableData, TestID, TestPaper, TestRecord, TestResultSummary, Topic, UpdateQuestionForm } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
