@@ -161,7 +161,7 @@ function GroupQuestionNumber(questionRow: QuestionRow): string {
 function GroupQuestionNumberForPart(questionNodeArray: TreeNode[]): string {
     
     // Lấy số câu hỏi đầu tiên và cuối cùng trong mảng questionNodeArray
-    var start = questionNodeArray[0].data.questionNum, // Số câu hỏi đầu tiên
+    let start = questionNodeArray[0].data.questionNum, // Số câu hỏi đầu tiên
         end = questionNodeArray.at(-1)!.data.questionNum; // Số câu hỏi cuối cùng
 
     // Kiểm tra nếu phần tử đầu tiên có các câu hỏi con (children)

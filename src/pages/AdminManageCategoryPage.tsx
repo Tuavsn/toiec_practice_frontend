@@ -108,8 +108,8 @@ async function customSaveRowFunction(state: any, emptyCategory: CategoryRow) {
 
     state.setSubmitted(true);
     if (state.row.format.trim()) {
-        let _rows: CategoryRow[] = [...state.rows];
-        let _row: CategoryRow = { ...state.row };
+        const _rows: CategoryRow[] = [...state.rows];
+        const _row: CategoryRow = { ...state.row };
         // call api
         try {
 

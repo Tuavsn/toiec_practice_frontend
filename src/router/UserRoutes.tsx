@@ -1,21 +1,22 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Suspense } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
+import { LoadingSpinner } from "../components/Common/Index";
 import {
-    HomePage,
-    UserProfilePage,
-    TestPage,
-    TestDetailPage,
-    TestReviewPage,
-    CoursePage,
-    NotFoundPage,
     CourseDetailsPage,
+    CoursePage,
+    DoExercisePage,
     DoTestPage,
     ExercisePage,
-    DoExercisePage,
-    LookUpPage
+    HomePage,
+    LookUpPage,
+    NotFoundPage,
+    TestDetailPage,
+    TestPage,
+    TestReviewPage,
+    UserProfilePage
 } from "../pages/Index";
-import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
-import { Suspense } from "react";
-import { LoadingSpinner } from "../components/Common/Index";
+
 
 
 export default function UserRoutes() {
@@ -45,9 +46,8 @@ export default function UserRoutes() {
                 <Route path="/doexercise/:exerciseType" element={<DoExercisePage />} />
                 {/* Lookup  Page */}
                 <Route path="/lookup" element={<LookUpPage />} />
-
-
                 {/* NotFound Page */}
+                <Route path="/dashboard" element={<Navigate to="/dashboard/" />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </Suspense>

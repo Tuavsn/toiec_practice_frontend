@@ -10,7 +10,7 @@ interface TestState {
 // Tạo một giá trị mặc định cho context
 const defaultTestState: TestState = {
   isOnTest: false, // Giá trị mặc định là không đang kiểm tra
-  setIsOnTest: () => {}, // Hàm giữ chỗ (placeholder function)
+  setIsOnTest: () => { }, // Hàm giữ chỗ (placeholder function)
 };
 
 // Tạo context với giá trị mặc định
@@ -28,11 +28,11 @@ export const TestStateProvider = ({ children }: { children: ReactNode }) => {
 };
 
 // Tạo hook tùy chỉnh để sử dụng context
-export const useTestState = () => {
+export function useTestState() {
   const context = useContext(TestStateContext); // Lấy giá trị context
   if (!context) {
     // Kiểm tra xem hook có được sử dụng trong TestStateProvider không
-    throw new Error("useTestState must be used within a TestStateProvider"); 
+    throw new Error("useTestState must be used within a TestStateProvider");
   }
   return context; // Trả về giá trị context
 };

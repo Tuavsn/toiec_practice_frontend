@@ -8,7 +8,7 @@ import { Checkbox } from "primereact/checkbox";
 import { useCheckBox } from "../hooks/TestDetailPapeHook";
 import { Chip } from "primereact/chip";
 import { Button } from "primereact/button";
-import { UserResultTemplate } from "../components/Common/Table/CommonColumn";
+import { detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
 
 function TestDetailPage() {
     const navigate = useNavigate();
@@ -20,8 +20,8 @@ function TestDetailPage() {
         <Column key="col-createdAt" field="createdAt" header="Ngày làm" body={(rowData: UserResultRow) => formatDate(rowData.createdAt)} sortable filter />,
         <Column key="col-correct_count" field="totalCorrectAnswer" header="Kết quả" sortable filter />,
         <Column key="col-time" field="totalTime" header="Thời gian làm bài" sortable filter />,
-        <Column key="col-type" header="Loại" body={UserResultTemplate.typeUserResultRowBodyTemplate} />,
-        <Column key="col-detail" body={UserResultTemplate.detailUserResultRowBodyTemplate} />,
+        <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} />,
+        <Column key="col-detail" body={detailUserResultRowBodyTemplate} />,
     ];
 
     const checkboxes = Array.from({ length: 8 }, (_, index) => {

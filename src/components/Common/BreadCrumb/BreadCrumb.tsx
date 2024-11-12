@@ -12,19 +12,9 @@ export default function CustomBreadCrumb() {
     // Tạo các mục breadcrumb dựa trên đường dẫn URL hiện tại
     const items = generateBreadcrumbs(location.pathname);
 
-    // Hàm định dạng để render từng liên kết breadcrumb của PrimeReact
-    const iconItemTemplate = (item: any, options: any) => {
-        return (
-            <a className={`${options.className} text-black-alpha-80 hover:text-blue-700`} href={item.url}>
-                <span className="ml-2">{item.label}</span>
-            </a>
-        );
-    };
-
     // Áp dụng iconItemTemplate cho từng mục breadcrumb
     const breadCrumbItems = items.map(item => ({
         ...item,
-        template: iconItemTemplate,
     }));
 
     return (

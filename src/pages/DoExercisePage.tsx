@@ -48,7 +48,7 @@ function DoExercisePage() {
 
             );
         })
-    }, [userAnswerSheet.size])
+    }, [userAnswerSheet,currentPageIndex,pageMapper,setCurrentPageIndex])
 
 
     // Render giao diện chính của trang thi

@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { Suspense, lazy } from 'react';
 import { LoadingSpinner } from "../components/Common/Index";
 const AdminManageQuestionPage = lazy(() => import("../pages/AdminManageQuestionPage/AdminManageQuestionPage"))
@@ -8,8 +8,13 @@ const AdminManageAccountPage = lazy(() => import("../pages/AdminManageAccount"))
 const AdminManageCategoryPage = lazy(() => import("../pages/AdminManageCategoryPage"))
 const AdminManageTestPage = lazy(() => import("../pages/AdminManageTestPage"))
 const AdminManageCoursePage = lazy(() => import("../pages/AdminManageCoursePage"))
+const AdminLayout = lazy(() => import('../components/Layout/AdminLayout'));
 export default function AdminRoutes() {
+  if( localStorage.getItem("role") != "ADMIN"){
+    return <Navigate to="/home" />
+  }
     return (
+      <AdminLayout>
       <Suspense fallback={<LoadingSpinner text="Trang quản trị đang tải...." />}>
         <Routes>
           <Route path="/" element={<AdminDashboardPage />} /> {/* Trang chủ quản trị */}
@@ -34,5 +39,6 @@ export default function AdminRoutes() {
           <Route path="chat" element={<TempAdminPage text="chat" />} />
         </Routes>
       </Suspense>
+      </AdminLayout>
     );
   }

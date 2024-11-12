@@ -1,7 +1,7 @@
 import { Button } from "primereact/button";
 import { Menubar } from "primereact/menubar";
 import { OverlayPanel } from "primereact/overlaypanel";
-import { useRef } from "react";
+import { MouseEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../../assets/Header-Logo.png";
 import { useTestState } from "../../../context/TestStateProvider";
@@ -32,10 +32,10 @@ export default function Header() {
 
     // Nếu người dùng có vai trò ADMIN, thêm mục Dashboard vào danh sách
     if (localStorage.getItem('role') === 'ADMIN') {
-        HeaderItems.push({ label: 'Dashboard', icon: 'pi pi-cog', command: () => handleCommand('/dashboard') });
+        HeaderItems.push({ label: 'Dashboard', icon: 'pi pi-cog', command: () => handleCommand('/dashboard/') });
     }
     // tắt bảng hiển thị khi nhấn vào biểu tượng người dùng
-    const toggleOverlayPanel = (e: any) => {
+    const toggleOverlayPanel = (e: MouseEvent) => {
         // Khi nhấn vào nút, toggle OverlayPanel
         if (op.current) {
             op.current.toggle(e);

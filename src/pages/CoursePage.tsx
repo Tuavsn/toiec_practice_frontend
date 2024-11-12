@@ -120,7 +120,7 @@ export default function CoursePage() {
     ];
 
     const difficultyOptions = [
-        { label: 'All', value: 'all' },
+        { label: 'All', value: 9999 },
         { label: '1 Star', value: 1 },
         { label: '2 Stars', value: 2 },
         { label: '3 Stars', value: 3 },
@@ -130,8 +130,8 @@ export default function CoursePage() {
 
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = React.useState('');
-    const [selectedFormat, setSelectedFormat] = React.useState<any>(null);
-    const [selectedDifficulty, setSelectedDifficulty] = React.useState<any>(null);
+    const [selectedFormat, setSelectedFormat] = React.useState<string | null>(null);
+    const [selectedDifficulty, setSelectedDifficulty] = React.useState<number>(9999);
     const [first, setFirst] = React.useState(0);
     const [rows] = React.useState(4); // Number of courses per page
 
@@ -139,7 +139,7 @@ export default function CoursePage() {
         const matchesFormat =
             !selectedFormat || selectedFormat === 'all' || course.format.toLowerCase() === selectedFormat;
         const matchesDifficulty =
-            !selectedDifficulty || selectedDifficulty === 'all' || course.difficulty === selectedDifficulty;
+            !selectedDifficulty || selectedDifficulty === 9999 || course.difficulty === selectedDifficulty;
         const matchesSearchTerm =
             course.name.toLowerCase().includes(searchTerm.toLowerCase());
         return matchesFormat && matchesDifficulty && matchesSearchTerm;
@@ -179,7 +179,7 @@ export default function CoursePage() {
                     />
                 </div>
             </div>
-            <div className="flex align-items-center justify-content-between row-gap-4 align-items-stretch mt-4">
+            <div className="flex align-items-center justify-content-center row-gap-4 align-items-stretch mt-4">
                 {currentCourses.map((course) => (
 
                     <Card key={course.id} title={course.name} className="scalein animation-duration-1000 flex align-items-center justify-content-center border-round m-2 shadow-2 min-h-full">

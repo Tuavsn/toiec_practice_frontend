@@ -10,7 +10,7 @@ const banners = [
     { title: 'Banner 3', image: banner03, description: 'This is the third banner' },
 ]
 
-const bannerTemplate = (banner: any) => {
+const bannerTemplate = (banner: { image: string | undefined; title: string | undefined; }) => {
     return (
         <div className="banner-item">
             <img loading="lazy" src={banner.image} alt={banner.title} style={{ width: '100%', maxHeight: '600px', objectFit: 'contain' }} />
