@@ -7,11 +7,11 @@ import { useTestCard } from "../hooks/TestCardHook";
 export default function TestPage() {
 
     const {
-        setCurrentFormatIndex,
         currentFormatIndex,
         categoryLabels,
         setCurrentYear,
         totalItemsRef,
+        setNewFormat,
         onPageChange,
         currentYear,
         testCards,
@@ -32,11 +32,7 @@ export default function TestPage() {
                                     : 'secondary'
                             }
                             rounded
-                            onClick={
-                                () => {
-                                    setCurrentFormatIndex(index);
-                                    setCurrentYear(0);
-                                }
+                            onClick={() => setNewFormat(index)
                             } />
                     )
                 }

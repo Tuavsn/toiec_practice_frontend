@@ -13,10 +13,16 @@ export function useTestCard() {
     const [pageIndex, setPageIndex] = useState(0);
     const totalItemsRef = useRef<number>(-1);
 
-    // === Hàm lấy dữ liệu câu hỏi theo trang, không thay đổi pageIndex trong hàm này ===
-    const fetchQuestionByPage = useCallback(async (selectedFormat: string, selectedYear: number, page: number) => {
+
+    const setNewFormat = (index: number) => {
+        setCurrentFormatIndex(index);
+        setCurrentYear(0);
+        setPageIndex(0);
+    }
+    // === Hàm lấy dữ liệu thẻ bài kiểm tra theo trang, không thay đổi pageIndex trong hàm này ===
+    const fetchTestCardByPage = useCallback(async (selectedFormat: string, selectedYear: number, page: number) => {
         try {
-            // Gọi API để lấy dữ liệu câu hỏi
+            // Gọi API để lấy dữ liệu thẻ bài kiểm tra
             const responseData = await callGetTestCard(selectedFormat, selectedYear, page);
 
             // Lưu trữ tổng số mục
@@ -35,9 +41,9 @@ export function useTestCard() {
             try {
                 const responseData = await callGetCategoryLabel();
                 setCategoryLabels(responseData.data);
-                
+
                 // Lấy dữ liệu câu hỏi cho nhãn và năm mặc định
-                await fetchQuestionByPage(responseData.data[0].format, 0, 0);
+                await fetchTestCardByPage(responseData.data[0].format, 0, 0);
             } catch (error) {
                 console.error('Failed to fetch category labels:', error);
             }
@@ -56,16 +62,16 @@ export function useTestCard() {
     useEffect(() => {
         if (categoryLabels.length > 0) {
             // Gọi API khi format, năm hoặc trang thay đổi, nhưng không thay đổi pageIndex
-            fetchQuestionByPage(categoryLabels[currentFormatIndex].format, currentYear, pageIndex);
+            fetchTestCardByPage(categoryLabels[currentFormatIndex].format, currentYear, pageIndex);
         }
-    }, [currentFormatIndex, currentYear, pageIndex, categoryLabels, fetchQuestionByPage]);
+    }, [currentFormatIndex, currentYear, pageIndex, categoryLabels, fetchTestCardByPage]);
 
     return {
-        setCurrentFormatIndex,
         currentFormatIndex,
         categoryLabels,
         setCurrentYear,
         totalItemsRef,
+        setNewFormat,
         onPageChange,
         currentYear,
         testCards,
