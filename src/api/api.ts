@@ -1,4 +1,4 @@
-import { ApiResponse, CategoryRow, QuestionRow, ResultID, TableData, TestID, TestPaper, TestRecord, TestResultSummary, Topic, UpdateQuestionForm } from "../utils/types/type";
+import { ApiResponse, CategoryLabel, CategoryRow, QuestionRow, ResultID, TableData, TestCard, TestID, TestPaper, TestRecord, TestResultSummary, Topic, UpdateQuestionForm } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -37,8 +37,8 @@ export const callPostTestRecord = async (testRecord: TestRecord): Promise<ApiRes
     return response.data;
 }
 
-export const callGetUserDetailResultList = async (pageNumber: number = 0, pageSize: number = 5): Promise<ApiResponse<TableData<TestResultSummary>>>=> {
-  
+export const callGetUserDetailResultList = async (pageNumber: number = 0, pageSize: number = 5): Promise<ApiResponse<TableData<TestResultSummary>>> => {
+
     const response = await axios.get<ApiResponse<TableData<TestResultSummary>>>(`${import.meta.env.VITE_API_URL}/result?current=${pageNumber + 1}&pageSize=${pageSize}&type=FULL_TEST`);
 
     return response.data;
@@ -68,5 +68,15 @@ export const callGetTopics = async (): Promise<ApiResponse<Topic[]>> => {
 
 export const callGetResult = async (id: ResultID): Promise<ApiResponse<TestResultSummary>> => {
     const response = await axios.get<ApiResponse<TestResultSummary>>(`${import.meta.env.VITE_API_URL}/result/${id}`);
+    return response.data;
+}
+
+export const callGetCategoryLabel = async (): Promise<ApiResponse<CategoryLabel[]>> => {
+    const response = await axios.get<ApiResponse<CategoryLabel[]>>(`${import.meta.env.VITE_API_URL}/categories/none-page`);
+    return response.data;
+}
+
+export const callGetTestCard = async (format: string, year: number, pageIndex: number): Promise<ApiResponse<TableData<TestCard>>> => {
+    const response = await axios.get<ApiResponse<TableData<TestCard>>>(`${import.meta.env.VITE_API_URL}/categories/tests?format=${format}&year=${year}&current=${pageIndex + 1}&pageSize=4`);
     return response.data;
 }

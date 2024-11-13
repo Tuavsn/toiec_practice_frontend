@@ -52,7 +52,7 @@ export function useQuestionTable() {
 
         // Cập nhật lại trang hiện tại
         setCurrentPageIndex(pageIndex);
-    }, []); // Hàm fetchQuestionByPage sẽ được tạo lại khi testID thay đổi
+    }, []); 
 
     // === useEffect để gọi fetchQuestionByPage khi khởi tạo ===
     useEffect(() => {
