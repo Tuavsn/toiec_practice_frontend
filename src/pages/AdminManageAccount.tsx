@@ -10,18 +10,10 @@ import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
 import { timeStampBodyTemplate, statusBodyTemplate } from "../components/Common/Table/CommonColumn";
+import { emptyUserRow } from "../utils/types/emptyValue";
 function AdminManageAccountPage() {
 
-    const emptyAccount: UserRow = {
-        id: "",
-        email: "",
-        avatar: "",
-        roleName: "",
-        target: 0,
-        isActive: false,
-        createdAt: new Date(),
-        updatedAt: new Date()
-    }
+
 
     const {
         row, setRow, rows,
@@ -48,7 +40,7 @@ function AdminManageAccountPage() {
         setSelectedRows,
         setGlobalFilter,
         handleOnPage
-    } = useDataTable<UserRow>("testusers", emptyAccount
+    } = useDataTable<UserRow>("testusers", emptyUserRow
         , (state) => ({
             saveRow: () => {
                 state.setSubmitted(true);
@@ -71,17 +63,17 @@ function AdminManageAccountPage() {
                     state.setRows(_rows);
                     console.log(_rows);
                     state.setRowDialog(false);
-                    state.setRow(emptyAccount);
+                    state.setRow(emptyUserRow);
                 }
             },
         })
     );
 
     const renderColumns = [
-        <Column key="col-email" field="email" header="Email" sortable filter align="center"/>,
+        <Column key="col-email" field="email" header="Email" sortable filter align="center" />,
         <Column key="col-timestamp" header="Ngày" body={timeStampBodyTemplate} sortable />,
-        <Column key="col-role" field="role" header="Vai trò" align="center"/>,
-        <Column key="col-isActive" field="isActive" header="Hoạt động" sortable body={statusBodyTemplate}  bodyClassName="text-center"/>,
+        <Column key="col-role" field="role" header="Vai trò" align="center" />,
+        <Column key="col-isActive" field="isActive" header="Hoạt động" sortable body={statusBodyTemplate} bodyClassName="text-center" />,
     ];
 
     return (

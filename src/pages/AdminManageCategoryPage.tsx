@@ -14,16 +14,10 @@ import GenericTable from "../components/Common/Table/GenericTable";
 import { SimpleToolBar } from "../components/Common/ToolBar/ToolBar";
 import { useDataTable } from "../hooks/GenericDataTableHook";
 import { CategoryRow } from "../utils/types/type";
+import { emptyCategoryRow } from "../utils/types/emptyValue";
 
 function AdminManageCategoryPage() {
-    const emptyCategory: CategoryRow = {
-        id: "",
-        format: "vô danh",
-        year: 2020,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        active: true
-    };
+
 
     const {
         row, setRow, rows,
@@ -48,9 +42,9 @@ function AdminManageCategoryPage() {
         confirmDeleteRow,
         setSelectedRows,
         setGlobalFilter
-    } = useDataTable<CategoryRow>('categories', emptyCategory
+    } = useDataTable<CategoryRow>('categories', emptyCategoryRow
         , (state) => ({
-            saveRow: async () => await customSaveRowFunction(state, emptyCategory)
+            saveRow: async () => await customSaveRowFunction(state, emptyCategoryRow)
         })
     );
 
@@ -59,7 +53,7 @@ function AdminManageCategoryPage() {
         <Column key="col-format" field="format" header="Dạng đề" sortable filter />,
         <Column key="col-year" field="year" header="Năm" sortable />,
         <Column key="col-timestamp" header="Time stamp" body={timeStampBodyTemplate} sortable style={{ minWidth: '10rem' }} />,
-        <Column key="col-tests" field="tests" header="Tests" body={TestsBodyTemplate}/>,
+        <Column key="col-tests" field="tests" header="Tests" body={TestsBodyTemplate} />,
         <Column key="col-isActive" field="isActive" header="Active" sortable bodyClassName="text-center" body={statusBodyTemplate} />,
     ];
 

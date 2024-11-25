@@ -352,9 +352,45 @@ export interface UpdateQuestionForm {
   correctAnswer: string;
 }
 
+export interface UpdateLectureForm {
+  id: LectureID;
+  name: string;
+  topicIds: TopicID[];
+}
+
 
 
 // ------------------------- tham số truyền
+export type DialogLectureProps = {
+  currentSelectedLecture: LectureRow,
+  dispatch: Dispatch<LectureHookAction>,
+  job: DialogLectureActionType,
+}
+
+export type DialogLectureBodyProps = {
+  currentSelectedLecture: LectureRow,
+  dispatch: Dispatch<LectureHookAction>,
+  topicListRef: React.MutableRefObject<Topic[]>,
+
+}
+
+export type RenderLectureDialogParams = {
+  job: DialogLectureActionType,
+  currentSelectedLecture: LectureRow,
+  dispatch: Dispatch<LectureHookAction>,
+  topicListRef: React.MutableRefObject<Topic[]>
+}
+
+export type AdminLectureTableProps = {
+  lectures: LectureRow[],
+  dispatch: Dispatch<LectureHookAction>,
+}
+
+export type LectureActionButtonProps = {
+  currentSelectedLecture: LectureRow,
+  dispatch: Dispatch<LectureHookAction>,
+}
+
 export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;
   onTimeUp: () => void;
@@ -368,7 +404,7 @@ export interface DialogQuestionActionProps {
   currentSelectedQuestion: React.MutableRefObject<TreeNode>,
 }
 
-export interface DialogLectureActionProps {
+export type LectureReduceProps = {
   state: LectureHookState;
   dispatch: Dispatch<LectureHookAction>;
 }
@@ -415,11 +451,6 @@ export interface QuestionActionButtonProps {
   currentSelectedQuestion: React.MutableRefObject<TreeNode>,
 }
 
-export interface LectureActionButtonProps {
-  currentSelectedLecture: LectureRow,
-  dispatch: Dispatch<LectureHookAction>
-}
-
 export interface UpdateQuestionDialogProps {
   currentSelectedQuestion: React.MutableRefObject<TreeNode>,
   topicList: React.MutableRefObject<Topic[]>,
@@ -454,19 +485,23 @@ export type UserAnswerTimeCounter = Map<QuestionNumber, milisecond>
 export type TestType = 'fulltest' | 'practice' | 'survival';
 export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
 export type ExerciseType = "partNum=1" | "partNum=2" | "partNum=3" | "partNum=4" | "partNum=5" | "partNum=6" | "partNum=7" | "TOPIC=grammar" | "TOPIC=vocabulary";
-
+export type DialogLectureActionType = 'CREATE' | 'UPDATE' | 'DELETE' | '';
 export type Name_ID<T extends string> = T;
 
 //-----------------------------reducer---------------------
 export interface LectureHookState {
   lectures: LectureRow[],
   currentPageIndex: number,
-  title: string,
-
+  job: DialogLectureActionType,
+  currentSelectedLecture: LectureRow
 }
 
 export type LectureHookAction =
-  | { type: 'FETCH_SUCCESS'; payload: LectureRow[] }
+  | { type: 'FETCH_LECTURE_SUCCESS'; payload: LectureRow[] }
+  | { type: 'FETCH_TOPIC_SUCCESS'; payload: Topic[] }
   | { type: 'SET_PAGE'; payload: number }
   | { type: 'SET_CURRENT_LECTURE'; payload: LectureRow }
-  | { type: 'TOGGLE_DIALOG'; payload: string }
+  | { type: 'TOGGLE_DIALOG'; payload: DialogLectureActionType }
+  | { type: 'OPEN_UPDATE_DIALOG'; payload: LectureRow }
+  | { type: 'OPEN_DELETE_DIALOG'; payload: LectureRow }
+

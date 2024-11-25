@@ -14,24 +14,13 @@ import { SimpleToolBar } from '../components/Common/ToolBar/ToolBar';
 import { useDataTable } from '../hooks/GenericDataTableHook';
 import { CategoryID, Name_ID, TestRow } from '../utils/types/type';
 import SplitNameIDFromURL from '../utils/splitNameIDFromURL';
+import { emptyTestRow } from '../utils/types/emptyValue';
 
 export function AdminManageTestPage() {
     const { category_name_id = "no idCategory found" } = useParams<{ category_name_id: Name_ID<CategoryID> }>();
     const [, category_id] = SplitNameIDFromURL(category_name_id);
 
-    const emptyTest: TestRow = {
-        id: '',
-        name: '',
-        isActive: true,
-        idCategory: category_id,
-        totalTestAttempt: 0,
-        totalQuestion: 0,
-        totalScore: 0,
-        limitTime: 0,
-        totalUserAttempt: 0,
-        createdAt: new Date(),
-        updatedAt: new Date()
-    }
+    const emptyTest = emptyTestRow(category_id);
 
     const {
         row, setRow, rows,
