@@ -1,4 +1,4 @@
-import { ApiResponse, CategoryLabel, CategoryRow, ExerciseType, LectureCard, LectureID, QuestionRow, ResultID, TableData, TestCard, TestID, TestPaper ,PracticePaper, TestRecord, TestResultSummary, Topic, UpdateQuestionForm } from "../utils/types/type";
+import { ApiResponse, CategoryLabel, CategoryRow, ExerciseType, LectureCard, LectureID, QuestionRow, ResultID, TableData, TestCard, TestID, TestPaper, PracticePaper, TestRecord, TestResultSummary, Topic, UpdateQuestionForm } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -100,5 +100,13 @@ export const callGetLectureCards = async (pageIndex: number): Promise<ApiRespons
 export const callGetPracticePaper = async (lectureId: LectureID): Promise<ApiResponse<PracticePaper>> => {
     const response = await fetch(`https://dummyjson.com/c/e6c2-181c-4ceb-86b1?lecture=${lectureId}`);
     const apiResponse: ApiResponse<PracticePaper> = await response.json();
-    return apiResponse 
+    return apiResponse
+}
+
+export const callPostDoctrine = async (lectureId: LectureID, htmlContent: string): Promise<string> => {
+    try {
+        return "";
+    } catch (e: unknown) {
+        return "Lỗi";
+    }
 }

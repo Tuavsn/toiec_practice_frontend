@@ -34,20 +34,20 @@ export const ActionBodyTemplate: React.FC<LectureActionButtonProps> = React.memo
 
                 {/* Sửa thiết kế */}
                 <Button icon="pi pi-code" rounded outlined severity="success" style={{ width: "50px", height: "50px" }} onClick={() => {
-                    dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedLecture });
+                    dispatch({ type: "OPEN_PAGE_DESIGNER_DIALOG", payload: currentSelectedLecture });
                 }} />
 
                 {/* Sửa Câu hỏi */}
                 <Button icon="pi pi-question-circle" rounded outlined severity="help" style={{ width: "50px", height: "50px" }} onClick={() => {
-                    dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedLecture });
+                    dispatch({ type: "OPEN_QUESTION_EDITOR_DIALOG", payload: currentSelectedLecture });
                 }} />
 
                 {/* Nút xóa */}
                 <Button icon="pi pi-trash" rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => {
                     dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedLecture });
                 }} />
-                
-                
+
+
             </div>
         )
     }

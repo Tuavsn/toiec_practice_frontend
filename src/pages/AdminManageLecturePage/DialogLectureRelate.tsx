@@ -8,6 +8,7 @@ import { useToast } from "../../context/ToastProvider";
 import useTopicRef from "../../hooks/TopicHook";
 import { emptyLectureRowValue } from "../../utils/types/emptyValue";
 import { DialogLectureBodyProps, DialogLectureProps, RenderLectureDialogParams, Topic, TopicID } from "../../utils/types/type";
+import EditCourseRichTextBox from "../../components/Common/richTextBox/richTextBox";
 
 
 
@@ -24,13 +25,35 @@ export const DialogLectureActionButton: React.FC<DialogLectureProps> = React.mem
                 visible={header != ""}                       // Tiêu đề của Dialog lấy từ prop title
                 style={{ width: "80vw" }}                    // Thiết lập chiều rộng của Dialog
                 maximizable
-                maximized={job === "DELETE"}
+                maximized={job === "PAGE_DESIGNER" || job === "QUESTION_EDITOR"}
             >
                 {body}
             </Dialog>
         );
     }
 );
+
+function RenderDialog(params: RenderLectureDialogParams): [string, JSX.Element] {
+
+    switch (params.job) {
+        case "CREATE":
+            return ["Tạo bài giảng mới", <RenderUpdateLectureBody currentSelectedLecture={emptyLectureRowValue} dispatch={params.dispatch} topicListRef={params.topicListRef} />];
+        case "UPDATE":
+            return [`Sửa bài giảng ${params.currentSelectedLecture.name}`, <RenderUpdateLectureBody currentSelectedLecture={params.currentSelectedLecture} dispatch={params.dispatch} topicListRef={params.topicListRef} />];
+        case "DELETE":
+            return [`Xóa bài giảng ${params.currentSelectedLecture.name}`, <h1 className='text-center'>Bạn có chắc muốn xóa</h1>];
+        case "PAGE_DESIGNER":
+            return [`Viết bài giảng ${params.currentSelectedLecture.name}`, <EditCourseRichTextBox lectureID={params.currentSelectedLecture.id} />];
+        case "QUESTION_EDITOR":
+            return [`Tạo câu hỏi bài giảng ${params.currentSelectedLecture.name}`, <RenderUpdateLectureBody currentSelectedLecture={params.currentSelectedLecture} dispatch={params.dispatch} topicListRef={params.topicListRef} />];
+    }
+    return ["", <>Lỗi</>]
+};
+
+
+function GetIDNameTopicPair(topicList: Topic[]) {
+    return topicList.map((topic) => ({ label: topic.name, value: topic.id }))
+}
 
 const RenderUpdateLectureBody: React.FC<DialogLectureBodyProps> = React.memo(
     (props) => {
@@ -63,26 +86,12 @@ const RenderUpdateLectureBody: React.FC<DialogLectureBodyProps> = React.memo(
                     {/* Transcript */}
                     <div className="field flex-1">
                         <label className='block' htmlFor="lecture">Tiêu Đề Bài giảng</label>
-                        <InputText
-                            defaultValue={props.currentSelectedLecture.name}
-                            ref={inputRef}
-                            id="lecture"
-                            name="name"
-                            autoComplete="additional-name"
-                        />
+                        <InputText id="lecture" name="name" autoComplete="additional-name" ref={inputRef} defaultValue={props.currentSelectedLecture.name} />
                     </div>
                     {/* Topics */}
                     <div className="field flex-1">
-                        <p className='m-0 mb-2'>Topics</p>
-                        <MultiSelect
-                            style={{ width: '100%', maxWidth: "70vw" }}
-                            name="topicIds"
-                            value={topicIds}
-                            options={GetIDNameTopicPair(props.topicListRef.current)}
-                            onChange={(e) => setTopicIds((prev) => [...prev, ...e.value])}
-                            placeholder="Select Topics"
-                            display='chip'
-                        />
+                        <label className='block' htmlFor="topicIds">Chủ đề</label>
+                        <MultiSelect name="topicIds" display='chip' placeholder="Select Topics" style={{ width: '100%', maxWidth: "70vw" }} value={topicIds} onChange={(e) => setTopicIds([...e.value])} options={GetIDNameTopicPair(props.topicListRef.current)} />
                     </div>
                 </section>
                 {/* Save Button */}
@@ -95,21 +104,3 @@ const RenderUpdateLectureBody: React.FC<DialogLectureBodyProps> = React.memo(
     }
 )
 
-
-function RenderDialog(params: RenderLectureDialogParams): [string, JSX.Element] {
-
-    switch (params.job) {
-        case "CREATE":
-            return ["Tạo bài giảng mới", <RenderUpdateLectureBody currentSelectedLecture={emptyLectureRowValue} dispatch={params.dispatch} topicListRef={params.topicListRef} />];
-        case "DELETE":
-            return [`Xóa bài giảng ${params.currentSelectedLecture.name}`, <h1 className='text-center'>Bạn có chắc muốn xóa</h1>];
-        case "UPDATE":
-            return [`Sửa bài giảng ${params.currentSelectedLecture.name}`, <RenderUpdateLectureBody currentSelectedLecture={params.currentSelectedLecture} dispatch={params.dispatch} topicListRef={params.topicListRef} />];
-    }
-    return ["", <>Lỗi</>]
-};
-
-
-function GetIDNameTopicPair(topicList: Topic[]) {
-    return topicList.map((topic) => ({ label: topic.name, value: topic.id }))
-}

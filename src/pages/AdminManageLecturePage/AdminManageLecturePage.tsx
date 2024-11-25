@@ -32,7 +32,7 @@ export default memo(AdminManageLecturePage);
 //         <main key={"expandrow" + data.id} className='align-items-center justify-content-center border-round m-2' style={{ width: '80%' }}>
 //             <Card title={`Lý thuyết ${data.name}`} className="bg-purple-200">
 
-//                 <EditCourseRichTextBox content={data.content} />
+//
 
 //             </Card>
 //             <br></br>

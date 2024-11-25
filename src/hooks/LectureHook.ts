@@ -15,6 +15,10 @@ const reducer = (state: LectureHookState, action: LectureHookAction): LectureHoo
             return { ...state, job: "UPDATE", currentSelectedLecture: action.payload }
         case 'OPEN_DELETE_DIALOG':
             return { ...state, job: "DELETE", currentSelectedLecture: action.payload }
+        case 'OPEN_PAGE_DESIGNER_DIALOG':
+            return { ...state, job: "PAGE_DESIGNER", currentSelectedLecture: action.payload }
+        case 'OPEN_QUESTION_EDITOR_DIALOG':
+            return { ...state, job: "QUESTION_EDITOR", currentSelectedLecture: action.payload }
         default:
             return state;
     }

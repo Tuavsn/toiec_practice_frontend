@@ -1,6 +1,8 @@
 import { DataTableValue } from "primereact/datatable";
+import { EditorTextChangeEvent } from "primereact/editor";
+import { Toast } from "primereact/toast";
 import { TreeNode } from "primereact/treenode";
-import { Dispatch } from "react";
+import { Dispatch, MutableRefObject } from "react";
 
 
 export interface Category extends CategoryRow {
@@ -361,10 +363,16 @@ export interface UpdateLectureForm {
 
 
 // ------------------------- tham số truyền
+export type RichEditorProps = {
+  button: React.MutableRefObject<HTMLButtonElement>,
+  text: React.MutableRefObject<string>,
+  saveText(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, text: React.MutableRefObject<string>): void
+
+}
 export type DialogLectureProps = {
   currentSelectedLecture: LectureRow,
   dispatch: Dispatch<LectureHookAction>,
-  job: DialogLectureActionType,
+  job: DialogLectureJobType,
 }
 
 export type DialogLectureBodyProps = {
@@ -375,12 +383,23 @@ export type DialogLectureBodyProps = {
 }
 
 export type RenderLectureDialogParams = {
-  job: DialogLectureActionType,
+  job: DialogLectureJobType,
   currentSelectedLecture: LectureRow,
   dispatch: Dispatch<LectureHookAction>,
   topicListRef: React.MutableRefObject<Topic[]>
 }
 
+export type SaveTextParams = {
+  e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  toast: MutableRefObject<Toast | null>
+  text: React.MutableRefObject<string>,
+  lectureID: LectureID,
+}
+export type EditTextParams = {
+  e: EditorTextChangeEvent,
+  button: React.MutableRefObject<HTMLButtonElement>,
+  text: React.MutableRefObject<string>
+}
 export type AdminLectureTableProps = {
   lectures: LectureRow[],
   dispatch: Dispatch<LectureHookAction>,
@@ -485,14 +504,14 @@ export type UserAnswerTimeCounter = Map<QuestionNumber, milisecond>
 export type TestType = 'fulltest' | 'practice' | 'survival';
 export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
 export type ExerciseType = "partNum=1" | "partNum=2" | "partNum=3" | "partNum=4" | "partNum=5" | "partNum=6" | "partNum=7" | "TOPIC=grammar" | "TOPIC=vocabulary";
-export type DialogLectureActionType = 'CREATE' | 'UPDATE' | 'DELETE' | '';
+export type DialogLectureJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE' | 'PAGE_DESIGNER' | 'QUESTION_EDITOR';
 export type Name_ID<T extends string> = T;
 
 //-----------------------------reducer---------------------
 export interface LectureHookState {
   lectures: LectureRow[],
   currentPageIndex: number,
-  job: DialogLectureActionType,
+  job: DialogLectureJobType,
   currentSelectedLecture: LectureRow
 }
 
@@ -501,7 +520,10 @@ export type LectureHookAction =
   | { type: 'FETCH_TOPIC_SUCCESS'; payload: Topic[] }
   | { type: 'SET_PAGE'; payload: number }
   | { type: 'SET_CURRENT_LECTURE'; payload: LectureRow }
-  | { type: 'TOGGLE_DIALOG'; payload: DialogLectureActionType }
+  | { type: 'TOGGLE_DIALOG'; payload: DialogLectureJobType }
   | { type: 'OPEN_UPDATE_DIALOG'; payload: LectureRow }
   | { type: 'OPEN_DELETE_DIALOG'; payload: LectureRow }
+  | { type: 'OPEN_CREATE_DIALOG'; payload: LectureRow }
+  | { type: 'OPEN_PAGE_DESIGNER_DIALOG'; payload: LectureRow }
+  | { type: 'OPEN_QUESTION_EDITOR_DIALOG'; payload: LectureRow }
 
