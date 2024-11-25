@@ -67,8 +67,10 @@ export default function TestPage() {
                             <p>
                                 <strong>Năm:</strong> {testCard.year}
                             </p>
+                            <div className="flex justify-content-center">
 
-                            <Button label="View Details" onClick={() => navigate(`/test/${testCard.id}`)} />
+                                <Button label="View Details" onClick={() => navigate(`/test/${testCard.id}`)} />
+                            </div>
                         </div>
                     </Card>
 

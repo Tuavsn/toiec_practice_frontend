@@ -19,8 +19,8 @@ function DoExercisePage() {
         pageMapper,
         changePage,
         timeDoTest,
+        startTest,
         onEndTest,
-        setStart,
         start,
     } = useExercisePage();
     // Tạo danh sách nút điều hướng dựa trên pageMapper
@@ -31,7 +31,7 @@ function DoExercisePage() {
         return pageMapper.map((pq, index) => {
             const isOnPage = currentPageIndex === pq.page;
             const text = userAnswerSheet.get(pq.questionNum)?.userAnswer ?? "";
-           
+
             return (
                 <Button
                     key={"answer_" + index}
@@ -48,7 +48,7 @@ function DoExercisePage() {
 
             );
         })
-    }, [userAnswerSheet,currentPageIndex,pageMapper,setCurrentPageIndex])
+    }, [userAnswerSheet, currentPageIndex, pageMapper, setCurrentPageIndex])
 
 
     // Render giao diện chính của trang thi
@@ -61,7 +61,7 @@ function DoExercisePage() {
                         // bắt đầu tính giờ đếm số giây đã trôi qua
                         timeDoTest.current = Date.now();
                         // mở giao diện làm bài
-                        setStart(true)
+                        startTest();
                     }} />
                 </div>
             )}

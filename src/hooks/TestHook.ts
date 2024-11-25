@@ -32,8 +32,8 @@ const useTestPage = () => {
         pageMapper,
         changePage,
         timeDoTest,
+        startTest,
         isOnTest,
-        setStart,
         navigate,
         start,
     } = useMultipleQuestion();
@@ -109,7 +109,7 @@ const useTestPage = () => {
         timeDoTest,
         onEndTest,
         isOnTest,
-        setStart,
+        startTest,
         testType,
         start,
     };

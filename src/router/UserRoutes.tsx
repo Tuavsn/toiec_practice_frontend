@@ -3,8 +3,8 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
 import { LoadingSpinner } from "../components/Common/Index";
 import {
-    CourseDetailsPage,
-    CoursePage,
+    LectureDetailsPage,
+    LecturePage,
     DoExercisePage,
     DoTestPage,
     ExercisePage,
@@ -38,8 +38,8 @@ export default function UserRoutes() {
                 {/* Test Review Page */}
                 <Route path="/test/:id/review" element={<TestReviewPage />} />
                 {/* Course Page */}
-                <Route path="/course" element={<CoursePage />} />
-                <Route path="/courses/:id" element={<CourseDetailsPage />} />F
+                <Route path="/lecture" element={<LecturePage />} />
+                <Route path="/lectures/:id" element={<LectureDetailsPage />} />F
                 {/* Exercise page */}
                 <Route path="/exercise" element={<ExercisePage />} />
                 {/* Do Exercise  Page */}

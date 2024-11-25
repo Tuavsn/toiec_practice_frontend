@@ -7,7 +7,7 @@ const AdminDashboardPage = lazy(() => import("../pages/AdminDashboardPage"))
 const AdminManageAccountPage = lazy(() => import("../pages/AdminManageAccount"))
 const AdminManageCategoryPage = lazy(() => import("../pages/AdminManageCategoryPage"))
 const AdminManageTestPage = lazy(() => import("../pages/AdminManageTestPage"))
-const AdminManageCoursePage = lazy(() => import("../pages/AdminManageCoursePage"))
+const AdminManageLecturePage = lazy(() => import("../pages/AdminManageLecturePage/AdminManageLecturePage"))
 const AdminLayout = lazy(() => import('../components/Layout/AdminLayout'));
 export default function AdminRoutes() {
   if( localStorage.getItem("role") != "ADMIN"){
@@ -33,7 +33,7 @@ export default function AdminRoutes() {
           <Route path="categories" element={<AdminManageCategoryPage />} /> {/* Quản lý các danh mục */}
           
           <Route path="account" element={<AdminManageAccountPage />} />
-          <Route path="course" element={<AdminManageCoursePage />} />
+          <Route path="lecture" element={<AdminManageLecturePage />} />
           <Route path="user-analyst" element={<TempAdminPage text="thống kê người dùng" />} />
           <Route path="notify" element={<TempAdminPage text="notify" />} />
           <Route path="chat" element={<TempAdminPage text="chat" />} />

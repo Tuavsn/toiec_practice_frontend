@@ -3,13 +3,13 @@ import { useParams } from "react-router-dom";
 import { callGetExercisePaper, callPostTestRecord } from "../api/api";
 import { MappingPageWithQuestionNum } from "../utils/convertToHTML";
 import prepareForTest from "../utils/prepareForTest";
-import { milisecond, QuestionNumber, ResultID, TestRecord } from "../utils/types/type";
+import { ExerciseType, milisecond, QuestionNumber, ResultID, TestRecord } from "../utils/types/type";
 import { useMultipleQuestion } from "./MultipleQuestionHook";
 
 const useExercisePage = () => {
 
     // Lấy tham số từ URL (loại của bài tập)
-    const { exerciseType = "" } = useParams<{ exerciseType: string }>();
+    const { exerciseType = "partNum=1" } = useParams<{ exerciseType: ExerciseType }>();
     const {
         updateTimeSpentOnEachQuestionInCurrentPage,
         setIsUserAnswerSheetVisible,
@@ -30,8 +30,8 @@ const useExercisePage = () => {
         pageMapper,
         changePage,
         timeDoTest,
+        startTest,
         isOnTest,
-        setStart,
         navigate,
         start,
     } = useMultipleQuestion();
@@ -71,12 +71,12 @@ const useExercisePage = () => {
                 localStorage.removeItem('userAnswerSheet');
                 const responseData = await callGetExercisePaper(exerciseType);
 
-                const newPageMapper = MappingPageWithQuestionNum(responseData.data.listMultipleChoiceQuestions);
-                setTotalQuestions(responseData.data.totalQuestion);
+                const newPageMapper = MappingPageWithQuestionNum(responseData.data.result);
+                setTotalQuestions(responseData.data.meta.totalItems);
                 timeSpentListRef.current = new Map<QuestionNumber, milisecond>();
-                prepareForTest.prepareAnswerSheet(responseData.data.listMultipleChoiceQuestions, setUserAnswerSheet, timeSpentListRef);
+                prepareForTest.prepareAnswerSheet(responseData.data.result, setUserAnswerSheet, timeSpentListRef);
                 setPageMapper(newPageMapper);
-                setQuestionList(responseData.data.listMultipleChoiceQuestions);
+                setQuestionList(responseData.data.result);
             } catch (error: any) {
                 // Kiểm tra nếu lỗi là do yêu cầu bị hủy
                 if (error.name === "CanceledError") {
@@ -110,8 +110,8 @@ const useExercisePage = () => {
         changePage,
         timeDoTest,
         onEndTest,
+        startTest,
         isOnTest,
-        setStart,
         start,
     };
 };

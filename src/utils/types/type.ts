@@ -1,19 +1,20 @@
 import { DataTableValue } from "primereact/datatable";
 import { TreeNode } from "primereact/treenode";
+import { Dispatch } from "react";
 
 
 export interface Category extends CategoryRow {
   tests: Test[];
 }
 
-// Course Collection
-export interface Course extends DataTableValue {
+// Lecture Collection
+export interface Lecture extends DataTableValue {
   id: string;
   name: string;
   topic: string[];
   format: string;
   difficulty: number;
-  lecture: Lecture[];
+  doctrine: Doctrine;
   assignment: Assignment;
   isActive: boolean;
   createdAt: Date;
@@ -30,7 +31,7 @@ export interface Topic {
   active: boolean
 }
 
-export interface Lecture extends DataTableValue {
+export interface Doctrine extends DataTableValue {
   title: string;
   content: string;
 }
@@ -118,7 +119,14 @@ export interface Test extends TestRow {
   category: Category;  // Reference to Category
 }
 
-
+export interface LectureRow {
+  id: LectureID;
+  name: string;
+  topic: Topic[];
+  createdAt: Date;
+  updatedAt: Date;
+  active: boolean;
+}
 
 export interface User extends UserRow {
   refreshToken: string;
@@ -132,7 +140,7 @@ export interface TestAttempt extends DataTableValue {
 }
 
 export interface LearningProgress extends DataTableValue {
-  courses: Course[];  // List of Courses
+  lectures: Lecture[];  // List of Lectures
   isCompleted: boolean;
 }
 
@@ -162,11 +170,6 @@ export interface ApiResponse<T> {
   error: string,
 }
 
-export interface CourseOutLine {
-  lectureTitles: string[];
-  practiceTitles: PracticeTitle[];
-}
-
 export interface PracticeTitle {
   title: string;
   isCompleted: boolean
@@ -177,12 +180,10 @@ export interface CategoryLabel {
   year: number[];
 }
 
-export interface CourseCard {
+export interface LectureCard {
   id: string,
   name: string,
   topic: string[],
-  format: string,
-  difficulty: number
 }
 
 export interface TestCard {
@@ -279,7 +280,7 @@ export type TestRecord = {
 
 
 
-export type TestResultSummary ={
+export type TestResultSummary = {
   id: ResultID;
   testId: TestID;
   totalTime: number;
@@ -351,19 +352,25 @@ export interface UpdateQuestionForm {
   correctAnswer: string;
 }
 
+
+
 // ------------------------- tham số truyền
 export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;
   onTimeUp: () => void;
 }
 
-export interface DialogActionProps {
+export interface DialogQuestionActionProps {
   isVisible: boolean,
   title: string,
   topicList: React.MutableRefObject<Topic[]>,
   setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
   currentSelectedQuestion: React.MutableRefObject<TreeNode>,
+}
 
+export interface DialogLectureActionProps {
+  state: LectureHookState;
+  dispatch: Dispatch<LectureHookAction>;
 }
 
 export interface UserAnswerSheetProps {
@@ -408,6 +415,11 @@ export interface QuestionActionButtonProps {
   currentSelectedQuestion: React.MutableRefObject<TreeNode>,
 }
 
+export interface LectureActionButtonProps {
+  currentSelectedLecture: LectureRow,
+  dispatch: Dispatch<LectureHookAction>
+}
+
 export interface UpdateQuestionDialogProps {
   currentSelectedQuestion: React.MutableRefObject<TreeNode>,
   topicList: React.MutableRefObject<Topic[]>,
@@ -433,7 +445,7 @@ export type QuestionID = string;
 export type QuestionNumber = number;
 export type milisecond = number;
 export type TestID = string;
-export type CourseID = string;
+export type LectureID = string;
 export type PracticeAnswerSheet = Map<QuestionID, string>;
 export type CategoryID = string;
 export type TopicID = string;
@@ -441,6 +453,20 @@ export type ResponseUserResultList = ApiResponse<TableData<UserDetailResultRow>>
 export type UserAnswerTimeCounter = Map<QuestionNumber, milisecond>
 export type TestType = 'fulltest' | 'practice' | 'survival';
 export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
-export type ExerciseType = "part1" | "part2" | "part3" | "part4" | "part5" | "part6" | "part7" | "grammar" | "vocabulary";
+export type ExerciseType = "partNum=1" | "partNum=2" | "partNum=3" | "partNum=4" | "partNum=5" | "partNum=6" | "partNum=7" | "TOPIC=grammar" | "TOPIC=vocabulary";
 
 export type Name_ID<T extends string> = T;
+
+//-----------------------------reducer---------------------
+export interface LectureHookState {
+  lectures: LectureRow[],
+  currentPageIndex: number,
+  title: string,
+
+}
+
+export type LectureHookAction =
+  | { type: 'FETCH_SUCCESS'; payload: LectureRow[] }
+  | { type: 'SET_PAGE'; payload: number }
+  | { type: 'SET_CURRENT_LECTURE'; payload: LectureRow }
+  | { type: 'TOGGLE_DIALOG'; payload: string }

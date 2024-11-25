@@ -48,7 +48,7 @@ function AdminManageAccountPage() {
         setSelectedRows,
         setGlobalFilter,
         handleOnPage
-    } = useDataTable<UserRow>("https://dummyjson.com/c/cba1-c411-488b-9200", emptyAccount
+    } = useDataTable<UserRow>("testusers", emptyAccount
         , (state) => ({
             saveRow: () => {
                 state.setSubmitted(true);
@@ -78,12 +78,10 @@ function AdminManageAccountPage() {
     );
 
     const renderColumns = [
-        <Column key="col-selection" selectionMode="multiple" exportable={false} />,
-        <Column key="col-id" field="id" header="ID" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-email" field="email" header="Email" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-timestamp" header="Time stamp" body={timeStampBodyTemplate} sortable style={{ minWidth: '10rem' }} />,
-        <Column key="col-role" field="role" header="Role" style={{ minWidth: '17ream' }} />,
-        <Column key="col-isActive" field="isActive" header="status" sortable body={statusBodyTemplate} />,
+        <Column key="col-email" field="email" header="Email" sortable filter align="center"/>,
+        <Column key="col-timestamp" header="Ngày" body={timeStampBodyTemplate} sortable />,
+        <Column key="col-role" field="role" header="Vai trò" align="center"/>,
+        <Column key="col-isActive" field="isActive" header="Hoạt động" sortable body={statusBodyTemplate}  bodyClassName="text-center"/>,
     ];
 
     return (

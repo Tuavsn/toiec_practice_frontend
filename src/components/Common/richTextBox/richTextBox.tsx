@@ -1,31 +1,34 @@
 
-import React, { useEffect, useState } from "react";
 import { Editor, EditorTextChangeEvent } from "primereact/editor";
+import React, { useRef } from "react";
 
 export default function EditCourseRichTextBox(props: { content: string }) {
-    const [text, setText] = useState<string>('');
-    const [dirty, setDirty] = useState<boolean>(false);
-    useEffect(() => {
-        setText(props.content);
-        setDirty(false);
-    }, [])
-
-
-    const header = renderHeader(dirty);
-
+    const text = useRef<string>(props.content);
+    const button = useRef<HTMLButtonElement | null>(null);
+    const header = renderHeader(button);
+    const editor = useRef<Editor|null>(null);
+    editor.current?.getElement()
     return (
         <div className="card">
-            <Editor value={text} onTextChange={(e: EditorTextChangeEvent) => { if (e.htmlValue) { setDirty(true); } setText(e.htmlValue ?? "") }} headerTemplate={header} style={{ height: '320px' }} />
+            <Editor value={text.current} headerTemplate={header} style={{ height: '320px' }} onTextChange={
+                (e) => editText(e, button, text)} />
         </div>
     )
 }
 
+function editText(e: EditorTextChangeEvent, button: React.MutableRefObject<HTMLButtonElement | null>, text: React.MutableRefObject<string>) {
+    if (e.htmlValue) { button.current!.innerText = "Lưu*"; toggleButtonColor(button.current!) }
+    console.log(text);
+    text.current = e.htmlValue ?? ""
+}
 
-const renderHeader = (dirty: boolean) => {
+
+const renderHeader = (button: React.MutableRefObject<HTMLButtonElement | null>) => {
+    // const color = dirty.current ? "bg-yellow-500" : "bg-green-500"
     return (
         <React.Fragment>
             <span className="ql-formats">
-                <button className="bg-yellow-500 min-w-min">Lưu {dirty ? '*' : ''}</button>
+                <button ref={button} className={`bg-green-500`} style={{ width: "60px" }} onClick={saveText} >Lưu</button>
             </span>
             <span className="ql-formats">
                 <select className="ql-font"></select>
@@ -73,3 +76,13 @@ const renderHeader = (dirty: boolean) => {
         </React.Fragment>
     );
 };
+
+function saveText(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    toggleButtonColor(e.currentTarget);
+    e.currentTarget.innerText = "Lưu";
+}
+
+function toggleButtonColor(button: HTMLButtonElement) {
+    button.classList.toggle("bg-green-500");
+    button.classList.toggle("bg-yellow-500");
+}

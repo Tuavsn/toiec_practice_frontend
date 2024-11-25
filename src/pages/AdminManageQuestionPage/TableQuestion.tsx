@@ -8,7 +8,7 @@ import { LoadingSpinner } from "../../components/Common/Index";
 import { useQuestionTable } from "../../hooks/QuestionHook";
 import { QuestionTableProps } from "../../utils/types/type";
 import { RenderColumnsForTable } from "./ColumnsTreeTable";
-import { DialogActionButton } from "./DialogRelate";
+import { DialogQuestionActionButton } from "./DialogQuestionRelate";
 
 // Thành phần hiển thị bảng câu hỏi dạng cây, với các cột và hàng được thiết kế cụ thể
 const QuestionTreeTable: React.FC<QuestionTableProps> = React.memo(
@@ -42,7 +42,7 @@ const QuestionTreeTable: React.FC<QuestionTableProps> = React.memo(
         return (
             <React.Fragment>
                 {/* Dialog dùng để hiển thị nội dung xác nhận xóa hoặc cập nhật câu hỏi. */}
-                <DialogActionButton isVisible={isVisible} title={title} topicList={topics} setIsVisible={setIsVisible} currentSelectedQuestion={currentSelectedQuestion} />
+                <DialogQuestionActionButton isVisible={isVisible} title={title} topicList={topics} setIsVisible={setIsVisible} currentSelectedQuestion={currentSelectedQuestion} />
 
                 <TreeTable value={nodes} rows={5} scrollable rowClassName={rowClassName}>
 

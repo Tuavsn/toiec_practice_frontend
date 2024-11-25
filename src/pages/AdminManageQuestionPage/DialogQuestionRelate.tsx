@@ -8,7 +8,7 @@ import { InputTextarea } from "primereact/inputtextarea"
 import { MultiSelect } from "primereact/multiselect"
 import React, { useState } from "react"
 import { callPutQuestionUpdate } from "../../api/api"
-import { DialogActionProps, DialogQuestionPageProps, Topic, UpdateQuestionDialogProps, UpdateQuestionForm } from "../../utils/types/type"
+import { DialogQuestionActionProps, DialogQuestionPageProps, Topic, UpdateQuestionDialogProps, UpdateQuestionForm } from "../../utils/types/type"
 import { useToast } from "../../context/ToastProvider"
 
 // Định nghĩa component DialogForQuestionPage sử dụng React.FC với React.memo để tối ưu hiệu suất
@@ -32,7 +32,7 @@ export const DialogForQuestionPage: React.FC<DialogQuestionPageProps> = React.me
 
 
 // Định nghĩa component DialogActionButton sử dụng React.FC với React.memo để tối ưu hiệu suất
-export const DialogActionButton: React.FC<DialogActionProps> = React.memo(
+export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = React.memo(
     ({ setIsVisible, isVisible, title, topicList, currentSelectedQuestion }) => {
 
         return (
@@ -82,10 +82,10 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
             console.log("Hello update");
             // toast.current?.show({ severity: 'success', content: "Sửa thành công" });
             // callPutQuestionUpdate(formData);
-            const updateQuestion = async() => {
-                const questionUpdatedResponse:any = await callPutQuestionUpdate(formData);
-                if(questionUpdatedResponse) {
-                    if(questionUpdatedResponse.status == 200) {
+            const updateQuestion = async () => {
+                const questionUpdatedResponse: any = await callPutQuestionUpdate(formData);
+                if (questionUpdatedResponse) {
+                    if (questionUpdatedResponse.status == 200) {
                         toast.current?.show({ severity: 'success', content: "Sửa thành công" });
                     } else {
                         toast.current?.show({ severity: 'error', content: questionUpdatedResponse.error });

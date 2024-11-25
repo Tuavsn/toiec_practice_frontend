@@ -1,56 +1,34 @@
-import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Card } from 'primereact/card';
 import { Divider } from 'primereact/divider';
-import { Tag } from 'primereact/tag';
-import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ApiResponse, PracticeTitle, CourseOutLine, CourseID, PracticeQuestion, PracticeAnswerSheet, QuestionID, PracticePaper } from '../utils/types/type';
 import { Paginator } from 'primereact/paginator';
+import { Tag } from 'primereact/tag';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { ConvertThisPracticeQuestionToHTML } from '../utils/convertToHTML';
+import { ApiResponse, LectureID, PracticeAnswerSheet, PracticePaper, PracticeQuestion, QuestionID } from '../utils/types/type';
+import { callGetPracticePaper } from '../api/api';
 
 
 // Component chi tiết khóa học
 const CourseDetailsPage: React.FC = () => {
     // Lấy ID của khóa học từ tham số URL
-    const { id = "" } = useParams<{ id: CourseID }>();
-
-    // Trạng thái lưu danh sách tiêu đề bài giảng
-    const [lectureTitles, setLectureTitles] = useState<string[]>([]);
-
-    // Trạng thái lưu danh sách tiêu đề bài tập
-    const [practiceTitles, setPracticeTitles] = useState<PracticeTitle[]>([]);
+    const { id = "" } = useParams<{ id: LectureID }>();
 
     // Hook useEffect chạy khi component mount
     useEffect(() => {
-        // Hàm lấy dữ liệu outline của khóa học
-        const fetchCourseOutline = async () => {
-            try {
-                // Gọi API lấy tiêu đề bài giảng và bài tập
-                const { lectureTitles, practiceTitles: practiceTitles } = await fetchCourseOutLine();
-                // Lưu tiêu đề bài tập vào state
-                setPracticeTitles([...practiceTitles]);
-                // Lưu tiêu đề bài giảng vào state
-                setLectureTitles([...lectureTitles]);
-            } catch (error) {
-                // Bắt lỗi khi không lấy được dữ liệu
-                console.error('Error fetching course outline:', error);
-            }
-        };
 
-        // Gọi hàm fetchCourseOutline
-        fetchCourseOutline();
     }, []);
 
     // Phần giao diện của component
     return (
-        <div>
+        <main className='pt-7'>
             {/* Hiển thị tiêu đề khóa học */}
-            <h2>Course Details for ID: {id}</h2>
+            <h2 className='pb-3 text-center'>Bài giảng cho for ID: {id}</h2>
             <div className='flex-1 flex-column md:flex-row'>
                 {/* Nội dung chính của khóa học */}
                 <main className='align-items-center justify-content-center border-round m-2' style={{ minWidth: '70%' }}>
                     <div className='flex flex-row flex-wrap pb-5'>
-                        <LectureSection lectureTitles={lectureTitles} courseId={id} />
+                        <DoctrineSection lectureId={id} />
                         {/* Phần hiển thị các khóa học liên quan */}
                         <aside className='align-items-center justify-content-center border-round m-2' style={{ minWidth: '28%' }}>
                             <Card className='shadow-6'>
@@ -63,11 +41,11 @@ const CourseDetailsPage: React.FC = () => {
 
                     <br />
                     {/* Phần hiển thị các bài tập */}
-                    <PracticeSection practiceTitles={practiceTitles} courseID={id} />
+                    <PracticeSection lectureID={id} />
                 </main>
 
             </div>
-        </div>
+        </main>
     );
 };
 
@@ -109,47 +87,26 @@ function RelateCoursesTemplate() {
 
 }
 
-const LectureSection: React.FC<{ lectureTitles: string[], courseId: CourseID }> = React.memo(
-    ({ lectureTitles, courseId }) => {
-        // Trạng thái lưu vị trí bài học hiện tại
-        const [activeLessonIndex, setActiveLessonIndex] = useState<number | number[]>([]);
-        // Trạng thái lưu nội dung bài học hiện tại
-        const [currentLesson, setCurrentLesson] = useState<string>("");
+const DoctrineSection: React.FC<{ lectureId: LectureID }> = React.memo(
+    ({ lectureId }) => {
+        const divRef = useRef<HTMLDivElement | null>(null);
+        useLayoutEffect(() => {
+            divRef.current!.innerHTML = GetFakeDoctrineSection();
+        }, [])
+        return <Card title="Lý thuyết" className='shadow-8 flex-1' style={{ flexBasis: '900', minWidth: '700px' }}>
 
-        return lectureTitles && (
-            <Card className='shadow-8 flex-1' style={{flexBasis:'900', minWidth:'700px'}}>
-                <h1>Lý thuyết</h1>
-                {/* Accordion hiển thị các bài giảng */}
-                <Accordion
-                    activeIndex={activeLessonIndex}
-                    onTabChange={(e) => {
-                        // Cập nhật bài giảng đang chọn và tải nội dung bài học
-                        setActiveLessonIndex(e.index as number);
-                        LoadLessons(e.index as number, courseId, setCurrentLesson);
-                    }}>
-                    {lectureTitles.map((lectureTitle, index) => (
-                        // Tab cho từng bài giảng
-                        <AccordionTab key={"lectureNo_" + index} header={lectureTitle}>
-                            {(index === activeLessonIndex) && (
-                                // Nội dung bài giảng hiện tại
-                                <div dangerouslySetInnerHTML={{ __html: currentLesson }} />
-                            )}
-                        </AccordionTab>
-                    ))}
-                </Accordion>
-            </Card>
-        )
+            {/* <div dangerouslySetInnerHTML={{ __html: currentLesson }} /> */}
+            <div ref={divRef} />
+        </Card>
+
     }
 )
 
 // Component PracticeSection dùng để hiển thị các bài tập của khóa học
-const PracticeSection: React.FC<{ practiceTitles: PracticeTitle[], courseID: CourseID }> = React.memo(
-    ({ practiceTitles, courseID }) => {
+const PracticeSection: React.FC<{ lectureID: LectureID }> = React.memo(
+    ({ lectureID }) => {
         // Trạng thái lưu câu trả lời của người dùng
         const [userAnswerSheet, setUserAnswerSheet] = useState<PracticeAnswerSheet>(new Map<QuestionID, string>());
-
-        // Trạng thái lưu vị trí bài tập hiện tại
-        const [activePracticeIndex, setActivePracticeIndex] = useState<number | number[]>([]);
 
         // Trạng thái lưu danh sách các câu hỏi hiển thị
         const [questionPage, setQuestionPage] = useState<PracticeQuestion[]>([]);
@@ -158,14 +115,14 @@ const PracticeSection: React.FC<{ practiceTitles: PracticeTitle[], courseID: Cou
         const [first, setFirst] = useState<number>(0);
 
         // tổng số câu hỏi cần phải trả lời để tính hoàn thành bài tập
-        const [totalQuestions, setToTalQuestions] = useState<number>(0);
+        const totalQuestions = useRef<number>(-1);
 
         // cập nhật vào danh sách các câu trả lời của người dùng. nếu trả lời đủ số câu thì coi như kết thúc 
         const updateUserAnswerSheet = (qID: QuestionID, answer: string) => {
             const newAnswerSheet = new Map(userAnswerSheet);
             newAnswerSheet.set(qID, answer);
             setUserAnswerSheet(newAnswerSheet);
-            if (newAnswerSheet.size >= totalQuestions) {
+            if (newAnswerSheet.size >= totalQuestions.current) {
                 alert("làm xong");
                 console.log(JSON.stringify(newAnswerSheet, null, 2));
 
@@ -180,63 +137,27 @@ const PracticeSection: React.FC<{ practiceTitles: PracticeTitle[], courseID: Cou
                 totalRecords={questionPage.length}
                 onPageChange={(event) => setFirst(event.first)}
                 template={{ layout: 'PrevPageLink CurrentPageReport NextPageLink' }} />
-
+        useEffect(() => {
+            const fetchPraticeQuestion = async () => {
+                const response = await callGetPracticePaper(lectureID);
+                console.log(response);
+                totalQuestions.current = response.data.totalQuestions;
+                setQuestionPage(response.data.practiceQuestions);
+            }
+            fetchPraticeQuestion();
+        }, [])
         // Trả về phần giao diện của component
-        return (
-            practiceTitles && (
-                // Thẻ chứa danh sách bài tập
-                <Card className='shadow-7'>
-                    <h1>Bài tập</h1>
-                    {/* Accordion hiển thị danh sách bài tập */}
-                    <Accordion
-                        activeIndex={activePracticeIndex}
-                        onTabChange={(e) => {
-                            // Cập nhật vị trí bài tập hiện tại và tải dữ liệu bài tập
-                            setActivePracticeIndex(e.index as number);
-                            LoadPractice(e.index as number, courseID, setQuestionPage, setFirst, setUserAnswerSheet, setToTalQuestions);
-                        }}>
-                        {practiceTitles.map((practiceDetail, index) => (
-                            // Tab hiển thị thông tin từng bài tập
-                            <AccordionTab
-                                key={"homeworkNo_" + index}
-                                header={headerTemplate(practiceDetail.title, practiceDetail.isCompleted)}>
-                                {/* Hiển thị câu hỏi nếu đang ở bài tập hiện tại */}
-                                {(index === activePracticeIndex) && questionPage.length > 0 && (
-                                    <React.Fragment>
+        return <Card title="Bài tập" className='shadow-7'>
+            {
+                (questionPage.length) ?
+                    ConvertThisPracticeQuestionToHTML(questionPage[first], userAnswerSheet, updateUserAnswerSheet, paginator) /* Hiển thị câu hỏi hiện tại */
+                    :
+                    <div className='flex justify-content-center align-item-center p-8'>Không có bài tập</div>
+            }
+        </Card>
 
-                                        {ConvertThisPracticeQuestionToHTML(questionPage[first], userAnswerSheet, updateUserAnswerSheet, paginator) /* Hiển thị câu hỏi hiện tại */}
-                                        {/* Paginator cho phép chuyển câu hỏi */}
+    })
 
-                                    </React.Fragment>
-                                )}
-                            </AccordionTab>
-                        ))}
-                    </Accordion>
-                </Card>
-            )
-        );
-    }
-);
-
-
-async function fetchCourseOutLine(): Promise<CourseOutLine> {
-    try {
-        const response = await fetch("https://dummyjson.com/c/2cd9-9ec9-42c8-a1e7");
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        // Get the full response and cast it to ApiResponse<TestPaper>
-        const apiResponse: ApiResponse<CourseOutLine> = await response.json();
-
-        // Return the data part of the response
-        return apiResponse.data;
-    } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
-        return { practiceTitles: [], lectureTitles: [] }; // Return empty arrays in case of an error
-    }
-}
 
 async function LoadPractice(practicePosition: number | null,
     courseID: string,
@@ -301,6 +222,57 @@ async function LoadLessons(lessonIndex: number | null, courseId: string, setCurr
         console.error('There was a problem with the fetch operation:', error);
         setCurrentLesson("lỗi rồi");
     }
+}
+
+function GetFakeDoctrineSection(): string {
+    return `
+    <section style="font-family: Arial, sans-serif; line-height: 1.6;">
+  <h2 style="font-weight: bold; font-size: 24px;">Tìm hiểu về câu điều kiện loại 1 và loại 2</h2>
+  <p style="font-size: 16px;">Để có thể nắm vững cách phân biệt câu điều kiện loại 1 và loại 2, trước tiên, bạn cần biết rõ câu điều kiện loại 1 là câu gì và câu điều kiện loại 2 là loại câu như thế nào. Cùng tìm hiểu trong phần nội dung dưới đây.</p>
+
+  <h3 style="font-weight: bold; font-size: 20px;">Câu điều kiện loại 1</h3>
+  <p style="font-size: 16px;">Câu điều kiện loại 1 là dạng câu được dùng để mô tả những tình huống, hành động, sự việc có khả năng xảy ra trong tương lai thông qua một điều kiện cụ thể. Câu điều kiện loại 1 bao gồm 2 mệnh đề đó là mệnh đề điều kiện và mệnh đề chính hay còn được biết đến với tên gọi mệnh đề kết quả.</p>
+
+  <h4 style="font-weight: bold; font-size: 18px;">Cấu trúc</h4>
+  
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+    <thead>
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold; background-color: #f0f0f0;">Mệnh đề If (Nếu)</th>
+        <th style="border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold; background-color: #f0f0f0;">Mệnh đề chính (Thì)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="border: 1px solid #000; padding: 8px;">If + S + V(s, es)…</td>
+        <td style="border: 1px solid #000; padding: 8px;">S + will + V-inf</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 8px;">Thì hiện tại đơn</td>
+        <td style="border: 1px solid #000; padding: 8px;">Thì tương lai đơn</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4 style="font-weight: bold; font-size: 18px;">Ví dụ:</h4>
+  <ul style="font-size: 16px; list-style-type: disc; margin-left: 20px;">
+    <li>If you visit New York, you will see the Statue of Liberty. (Nếu bạn đến thăm New York, bạn sẽ thấy tượng Nữ thần Tự do)</li>
+    <li>If he eats too much junk food, he will gain weight. (Nếu anh ấy ăn quá nhiều đồ ăn vặt, anh ấy sẽ tăng cân)</li>
+    <li>If you study regularly, you will improve your English skills. (Nếu bạn học thường xuyên, bạn sẽ cải thiện được kỹ năng tiếng Anh của mình)</li>
+  </ul>
+  <p style="font-size: 16px;">Trong các ví dụ trên, mệnh đề “If” mô tả một điều kiện có khả năng có thể xảy ra trong tương lai và mệnh đề chính diễn đạt một kết quả sẽ xảy ra nếu điều kiện đã nêu được đáp ứng.</p>
+
+  <h4 style="font-weight: bold; font-size: 18px;">Cách dùng</h4>
+  <p style="font-size: 16px;">Câu điều kiện loại 1 thường được sử dụng để nêu các kế hoạch cho tương lai hoặc đưa ra các tình huống giả định. Ngoài ra, câu điều kiện dạng này cũng được dùng để đưa ra lời gợi ý hoặc lời khuyên.</p>
+
+  <h4 style="font-weight: bold; font-size: 18px;">Ví dụ:</h4>
+  <ul style="font-size: 16px; list-style-type: disc; margin-left: 20px;">
+    <li>If the weather stays nice, we will have a barbecue in the garden. (Nếu thời tiết đẹp, chúng tôi sẽ tổ chức tiệc nướng ngoài vườn)</li>
+    <li>If she finishes her work on time, she can go to the concert. (Nếu cô ấy hoàn thành công việc đúng giờ, cô ấy có thể đến buổi hòa nhạc)</li>
+    <li>If she exercises regularly, she will improve her health. (Nếu cô ấy tập thể dục thường xuyên, cô ấy sẽ cải thiện sức khỏe của mình)</li>
+  </ul>
+</section>
+`
 }
 
 // function GetFakeData(): MultipleChoiceQuestion[] {

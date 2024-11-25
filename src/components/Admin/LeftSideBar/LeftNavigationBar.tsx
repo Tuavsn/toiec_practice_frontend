@@ -10,7 +10,7 @@ export default function LeftNavigationBar() {
             label: 'Thống kê',
             items: [
                 { label: 'Thống kê bài làm', icon: 'pi pi-chart-pie', command: () => navigate('/dashboard/test-analyst') },
-                { label: 'Thống kê tài khoản', icon: 'pi pi-users', command: () => navigate('/dashboard/user-analyst') },
+                // { label: 'Thống kê tài khoản', icon: 'pi pi-users', command: () => navigate('/dashboard/user-analyst') },
             ]
         },
         {
@@ -20,11 +20,17 @@ export default function LeftNavigationBar() {
             ]
         },
         {
+            label: 'Quản lý bài giảng',
+            items: [
+                { label: 'Quản lý bài giảng', icon: 'pi pi-folder', command: () => navigate('/dashboard/lecture') },
+            ]
+        },
+        {
             label: 'Quản lý người dùng',
             items: [
                 { label: 'Quản lý tài khoản', icon: 'pi pi-user', command: () => navigate('/dashboard/account') },
-                { label: 'Gửi thông báo', icon: 'pi pi-bell', command: () => navigate('/dashboard/notify') },
-                { label: 'Quản lý chatbox', icon: 'pi pi-inbox', command: () => navigate('/dashboard/chat') },
+                // { label: 'Gửi thông báo', icon: 'pi pi-bell', command: () => navigate('/dashboard/notify') },
+                // { label: 'Quản lý chatbox', icon: 'pi pi-inbox', command: () => navigate('/dashboard/chat') },
             ]
         },
     ];

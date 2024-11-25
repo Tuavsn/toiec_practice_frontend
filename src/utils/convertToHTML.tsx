@@ -117,7 +117,7 @@ export function ConvertThisPracticeQuestionToHTML(
         <div className="flex xl:flex-row lg:flex-row flex-wrap md:flex-row sm:flex-row justify-content-between p-5 gap-4 custom-scrollpanel w-full px-0 py-0 text-sm">
             <ScrollPanel
                 className="flex-1 custombar1 border-round m-2 shadow-2"
-                style={{ minHeight: '50px', overflowY: 'auto', minWidth: '400px', maxHeight: '100%' }}
+                style={{ minHeight: '50px', minWidth: '400px' }}
             >
                 {resourcesElement}
             </ScrollPanel>
@@ -128,8 +128,8 @@ export function ConvertThisPracticeQuestionToHTML(
                     {paginator}
                 </div>
                 <ScrollPanel
-                    className="custombar1 border-round m-2 shadow-2 pl-2"
-                    style={{ minHeight: '50px', overflowY: 'auto', maxHeight: '400px', flex: '1 1 auto' }}
+                    className="custombar1 border-round m-2 shadow-2 pl-2 text-xs"
+                    style={{ minHeight: '50px', overflowY: 'auto', maxHeight: '800px', flex: '1 1 auto' }}
                 >
                     {questionsElement}
                 </ScrollPanel>
@@ -289,7 +289,7 @@ function UserAnswerToHTML(question: QuestionDetailRecord, questionNum: number): 
 function PracticeAnswerToHTML(question: PracticeQuestion, userAnswer: string, updateUserAnswerSheet: (qID: QuestionID, answer: string) => void) {
     const answerTexts: string[] = (question.type === 'ABCD') ? ['A', 'B', 'C', 'D'] : question.answers;
     return (
-        <div key={"panswer" + question.id} className={"flex flex-column gap-3 mb-3 pb-7"}>
+        <div key={"panswer" + question.id} className={"flex flex-column gap-3"}>
             {question.answers.map((answer, index) => {
                 let colorBackground = '';
                 if (userAnswer && answer === question.correctAnswer) {
@@ -299,10 +299,10 @@ function PracticeAnswerToHTML(question: PracticeQuestion, userAnswer: string, up
                 }
 
                 return (
-                    <div key={"answerbox" + index} className={"flex align-items-center py-3 " + colorBackground}>
+                    <div key={"answerbox" + index} className={"flex align-items-center " + colorBackground}>
                         <input
                             key={index + "radio" + question.id}
-                            style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }}
+                            style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative' }}
                             type="radio"
                             id={"id" + question.id + index}
                             name={`answer-${question.id}`}

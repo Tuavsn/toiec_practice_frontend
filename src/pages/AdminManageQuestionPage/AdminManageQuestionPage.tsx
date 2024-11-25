@@ -3,7 +3,7 @@ import { Card } from 'primereact/card';
 import { Toolbar } from 'primereact/toolbar';
 import React, { memo } from 'react';
 import { useQuestion } from '../../hooks/QuestionHook';
-import { DialogForQuestionPage } from './DialogRelate';
+import { DialogForQuestionPage } from './DialogQuestionRelate';
 import QuestionTreeTable from './TableQuestion';
 import { CustomBreadCrumb } from '../../components/Common/Index';
 

@@ -23,8 +23,8 @@ function DoTestPage() {
         changePage,
         timeDoTest,
         onEndTest,
+        startTest,
         isOnTest,
-        setStart,
         testType,
         start,
     } = useTestPage();
@@ -73,7 +73,7 @@ function DoTestPage() {
                             // bắt đầu tính giờ đếm số giây đã trôi qua
                             timeDoTest.current = Date.now();
                             // mở giao diện làm bài
-                            setStart(true)
+                            startTest();
                         }} />
                     </span>
                 </div>
