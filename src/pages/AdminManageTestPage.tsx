@@ -15,6 +15,8 @@ import { useDataTable } from '../hooks/GenericDataTableHook';
 import { CategoryID, Name_ID, TestRow } from '../utils/types/type';
 import SplitNameIDFromURL from '../utils/splitNameIDFromURL';
 import { emptyTestRow } from '../utils/types/emptyValue';
+import { callPostTest } from '../api/api';
+import { InputNumber } from 'primereact/inputnumber';
 
 export function AdminManageTestPage() {
     const { category_name_id = "no idCategory found" } = useParams<{ category_name_id: Name_ID<CategoryID> }>();
@@ -49,9 +51,9 @@ export function AdminManageTestPage() {
         handleOnPage
     } = useDataTable<TestRow>(`categories/${category_id}/tests`, emptyTest
         , (state) => ({
-            saveRow: () => {
+            saveRow: async () => {
                 state.setSubmitted(true);
-                if (state.row.format.trim()) {
+                if (state.row.name.trim()) {
                     const _rows = [...state.rows];
                     const _row = { ...state.row };
 
@@ -59,12 +61,18 @@ export function AdminManageTestPage() {
                         const index = _rows.findIndex(item => item.id === state.row.id)
 
                         _rows[index] = _row;
+
                         state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Updated', life: 3000 });
                     } else {
                         (_row as any).id = crypto.randomUUID();
+                        const error = await callPostTest(_row);
+                        if (error) {
+                            state.toast.current?.show({ severity: 'error', summary: 'Lỗi', detail: 'Tạo thất bại', life: 3000 });
 
-                        _rows.push(_row);
-                        state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
+                        } else {
+                            _rows.push(_row);
+                            state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
+                        }
                     }
 
                     state.setRows(_rows);
@@ -167,8 +175,16 @@ function dialogBody(row: TestRow, setRow: (value: React.SetStateAction<TestRow>)
                 autoFocus
                 className={classNames({ 'p-invalid': submitted && !row.name })}
             />
-            {submitted && !row.email && <small className="p-error">format is required.</small>}
-        </div>
+
+            <label htmlFor="totalQuestion" className="font-bold block mb-2">Số câu hỏi</label>
+            <InputNumber inputId="totalQuestion" value={row.totalQuestion} onChange={(e) => onInputChange(e, 'totalQuestion')} />
+            <label htmlFor="limitTime" className="font-bold block mb-2">Thời gian làm bài</label>
+            <InputNumber inputId="limitTime" value={row.limitTime} onChange={(e) => onInputChange(e, 'limitTime')} />
+            <label htmlFor="totalScore" className="font-bold block mb-2">Điểm tối đa</label>
+            <InputNumber inputId="totalScore" value={row.totalScore} onChange={(e) => onInputChange(e, 'totalScore')} />
+
+            {submitted && !row.name && <small className="p-error">name is required.</small>}
+        </div >
 
     )
 }

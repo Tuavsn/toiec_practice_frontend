@@ -400,6 +400,12 @@ export type EditTextParams = {
   button: React.MutableRefObject<HTMLButtonElement>,
   text: React.MutableRefObject<string>
 }
+export type handeSaveLectureParams = {
+  toast: React.MutableRefObject<Toast | null>,
+  lectureID: LectureID,
+  title: string,
+  topicIds: TopicID[]
+}
 export type AdminLectureTableProps = {
   lectures: LectureRow[],
   dispatch: Dispatch<LectureHookAction>,

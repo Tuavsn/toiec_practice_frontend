@@ -82,7 +82,7 @@ export function useQuestionTable() {
 }
 
 // Hàm chuyển đổi danh sách QuestionRow thành danh sách TreeNode
-function ConvertQuestionRowListToTreeNodeList(QuestionRowList: QuestionRow[]): TreeNode[] {
+export function ConvertQuestionRowListToTreeNodeList(QuestionRowList: QuestionRow[]): TreeNode[] {
     
     // Duyệt qua từng QuestionRow trong danh sách và chuyển đổi thành TreeNode
     const questionNodeList = QuestionRowList.map((questionRow): TreeNode => {

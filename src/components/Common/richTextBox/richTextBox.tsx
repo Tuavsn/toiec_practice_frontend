@@ -9,11 +9,12 @@ export default function EditCourseRichTextBox(props: { lectureID: LectureID }) {
         text,
         button,
         EditText,
+        isLoading,
         onSaveText,
     } = useRichTextBox(props.lectureID);
-    return (
+    return (!isLoading &&
         <div className="card">
-            <Editor value={text.current} style={{height:"70vh"}}
+            <Editor value={text.current} style={{ height: "70vh" }}
                 headerTemplate={<RenderHeader button={button} text={text} saveText={onSaveText} />}
                 onTextChange={(e) => EditText({ e, button, text })} />
         </div>

@@ -1,13 +1,14 @@
 
 import { Card } from 'primereact/card';
+import { Toolbar } from 'primereact/toolbar';
 import React, { memo } from 'react';
-import { CustomBreadCrumb } from '../../components/Common/Index';
 import { useQuestion } from '../../hooks/QuestionHook';
-import { DialogForQuestionPage } from './DialogQuestionRelate';
-import QuestionTreeTable from './TableQuestion';
+import { CustomBreadCrumb } from '../../components/Common/Index';
+import QuestionTreeTable from './TableAssignment';
+import { DialogForQuestionPage } from './DialogAssignmentRelate';
 
 // Hàm xuất trang quản lý câu hỏi của Admin
-export function AdminManageQuestionPage() {
+export function AdminManageAssignmentPage() {
 
 
     // Sử dụng hook useQuestion để lấy các dữ liệu liên quan như:
@@ -26,6 +27,10 @@ export function AdminManageQuestionPage() {
                 <CustomBreadCrumb />
                 <Card className="my-2">
                     <div key={'a'}>
+                        <div className="card pb-5">
+                            {/* Thanh công cụ hiển thị tiêu đề */}
+                            <Toolbar start={<h1>Danh sách câu hỏi</h1>} />
+                        </div>
 
                         {/* Hiển thị bảng cây chứa các câu hỏi có phân trang */}
                         <QuestionTreeTable
@@ -56,4 +61,4 @@ export function AdminManageQuestionPage() {
     )
 }
 
-export default memo(AdminManageQuestionPage);
+export default memo(AdminManageAssignmentPage);

@@ -4,9 +4,9 @@ import { Paginator } from 'primereact/paginator';
 import { Tag } from 'primereact/tag';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { callGetPracticePaper } from '../api/api';
 import { ConvertThisPracticeQuestionToHTML } from '../utils/convertToHTML';
 import { ApiResponse, LectureID, PracticeAnswerSheet, PracticePaper, PracticeQuestion, QuestionID } from '../utils/types/type';
-import { callGetPracticePaper } from '../api/api';
 
 
 // Component chi tiết khóa học

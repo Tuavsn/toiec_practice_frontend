@@ -1,14 +1,25 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "../context/ToastProvider";
 import { EditTextParams, LectureID, SaveTextParams } from "../utils/types/type";
-import { callPostDoctrine } from "../api/api";
+import { callGetLectureDoctrine, callPostDoctrine } from "../api/api";
 
 export default function useRichTextBox(lectureID: LectureID) {
     const text = useRef<string>("");
     const button = useRef<HTMLButtonElement>(null!);
     const { toast } = useToast();
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     useEffect(() => {
-        text.current = "<p>á à</p>"
+        async function fetchDoctrine() {
+            const [result, error] = await callGetLectureDoctrine(lectureID);
+            if (error) {
+                toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Lỗi khi tải dữ liệu" });
+            }
+            if (result) {
+                text.current = result;
+            }
+            setIsLoading(false);
+        }
+        fetchDoctrine();
     }, [])
     const onSaveText = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>, text: React.MutableRefObject<string>) => {
         SaveText({ e, text, lectureID, toast });
@@ -16,8 +27,9 @@ export default function useRichTextBox(lectureID: LectureID) {
     return {
         text,
         button,
+        EditText,
+        isLoading,
         onSaveText,
-        EditText
     };
 }
 
