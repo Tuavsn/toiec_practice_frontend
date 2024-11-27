@@ -1,66 +1,54 @@
 
 import { Button } from "primereact/button";
-import { CategoryLabel, TestCard } from "../utils/types/type";
-import { useState } from "react";
 import { Card } from "primereact/card";
 import { Paginator } from "primereact/paginator";
-import { useNavigate } from "react-router-dom";
+import { useTestCard } from "../hooks/TestCardHook";
 
 export default function TestPage() {
-    const navigate = useNavigate();
-    const [currentIndex, setCurrentIndex] = useState<number>(-1);
-    const [currentYear, setCurrentYear] = useState<number>(0);
-    const allTestCards: TestCard[] = GetFakeData();
-    const categoryLabel: CategoryLabel[] = GetLabel();
-    const [first, setFirst] = useState(0);
-    const [rows] = useState(4); // Number of courses per page
-    const currentTestCards = allTestCards.slice(first, first + rows);
+
+    const {
+        currentFormatIndex,
+        categoryLabels,
+        setCurrentYear,
+        totalItemsRef,
+        setNewFormat,
+        onPageChange,
+        currentYear,
+        testCards,
+        pageIndex,
+        navigate,
+    } = useTestCard();
     return (
         <main className="pt-8">
             <h1>Thư viện đề thi</h1>
             <nav className="my-4">
-                <Button className="m-1" key={"card all"} label="Tất cả"
-                    severity={(currentIndex === -1 ? "info" : 'secondary')} rounded
-                    onClick={
-                        () => {
-                            setCurrentIndex(-1);
-                            alert("nhảy qua trang cate tổng")
-                        }
-                    } />
-
                 {
-                    categoryLabel.map((category, index) =>
+                    categoryLabels.map((category, index) =>
 
                         <Button className="m-1" key={"card" + index} label={category.format}
                             severity={
-                                currentIndex !== -1 && categoryLabel[currentIndex].format === category.format
+                                categoryLabels[currentFormatIndex].format === category.format
                                     ? 'info'
                                     : 'secondary'
                             }
-
                             rounded
-                            onClick={
-                                () => {
-                                    setCurrentIndex(index);
-                                    alert("nhảy qua trang cate=" + category.format)
-                                }
+                            onClick={() => setNewFormat(index)
                             } />
                     )
                 }
             </nav>
-            {currentIndex !== -1 &&
+            {
                 <nav>
                     <Button key={"year all"} className="m-1" label="Tất cả"
                         severity={(currentYear === 0 ? "info" : 'secondary')} text raised />
                     {
-                        categoryLabel[currentIndex].year.map((year, index) =>
+                        categoryLabels[currentFormatIndex].year.map((year, index) =>
 
                             <Button className="m-1" key={"year" + index} label={year.toString()}
                                 severity={(currentYear === year ? "info" : 'secondary')} text raised
                                 onClick={
                                     () => {
                                         setCurrentYear(year);
-                                        alert("nhảy qua trang cate=" + year)
                                     }
                                 } />
                         )
@@ -68,10 +56,10 @@ export default function TestPage() {
                 </nav>
             }
 
-            <div className="flex flex-wrap row-gap-4 align-items-stretch mt-4" >
-                {currentTestCards.map((testCard,index) => (
+            <div className="flex flex-wrap row-gap-4 justify-content-center align-items-stretch mt-4" >
+                {testCards.map((testCard, index) => (
 
-                    <Card style={{ flex: "1 1 0px" }} key={testCard.id+ index} title={<p className="text-center">{testCard.name}</p>} className="flex align-items-left justify-content-center border-round m-2 shadow-2 min-h-full">
+                    <Card style={{ flex: '1 1 20%', minWidth: "300px", maxWidth: "20%", height: "100%" }} key={testCard.id + index} title={<p className="text-center">{testCard.name}</p>} className="flex align-items-left justify-content-center border-round m-2 shadow-2 min-h-full">
                         <div>
                             <p>
                                 <strong>Format:</strong> {testCard.format}
@@ -79,133 +67,22 @@ export default function TestPage() {
                             <p>
                                 <strong>Năm:</strong> {testCard.year}
                             </p>
+                            <div className="flex justify-content-center">
 
-                            <Button label="View Details" onClick={() => navigate(`/test/${testCard.id}`)} />
+                                <Button label="View Details" onClick={() => navigate(`/test/${testCard.id}`)} />
+                            </div>
                         </div>
                     </Card>
 
                 ))}
             </div>
             <Paginator
-                first={first}
-                rows={rows}
-                totalRecords={10}
-                onPageChange={(e) => {
-                    setFirst(e.first);
-                }}
+                first={pageIndex * 4}
+                rows={4}
+                totalRecords={totalItemsRef.current}
+                onPageChange={onPageChange}
             />
         </main>
     );
 }
 
-
-function GetLabel(): CategoryLabel[] {
-    return [
-        {
-            format: "Video",
-            year: [2020, 2021, 2022, 2023],
-        },
-        {
-            format: "Audio",
-            year: [2018, 2019, 2021, 2023],
-        },
-        {
-            format: "PDF",
-            year: [2019, 2020, 2023],
-        },
-        {
-            format: "E-book",
-            year: [2021, 2022],
-        },
-        {
-            format: "Webinar",
-            year: [2020, 2023, 2024],
-        },
-        {
-            format: "Interactive Course",
-            year: [2021, 2022, 2023],
-        },
-        {
-            format: "Article",
-            year: [2018, 2019, 2020, 2021],
-        },
-        {
-            format: "Tutorial",
-            year: [2017, 2019, 2021, 2023],
-        },
-        {
-            format: "Podcast",
-            year: [2020, 2022, 2023],
-        },
-        {
-            format: "Workshop",
-            year: [2021, 2022, 2023, 2024],
-        },
-    ];
-
-}
-
-function GetFakeData(): TestCard[] {
-    return [
-        {
-            id: "671a25094dbe5f4c165c31dc",
-            format: "Video",
-            year: 2023,
-            name: 'đề',
-        },
-        {
-            id: "671a25094dbe5f4c165c31dc",
-            format: "Audio",
-            year: 2022,
-            name: 'đề',
-        },
-        {
-            id: "671a25094dbe5f4c165c31dc",
-            format: "PDF",
-            year: 2024,
-            name: 'đề',
-        },
-        {
-            id: "671a25094dbe5f4c165c31dc",
-            format: "E-book",
-            year: 2021,
-            name: 'đề',
-        },
-        {
-            id: "671a25094dbe5f4c165c31dc",
-            format: "Webinar",
-            year: 2023,
-            name: 'đề',
-        },
-        {
-            id: "671a25094dbe5f4c165c31dc",
-            format: "Interactive Course",
-            year: 2024,
-            name: 'đề',
-        },
-        {
-            id: "671a25094dbe5f4c165c31dc",
-            format: "Article",
-            year: 2020,
-            name: 'đề',
-        },
-        {
-            id: "671a25094dbe5f4c165c31dc",
-            format: "Tutorial",
-            year: 2023,
-            name: 'đề',
-        },
-        {
-            id: "671a25094dbe5f4c165c31dc",
-            format: "Podcast",
-            year: 2022,
-            name: 'đề',
-        },
-        {
-            id: "671a25094dbe5f4c165c31dc",
-            format: "Workshop",
-            year: 2024,
-            name: 'đề',
-        },
-    ];
-}

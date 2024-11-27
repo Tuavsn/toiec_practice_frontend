@@ -1,22 +1,21 @@
-import { Card } from "primereact/card";
 import { Tag } from "primereact/tag";
+import React from "react";
+import { Link } from "react-router-dom";
 import formatDate from "../../../utils/formatDateToString";
 import { UserResultRow } from "../../../utils/types/type";
-import { Link } from "react-router-dom";
-import React from "react";
 
 export function timeStampBodyTemplate<Model extends { createdAt: Date, updatedAt: Date }>(rowData: Model) {
     return (
-        <Card className="flex align-items-center justify-content-start p-0">
-            <div className="flex align-items-center">
+        <div className="p-0">
+            <div className="flex align-items-center justify-content-center text-center">
                 <i className="pi pi-calendar-plus mr-2" style={{ color: 'slateblue' }}></i>
                 {formatDate(rowData.createdAt)}
             </div>
-            <div className="flex align-items-center">
+            <div className="flex align-items-center justify-content-center text-center">
                 <i className="pi pi-pencil mr-2" style={{ color: 'red' }}></i>
                 {formatDate(rowData.updatedAt)}
             </div>
-        </Card>
+        </div>
 
 
     );

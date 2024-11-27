@@ -14,24 +14,15 @@ import { SimpleToolBar } from '../components/Common/ToolBar/ToolBar';
 import { useDataTable } from '../hooks/GenericDataTableHook';
 import { CategoryID, Name_ID, TestRow } from '../utils/types/type';
 import SplitNameIDFromURL from '../utils/splitNameIDFromURL';
+import { emptyTestRow } from '../utils/types/emptyValue';
+import { callPostTest } from '../api/api';
+import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
 
 export function AdminManageTestPage() {
     const { category_name_id = "no idCategory found" } = useParams<{ category_name_id: Name_ID<CategoryID> }>();
     const [, category_id] = SplitNameIDFromURL(category_name_id);
 
-    const emptyTest: TestRow = {
-        id: '',
-        name: '',
-        isActive: true,
-        idCategory: category_id,
-        totalTestAttempt: 0,
-        totalQuestion: 0,
-        totalScore: 0,
-        limitTime: 0,
-        totalUserAttempt: 0,
-        createdAt: new Date(),
-        updatedAt: new Date()
-    }
+    const emptyTest = emptyTestRow(category_id);
 
     const {
         row, setRow, rows,
@@ -60,9 +51,9 @@ export function AdminManageTestPage() {
         handleOnPage
     } = useDataTable<TestRow>(`categories/${category_id}/tests`, emptyTest
         , (state) => ({
-            saveRow: () => {
+            saveRow: async () => {
                 state.setSubmitted(true);
-                if (state.row.format.trim()) {
+                if (state.row.name.trim()) {
                     const _rows = [...state.rows];
                     const _row = { ...state.row };
 
@@ -70,12 +61,19 @@ export function AdminManageTestPage() {
                         const index = _rows.findIndex(item => item.id === state.row.id)
 
                         _rows[index] = _row;
+
                         state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Updated', life: 3000 });
+                        state.setTotalRecords((pre: number) => pre + 1)
                     } else {
                         (_row as any).id = crypto.randomUUID();
+                        const error = await callPostTest(_row);
+                        if (error) {
+                            state.toast.current?.show({ severity: 'error', summary: 'Lỗi', detail: 'Tạo thất bại', life: 3000 });
 
-                        _rows.push(_row);
-                        state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
+                        } else {
+                            _rows.push(_row);
+                            state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
+                        }
                     }
 
                     state.setRows(_rows);
@@ -158,8 +156,16 @@ function questionsBodyTemplate(rowData: TestRow) {
 //------------------------for dialog-------------------------------------
 
 function dialogBody(row: TestRow, setRow: (value: React.SetStateAction<TestRow>) => void, submitted: boolean) {
-    const onInputChange = (e: any, field: keyof TestRow) => {
-        const value = e.target.value ?? ''; // Ensuring fallback to an empty string if value is undefined
+    const onInputTextChange = (e: any, field: keyof TestRow) => {
+        const value = e.target.value === null ? '' : e.target.value; // Handle text input
+        setRow((prevRow) => ({
+            ...prevRow,
+            [field]: value
+        }));
+    };
+
+    const onInputNumberChange = (e: InputNumberValueChangeEvent, field: keyof TestRow) => {
+        const value = e.value === null ? 0 : e.value; // Handle number input, default to 0 if null
         setRow((prevRow) => ({
             ...prevRow,
             [field]: value
@@ -173,12 +179,34 @@ function dialogBody(row: TestRow, setRow: (value: React.SetStateAction<TestRow>)
             <InputText
                 id="name"
                 value={row.name}
-                onChange={(e) => onInputChange(e, 'name')}
+                onChange={(e) => onInputTextChange(e, 'name')}
                 required
                 autoFocus
                 className={classNames({ 'p-invalid': submitted && !row.name })}
             />
-            {submitted && !row.email && <small className="p-error">format is required.</small>}
+
+            <label htmlFor="totalQuestion" className="font-bold block mb-2">Số câu hỏi</label>
+            <InputNumber
+                inputId="totalQuestion"
+                value={row.totalQuestion}
+                onValueChange={(e) => onInputNumberChange(e, 'totalQuestion')}
+            />
+
+            <label htmlFor="limitTime" className="font-bold block mb-2">Thời gian làm bài</label>
+            <InputNumber
+                inputId="limitTime"
+                value={row.limitTime}
+                onValueChange={(e) => onInputNumberChange(e, 'limitTime')}
+            />
+
+            <label htmlFor="totalScore" className="font-bold block mb-2">Điểm tối đa</label>
+            <InputNumber
+                inputId="totalScore"
+                value={row.totalScore}
+                onValueChange={(e) => onInputNumberChange(e, 'totalScore')}
+            />
+
+            {submitted && !row.name && <small className="p-error">name is required.</small>}
         </div>
 
     )

@@ -15,6 +15,7 @@ import { Stepper, StepperRefAttributes } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
 import { SelectButton } from "primereact/selectbutton";
 import { Paginator } from "primereact/paginator";
+import convertSecondsToString from "../utils/convertSecondsToString";
 // Đăng ký các phần tử Chart.js cần thiết
 ChartJS.register(...registerables);
 // Đăng ký plugin DataLabels
@@ -199,7 +200,7 @@ const ActivityLog: React.FC = React.memo(
             <Column key="col-answer_count" header="thống kê" body={CountAnswerTypeTemplate} sortable filter />,
 
             // Cột thời gian làm bài, lấy dữ liệu từ trường totalTime và cho phép sắp xếp
-            <Column key="col-time" field="totalTime" header="Thời gian làm" sortable filter />,
+            <Column key="col-time" field="totalTime" header="Thời gian làm" body={(data)=>convertSecondsToString(data.totalTime)} sortable filter />,
 
             // Cột loại bài kiểm tra, dùng template UserResultTemplate để hiển thị thông tin loại
             <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} />,

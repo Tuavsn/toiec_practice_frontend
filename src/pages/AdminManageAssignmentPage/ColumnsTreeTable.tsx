@@ -15,9 +15,6 @@ export function RenderColumnsForTable(setContextDialogBody: React.Dispatch<React
         /* Cột hiển thị loại câu hỏi, cho phép mở rộng */
         < Column key="col-type" headerClassName='text-center' field="type" header="Loại" body={ExpandTypeBodyTemplate} expander />,
 
-        /* Cột hiển thị số thứ tự câu hỏi */
-        < Column key="col-qNum" bodyClassName="text-center" headerClassName='text-center' field="questionNum" header="Câu số" />,
-
         /* Cột hiển thị độ khó */
         < Column key="col-difficulty" bodyClassName="text-center" headerClassName='text-center' field='difficulty' header="Độ khó" />,
 
@@ -139,7 +136,7 @@ function ConvertTopicsToSimpleTable(topics: Topic[]): JSX.Element {
 function ConvertContextToSimpleTable(questionContext: QuestionContext): JSX.Element {
 
     return ( // Bao bọc nội dung trong một section với kiểu layout flex
-        <section className='flex flex-wrap gap-3'>  
+        <section className='flex flex-wrap gap-3'> 
             {
                 questionContext.ask &&                 // Kiểm tra nếu có câu hỏi (ask) Hiển thị câu hỏi trong div với border và padding
                 <div className='border-solid p-2'>

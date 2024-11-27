@@ -6,9 +6,9 @@ const UserProfilePage = React.lazy(() => import("./UserProfilePage"));
 const TestPage = React.lazy(() => import("./TestPage"));
 const TestDetailPage = React.lazy(() => import("./TestDetailPage"));
 const TestReviewPage = React.lazy(() => import("./TestReviewPage"));
-const CoursePage = React.lazy(() => import("./CoursePage"));
+const LecturePage = React.lazy(() => import("./LecturePage"));
 const NotFoundPage = React.lazy(() => import("./NotFoundPage"));
-const CourseDetailsPage = React.lazy(() => import("./CourseDetailsPage"));
+const LectureDetailsPage = React.lazy(() => import("./LectureDetailsPage"));
 const LookUpPage = React.lazy(() => import("./LookUpPage"));
 const DoTestPage = React.lazy(() => import("./DoTestPage"));
 const ExercisePage = React.lazy(() => import("./ExercisePage"))
@@ -19,9 +19,9 @@ export {
     TestPage,
     TestDetailPage,
     TestReviewPage,
-    CoursePage,
+    LecturePage,
     NotFoundPage,
-    CourseDetailsPage,
+    LectureDetailsPage,
     LookUpPage,
     DoTestPage,
     ExercisePage,

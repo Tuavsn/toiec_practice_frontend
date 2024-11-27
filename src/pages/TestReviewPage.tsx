@@ -12,7 +12,7 @@ export default function TestReviewPage() {
         <main className="pt-8 w-full family-font">
             <Card title={`Kết quả thi: ${overallDetail.type} phần ${overallDetail.parts}`}>
                 <section className="flex flex-wrap justify-content-around gap-3">
-                    <table className="bg-gray-300 p-2 border-round-md flex-1">
+                    <table className="bg-gray-300 p-2 border-round-md flex-1 shadow-4">
                         <tbody>
                             <tr>
                                 <td>Kết quả làm bài:</td>
@@ -51,7 +51,7 @@ export default function TestReviewPage() {
                             overallDetail.userAnswers.map((userAnswer, index) => {
 
                                 return (
-                                    <div className="flex-1 align-center shadow-7 p-4" style={{ minWidth: "50vh", maxWidth:"50vh" }} key={index}>
+                                    <div className="flex-1 align-center shadow-7 p-4" style={{minWidth:"33%"}} key={index}>
                                         <Badge className="mr-2" value={index + 1} />
                                         <div className="pt-2 pl-4">{ConcatLineFromUserAnswerAndIcon(userAnswer.answer, userAnswer.correct)}</div>
                                     </div>

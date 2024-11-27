@@ -51,27 +51,6 @@ export function useDataTable<Model extends DataTableValue>(
     const saveRow = (async () => {
         setSubmitted(true);
         toast.current?.show({ severity: 'success', summary: 'Cần quá tải hàm saveRow', detail: 'Row Updated', life: 3000 });
-        // if (row.name.trim()) {
-        //     let _rows = [...rows];
-        //     let _row = { ...row };
-
-        //     if (row.id) {
-        //         const index = findIndexById(row.id);
-
-        //         _rows[index] = _row;
-        //         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Updated', life: 3000 });
-        //     } else {
-        //         (_row as any).id = createId();
-
-        //         _rows.push(_row);
-        //         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
-        //     }
-
-        //     setRows(_rows);
-        //     console.log(_rows);
-        //     setRowDialog(false);
-        //     setRow(defaultValues);
-        // }
     });
 
     // Fetch data from server

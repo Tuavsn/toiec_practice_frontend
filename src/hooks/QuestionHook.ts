@@ -2,9 +2,10 @@ import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { TreeNode } from "primereact/treenode";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { callGetQuestionRows, callGetTopics } from "../api/api";
-import { Name_ID, QuestionID, QuestionRow, TestID, Topic } from "../utils/types/type";
+import { callGetQuestionRows } from "../api/api";
 import SplitNameIDFromURL from "../utils/splitNameIDFromURL";
+import { Name_ID, QuestionID, QuestionRow, TestID } from "../utils/types/type";
+import useTopicRef from "./TopicHook";
 
 export function useQuestion() {
 
@@ -37,7 +38,7 @@ export function useQuestionTable() {
     const [nodes, setNodes]                         = useState<TreeNode[]>([]); // Lưu dữ liệu câu hỏi dạng TreeNode
     const [title, setTitle]                         = useState<string>("Xóa");  // Tiêu đề của Dialog
     const totalItems                                = useRef<number>(0);        // Lưu tổng số mục, không gây render lại
-    const topics                                    = useRef<Topic[]>([]);      // Lưu danh sách chủ đề
+    const topics                                    = useTopicRef();            // Lưu danh sách chủ đề
 
     // === Hàm lấy dữ liệu câu hỏi theo trang ===
     const fetchQuestionByPage = useCallback(async (pageIndex: number) => {
@@ -52,17 +53,12 @@ export function useQuestionTable() {
 
         // Cập nhật lại trang hiện tại
         setCurrentPageIndex(pageIndex);
-    }, []); // Hàm fetchQuestionByPage sẽ được tạo lại khi testID thay đổi
+    }, []); 
 
     // === useEffect để gọi fetchQuestionByPage khi khởi tạo ===
-    useEffect(() => {
-        const getAllTopic = async () => {
-            const responseData = await callGetTopics();
-            topics.current = responseData.data; // Lưu chủ đề vào ref topics
-        }
-        fetchQuestionByPage(0); // Gọi hàm fetch dữ liệu câu hỏi lần đầu
-        getAllTopic(); // Gọi hàm lấy tất cả chủ đề
-    }, []);
+    useEffect(() => {fetchQuestionByPage(0)}, []); // Gọi hàm fetch dữ liệu câu hỏi lần đầu
+
+
 
     // === Hàm xử lý thay đổi trang ===
     const onPageChange = useCallback(async (event: PaginatorPageChangeEvent) => {
@@ -86,7 +82,7 @@ export function useQuestionTable() {
 }
 
 // Hàm chuyển đổi danh sách QuestionRow thành danh sách TreeNode
-function ConvertQuestionRowListToTreeNodeList(QuestionRowList: QuestionRow[]): TreeNode[] {
+export function ConvertQuestionRowListToTreeNodeList(QuestionRowList: QuestionRow[]): TreeNode[] {
     
     // Duyệt qua từng QuestionRow trong danh sách và chuyển đổi thành TreeNode
     const questionNodeList = QuestionRowList.map((questionRow): TreeNode => {

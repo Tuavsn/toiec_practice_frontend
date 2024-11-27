@@ -20,7 +20,7 @@ export function useMultipleQuestion() {
     // State để kiểm soát trạng thái bắt đầu bài thi
     const [start, setStart] = useState<boolean>(false);
     // Ref dùng để ghi lại thời gian
-    const lastTimeStampRef = useRef(Date.now());
+    const lastTimeStampRef = useRef<number>(0);
     // thời gian người dùng đã tốn 
     const timeDoTest = useRef<number>(0);
     const timeSpentListRef = useRef<UserAnswerTimeCounter>(new Map<QuestionNumber, milisecond>());
@@ -37,7 +37,10 @@ export function useMultipleQuestion() {
         }
     }, [currentPageIndex, questionList.length]);
 
-
+    const startTest = () =>{
+        setStart(true);
+        timeDoTest.current = lastTimeStampRef.current = Date.now();
+    }
 
     // Hàm cập nhật câu trả lời của người dùng
     const setTestAnswerSheet = (qNum: QuestionNumber, qID: QuestionID, answer: string) => {
@@ -105,8 +108,8 @@ export function useMultipleQuestion() {
         pageMapper,
         changePage,
         timeDoTest,
+        startTest,
         isOnTest,
-        setStart,
         navigate,
         start,
     }
