@@ -39,7 +39,7 @@ export default function UserRoutes() {
                 <Route path="/test/:id/review" element={<TestReviewPage />} />
                 {/* Course Page */}
                 <Route path="/lecture" element={<LecturePage />} />
-                <Route path="/lectures/:id" element={<LectureDetailsPage />} />F
+                <Route path="/lectures/:lecture_name_id" element={<LectureDetailsPage />} />F
                 {/* Exercise page */}
                 <Route path="/exercise" element={<ExercisePage />} />
                 {/* Do Exercise  Page */}

@@ -16,7 +16,7 @@ export interface Lecture extends DataTableValue {
   topic: string[];
   format: string;
   difficulty: number;
-  doctrine: Doctrine;
+  content: string;
   assignment: Assignment;
   isActive: boolean;
   createdAt: Date;
@@ -213,7 +213,7 @@ export interface TestRow extends DataTableValue {
   totalScore: number;
   idCategory: string;
   limitTime: number;
-  isActive: boolean;
+  active: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,4 +1,4 @@
-import { ApiResponse, CategoryLabel, CategoryRow, ExerciseType, LectureCard, LectureID, PracticePaper, QuestionRow, ResultID, TableData, Test, TestCard, TestID, TestPaper, TestRecord, TestResultSummary, TestRow, Topic, TopicID, UpdateQuestionForm } from "../utils/types/type";
+import { ApiResponse, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureRow, PracticePaper, QuestionRow, ResultID, TableData, Test, TestCard, TestID, TestPaper, TestRecord, TestResultSummary, TestRow, Topic, TopicID, UpdateQuestionForm } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -128,7 +128,15 @@ export const callPostDoctrine = async (lectureId: LectureID, htmlContent: string
         return "Lỗi";
     }
 }
-
+export const callGetLectureRow = async (pageNumber: number): Promise<TableData<LectureRow> | Error> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<LectureRow>>>(`https://api.trinhhoctuan.io.vn/api/v1/lectures?info=true&current=${pageNumber + 1}&pageSize=99`);
+        // Assuming `response` is a string in this example:
+        return response.data.data;
+    } catch (error) {
+        return (error as Error)
+    }
+}
 export const callPutLectureDetailUpdate = async (lectureID: LectureID, title: string, topicIds: TopicID[]): Promise<boolean> => {
     try {
         await axios.put<ApiResponse<any>>(`${import.meta.env.VITE_API_URL}/lectures`, {
@@ -143,7 +151,7 @@ export const callPutLectureDetailUpdate = async (lectureID: LectureID, title: st
 }
 
 export const callPostLectureDetail = async (title: string, topicIds: TopicID[]): Promise<boolean> => {
-    try {
+    try {//https://api.trinhhoctuan.io.vn/api/v1/lectures
         await axios.post<ApiResponse<any>>(`${import.meta.env.VITE_API_URL}/lectures`, {
             title,
             topicIds
@@ -155,16 +163,13 @@ export const callPostLectureDetail = async (title: string, topicIds: TopicID[]):
 }
 
 
-export const callGetLectureDoctrine = async (lectureID: LectureID): Promise<string> => {
+export const callGetLectureDoctrine = async (lectureID: LectureID): Promise<string | Error> => {
     try {
-        const responseCall = await fetch(`https://raw.githubusercontent.com/Tuavsn/toiec_practice_frontend/refs/heads/fix-route-bug/test.json?lecture=${lectureID}`)
-        const response = await responseCall.json();
-        console.log(response);
-
-        // const response = await axios.get<ApiResponse<string>>(`${import.meta.env.VITE_API_URL}/lecture/doctrine/${lectureID}`);
-        return response.data;
+        const response = await axios.get<ApiResponse<Lecture>>(`https://api.trinhhoctuan.io.vn/api/v1/lectures/${lectureID}?content=true`);
+        // Assuming `response` is a string in this example:
+        return response.data.data.content;
     } catch (error) {
-        return (error as Error).message;
+        return (error as Error);
     }
 }
 

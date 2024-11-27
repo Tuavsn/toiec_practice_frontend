@@ -13,7 +13,7 @@ export function AdminManageUploadQuestionPage() {
     const [, test_id] = SplitNameIDFromURL(test_name_id);
     const { toast } = useToast()
     const handleFileUpload = async (event: FileUploadHandlerEvent) => {
-        
+
         const files: File[] = event.files; // Get all selected files
         const excelFiles: File[] = [];
         const resourceFiles: File[] = [];
@@ -26,11 +26,12 @@ export function AdminManageUploadQuestionPage() {
                 resourceFiles.push(file); // Assume other files are resources
             }
         });
-        const [excelError, resourceError] = await Promise.all([
-            callPostImportExcel(test_id, excelFiles),
-            callPostImportResource(resourceFiles),
-        ])
-        if (excelError || resourceError) {
+        // const [excelError, resourceError] = await Promise.all([
+        //     callPostImportExcel(test_id, excelFiles),
+        //     callPostImportResource(resourceFiles),
+        // ])
+        const excelError = await callPostImportExcel(test_id, excelFiles);
+        if (excelError) {
             toast.current?.show({ severity: "error", summary: "Tải câu hỏi", detail: "Lỗi tải lên thất bại!" });
             return;
         }

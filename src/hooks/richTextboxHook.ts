@@ -4,20 +4,20 @@ import { EditTextParams, LectureID, SaveTextParams } from "../utils/types/type";
 import { callGetLectureDoctrine, callPostDoctrine } from "../api/api";
 
 export default function useRichTextBox(lectureID: LectureID) {
-    const text = useRef<string>("");
+    const text = useRef<string>("<p>á</p>");
     const button = useRef<HTMLButtonElement>(null!);
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState<boolean>(true);
     useEffect(() => {
         async function fetchDoctrine() {
-            const [result, error] = await callGetLectureDoctrine(lectureID);
-            if (error) {
-                toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Lỗi khi tải dữ liệu" });
+            const result = await callGetLectureDoctrine(lectureID);
+            if (result instanceof Error) {
+                toast.current?.show({ severity: "error", summary: "Lỗi khi tải dữ liệu", detail: result.message });
+                return;
             }
-            if (result) {
                 text.current = result;
-            }
-            setIsLoading(false);
+                setIsLoading(false);
+            
         }
         fetchDoctrine();
     }, [])

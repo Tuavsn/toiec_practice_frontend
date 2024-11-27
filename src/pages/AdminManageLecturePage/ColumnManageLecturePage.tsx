@@ -16,7 +16,7 @@ export function RenderAdminLectureColumns(dispatch: Dispatch<LectureHookAction>)
 
         <Column key="col-timestamp"/*                                  */ header="Thời gian"/*  */ filter/*           */ sortable/*         */ headerClassName="justify-content-center"/*     */ style={{ width: "9rem" }}/*                                        */ body={timeStampBodyTemplate} />,
 
-        <Column key="col-active"/*           */ field="isActive"/*    */ header="Hoạt động"/*    */ filter/*          */ sortable/*                                                           */ style={{ width: "5rem" }}/*     */ bodyClassName="text-center"/*   */ body={(data) => statusBodyTemplate({ active: data.isActive })} />,
+        <Column key="col-active"/*           */ field="active"/*       */ header="Hoạt động"/*    */ filter/*          */ sortable/*                                                           */ style={{ width: "5rem" }}/*     */ bodyClassName="text-center"/*   */ body={statusBodyTemplate} />,
 
         <Column key="col-action"/*                                    */ header={() => AddNew(dispatch)}/*                                    */ headerClassName='flex justify-content-end'/*                                                                                      */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedLecture={data} />} />
     ];

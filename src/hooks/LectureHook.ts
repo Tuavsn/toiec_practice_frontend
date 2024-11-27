@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useReducer } from "react";
 import { initialLectureState } from "../utils/types/emptyValue";
 import { LectureHookAction, LectureHookState } from "../utils/types/type";
+import { callGetLectureRow } from "../api/api";
+import { useToast } from "../context/ToastProvider";
 
 
 const reducer = (state: LectureHookState, action: LectureHookAction): LectureHookState => {
@@ -28,19 +30,16 @@ const reducer = (state: LectureHookState, action: LectureHookAction): LectureHoo
 
 export default function useLecture() {
     const [state, dispatch] = useReducer(reducer, initialLectureState);
-
+    const { toast } = useToast();
     const fetchLectures = useCallback(async (pageNumber: number) => {
-        try {
-            const response = await fetch(`https://dummyjson.com/c/41e4-b615-4556-a191?page=${pageNumber}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch courses');
-            }
-            const data = await response.json();
-            dispatch({ type: "FETCH_LECTURE_SUCCESS", payload: data });
-        } catch (err) {
-            console.error("không tải được khóa");
 
+        const response = await callGetLectureRow(pageNumber);
+        if (response instanceof Error) {
+            toast.current?.show({ severity: "error", summary: "Lỗi tải dữ liệu", detail: response.message });
+            return;
         }
+        dispatch({ type: "FETCH_LECTURE_SUCCESS", payload: response.result });
+
     }, [])
     useEffect(() => {
 

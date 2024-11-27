@@ -1,14 +1,14 @@
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
+import { IconField } from "primereact/iconfield";
+import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Paginator } from "primereact/paginator";
 import { useEffect, useReducer, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { LectureCard } from "../utils/types/type";
-import { callGetLectureCards } from "../api/api";
+import { callGetLectureRow } from "../api/api";
 import { LoadingSpinner } from "../components/Common/Index";
-import { InputIcon } from "primereact/inputicon";
-import { IconField } from "primereact/iconfield";
+import { LectureRow, Topic } from "../utils/types/type";
 
 export default function CoursePage() {
 
@@ -19,13 +19,13 @@ export default function CoursePage() {
 
     useEffect(() => {
         const fetchLectures = async (pageIndex: number) => {
-            try {
-                const response = await callGetLectureCards(pageIndex);
-                totalItemsRef.current = response.data.meta.totalItems;
-                dispatch({ type: "FETCH_SUCCESS", payload: response.data.result });
-            } catch (error) {
-                console.error("lỗi " + error)
-            }
+            
+                const response = await callGetLectureRow(pageIndex);
+                if(response instanceof Error){
+                    return;
+                }
+                totalItemsRef.current = response.meta.totalItems;
+                dispatch({ type: "FETCH_SUCCESS", payload: response.result });
         }
         fetchLectures(state.currentPageIndex);
     }, [state.currentPageIndex])
@@ -53,9 +53,9 @@ export default function CoursePage() {
                     <Card key={lecture.id} title={lecture.name} className="border-round m-2 shadow-2 min-h-full bg-yellow-50 hover:shadow-4">
                         <div>
                             <p className="pb-5">
-                                <strong>Nội dung:</strong> {lecture.topic.join(', ')}
+                                <strong>Nội dung:</strong> {getTopicName(lecture.topic)}
                             </p>
-                            <Button severity="help" label="Học ngay" onClick={() => navigate(`/lectures/${lecture.id}`)} />
+                            <Button severity="help" label="Học ngay" onClick={() => navigate(`/lectures/${lecture.name}___${lecture.id}`)} />
                         </div>
                     </Card>
 
@@ -72,13 +72,13 @@ export default function CoursePage() {
 };
 
 interface State {
-    lectures: LectureCard[],
+    lectures: LectureRow[],
     currentPageIndex: number,
 
 }
 
 type Action =
-    | { type: 'FETCH_SUCCESS'; payload: LectureCard[] }
+    | { type: 'FETCH_SUCCESS'; payload: LectureRow[] }
     | { type: 'SET_PAGE'; payload: number }
 
 const initialState: State = {
@@ -95,4 +95,8 @@ const reducer = (state: State, action: Action): State => {
         default:
             return state;
     }
+}
+
+function getTopicName(topics:Topic[]): string{
+    return topics.map(t=>t.name).join(" ,")
 }

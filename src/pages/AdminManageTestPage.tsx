@@ -16,7 +16,7 @@ import { CategoryID, Name_ID, TestRow } from '../utils/types/type';
 import SplitNameIDFromURL from '../utils/splitNameIDFromURL';
 import { emptyTestRow } from '../utils/types/emptyValue';
 import { callPostTest } from '../api/api';
-import { InputNumber } from 'primereact/inputnumber';
+import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
 
 export function AdminManageTestPage() {
     const { category_name_id = "no idCategory found" } = useParams<{ category_name_id: Name_ID<CategoryID> }>();
@@ -63,6 +63,7 @@ export function AdminManageTestPage() {
                         _rows[index] = _row;
 
                         state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Updated', life: 3000 });
+                        state.setTotalRecords((pre: number) => pre + 1)
                     } else {
                         (_row as any).id = crypto.randomUUID();
                         const error = await callPostTest(_row);
@@ -155,8 +156,16 @@ function questionsBodyTemplate(rowData: TestRow) {
 //------------------------for dialog-------------------------------------
 
 function dialogBody(row: TestRow, setRow: (value: React.SetStateAction<TestRow>) => void, submitted: boolean) {
-    const onInputChange = (e: any, field: keyof TestRow) => {
-        const value = e.target.value ?? ''; // Ensuring fallback to an empty string if value is undefined
+    const onInputTextChange = (e: any, field: keyof TestRow) => {
+        const value = e.target.value === null ? '' : e.target.value; // Handle text input
+        setRow((prevRow) => ({
+            ...prevRow,
+            [field]: value
+        }));
+    };
+
+    const onInputNumberChange = (e: InputNumberValueChangeEvent, field: keyof TestRow) => {
+        const value = e.value === null ? 0 : e.value; // Handle number input, default to 0 if null
         setRow((prevRow) => ({
             ...prevRow,
             [field]: value
@@ -170,21 +179,35 @@ function dialogBody(row: TestRow, setRow: (value: React.SetStateAction<TestRow>)
             <InputText
                 id="name"
                 value={row.name}
-                onChange={(e) => onInputChange(e, 'name')}
+                onChange={(e) => onInputTextChange(e, 'name')}
                 required
                 autoFocus
                 className={classNames({ 'p-invalid': submitted && !row.name })}
             />
 
             <label htmlFor="totalQuestion" className="font-bold block mb-2">Số câu hỏi</label>
-            <InputNumber inputId="totalQuestion" value={row.totalQuestion} onChange={(e) => onInputChange(e, 'totalQuestion')} />
+            <InputNumber
+                inputId="totalQuestion"
+                value={row.totalQuestion}
+                onValueChange={(e) => onInputNumberChange(e, 'totalQuestion')}
+            />
+
             <label htmlFor="limitTime" className="font-bold block mb-2">Thời gian làm bài</label>
-            <InputNumber inputId="limitTime" value={row.limitTime} onChange={(e) => onInputChange(e, 'limitTime')} />
+            <InputNumber
+                inputId="limitTime"
+                value={row.limitTime}
+                onValueChange={(e) => onInputNumberChange(e, 'limitTime')}
+            />
+
             <label htmlFor="totalScore" className="font-bold block mb-2">Điểm tối đa</label>
-            <InputNumber inputId="totalScore" value={row.totalScore} onChange={(e) => onInputChange(e, 'totalScore')} />
+            <InputNumber
+                inputId="totalScore"
+                value={row.totalScore}
+                onValueChange={(e) => onInputNumberChange(e, 'totalScore')}
+            />
 
             {submitted && !row.name && <small className="p-error">name is required.</small>}
-        </div >
+        </div>
 
     )
 }

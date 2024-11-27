@@ -47,12 +47,12 @@ export function emptyTestRow(category_id: CategoryID): TestRow {
     return {
         id: '',
         name: '',
-        isActive: true,
+        active: true,
         idCategory: category_id,
         totalTestAttempt: 0,
-        totalQuestion: 0,
-        totalScore: 0,
-        limitTime: 0,
+        totalQuestion: 200,
+        totalScore: 990,
+        limitTime: 90,
         totalUserAttempt: 0,
         createdAt: new Date(),
         updatedAt: new Date()
