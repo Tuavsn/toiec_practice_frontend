@@ -1,66 +1,33 @@
-import { Card } from "primereact/card";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionDetailRecord, QuestionID, QuestionNumber, QuestionPage, Resource, TestAnswerSheet, TestType } from "./types/type";
-import { Image } from 'primereact/image';
 import { Accordion, AccordionTab } from "primereact/accordion";
-import React from "react";
-import { ScrollPanel } from "primereact/scrollpanel";
+import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
-
-export function ConvertTestRecordToHTML(questionRecords: QuestionDetailRecord[]): [JSX.Element[], JSX.Element[], number[], boolean[]] {
-    const resoursesSection: JSX.Element[] = [];
-    const questionsSection: JSX.Element[] = [];
-    const mappingQuestionsWithPage: number[] = []
-    const isCorrect: boolean[] = [];
-    let questionNum: number = 0;
-    let page = 0;
-    for (const quest of questionRecords) {
-        const resoursesElement: JSX.Element[] = [];
-        const questionsElement: JSX.Element[] = [];
-        resoursesElement.push(...ResourcesToHTML(quest.resources, questionNum));
-        if (quest.type !== 'group') {
-
-            questionNum += 1;
-            isCorrect.push(quest.correctAnswer === quest.userAnswer);
-            mappingQuestionsWithPage.push(page);
-
-            questionsElement.push(
-                <h5 key={"h5" + questionNum} > {questionNum}.{quest.content} </h5>
-            );
-            questionsElement.push(UserAnswerToHTML(quest, questionNum));
-        }
-        else {
-            questionsElement.push(<h3 key={"group" + questionNum} > {quest.content} </h3>);
-            for (const subQuest of quest.subQuestions) {
-
-                questionNum += 1;
-                isCorrect.push(subQuest.correctAnswer === subQuest.userAnswer);
-                mappingQuestionsWithPage.push(page);
-
-                questionsElement.push(<h5 key={"h5" + questionNum} > {questionNum}.{subQuest.content} </h5>);
-                resoursesElement.push(...ResourcesToHTML(subQuest.resources, questionNum));
-                questionsElement.push(UserAnswerToHTML(subQuest, questionNum));
-            }
-        }
-        questionsSection.push(
-            <section className="px-3 pt-3 pb-8" key={"questionsSection" + questionNum} >
-                {questionsElement}
-            </section>
-        );
-        resoursesSection.push(
-            <section key={"resouresSection" + questionNum} className="pt-3 pb-8" >
-                {resoursesElement}
-            </section>
-        );
-        page += 1;
-    }
-    return [resoursesSection, questionsSection, mappingQuestionsWithPage, isCorrect];
-}
+import { Image } from 'primereact/image';
+import { ScrollPanel } from "primereact/scrollpanel";
+import React from "react";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord } from "./types/type";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
     const questionPages = [];
     for (const q of questionList) {
         if (q.subQuestions.length) {
             for (const sq of q.subQuestions) {
+                questionPages.push({ questionNum: sq.questionNum, page: pageNum } as QuestionPage)
+            }
+        }
+        else {
+            questionPages.push({ questionNum: q.questionNum, page: pageNum } as QuestionPage)
+        }
+        pageNum += 1;
+    }
+    return questionPages;
+}
+
+export function MappingPageWithQuestionNumReview(questionList: TestReviewAnswerSheet): QuestionPage[] {
+    let pageNum = 0;
+    const questionPages = [];
+    for (const q of questionList) {
+        if (q.subUserAnswer.length) {
+            for (const sq of q.subUserAnswer) {
                 questionPages.push({ questionNum: sq.questionNum, page: pageNum } as QuestionPage)
             }
         }
@@ -234,11 +201,11 @@ function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, testTy
 //     }
 // }
 
-function UserAnswerToHTML(question: QuestionDetailRecord, questionNum: number): JSX.Element {
+function UserAnswerToHTML(question: UserAnswerRecord): JSX.Element {
 
 
     return (
-        <div key={"answer" + questionNum} className="flex flex-column gap-3 my-3">
+        <div key={"answer" + question.questionNum} className="flex flex-column gap-3 my-3">
             {question.answers.map((answer, index) => {
                 let colorBackground = '';
                 if (answer === question.correctAnswer) {
@@ -252,13 +219,13 @@ function UserAnswerToHTML(question: QuestionDetailRecord, questionNum: number): 
                         <input
                             style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }}
                             type="radio"
-                            id={"id" + questionNum + index} // Unique ID for each radio button
-                            name={`answer-${questionNum}`}   // Use a unique name for grouping per question
+                            id={"id" + question.questionNum + index} // Unique ID for each radio button
+                            name={`answer-${question.questionNum}`}   // Use a unique name for grouping per question
                             value={answer}            // Value of the radio button
                             readOnly
                             checked={question.userAnswer === answer}
                         />
-                        <label htmlFor={"id" + questionNum + index} style={{ marginLeft: '8px' }}>
+                        <label htmlFor={"id" + question.questionNum + index} style={{ marginLeft: '8px' }}>
                             {answer}
                         </label>
                     </div>
@@ -347,6 +314,56 @@ function PracticeAnswerToHTML(question: PracticeQuestion, userAnswer: string, up
             }
         </div>
     );
+}
+
+export function ConvertUserAnswerRecordToHTML(question: UserAnswerRecord): [JSX.Element[], JSX.Element[]] {
+    
+    // Mảng để chứa các tài nguyên của câu hỏi
+    const resoursesElement: JSX.Element[] = [];
+
+    // Mảng để chứa các phần tử HTML của câu hỏi
+    const questionsElement: JSX.Element[] = [];
+
+    // Nếu câu hỏi có tài nguyên đi kèm (hình ảnh, audio,...)
+    if (question.resources) {
+        resoursesElement.push(...ResourcesToHTML(question.resources, question.questionNum));
+    }
+
+    // Nếu câu hỏi có các câu hỏi con (subQuestions)
+    if (question.subUserAnswer.length) {
+        // Thêm tiêu đề câu hỏi nhóm
+        questionsElement.push(<h3 key={"group" + question.questionNum} > {question.content} </h3>);
+
+        // Duyệt qua từng câu hỏi con
+        for (const subq of question.subUserAnswer) {
+            // Thêm nội dung từng câu hỏi con
+            questionsElement.push(<h5 key={"h5" + subq.questionNum} > {subq.questionNum}.{subq.content} </h5>);
+
+            // Nếu câu hỏi con có tài nguyên, thêm chúng vào
+            resoursesElement.push(...ResourcesToHTML(subq.resources, subq.questionNum));
+
+            // Xây dựng phần tử HTML cho từng câu hỏi con
+            questionsElement.push(
+                UserAnswerToHTML(subq)
+            );
+        }
+    } else {
+        // Nếu là câu hỏi đơn lẻ, thêm nội dung câu hỏi
+        questionsElement.push(
+            <h5 key={"h5" + question.questionNum} > {question.questionNum}.{question.content} </h5>
+        );
+
+        // Xây dựng phần tử HTML cho câu hỏi
+        questionsElement.push(
+            UserAnswerToHTML(question)
+        );
+    }
+
+    // Trả về hai mảng JSX: mảng tài nguyên và mảng câu hỏi
+    return [
+        resoursesElement,
+        questionsElement
+    ]
 }
 
 // Hàm chuyển đổi câu hỏi trắc nghiệm thành HTML

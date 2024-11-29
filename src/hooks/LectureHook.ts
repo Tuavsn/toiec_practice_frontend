@@ -1,16 +1,19 @@
-import { useCallback, useEffect, useReducer } from "react";
-import { initialLectureState } from "../utils/types/emptyValue";
-import { LectureHookAction, LectureHookState } from "../utils/types/type";
+import { PaginatorPageChangeEvent } from "primereact/paginator";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 import { callGetLectureRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
+import { initialLectureState } from "../utils/types/emptyValue";
+import { LectureHookAction, LectureHookState } from "../utils/types/type";
 
 
 const reducer = (state: LectureHookState, action: LectureHookAction): LectureHookState => {
     switch (action.type) {
         case 'FETCH_LECTURE_SUCCESS':
-            return { ...state, lectures: action.payload }
+            return { ...state, lectures: action.payload.lectures, currentPageIndex: action.payload.pageIndex }
         case 'SET_PAGE':
             return { ...state, currentPageIndex: action.payload }
+        case 'REFRESH_DATA':
+            return { ...state, isRefresh: !state.isRefresh }
         case 'TOGGLE_DIALOG':
             return { ...state, job: action.payload }
         case 'OPEN_UPDATE_DIALOG':
@@ -30,6 +33,7 @@ const reducer = (state: LectureHookState, action: LectureHookAction): LectureHoo
 
 export default function useLecture() {
     const [state, dispatch] = useReducer(reducer, initialLectureState);
+    const totalItems = useRef(0);
     const { toast } = useToast();
     const fetchLectures = useCallback(async (pageNumber: number) => {
 
@@ -38,19 +42,24 @@ export default function useLecture() {
             toast.current?.show({ severity: "error", summary: "Lỗi tải dữ liệu", detail: response.message });
             return;
         }
-        dispatch({ type: "FETCH_LECTURE_SUCCESS", payload: response.result });
+        dispatch({ type: "FETCH_LECTURE_SUCCESS", payload: { lectures: response.result, pageIndex: pageNumber } });
+        totalItems.current = response.meta.totalItems;
 
     }, [])
     useEffect(() => {
 
         fetchLectures(state.currentPageIndex);
 
-    }, [state.currentPageIndex]);
+    }, [state.isRefresh]);
 
-
+    const onPageChange = (e: PaginatorPageChangeEvent) => {
+        fetchLectures(e.page)
+    }
 
     return {
         state,
         dispatch,
+        totalItems,
+        onPageChange,
     }
 }

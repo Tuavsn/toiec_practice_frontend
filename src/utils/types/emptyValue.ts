@@ -1,11 +1,12 @@
-import { CategoryID, CategoryRow, LectureHookState, LectureRow, TestResultSummary, TestRow, UserRow } from "./type";
-
+import { UserHookState, CategoryID, CategoryRow, LectureHookState, LectureRow, TestResultSummary, TestReviewHookState, TestRow, UserRow } from "./type";
+const emptyDate = new Date(0, 0, 0);
+Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
     id: "",
     name: "",
     topic: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: emptyDate,
+    updatedAt: emptyDate,
     active: false
 } as const
 
@@ -30,16 +31,16 @@ export const emptyUserRow: UserRow = {
     roleName: "",
     target: 0,
     isActive: false,
-    createdAt: new Date(),
-    updatedAt: new Date()
+    createdAt: emptyDate,
+    updatedAt: emptyDate
 } as const
 
 export const emptyCategoryRow: CategoryRow = {
     id: "",
     format: "vô danh",
     year: 2020,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: emptyDate,
+    updatedAt: emptyDate,
     active: true
 } as const;
 
@@ -54,14 +55,30 @@ export function emptyTestRow(category_id: CategoryID): TestRow {
         totalScore: 990,
         limitTime: 90,
         totalUserAttempt: 0,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: emptyDate,
+        updatedAt: emptyDate
     } as const
 }
 
 export const initialLectureState: LectureHookState = {
+    job: "",
     lectures: [],
+    isRefresh: true,
+    currentPageIndex: 0,
+    currentSelectedLecture: emptyLectureRowValue
+} as const
+
+export const initialTestReviewState: TestReviewHookState = {
+    isUserAnswerSheetVisible: false,
+    testReviewAnswerSheet: [],
+    currentPageIndex: 0,
+    pageMapper: []
+} as const
+
+export const initialUserState: UserHookState = {
+    users: [],
+    isRefresh: false,
     currentPageIndex: 0,
     job: "",
-    currentSelectedLecture: emptyLectureRowValue
+    currentSelectedUser: emptyUserRow
 } as const

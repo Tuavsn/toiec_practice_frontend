@@ -41,8 +41,7 @@ export function useTestCard() {
             try {
                 const responseData = await callGetCategoryLabel();
                 setCategoryLabels(responseData.data);
-                console.log("first",responseData.data[0].format);
-                
+
                 // Lấy dữ liệu  cho nhãn và năm mặc định
                 await fetchTestCardByPage(responseData.data[0].format, 0, 0);
             } catch (error) {
@@ -54,8 +53,7 @@ export function useTestCard() {
 
     // === Xử lý thay đổi chỉ số trang từ sự kiện phân trang ===
     const onPageChange = useCallback((event: PaginatorPageChangeEvent) => {
-        console.log("onPage");
-        
+
         const newPageIndex = event.page;
         // Cập nhật chỉ số trang và gọi lại dữ liệu
         setPageIndex(newPageIndex);
@@ -63,8 +61,7 @@ export function useTestCard() {
 
     // === Tự động gọi lại khi thay đổi format, năm hoặc chỉ số trang hiện tại ===
     useEffect(() => {
-        console.log("use effect call");
-        
+
         if (categoryLabels[0].format != "NOT_FOUND") {
             // Gọi API khi format, năm hoặc trang thay đổi, nhưng không thay đổi pageIndex
             fetchTestCardByPage(categoryLabels[currentFormatIndex].format, currentYear, pageIndex);

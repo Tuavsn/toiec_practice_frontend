@@ -47,3 +47,16 @@ h6,
     font-family: var(--font-family);
 }
 
+.test-resouce {
+    min-height: 50px;
+    overflow-y: auto;
+    min-width: 600px;
+    max-height: 700px;
+}
+
+.test-quest {
+    min-height: 50px;
+    overflow-y: auto;
+    max-height: 700px;
+    flex: 1 1 auto
+}

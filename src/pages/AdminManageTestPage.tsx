@@ -63,16 +63,16 @@ export function AdminManageTestPage() {
                         _rows[index] = _row;
 
                         state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Updated', life: 3000 });
-                        state.setTotalRecords((pre: number) => pre + 1)
+                        
                     } else {
-                        (_row as any).id = crypto.randomUUID();
-                        const error = await callPostTest(_row);
-                        if (error) {
+                        const result = await callPostTest(_row);
+                        if (result instanceof Error) {
                             state.toast.current?.show({ severity: 'error', summary: 'Lỗi', detail: 'Tạo thất bại', life: 3000 });
 
                         } else {
-                            _rows.push(_row);
+                            _rows.push(result);
                             state.toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Created', life: 3000 });
+                            state.setTotalRecords((pre: number) => pre + 1)
                         }
                     }
 

@@ -5,7 +5,7 @@ import { UserResultRow } from "../utils/types/type";
 import { memo } from "react";
 import formatDate from "../utils/formatDateToString";
 import { Checkbox } from "primereact/checkbox";
-import { useCheckBox } from "../hooks/TestDetailPapeHook";
+import { useCheckBox } from "../hooks/TestDetailPaperHook";
 import { Chip } from "primereact/chip";
 import { Button } from "primereact/button";
 import { detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";

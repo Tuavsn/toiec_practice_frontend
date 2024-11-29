@@ -1,15 +1,15 @@
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Fieldset } from "primereact/fieldset";
-import useTopicRef from "../../hooks/TopicHook";
-import React, { useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { MultiSelect } from "primereact/multiselect";
-import { useToast } from "../../context/ToastProvider";
-import { emptyLectureRowValue } from "../../utils/types/emptyValue";
-import { callPostLectureDetail, callPutLectureDetailUpdate } from "../../api/api";
+import React, { useRef, useState } from "react";
+import { callDeleteLecture, callPostLectureDetail, callPutLectureDetailUpdate } from "../../api/api";
 import EditCourseRichTextBox from "../../components/Common/richTextBox/richTextBox";
-import { DialogLectureBodyProps, DialogLectureProps, handeSaveLectureParams, RenderLectureDialogParams, Topic, TopicID } from "../../utils/types/type";
+import { useToast } from "../../context/ToastProvider";
+import useTopicRef from "../../hooks/TopicHook";
+import { emptyLectureRowValue } from "../../utils/types/emptyValue";
+import { DialogDeleteLectureBodyProps, DialogLectureProps, DialogUpdateLectureBodyProps, handeDeleteLectureParams, handeSaveLectureParams, RenderLectureDialogParams, Topic, TopicID } from "../../utils/types/type";
 
 
 
@@ -64,7 +64,7 @@ function RenderDialog(params: RenderLectureDialogParams): [string, JSX.Element] 
         case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa bài giảng" cùng với tên của bài giảng hiện tại và một thông báo xác nhận xóa
 
             return [`Xóa bài giảng ${params.currentSelectedLecture.name}`,
-            <h1 className='text-center'>Bạn có chắc muốn xóa</h1>
+            <RenderDeleteLectureBody currentSelectedLecture={params.currentSelectedLecture} dispatch={params.dispatch} />
             ];
         case "PAGE_DESIGNER"://------------------------------- Khi job là PAGE_DESIGNER, hiển thị tiêu đề "Viết bài giảng" và nội dung là EditCourseRichTextBox
 
@@ -99,12 +99,12 @@ function GetIDNameTopicPair(topicList: Topic[]) {
 
 
 
-const RenderUpdateLectureBody: React.FC<DialogLectureBodyProps> = React.memo(
+const RenderUpdateLectureBody: React.FC<DialogUpdateLectureBodyProps> = React.memo(
     (props) => {
         const inputRef = useRef<HTMLInputElement | null>(null);
         const [topicIds, setTopicIds] = useState<TopicID[]>(props.currentSelectedLecture.topic.map(t => t.id));
         const { toast } = useToast();
-        const title = useRef<string>( props.currentSelectedLecture.id ?"Sửa câu hỏi":"Thêm câu hỏi");
+        const title = useRef<string>(props.currentSelectedLecture.id ? "Sửa câu hỏi" : "Thêm câu hỏi");
         return (
             <Fieldset legend={title.current} >
                 <section className='flex flex-column gap-4 justify-content-space'>
@@ -129,7 +129,7 @@ const RenderUpdateLectureBody: React.FC<DialogLectureBodyProps> = React.memo(
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end">
-                    <Button label="Lưu" icon="pi pi-save" onClick={() => handleSave({ lectureID: props.currentSelectedLecture.id, title: inputRef.current?.value || "", toast, topicIds })} />
+                    <Button label="Lưu" icon="pi pi-save" onClick={() => handleSave({ lectureID: props.currentSelectedLecture.id, title: inputRef.current?.value || "", dispatch: props.dispatch, toast, topicIds })} />
                 </div>
 
             </Fieldset>
@@ -146,16 +146,54 @@ const RenderUpdateLectureBody: React.FC<DialogLectureBodyProps> = React.memo(
 
 // khi nhấn nút Lưu
 async function handleSave(params: handeSaveLectureParams) {
-    let error = false;
-    if(params.lectureID){
-        error = await callPutLectureDetailUpdate(params.lectureID, params.title, params.topicIds);
-    }else{
-        error = await callPostLectureDetail(params.title,params.topicIds);
+    let success = false;
+    if (params.lectureID) {
+        success = await callPutLectureDetailUpdate(params.lectureID, params.title, params.topicIds);
+    } else {
+        success = await callPostLectureDetail(params.title, params.topicIds);
     }
 
-    if (error) {
-        params.toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Sửa thất bại" });
+    if (success) {
+        params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
+        params.dispatch({ type: "REFRESH_DATA" });
     } else {
-        params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Sửa thành công" });
+        params.toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Sửa thất bại" });
+    }
+};
+
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+const RenderDeleteLectureBody: React.FC<DialogDeleteLectureBodyProps> = React.memo(
+    (props) => {
+        const { toast } = useToast();
+        return (
+            <React.Fragment>
+
+                <h1 className='text-center'>Bạn có chắc muốn xóa <q>{props.currentSelectedLecture.name}</q> ?</h1>
+                <div className="flex justify-content-end">
+                    <Button label="Xóa" icon="pi pi-save" onClick={() => handleDelete({ lectureID: props.currentSelectedLecture.id, dispatch: props.dispatch, toast })} />
+                </div>
+            </React.Fragment>
+        )
+    }
+)
+
+
+
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+// khi nhấn nút Xóa
+async function handleDelete(params: handeDeleteLectureParams) {
+    const success = await callDeleteLecture(params.lectureID);
+
+
+    if (success) {
+        params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Xóa thành công" });
+        params.dispatch({ type: "REFRESH_DATA" });
+    } else {
+        params.toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Xóa thất bại" });
     }
 };

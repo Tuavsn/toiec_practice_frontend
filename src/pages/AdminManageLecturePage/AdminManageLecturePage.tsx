@@ -2,6 +2,7 @@ import { memo } from "react";
 import useLecture from "../../hooks/LectureHook";
 import AdminLectureTable from "./AdminLectureTable";
 import { DialogLectureActionButton } from "./DialogLectureRelate";
+import { Paginator } from "primereact/paginator";
 
 // Hàm AdminManageLecturePage là một thành phần React hiển thị giao diện quản lý bài giảng
 function AdminManageLecturePage() {
@@ -10,6 +11,8 @@ function AdminManageLecturePage() {
     const {
         state,                  // Chứa trạng thái hiện tại của bài giảng
         dispatch,               // Hàm để gửi hành động cập nhật state
+        totalItems,             // tổng số bài giảng hiện có trong hệ thống
+        onPageChange            // nhảy tới trang khác
     } = useLecture();
 
     return (
@@ -26,8 +29,8 @@ function AdminManageLecturePage() {
                 dispatch={dispatch}                                     // Hàm dispatch để quản lý các hành động trong bảng
                 lectures={state.lectures}                               // Dữ liệu các bài giảng để hiển thị
             />
-            
-            {/* Paginator (phân trang) có thể được kích hoạt nếu cần */}
+
+            <Paginator first={state.currentPageIndex * 5} rows={5} totalRecords={totalItems.current} onPageChange={onPageChange} />
         </div>
     );
 }

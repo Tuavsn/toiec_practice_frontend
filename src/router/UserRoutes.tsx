@@ -1,21 +1,23 @@
 import { Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
 import { LoadingSpinner } from "../components/Common/Index";
+import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
 import {
+    TestOverallResultPage,
     LectureDetailsPage,
-    LecturePage,
-    DoExercisePage,
-    DoTestPage,
-    ExercisePage,
-    HomePage,
-    LookUpPage,
-    NotFoundPage,
+    UserProfilePage,
     TestDetailPage,
-    TestPage,
+    DoExercisePage,
     TestReviewPage,
-    UserProfilePage
+    NotFoundPage,
+    ExercisePage,
+    LecturePage,
+    DoTestPage,
+    LookUpPage,
+    HomePage,
+    TestPage,
 } from "../pages/Index";
+
 
 
 
@@ -36,7 +38,8 @@ export default function UserRoutes() {
                 {/* Do Test  Page */}
                 <Route path="/dotest/:id/:testType/:parts" element={<DoTestPage />} />
                 {/* Test Review Page */}
-                <Route path="/test/:id/review" element={<TestReviewPage />} />
+                <Route path="/test/:id/review" element={<TestOverallResultPage />} />
+                <Route path="/test/:id/review/detail" element={<TestReviewPage />} />
                 {/* Course Page */}
                 <Route path="/lecture" element={<LecturePage />} />
                 <Route path="/lectures/:lecture_name_id" element={<LectureDetailsPage />} />F
