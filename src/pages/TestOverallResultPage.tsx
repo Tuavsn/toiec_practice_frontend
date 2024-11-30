@@ -34,7 +34,7 @@ export default function TestOverallResultPage() {
                     </div>
                     <div className="shadow-4 p-3 text-center border-round-md flex-1">
                         ❌
-                        <p className="text-red-500">Trả lời đúng</p>
+                        <p className="text-red-500">Trả lời sai</p>
                         <h1>{overallDetail.totalIncorrectAnswer}</h1>
                         câu hỏi
                     </div>

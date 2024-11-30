@@ -7,9 +7,10 @@ import { InputText } from "primereact/inputtext"
 import { InputTextarea } from "primereact/inputtextarea"
 import { MultiSelect } from "primereact/multiselect"
 import React, { useState } from "react"
-import { callPutQuestionUpdate } from "../../api/api"
-import { DialogQuestionActionProps, DialogQuestionPageProps, Topic, UpdateQuestionDialogProps, UpdateQuestionForm } from "../../utils/types/type"
+import { callPostConvertResourceToLink, callPutQuestionUpdate } from "../../api/api"
 import { useToast } from "../../context/ToastProvider"
+import { DialogQuestionActionProps, DialogQuestionPageProps, Resource, ResourceIndex, Topic, UpdateQuestionDialogProps, UpdateQuestionForm } from "../../utils/types/type"
+import ResourceSection from "./ResourceSection"
 
 // Định nghĩa component DialogForQuestionPage sử dụng React.FC với React.memo để tối ưu hiệu suất
 export const DialogForQuestionPage: React.FC<DialogQuestionPageProps> = React.memo(
@@ -60,6 +61,7 @@ export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = R
 const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo(
     ({ currentSelectedQuestion, topicList, }) => {
         const { toast } = useToast();
+        const [resources, setResourses] = useState<ResourceIndex[]>((currentSelectedQuestion.current.data.resources as Resource[]).map((res, index) => ({ ...res, index, file: null })))
         const [formData, setFormData] = useState<UpdateQuestionForm>({
             listTopicIds: (currentSelectedQuestion.current.data.topic as Topic[]).map((t) => t.id),
             correctAnswer: currentSelectedQuestion.current.data.correctChoice as string,
@@ -83,6 +85,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
             // toast.current?.show({ severity: 'success', content: "Sửa thành công" });
             // callPutQuestionUpdate(formData);
             const updateQuestion = async () => {
+                await convertResourceFileToLink(resources);
                 const questionUpdatedResponse: any = await callPutQuestionUpdate(formData);
                 if (questionUpdatedResponse) {
                     if (questionUpdatedResponse.status == 200) {
@@ -221,12 +224,18 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                         />
                     </div>
                 </section>
+                <ResourceSection resourseIndexes={resources} setResourseIndexes={setResourses} />
                 {/* Save Button */}
-                <div className="field flex justify-content-end">
-                    <Button label="Lưu" icon="pi pi-save" onClick={handleSave} />
+                <div className="field flex justify-content-end mt-7">
+                    <Button className="p-5" label="Lưu" icon="pi pi-save" onClick={handleSave} />
                 </div>
 
             </Fieldset>
         );
     }
 )
+async function convertResourceFileToLink(resources: ResourceIndex[]) {
+    const a = await Promise.all(resources.map((r) => callPostConvertResourceToLink(r.file)))
+    console.dir(a);
+}
+

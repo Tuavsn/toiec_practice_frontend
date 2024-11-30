@@ -8,6 +8,7 @@ import { TreeNode } from "primereact/treenode";
 import React from "react";
 import { timeStampBodyTemplate } from "../../components/Common/Table/CommonColumn";
 import { QuestionActionButtonProps, QuestionContext, Resource, Topic } from "../../utils/types/type";
+import { emptyQuestionTreeNode } from "../../utils/types/emptyValue";
 
 
 export function RenderColumnsForTable(setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, topics: React.MutableRefObject<Topic[]>, setTitle: React.Dispatch<React.SetStateAction<string>>, setIsVisible: React.Dispatch<React.SetStateAction<boolean>>, currentSelectedQuestion: React.MutableRefObject<TreeNode>): JSX.Element[] {
@@ -29,9 +30,9 @@ export function RenderColumnsForTable(setContextDialogBody: React.Dispatch<React
 
         /* Cột hiển thị thời gian tạo và cập nhật */
         <Column key="col-time" bodyStyle={{ width: "220px" }} headerClassName='text-center' header="Thời gian" body={QuestionTimeStampBodyTemplate} />,
-        
+
         /* Cột hiển thị nút sửa và xóa */
-        <Column key="col-action" headerClassName='text-center' header="" body={(data) => <ActionBodyTemplate questionNode={data} setTitle={setTitle} setIsVisible={setIsVisible} topicList={topics} currentSelectedQuestion={currentSelectedQuestion} />} />,
+        <Column key="col-action" headerClassName='text-center' header={AddNew(setTitle, setIsVisible, currentSelectedQuestion)} body={(data) => <ActionBodyTemplate questionNode={data} setTitle={setTitle} setIsVisible={setIsVisible} topicList={topics} currentSelectedQuestion={currentSelectedQuestion} />} />,
     ]
 }
 
@@ -136,7 +137,7 @@ function ConvertTopicsToSimpleTable(topics: Topic[]): JSX.Element {
 function ConvertContextToSimpleTable(questionContext: QuestionContext): JSX.Element {
 
     return ( // Bao bọc nội dung trong một section với kiểu layout flex
-        <section className='flex flex-wrap gap-3'> 
+        <section className='flex flex-wrap gap-3'>
             {
                 questionContext.ask &&                 // Kiểm tra nếu có câu hỏi (ask) Hiển thị câu hỏi trong div với border và padding
                 <div className='border-solid p-2'>
@@ -171,4 +172,14 @@ function ConvertContextToSimpleTable(questionContext: QuestionContext): JSX.Elem
 
         </section>
     );
+}
+
+function AddNew(setTitle: React.Dispatch<React.SetStateAction<string>>, setIsVisible: React.Dispatch<React.SetStateAction<boolean>>, currentSelectedQuestion: React.MutableRefObject<TreeNode>) {
+    return (
+        <Button icon="pi pi-plus" rounded outlined severity="success" style={{ width: "50px", height: "50px" }} onClick={() => {
+            setTitle("Tạo");
+            setIsVisible(true);
+            currentSelectedQuestion.current = emptyQuestionTreeNode;
+        }} />
+    )
 }

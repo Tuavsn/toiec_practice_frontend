@@ -5,6 +5,7 @@ import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
 import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord } from "./types/type";
+import { Chip } from "primereact/chip";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
     const questionPages = [];
@@ -139,6 +140,41 @@ function ResourcesToHTML(resources: Resource[], qNum: number): JSX.Element[] {
     return resourcesElement;
 }
 
+
+export function ResourcesToReviewHTML(resources: Resource[]): JSX.Element[] {
+    if (!resources) {
+        return [<h1 key={"res_"}>Cố lên</h1>]
+    }
+    const resourcesElement: JSX.Element[] = [];
+    resources.forEach(
+        (r, index) => {
+            switch (r.type) {
+                case 'paragraph':
+                    resourcesElement.push(<Card key={"para" + index} style={{ borderStyle: 'dotted', borderColor: 'lavender' }} ><p >{r.content}</p></Card>)
+                    break;
+                case 'image':
+                    resourcesElement.push(
+                        <div key={"img" + index} className="p-3 text-center"> <Image src={r.content} width="100px" indicatorIcon={<i className="pi pi-search"></i>} alt="Image" preview loading='lazy' /> </div>
+                    )
+                    break;
+                case 'audio':
+                    resourcesElement.unshift(
+                        <audio key={"audio" + index.toString()} className='w-full' controls>
+                            <source src={r.content} type="audio/mpeg" />
+                            Your browser does not support the audio element.
+                        </audio>
+                    )
+                    break;
+                default:
+                    console.error("not have that: ", r.type);
+                    break;
+            }
+        }
+    )
+
+    return resourcesElement;
+}
+
 function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, testType: TestType, changePage: (offset: number) => void): JSX.Element[] {
     if (!resources) {
         return [<h1 key={"res_" + qNum}>Cố lên</h1>]
@@ -189,17 +225,49 @@ function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, testTy
     return resourcesElement;
 }
 
-// async function fetchResourceAsBlob(url: string): Promise<void> {
-//     try {
-//         const response = await fetch(url);
-//         if (!response.ok) {
-//             throw new Error(`Failed to fetch resource: ${url}`);
-//         }
-//         // trình duyệt đưa tài nguyên vào bộ nhớ đệm
-//     } catch (error) {
-//         console.error("Error fetching resource:", error);
-//     }
-// }
+export function ConvertTopicToHTML(question: UserAnswerRecord): JSX.Element {
+    const topicElement: JSX.Element[] =
+        question.listTopics.map((topic, index) => {
+            return (
+                <React.Fragment key={"topicquest_" + index}>
+                    <Chip key={"topicq_" + index} label={topic.name} />
+                    <p className="pl-6">&#8627;{topic.solution}</p>
+                </React.Fragment>
+            )
+        })
+    if (question.subUserAnswer.length) {
+        for (const subpq of question.subUserAnswer) {
+            topicElement.push(...subpq.listTopics.map((topic, index) => {
+                return (
+                    <React.Fragment key={"topicsquest_" + index}>
+                        <Chip key={"topicsq_" + index} label={topic.name} />
+                        <p className="pl-6">⎣{topic.solution}</p>
+                    </React.Fragment>
+                )
+            }))
+        }
+    }
+    return <>{topicElement}</>
+}
+
+export function ConvertSolutionToHTML(question: UserAnswerRecord): JSX.Element {
+
+    let start = question.questionNum;
+    const solutionElement: JSX.Element[] = []
+    if (question.solution && question.solution.trim()) {
+        solutionElement.push(<li>{question.solution}</li>)
+    }
+    const subQuestion = question.subUserAnswer;
+    if (subQuestion.length) {
+        start = subQuestion[0].questionNum;
+        for (const subpq of subQuestion) {
+            if (subpq.solution && subpq.solution.trim()) {
+                solutionElement.push(<li>{subpq.solution}</li>)
+            }
+        }
+    }
+    return <ol start={start}>{solutionElement}</ol>
+}
 
 function UserAnswerToHTML(question: UserAnswerRecord): JSX.Element {
 
@@ -317,7 +385,7 @@ function PracticeAnswerToHTML(question: PracticeQuestion, userAnswer: string, up
 }
 
 export function ConvertUserAnswerRecordToHTML(question: UserAnswerRecord): [JSX.Element[], JSX.Element[]] {
-    
+
     // Mảng để chứa các tài nguyên của câu hỏi
     const resoursesElement: JSX.Element[] = [];
 
@@ -337,7 +405,7 @@ export function ConvertUserAnswerRecordToHTML(question: UserAnswerRecord): [JSX.
         // Duyệt qua từng câu hỏi con
         for (const subq of question.subUserAnswer) {
             // Thêm nội dung từng câu hỏi con
-            questionsElement.push(<h5 key={"h5" + subq.questionNum} > {subq.questionNum}.{subq.content} </h5>);
+            questionsElement.push(<h5 key={"h5" + subq.questionNum} > {subq.questionNum}.{subq.content} ({subq.timeSpent} giây)</h5>);
 
             // Nếu câu hỏi con có tài nguyên, thêm chúng vào
             resoursesElement.push(...ResourcesToHTML(subq.resources, subq.questionNum));
@@ -350,7 +418,7 @@ export function ConvertUserAnswerRecordToHTML(question: UserAnswerRecord): [JSX.
     } else {
         // Nếu là câu hỏi đơn lẻ, thêm nội dung câu hỏi
         questionsElement.push(
-            <h5 key={"h5" + question.questionNum} > {question.questionNum}.{question.content} </h5>
+            <h5 key={"h5" + question.questionNum} > {question.questionNum}.{question.content} ({question.timeSpent} giây)</h5>
         );
 
         // Xây dựng phần tử HTML cho câu hỏi

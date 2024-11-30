@@ -87,9 +87,34 @@ export const callGetQuestionRows = async (testId: TestID, currentPageIndex: numb
     return response.data;
 }
 
-export const callPutQuestionUpdate = async (formData: UpdateQuestionForm) => {
-    const response = await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/questions`, formData);
-    return response;
+export const callPutQuestionUpdate = async (formData: UpdateQuestionForm): Promise<boolean> => {
+    try {
+        await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/questions`, formData);
+        return true;
+    } catch (error) {
+        return false;
+
+    }
+}
+
+export const callPutAssignmentQuestionUpdate = async (formData: any): Promise<boolean> => {
+    try {
+        await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/lectures/${formData.id}/savePractice`, formData);
+        return true;
+    } catch (error) {
+        return false;
+
+    }
+}
+
+export const callPostAssignmentQuestion = async (formData: any): Promise<boolean> => {
+    try {
+        await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/lectures/${formData.id}/savePractice`, formData);
+        return true;
+    } catch (error) {
+        return false;
+
+    }
 }
 
 export const callGetTopics = async (): Promise<ApiResponse<Topic[]>> => {
@@ -136,8 +161,13 @@ export const callGetPracticePaper = async (lectureId: LectureID): Promise<ApiRes
 export const callPostDoctrine = async (lectureId: LectureID, request: string): Promise<boolean> => {
     try {
         await axios.post(`${import.meta.env.VITE_API_URL}/lectures/${lectureId}/saveContent`,
-            request
-        )
+            request,
+            {
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+            }
+        );
         return true;
     } catch (e: unknown) {
         return false;
@@ -194,10 +224,9 @@ export const callDeleteLecture = async (lectureID: LectureID): Promise<boolean> 
     }
 }
 
-export const callGetAssignmentRows = async (lectureID: LectureID, currentPageIndex: number, pageSize: number = 5): Promise<ApiResponse<TableData<QuestionRow>>> => {
-    lectureID = "671a25094dbe5f4c165c31dc";
-    const response = await axios.get<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/tests/${lectureID}/questions?current=${currentPageIndex + 1}&pageSize=${pageSize}`)
-    return response.data;
+export const callGetAssignmentRows = async (lectureID: LectureID): Promise<QuestionRow[]> => {
+    const response = await axios.get<ApiResponse<Lecture>>(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}?PRACTICE=true`)
+    return response.data.data.practiceQuestions || [];
 }
 
 export const callPostImportExcel = async (testID: TestID, excelFiles: File[]): Promise<string> => {
@@ -218,7 +247,23 @@ export const callPostImportExcel = async (testID: TestID, excelFiles: File[]): P
         return (e as Error).message;
     }
 }
-
+export const callPostConvertResourceToLink = async (resourse: File | null): Promise<string> => {
+    try {
+        if (!resourse) {
+            return "";
+        }
+        const resourceFormData = new FormData();
+        resourceFormData.append("files", resourse);
+        const response = await axios.post<ApiResponse<string[]>>(`${import.meta.env.VITE_API_URL}/tests/resources/upload`, resourceFormData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
+            }
+        );
+        return response.data.data[0];
+    } catch (e) {
+        return "";
+    }
+}
 export const callPostImportResource = async (resourceFiles: File[]): Promise<string> => {
     try {
         if (resourceFiles.length <= 0) {
@@ -237,6 +282,8 @@ export const callPostImportResource = async (resourceFiles: File[]): Promise<str
         return (e as Error).message;
     }
 }
+
+
 
 export const callGetUserRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<UserRow> | null> => {
     try {

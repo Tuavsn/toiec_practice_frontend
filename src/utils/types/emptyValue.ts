@@ -1,4 +1,5 @@
-import { UserHookState, CategoryID, CategoryRow, LectureHookState, LectureRow, TestResultSummary, TestReviewHookState, TestRow, UserRow } from "./type";
+import { TreeNode } from "primereact/treenode";
+import { CategoryID, CategoryRow, LectureHookState, LectureRow, TestResultSummary, TestReviewHookState, TestRow, UserHookState, UserRow } from "./type";
 const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
@@ -28,7 +29,15 @@ export const emptyUserRow: UserRow = {
     id: "",
     email: "",
     avatar: "",
-    roleName: "",
+    role: {
+        createdAt: "",
+        updatedAt: "",
+        id: "",
+        name: "",
+        description: "",
+        permissions: [],
+        active: false
+    },
     target: 0,
     isActive: false,
     createdAt: emptyDate,
@@ -82,3 +91,29 @@ export const initialUserState: UserHookState = {
     job: "",
     currentSelectedUser: emptyUserRow
 } as const
+
+export const emptyQuestionTreeNode: TreeNode = {
+    key: "",
+    data: {
+        practiceID: "",
+        testID: "",
+        //----
+        questionNum: "",
+        partNum: 1,
+        type: "single",
+        difficulty: 999,
+        //------
+        ask: "what are you doing ?",
+        choices: ["i am", "am i", "yes", "no"],
+        correctChoice: "yes",
+        transcript: "this is transcript",
+        explanation: "because...",
+        //------
+        topic: [],
+        //------
+        resources: [],
+        //------
+        createdAt: emptyDate,
+        updatedAt: emptyDate
+    }
+} as const;

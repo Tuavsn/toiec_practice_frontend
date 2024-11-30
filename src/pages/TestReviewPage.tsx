@@ -1,12 +1,13 @@
 import { Button } from "primereact/button";
+import { Card } from "primereact/card";
 import { ScrollPanel } from "primereact/scrollpanel";
 import { Sidebar } from "primereact/sidebar";
 import { Toolbar } from "primereact/toolbar";
 import React, { Dispatch, memo, useCallback, useMemo } from "react";
-import useTestReview from "../hooks/TestReviewHook";
-import { UserAnswerRecord, TestReviewAreaProps, TestReviewHookAction, UserAnswerSheetReviewProps } from "../utils/types/type";
 import { LoadingSpinner } from "../components/Common/Index";
-import { ConvertUserAnswerRecordToHTML } from "../utils/convertToHTML";
+import useTestReview from "../hooks/TestReviewHook";
+import { ConvertSolutionToHTML as ConvertSolutionToHTML, ConvertTopicToHTML, ConvertUserAnswerRecordToHTML } from "../utils/convertToHTML";
+import { TestReviewAreaProps, TestReviewHookAction, UserAnswerRecord, UserAnswerSheetReviewProps } from "../utils/types/type";
 
 //-------------- Main Component: TestReviewPage -------------- -------------- -------------- -------------- -------------- -------------- -------------- 
 
@@ -27,6 +28,7 @@ function TestReviewPage() {
                 <div id="test-area-container" className="max-w-screen p-0">
                     <TextReviewArea question={question} dispatch={dispatch} />
                 </div>
+                <TopicAndSolution question={question} />
             </section>
         </main>
     ) : (
@@ -174,3 +176,32 @@ const UserAnswerSheet: React.FC<UserAnswerSheetReviewProps> = React.memo(({ stat
         </Sidebar>
     );
 });
+
+
+
+
+
+
+//-------------- Subcomponents: Topic and solution -------------- -------------- -------------- -------------- -------------- -------------- -------------- 
+
+
+
+
+
+
+
+const TopicAndSolution: React.FC<{ question: UserAnswerRecord }> = React.memo(
+    ({ question }) => {
+        return (
+            <React.Fragment>
+                <Card title="Chủ đề trong câu hỏi">
+                    {ConvertTopicToHTML(question)}
+
+                </Card>
+                <Card title="Gợi ý giúp bạn cải thiện tốt hơn">
+                    {ConvertSolutionToHTML(question)}
+                </Card>
+            </React.Fragment>
+        )
+    }
+) 

@@ -1,8 +1,8 @@
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { useNavigate, useParams } from "react-router-dom";
-import { UserResultRow } from "../utils/types/type";
-import { memo } from "react";
+import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
+import { TestID, UserResultRow } from "../utils/types/type";
+import React, { memo } from "react";
 import formatDate from "../utils/formatDateToString";
 import { Checkbox } from "primereact/checkbox";
 import { useCheckBox } from "../hooks/TestDetailPaperHook";
@@ -11,11 +11,11 @@ import { Button } from "primereact/button";
 import { detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
 
 function TestDetailPage() {
-    const navigate = useNavigate();
-    const { id = "671a25094dbe5f4c165c31dc" } = useParams<{ id: string }>(); // Access course ID from URL params
+
+    const { id = "" } = useParams<{ id: string }>(); // Access course ID from URL params
     const data = GetFakeUserResult();
     const topics = GetFakeTopics();
-    const { parts, onPartSelectChange } = useCheckBox();
+
     const columns = [
         <Column key="col-createdAt" field="createdAt" header="Ngày làm" body={(rowData: UserResultRow) => formatDate(rowData.createdAt)} sortable filter />,
         <Column key="col-correct_count" field="totalCorrectAnswer" header="Kết quả" sortable filter />,
@@ -24,21 +24,7 @@ function TestDetailPage() {
         <Column key="col-detail" body={detailUserResultRowBodyTemplate} />,
     ];
 
-    const checkboxes = Array.from({ length: 8 }, (_, index) => {
-        const label = index === 0 ? "Thi thử" : "Phần " + index;
-        return (
-            <div className="flex align-items-center" key={"checkboxnum" + index}>
-                <Checkbox
-                    inputId={"checkBoxPart" + index}
-                    name={"part" + index}
-                    value={index}
-                    onChange={onPartSelectChange}
-                    checked={parts[index] === true}
-                />
-                <label htmlFor={"checkBoxPart" + index} className="ml-2"> {label}</label>
-            </div>
-        );
-    });
+
 
     const showDetailParts = Array.from({ length: 7 }, (_, index) => {
         const i = index + 1;
@@ -99,18 +85,7 @@ function TestDetailPage() {
                     {columns}
                 </DataTable>
             </section>
-            <section>
-                <h1>Chọn phần thi bạn muốn làm</h1>
-                <span className="flex flex-wrap justify-content-center gap-3">
-                    {checkboxes}
-                </span>
-            </section>
-            <div className="flex p-5 justify-content-center">
-                <Button onClick={() => {
-
-                    navigate(`/dotest/${id}/${DecodeCheckBoxesToUrl(parts)}`)
-                }} label="Bắt đầu"></Button>
-            </div>
+            <PartChooser testID={id} />
             <section>
                 {showDetailParts}
             </section>
@@ -135,6 +110,46 @@ function DecodeCheckBoxesToUrl(parts: boolean[]): string {
     }
     return "practice/" + returnString;
 }
+
+const PartChooser: React.FC<{ testID: TestID }> = memo(
+    ({testID}) => {
+        const { parts, onPartSelectChange } = useCheckBox();
+        const navigate = useNavigate();
+        const checkboxes = Array.from({ length: 8 }, (_, index) => {
+            const label = index === 0 ? "Thi thử" : "Phần " + index;
+            return (
+                <div className="flex align-items-center" key={"checkboxnum" + index}>
+                    <Checkbox
+                        inputId={"checkBoxPart" + index}
+                        name={"part" + index}
+                        value={index}
+                        onChange={onPartSelectChange}
+                        checked={parts[index] === true}
+                    />
+                    <label htmlFor={"checkBoxPart" + index} className="ml-2"> {label}</label>
+                </div>
+            );
+        });
+        return (
+            <React.Fragment>
+                <section>
+                    <h1>Chọn phần thi bạn muốn làm</h1>
+                    <span className="flex flex-wrap justify-content-center gap-3">
+                        {checkboxes}
+                    </span>
+                </section>
+                <div className="flex p-5 justify-content-center">
+                    <Button onClick={() => {
+
+                        navigate(`/dotest/${testID}/${DecodeCheckBoxesToUrl(parts)}`)
+                    }} label="Bắt đầu"></Button>
+                </div>
+            </React.Fragment>
+        )
+    }
+)
+
+
 
 function GetFakeUserResult(): UserResultRow[] {
     return [

@@ -11,13 +11,11 @@ export interface Category extends CategoryRow {
 
 // Lecture Collection
 export interface Lecture extends DataTableValue {
-  id: string;
+  id: LectureID;
   name: string;
-  topic: string[];
-  format: string;
-  difficulty: number;
+  topic: Topic[];
   content: string;
-  assignment: Assignment;
+  practiceQuestions: QuestionRow[] | null;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -44,6 +42,7 @@ export interface Assignment extends DataTableValue {
 // Question Collection
 export interface QuestionRow extends DataTableValue {
   id: QuestionID;
+  parentId: QuestionID;
   testId: TestID;
   practiceId: string | null;
   questionNum: number;
@@ -64,7 +63,7 @@ export interface QuestionRow extends DataTableValue {
 }
 
 export interface Resource extends DataTableValue {
-  type: 'paragraph' | 'image' | 'audio';  // Resource type
+  type: ResourceType;  // Resource type
   content: string;
 }
 
@@ -315,7 +314,7 @@ export interface UserAnswerRecord {
   parentId: QuestionID;
   listTopics: Topic[];
   userAnswer: string;
-  solution: string;
+  solution: string | null;
   correct: boolean;
   timeSpent: number;
   questionNum: QuestionNumber;
@@ -543,7 +542,15 @@ export interface QuestionContext {
   transcript?: string
   explanation?: string
 }
+export type ResourceIndex = Resource & {
+  index: number,
+  file: File | null,
+}
+export interface ResourceSectionProps {
+  resourseIndexes: ResourceIndex[],
+  setResourseIndexes: React.Dispatch<React.SetStateAction<ResourceIndex[]>>,
 
+}
 export interface DialogQuestionPageProps {
   setIsDialogVisible: React.Dispatch<React.SetStateAction<JSX.Element | null>>
   dialogBodyVisible: JSX.Element | null,
@@ -566,6 +573,7 @@ export type CategoryID = string;
 export type TopicID = string;
 export type ResponseUserResultList = ApiResponse<TableData<UserDetailResultRow>>;
 export type UserAnswerTimeCounter = Map<QuestionNumber, milisecond>
+export type ResourceType = 'paragraph' | 'image' | 'audio'
 export type TestType = 'fulltest' | 'practice' | 'survival';
 export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
 export type ExerciseType = "partNum=1" | "partNum=2" | "partNum=3" | "partNum=4" | "partNum=5" | "partNum=6" | "partNum=7" | "TOPIC=grammar" | "TOPIC=vocabulary";

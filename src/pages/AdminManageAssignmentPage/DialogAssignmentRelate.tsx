@@ -7,7 +7,7 @@ import { InputText } from "primereact/inputtext"
 import { InputTextarea } from "primereact/inputtextarea"
 import { MultiSelect } from "primereact/multiselect"
 import React, { useState } from "react"
-import { callPutQuestionUpdate } from "../../api/api"
+import { callPostAssignmentQuestion, callPutQuestionUpdate } from "../../api/api"
 import { DialogQuestionActionProps, DialogQuestionPageProps, Topic, UpdateQuestionDialogProps, UpdateQuestionForm } from "../../utils/types/type"
 import { useToast } from "../../context/ToastProvider"
 
@@ -79,24 +79,25 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
         };
         // khi nhấn nút Lưu
         const handleSave = () => {
-            console.log("Hello update");
-            // toast.current?.show({ severity: 'success', content: "Sửa thành công" });
-            // callPutQuestionUpdate(formData);
-            const updateQuestion = async () => {
-                const questionUpdatedResponse: any = await callPutQuestionUpdate(formData);
-                if (questionUpdatedResponse) {
-                    if (questionUpdatedResponse.status == 200) {
-                        toast.current?.show({ severity: 'success', content: "Sửa thành công" });
-                    } else {
-                        toast.current?.show({ severity: 'error', content: questionUpdatedResponse.error });
-                    }
+            const upsertQuestion = async () => {
+                let success = false;
+                if (formData.id) {
+                    success = await callPutQuestionUpdate(formData);
+                } else {
+                    success = await callPostAssignmentQuestion(formData);
+                }
+                if (success) {
+                    toast.current?.show({ severity: 'success', content: "Thao tác thành công" });
+                } else {
+                    toast.current?.show({ severity: 'error', content: "Thao tác thất bại" });
+
                 }
             }
-            updateQuestion();
+            upsertQuestion();
         };
 
         return (
-            <Fieldset legend="Sửa câu hỏi" >
+            <Fieldset legend={formData.id ? "Sửa câu hỏi" : "Tạo câu hỏi"} >
                 <section className='flex flex-wrap gap-4 justify-content-space'>
 
 
@@ -230,3 +231,4 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
         );
     }
 )
+
