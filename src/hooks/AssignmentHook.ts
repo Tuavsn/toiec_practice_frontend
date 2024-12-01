@@ -12,31 +12,31 @@ export function useAssignmentTable() {
     // Lấy test_id từ URL thông qua hook useParams, nếu không có thì mặc định là "no_idTest_found"
     const { lecture_id = "no_idlecture_found" } = useParams<{ lecture_id: LectureID }>();
     // === Khởi tạo các trạng thái cần thiết ===
-    const [currentPageIndex, setCurrentPageIndex]   = useState(-1);             // Lưu trang hiện tại
-    const [isVisible, setIsVisible]                 = useState<boolean>(false); // Trạng thái hiển thị của Dialog
-    const currentSelectedQuestion                   = useRef<TreeNode>({});     // Câu hỏi hiện tại được chọn
-    const [nodes, setNodes]                         = useState<TreeNode[]>([]); // Lưu dữ liệu câu hỏi dạng TreeNode
-    const [title, setTitle]                         = useState<string>("Xóa");  // Tiêu đề của Dialog
-    const totalItems                                = useRef<number>(0);        // Lưu tổng số mục, không gây render lại
-    const topics                                    = useTopicRef();            // Lưu danh sách chủ đề
+    const [currentPageIndex, setCurrentPageIndex] = useState(-1);             // Lưu trang hiện tại
+    const [isVisible, setIsVisible] = useState<boolean>(false); // Trạng thái hiển thị của Dialog
+    const currentSelectedQuestion = useRef<TreeNode>({});     // Câu hỏi hiện tại được chọn
+    const [nodes, setNodes] = useState<TreeNode[]>([]); // Lưu dữ liệu câu hỏi dạng TreeNode
+    const [title, setTitle] = useState<string>("Xóa");  // Tiêu đề của Dialog
+    const totalItems = useRef<number>(0);        // Lưu tổng số mục, không gây render lại
+    const topics = useTopicRef();            // Lưu danh sách chủ đề
 
     // === Hàm lấy dữ liệu câu hỏi theo trang ===
     const fetchQuestionByPage = useCallback(async (pageIndex: number) => {
         // Gọi API để lấy dữ liệu câu hỏi
-        const responseData = await callGetAssignmentRows(lecture_id, pageIndex, 5);
+        const responseData = await callGetAssignmentRows(lecture_id);
 
         // Lưu trữ tổng số mục
-        totalItems.current = responseData.data.meta.totalItems;
+        totalItems.current = responseData.length;
 
         // Chuyển đổi dữ liệu thành dạng TreeNode và cập nhật state
-        setNodes(ConvertQuestionRowListToTreeNodeList(responseData.data.result));
+        setNodes(ConvertQuestionRowListToTreeNodeList(responseData));
 
         // Cập nhật lại trang hiện tại
         setCurrentPageIndex(pageIndex);
-    }, []); 
+    }, []);
 
     // === useEffect để gọi fetchQuestionByPage khi khởi tạo ===
-    useEffect(() => {fetchQuestionByPage(0)}, []); // Gọi hàm fetch dữ liệu câu hỏi lần đầu
+    useEffect(() => { fetchQuestionByPage(0) }, []); // Gọi hàm fetch dữ liệu câu hỏi lần đầu
 
 
 

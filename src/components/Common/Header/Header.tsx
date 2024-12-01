@@ -54,7 +54,6 @@ export default function Header() {
             <OverlayPanel ref={op}>
                 <div className="block">
                     <Button className="block" link onClick={(e) => { toggleOverlayPanel(e); navigate('/profile') }}>Cá nhân</Button>
-                    <Button className="block" link>đọc cái gì</Button>
                     <Button className="block" link onClick={() => { localStorage.clear(); navigate('/home'); }}>Thoát</Button>
                 </div>
             </OverlayPanel>

@@ -54,7 +54,6 @@ const useTestPage = () => {
             type: testType,
             userAnswer: prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current)
         }
-        console.dir(resultBodyObject);
         return (await callPostTestRecord(resultBodyObject)).data.resultId;
     }
     // Gọi API để lấy dữ liệu bài thi khi component được mount

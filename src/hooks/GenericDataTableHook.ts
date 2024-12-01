@@ -1,7 +1,7 @@
 import { DataTable, DataTablePageEvent, DataTableValue } from "primereact/datatable";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { useEffect, useRef, useState } from "react";
-import { callGetRows } from "../api/api";
+import { callDeleteRow, callGetRows } from "../api/api";
 import { useToast } from "../context/ToastProvider";
 import { ApiResponse, TableData } from "../utils/types/type";
 
@@ -11,7 +11,7 @@ export function useDataTable<Model extends DataTableValue>(
     overrides: (state: any) => Partial<any> = () => ({}),
     searchValue: string = ''
 ) {
-    const {toast} = useToast();
+    const { toast } = useToast();
     const dt = useRef<DataTable<Model[]>>(null);
     const [rows, setRows] = useState<Model[]>([]);
     const [rowDialog, setRowDialog] = useState<boolean>(false);
@@ -54,16 +54,16 @@ export function useDataTable<Model extends DataTableValue>(
     });
 
     // Fetch data from server
-    const fetchData = async (pageNumber: number = 1,pageSize:number=5) => {
+    const fetchData = async (pageNumber: number = 1, pageSize: number = 5) => {
         try {
-            const response: ApiResponse<TableData<Model>> = await callGetRows<Model>(urlApi,pageNumber || 1,pageSize);
+            const response: ApiResponse<TableData<Model>> = await callGetRows<Model>(urlApi, pageNumber || 1, pageSize);
 
             setRows(response.data.result)
 
             setTotalRecords(response.data.meta.totalItems);
 
             return response;  // Return the data
-        } catch (error:any) {
+        } catch (error: any) {
             state.toast.current?.show({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 5000 });
             return null;  // Handle the error, returning null or an appropriate value
         }
@@ -80,12 +80,18 @@ export function useDataTable<Model extends DataTableValue>(
     });
 
     const deleteRow = (() => {
-        const _rows = rows.filter((val) => val.id !== row.id);
+        const _rows = rows.map((val) => val.id === row.id ? { ...val, active: false } : val);
 
         setRows(_rows);
         setDeleteRowDialog(false);
         setRow(defaultValues);
-        toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Row Deleted', life: 3000 });
+        callDeleteRow(urlApi, row.id).then((success) => {
+            if (success) {
+                toast.current?.show({ severity: 'success', summary: 'Thành công', detail: 'Xóa thành công', life: 3000 });
+            } else {
+                toast.current?.show({ severity: 'error', summary: 'Lỗi', detail: 'Xóa không thành công', life: 3000 });
+            }
+        });
     });
 
     const exportCSV = (() => {
@@ -116,8 +122,8 @@ export function useDataTable<Model extends DataTableValue>(
 
         // Calculate the page number based on event.first and event.rows
         console.log(event.first);
-        
-        const pageNumber = event.first / event.rows+1;
+
+        const pageNumber = event.first / event.rows + 1;
         fetchData(pageNumber, event.rows);
     }
     // The state object to pass to the override functions
@@ -130,7 +136,7 @@ export function useDataTable<Model extends DataTableValue>(
         selectedRows, setSelectedRows,
         submitted, setSubmitted,
         globalFilter, setGlobalFilter,
-        toast, dt, page, totalRecords
+        toast, dt, page, totalRecords, setTotalRecords
     };
     const actions = {
         openNew: overrides(state).openNew || openNew,

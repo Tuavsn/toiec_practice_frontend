@@ -1,11 +1,13 @@
-import { CategoryID, CategoryRow, LectureHookState, LectureRow, TestResultSummary, TestRow, UserRow } from "./type";
-
+import { TreeNode } from "primereact/treenode";
+import { CategoryID, CategoryRow, LectureHookState, LectureRow, TestResultSummary, TestReviewHookState, TestRow, UserHookState, UserRow } from "./type";
+const emptyDate = new Date(0, 0, 0);
+Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
     id: "",
     name: "",
     topic: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: emptyDate,
+    updatedAt: emptyDate,
     active: false
 } as const
 
@@ -27,19 +29,27 @@ export const emptyUserRow: UserRow = {
     id: "",
     email: "",
     avatar: "",
-    roleName: "",
+    role: {
+        createdAt: "",
+        updatedAt: "",
+        id: "",
+        name: "",
+        description: "",
+        permissions: [],
+        active: false
+    },
     target: 0,
     isActive: false,
-    createdAt: new Date(),
-    updatedAt: new Date()
+    createdAt: emptyDate,
+    updatedAt: emptyDate
 } as const
 
 export const emptyCategoryRow: CategoryRow = {
     id: "",
     format: "vô danh",
     year: 2020,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: emptyDate,
+    updatedAt: emptyDate,
     active: true
 } as const;
 
@@ -54,14 +64,56 @@ export function emptyTestRow(category_id: CategoryID): TestRow {
         totalScore: 990,
         limitTime: 90,
         totalUserAttempt: 0,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: emptyDate,
+        updatedAt: emptyDate
     } as const
 }
 
 export const initialLectureState: LectureHookState = {
-    lectures: [],
-    currentPageIndex: 0,
     job: "",
+    lectures: [],
+    isRefresh: true,
+    currentPageIndex: 0,
     currentSelectedLecture: emptyLectureRowValue
 } as const
+
+export const initialTestReviewState: TestReviewHookState = {
+    isUserAnswerSheetVisible: false,
+    testReviewAnswerSheet: [],
+    currentPageIndex: 0,
+    pageMapper: []
+} as const
+
+export const initialUserState: UserHookState = {
+    users: [],
+    isRefresh: false,
+    currentPageIndex: 0,
+    job: "",
+    currentSelectedUser: emptyUserRow
+} as const
+
+export const emptyQuestionTreeNode: TreeNode = {
+    key: "",
+    data: {
+        practiceID: "",
+        testID: "",
+        //----
+        questionNum: "",
+        partNum: 1,
+        type: "single",
+        difficulty: 999,
+        //------
+        ask: "what are you doing ?",
+        choices: ["i am", "am i", "yes", "no"],
+        correctChoice: "yes",
+        transcript: "this is transcript",
+        explanation: "because...",
+        //------
+        topic: [],
+        //------
+        resources: [],
+        //------
+        createdAt: emptyDate,
+        updatedAt: emptyDate
+    }
+} as const;

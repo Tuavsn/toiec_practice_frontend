@@ -1,4 +1,4 @@
-import { ApiResponse, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureRow, PracticePaper, QuestionRow, ResultID, TableData, Test, TestCard, TestID, TestPaper, TestRecord, TestResultSummary, TestRow, Topic, TopicID, UpdateQuestionForm } from "../utils/types/type";
+import { ApiResponse, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureRow, PracticePaper, QuestionRow, ResultID, TableData, Test, TestCard, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -20,7 +20,14 @@ export const callCreateCateogry = async (format: string, year: number) => {
 export const callGetCategory = () => {
     return axios.get<ApiResponse<CategoryRow[]>>(`${import.meta.env.VITE_API_URL}/categories`);
 }
-
+export const callDeleteRow = async (urlApi: string, id: string): Promise<boolean> => {
+    try {
+        await axios.post(`${import.meta.env.VITE_API_URL}/${urlApi}/${id}`, { active: false, isActive: false });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
 export const callGetRows = async <Model>(urlApi: string, pageNumber: number = 1, pageSize: number = 5): Promise<ApiResponse<TableData<Model>>> => {
     let url = `${import.meta.env.VITE_API_URL}/${urlApi}?current=${pageNumber}&pageSize=${pageSize}`;
     if (urlApi === "testusers") {
@@ -42,9 +49,9 @@ export const callGetTestPaper = async (testId: TestID, parts: string): Promise<A
     const response = await axios.get<ApiResponse<TestPaper>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}`);
     return response.data;
 }
-export const callPostTest = async (testRow: TestRow): Promise<string> => {
+export const callPostTest = async (testRow: TestRow): Promise<TestRow | Error> => {
     try {
-        await axios.post<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests`, {
+        const response = await axios.post<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests`, {
             name: testRow.name,
             categoryId: testRow.idCategory,
             totalUserAttempt: testRow.totalUserAttempt,
@@ -52,9 +59,9 @@ export const callPostTest = async (testRow: TestRow): Promise<string> => {
             totalScore: testRow.totalScore,
             limitTime: testRow.limitTime,
         });
-        return "";
+        return response.data.data;
     } catch (error) {
-        return (error as Error).message
+        return (error as Error)
     }
 }
 export const callPostTestRecord = async (testRecord: TestRecord): Promise<ApiResponse<{ resultId: ResultID }>> => {
@@ -80,9 +87,34 @@ export const callGetQuestionRows = async (testId: TestID, currentPageIndex: numb
     return response.data;
 }
 
-export const callPutQuestionUpdate = async (formData: UpdateQuestionForm) => {
-    const response = await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/questions`, formData);
-    return response;
+export const callPutQuestionUpdate = async (formData: UpdateQuestionForm): Promise<boolean> => {
+    try {
+        await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/questions`, formData);
+        return true;
+    } catch (error) {
+        return false;
+
+    }
+}
+
+export const callPutAssignmentQuestionUpdate = async (formData: any): Promise<boolean> => {
+    try {
+        await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/lectures/${formData.id}/savePractice`, formData);
+        return true;
+    } catch (error) {
+        return false;
+
+    }
+}
+
+export const callPostAssignmentQuestion = async (formData: any): Promise<boolean> => {
+    try {
+        await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/lectures/${formData.id}/savePractice`, formData);
+        return true;
+    } catch (error) {
+        return false;
+
+    }
 }
 
 export const callGetTopics = async (): Promise<ApiResponse<Topic[]>> => {
@@ -93,6 +125,15 @@ export const callGetTopics = async (): Promise<ApiResponse<Topic[]>> => {
 export const callGetResult = async (id: ResultID): Promise<ApiResponse<TestResultSummary>> => {
     const response = await axios.get<ApiResponse<TestResultSummary>>(`${import.meta.env.VITE_API_URL}/results/${id}`);
     return response.data;
+}
+
+export const callGetReviewTestPaper = async (id: ResultID): Promise<TestReviewAnswerSheet | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TestReviewAnswerSheet>>(`${import.meta.env.VITE_API_URL}/results/${id}/review`);
+        return response.data.data;
+    } catch (e) {
+        return null;
+    }
 }
 
 export const callGetCategoryLabel = async (): Promise<ApiResponse<CategoryLabel[]>> => {
@@ -117,31 +158,33 @@ export const callGetPracticePaper = async (lectureId: LectureID): Promise<ApiRes
     return apiResponse
 }
 
-export const callPostDoctrine = async (lectureId: LectureID, htmlContent: string): Promise<string> => {
+export const callPostDoctrine = async (lectureId: LectureID, request: string): Promise<boolean> => {
     try {
-        await axios.post<ApiResponse<any>>(`${import.meta.env.VITE_API_URL}/lecture/doctrine`, {
-            lectureId,
-            htmlContent,
-        })
-        return "";
+        await axios.post(`${import.meta.env.VITE_API_URL}/lectures/${lectureId}/saveContent`,
+            request,
+            {
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+            }
+        );
+        return true;
     } catch (e: unknown) {
-        return "Lỗi";
+        return false;
     }
 }
 export const callGetLectureRow = async (pageNumber: number): Promise<TableData<LectureRow> | Error> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<LectureRow>>>(`https://api.trinhhoctuan.io.vn/api/v1/lectures?info=true&current=${pageNumber + 1}&pageSize=99`);
-        // Assuming `response` is a string in this example:
+        const response = await axios.get<ApiResponse<TableData<LectureRow>>>(`${import.meta.env.VITE_API_URL}/lectures?info=true&current=${pageNumber + 1}&pageSize=5`);
         return response.data.data;
     } catch (error) {
         return (error as Error)
     }
 }
-export const callPutLectureDetailUpdate = async (lectureID: LectureID, title: string, topicIds: TopicID[]): Promise<boolean> => {
+export const callPutLectureDetailUpdate = async (lectureID: LectureID, name: string, topicIds: TopicID[]): Promise<boolean> => {
     try {
-        await axios.put<ApiResponse<any>>(`${import.meta.env.VITE_API_URL}/lectures`, {
-            lectureID,
-            title,
+        await axios.put(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}`, {
+            name,
             topicIds
         })
         return true
@@ -150,10 +193,10 @@ export const callPutLectureDetailUpdate = async (lectureID: LectureID, title: st
     }
 }
 
-export const callPostLectureDetail = async (title: string, topicIds: TopicID[]): Promise<boolean> => {
-    try {//https://api.trinhhoctuan.io.vn/api/v1/lectures
+export const callPostLectureDetail = async (name: string, topicIds: TopicID[]): Promise<boolean> => {
+    try {
         await axios.post<ApiResponse<any>>(`${import.meta.env.VITE_API_URL}/lectures`, {
-            title,
+            name,
             topicIds
         })
         return true
@@ -165,18 +208,25 @@ export const callPostLectureDetail = async (title: string, topicIds: TopicID[]):
 
 export const callGetLectureDoctrine = async (lectureID: LectureID): Promise<string | Error> => {
     try {
-        const response = await axios.get<ApiResponse<Lecture>>(`https://api.trinhhoctuan.io.vn/api/v1/lectures/${lectureID}?content=true`);
-        // Assuming `response` is a string in this example:
+        const response = await axios.get<ApiResponse<Lecture>>(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}?content=true`);
         return response.data.data.content;
     } catch (error) {
         return (error as Error);
     }
 }
 
-export const callGetAssignmentRows = async (lectureID: LectureID, currentPageIndex: number, pageSize: number = 5): Promise<ApiResponse<TableData<QuestionRow>>> => {
-    lectureID = "671a25094dbe5f4c165c31dc";
-    const response = await axios.get<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/tests/${lectureID}/questions?current=${currentPageIndex + 1}&pageSize=${pageSize}`)
-    return response.data;
+export const callDeleteLecture = async (lectureID: LectureID): Promise<boolean> => {
+    try {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}`);
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+export const callGetAssignmentRows = async (lectureID: LectureID): Promise<QuestionRow[]> => {
+    const response = await axios.get<ApiResponse<Lecture>>(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}?PRACTICE=true`)
+    return response.data.data.practiceQuestions || [];
 }
 
 export const callPostImportExcel = async (testID: TestID, excelFiles: File[]): Promise<string> => {
@@ -197,7 +247,23 @@ export const callPostImportExcel = async (testID: TestID, excelFiles: File[]): P
         return (e as Error).message;
     }
 }
-
+export const callPostConvertResourceToLink = async (resourse: File | null): Promise<string> => {
+    try {
+        if (!resourse) {
+            return "";
+        }
+        const resourceFormData = new FormData();
+        resourceFormData.append("files", resourse);
+        const response = await axios.post<ApiResponse<string[]>>(`${import.meta.env.VITE_API_URL}/tests/resources/upload`, resourceFormData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
+            }
+        );
+        return response.data.data[0];
+    } catch (e) {
+        return "";
+    }
+}
 export const callPostImportResource = async (resourceFiles: File[]): Promise<string> => {
     try {
         if (resourceFiles.length <= 0) {
@@ -217,3 +283,25 @@ export const callPostImportResource = async (resourceFiles: File[]): Promise<str
     }
 }
 
+
+
+export const callGetUserRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<UserRow> | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<UserRow>>>(`${import.meta.env.VITE_API_URL}/users?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        return response.data.data;
+    } catch (error) {
+        return null;
+    }
+
+}
+
+export const callPutUpdateUserRow = async (user: UserRow): Promise<boolean> => {
+    try {
+        await axios.put(`${import.meta.env.VITE_API_URL}/users/${user.id}/status`, {
+            isActive: false
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}

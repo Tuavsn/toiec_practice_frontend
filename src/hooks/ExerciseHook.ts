@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { callGetExercisePaper, callPostTestRecord } from "../api/api";
 import { MappingPageWithQuestionNum } from "../utils/convertToHTML";
 import prepareForTest from "../utils/prepareForTest";
-import { ExerciseType, milisecond, QuestionNumber, ResultID, TestRecord } from "../utils/types/type";
+import { ApiResponse, ExerciseType, milisecond, QuestionNumber, QuestionRow, ResultID, TableData, TestRecord } from "../utils/types/type";
 import { useMultipleQuestion } from "./MultipleQuestionHook";
 
 const useExercisePage = () => {
@@ -70,7 +70,7 @@ const useExercisePage = () => {
                 setIsOnTest(true);
                 localStorage.removeItem('userAnswerSheet');
                 const responseData = await callGetExercisePaper(exerciseType);
-
+                responseData.data.result = ReCountQuestionNumber(responseData.data.result);
                 const newPageMapper = MappingPageWithQuestionNum(responseData.data.result);
                 setTotalQuestions(responseData.data.meta.totalItems);
                 timeSpentListRef.current = new Map<QuestionNumber, milisecond>();
@@ -116,3 +116,12 @@ const useExercisePage = () => {
     };
 };
 export default useExercisePage;
+
+function ReCountQuestionNumber(questions: QuestionRow[]): QuestionRow[] {
+    return questions.map((q, index) => {
+        return {
+            ...q,
+            questionNum: index + 1
+        }
+    })
+}

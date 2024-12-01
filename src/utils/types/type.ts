@@ -11,13 +11,11 @@ export interface Category extends CategoryRow {
 
 // Lecture Collection
 export interface Lecture extends DataTableValue {
-  id: string;
+  id: LectureID;
   name: string;
-  topic: string[];
-  format: string;
-  difficulty: number;
+  topic: Topic[];
   content: string;
-  assignment: Assignment;
+  practiceQuestions: QuestionRow[] | null;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -33,10 +31,7 @@ export interface Topic {
   active: boolean
 }
 
-export interface Doctrine extends DataTableValue {
-  title: string;
-  content: string;
-}
+
 
 export interface Assignment extends DataTableValue {
   required: number;
@@ -47,6 +42,7 @@ export interface Assignment extends DataTableValue {
 // Question Collection
 export interface QuestionRow extends DataTableValue {
   id: QuestionID;
+  parentId: QuestionID;
   testId: TestID;
   practiceId: string | null;
   questionNum: number;
@@ -67,7 +63,7 @@ export interface QuestionRow extends DataTableValue {
 }
 
 export interface Resource extends DataTableValue {
-  type: 'paragraph' | 'image' | 'audio';  // Resource type
+  type: ResourceType;  // Resource type
   content: string;
 }
 
@@ -94,25 +90,29 @@ export interface UserAnswerResult extends DataTableValue {
   questionId: string;
   answer: string;
   solution: string;
+  questionNum: QuestionNumber;
 }
 
 // Role Collection
 export interface Role extends DataTableValue {
-  id: string;
+  createdAt: string;
+  updatedAt: string;
+  id: RoleID;
   name: string;
   description: string;
   permissions: Permission[];
-  users: User[];  // List of Users
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  active: boolean;
 }
 
 export interface Permission extends DataTableValue {
+  createdAt: Date;
+  updatedAt: Date;
+  id: PermissionID;
   name: string;
   apiPath: string;
   method: string;
   module: string;
+  active: boolean;
 }
 
 
@@ -220,14 +220,10 @@ export interface TestRow extends DataTableValue {
 
 // User Collection
 export interface UserRow extends DataTableValue {
-  id: string;
+  id: UserID;
   email: string;
-  avatar: string;
-  roleName: string;
+  role: Role;
   target: number;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 
@@ -313,16 +309,25 @@ export interface PracticeQuestion {
   correctAnswer: string;
 }
 
-export interface QuestionDetailRecord {
+export interface UserAnswerRecord {
+  questionId: QuestionID;
+  parentId: QuestionID;
+  listTopics: Topic[];
+  userAnswer: string;
+  solution: string | null;
+  correct: boolean;
+  timeSpent: number;
+  questionNum: QuestionNumber;
+  partNum: number;
   type: QuestionType;
-  subQuestions: QuestionDetailRecord[];
   content: string;
+  difficulty: number;
   resources: Resource[];
   transcript: string;
   explanation: string;
   answers: string[];
   correctAnswer: string;
-  userAnswer: string;
+  subUserAnswer: UserAnswerRecord[];
 }
 
 export interface MultipleChoiceQuestion {
@@ -362,6 +367,7 @@ export interface UpdateLectureForm {
 
 
 
+
 // ------------------------- tham số truyền
 export type RichEditorProps = {
   button: React.MutableRefObject<HTMLButtonElement>,
@@ -375,11 +381,16 @@ export type DialogLectureProps = {
   job: DialogLectureJobType,
 }
 
-export type DialogLectureBodyProps = {
+export type DialogUserProps = {
+  currentSelectedUser: UserRow,
+  dispatch: Dispatch<UserHookAction>,
+  job: DialogUserJobType,
+}
+
+export type DialogUpdateLectureBodyProps = {
   currentSelectedLecture: LectureRow,
   dispatch: Dispatch<LectureHookAction>,
   topicListRef: React.MutableRefObject<Topic[]>,
-
 }
 
 export type RenderLectureDialogParams = {
@@ -387,6 +398,12 @@ export type RenderLectureDialogParams = {
   currentSelectedLecture: LectureRow,
   dispatch: Dispatch<LectureHookAction>,
   topicListRef: React.MutableRefObject<Topic[]>
+}
+
+export type RenderUserDialogParams = {
+  job: DialogUserJobType,
+  currentSelectedUser: UserRow,
+  dispatch: Dispatch<UserHookAction>,
 }
 
 export type SaveTextParams = {
@@ -401,20 +418,47 @@ export type EditTextParams = {
   text: React.MutableRefObject<string>
 }
 export type handeSaveLectureParams = {
-  toast: React.MutableRefObject<Toast | null>,
-  lectureID: LectureID,
   title: string,
-  topicIds: TopicID[]
+  topicIds: TopicID[],
+  lectureID: LectureID,
+  toast: React.MutableRefObject<Toast | null>,
+  dispatch: React.Dispatch<LectureHookAction>,
 }
+
+export type handeDeleteLectureParams = {
+  lectureID: LectureID,
+  toast: React.MutableRefObject<Toast | null>,
+  dispatch: React.Dispatch<LectureHookAction>,
+}
+
+export type handeDeleteUserParams = {
+  userID: UserID,
+  toast: React.MutableRefObject<Toast | null>,
+  dispatch: React.Dispatch<UserHookAction>,
+}
+
 export type AdminLectureTableProps = {
   lectures: LectureRow[],
   dispatch: Dispatch<LectureHookAction>,
+}
+
+export type AdminUserTableProps = {
+  users: UserRow[],
+  dispatch: Dispatch<UserHookAction>,
 }
 
 export type LectureActionButtonProps = {
   currentSelectedLecture: LectureRow,
   dispatch: Dispatch<LectureHookAction>,
 }
+
+export type UserActionButtonProps = {
+  currentSelectedUser: UserRow,
+  dispatch: Dispatch<UserHookAction>,
+}
+export type DialogDeleteLectureBodyProps = LectureActionButtonProps;
+
+export type DialogDeleteUserBodyProps = UserActionButtonProps;
 
 export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;
@@ -438,6 +482,16 @@ export interface UserAnswerSheetProps {
   visible: boolean,
   setVisible: React.Dispatch<React.SetStateAction<boolean>>,
   ButtonListElement: JSX.Element[],
+}
+
+export type UserAnswerSheetReviewProps = {
+  dispatch: Dispatch<TestReviewHookAction>,
+  state: TestReviewHookState
+}
+
+export type TestReviewAreaProps = {
+  question: UserAnswerRecord,
+  dispatch: Dispatch<TestReviewHookAction>,
 }
 
 export interface TestAreaProps {
@@ -488,7 +542,15 @@ export interface QuestionContext {
   transcript?: string
   explanation?: string
 }
+export type ResourceIndex = Resource & {
+  index: number,
+  file: File | null,
+}
+export interface ResourceSectionProps {
+  resourseIndexes: ResourceIndex[],
+  setResourseIndexes: React.Dispatch<React.SetStateAction<ResourceIndex[]>>,
 
+}
 export interface DialogQuestionPageProps {
   setIsDialogVisible: React.Dispatch<React.SetStateAction<JSX.Element | null>>
   dialogBodyVisible: JSX.Element | null,
@@ -498,33 +560,69 @@ export interface DialogQuestionPageProps {
 export type TestAnswerSheet = Map<QuestionNumber, AnswerPair>;
 export type ResultID = string;
 export type QuestionID = string;
+export type UserID = string;
 export type QuestionNumber = number;
 export type milisecond = number;
 export type TestID = string;
+type RoleID = string;
+type PermissionID = string;
 export type LectureID = string;
 export type PracticeAnswerSheet = Map<QuestionID, string>;
+export type TestReviewAnswerSheet = UserAnswerRecord[];
 export type CategoryID = string;
 export type TopicID = string;
 export type ResponseUserResultList = ApiResponse<TableData<UserDetailResultRow>>;
 export type UserAnswerTimeCounter = Map<QuestionNumber, milisecond>
+export type ResourceType = 'paragraph' | 'image' | 'audio'
 export type TestType = 'fulltest' | 'practice' | 'survival';
 export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
 export type ExerciseType = "partNum=1" | "partNum=2" | "partNum=3" | "partNum=4" | "partNum=5" | "partNum=6" | "partNum=7" | "TOPIC=grammar" | "TOPIC=vocabulary";
 export type DialogLectureJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE' | 'PAGE_DESIGNER' | 'QUESTION_EDITOR';
+export type DialogUserJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE';
 export type Name_ID<T extends string> = T;
 
 //-----------------------------reducer---------------------
 export interface LectureHookState {
+  isRefresh: boolean;
   lectures: LectureRow[],
   currentPageIndex: number,
   job: DialogLectureJobType,
   currentSelectedLecture: LectureRow
 }
 
+export interface TestReviewHookState {
+  testReviewAnswerSheet: TestReviewAnswerSheet,
+  isUserAnswerSheetVisible: boolean,
+  currentPageIndex: number,
+  pageMapper: QuestionPage[],
+}
+export type UserHookState = {
+  users: UserRow[],
+  isRefresh: boolean;
+  currentPageIndex: number,
+  job: DialogUserJobType,
+  currentSelectedUser: UserRow,
+}
+
+type FetchLecture = {
+  lectures: LectureRow[],
+  pageIndex: number
+}
+
+export type UserHookAction =
+  | { type: 'FETCH_USERS_SUCCESS'; payload: [UserRow[], number] }
+  | { type: 'SET_PAGE'; payload: number }
+  | { type: 'REFRESH_DATA' }
+  | { type: 'SET_CURRENT_LECTURE'; payload: UserRow }
+  | { type: 'TOGGLE_DIALOG'; payload: DialogUserJobType }
+  | { type: 'OPEN_UPDATE_DIALOG'; payload: UserRow }
+  | { type: 'OPEN_DELETE_DIALOG'; payload: UserRow }
+  | { type: 'OPEN_CREATE_DIALOG'; payload: UserRow }
 export type LectureHookAction =
-  | { type: 'FETCH_LECTURE_SUCCESS'; payload: LectureRow[] }
+  | { type: 'FETCH_LECTURE_SUCCESS'; payload: FetchLecture }
   | { type: 'FETCH_TOPIC_SUCCESS'; payload: Topic[] }
   | { type: 'SET_PAGE'; payload: number }
+  | { type: 'REFRESH_DATA' }
   | { type: 'SET_CURRENT_LECTURE'; payload: LectureRow }
   | { type: 'TOGGLE_DIALOG'; payload: DialogLectureJobType }
   | { type: 'OPEN_UPDATE_DIALOG'; payload: LectureRow }
@@ -533,3 +631,10 @@ export type LectureHookAction =
   | { type: 'OPEN_PAGE_DESIGNER_DIALOG'; payload: LectureRow }
   | { type: 'OPEN_QUESTION_EDITOR_DIALOG'; payload: LectureRow }
 
+
+export type TestReviewHookAction =
+  | { type: 'FETCH_TEST_REVIEW_SUCCESS'; payload: [TestReviewAnswerSheet, QuestionPage[]] }
+  | { type: 'SET_ANSWER_SHEET_VISIBLE'; payload: boolean }
+  | { type: 'SET_PAGE'; payload: number }
+  | { type: 'MOVE_PAGE'; payload: number }
+// | { type: 'FETCH_TEST_REVIEW_SUCCESS'; payload: TestReviewAnswerSheet }

@@ -5,7 +5,7 @@ const HomePage = React.lazy(() => import("./HomePage"));
 const UserProfilePage = React.lazy(() => import("./UserProfilePage"));
 const TestPage = React.lazy(() => import("./TestPage"));
 const TestDetailPage = React.lazy(() => import("./TestDetailPage"));
-const TestReviewPage = React.lazy(() => import("./TestReviewPage"));
+const TestOverallResultPage = React.lazy(() => import("./TestOverallResultPage"));
 const LecturePage = React.lazy(() => import("./LecturePage"));
 const NotFoundPage = React.lazy(() => import("./NotFoundPage"));
 const LectureDetailsPage = React.lazy(() => import("./LectureDetailsPage"));
@@ -13,17 +13,19 @@ const LookUpPage = React.lazy(() => import("./LookUpPage"));
 const DoTestPage = React.lazy(() => import("./DoTestPage"));
 const ExercisePage = React.lazy(() => import("./ExercisePage"))
 const DoExercisePage = React.lazy(() => import("./DoExercisePage"))
+const TestReviewPage = React.lazy(() => import("../pages/TestReviewPage"))
 export {
-    HomePage,
-    UserProfilePage,
-    TestPage,
-    TestDetailPage,
-    TestReviewPage,
-    LecturePage,
-    NotFoundPage,
+    TestOverallResultPage,
     LectureDetailsPage,
-    LookUpPage,
-    DoTestPage,
-    ExercisePage,
+    UserProfilePage,
+    TestDetailPage,
     DoExercisePage,
+    TestReviewPage,
+    NotFoundPage,
+    ExercisePage,
+    LecturePage,
+    DoTestPage,
+    LookUpPage,
+    HomePage,
+    TestPage,
 };

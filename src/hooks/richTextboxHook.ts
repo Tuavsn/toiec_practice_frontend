@@ -15,9 +15,9 @@ export default function useRichTextBox(lectureID: LectureID) {
                 toast.current?.show({ severity: "error", summary: "Lỗi khi tải dữ liệu", detail: result.message });
                 return;
             }
-                text.current = result;
-                setIsLoading(false);
-            
+            text.current = result;
+            setIsLoading(false);
+
         }
         fetchDoctrine();
     }, [])
@@ -37,11 +37,11 @@ async function SaveText(params: SaveTextParams) {
     if (params.e.currentTarget.classList.contains("bg-yellow-500")) {
         params.e.currentTarget.classList.replace("bg-yellow-500", "bg-green-500");
         params.e.currentTarget.innerText = "Lưu";
-        const error = await callPostDoctrine(params.lectureID, params.text.current);
-        if (error) {
-            params.toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Lỗi khi lưu. vui lòng thử lại sau" });
-        } else {
+        const result = await callPostDoctrine(params.lectureID, params.text.current);
+        if (result) {
             params.toast.current?.show({ severity: "success", summary: "Thành công", detail: "Lưu thành công" });
+        } else {
+            params.toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Lỗi khi lưu. vui lòng thử lại sau" });
         }
 
     }

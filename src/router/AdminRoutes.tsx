@@ -6,7 +6,7 @@ const AdminManageAssignmentPage = lazy(() => import("../pages/AdminManageAssignm
 const AdminManageQuestionPage = lazy(() => import("../pages/AdminManageQuestionPage/AdminManageQuestionPage"))
 const AdminManageLecturePage = lazy(() => import("../pages/AdminManageLecturePage/AdminManageLecturePage"))
 const AdminManageCategoryPage = lazy(() => import("../pages/AdminManageCategoryPage"))
-const AdminManageAccountPage = lazy(() => import("../pages/AdminManageAccount"))
+const AdminManageAccountPage = lazy(() => import("../pages/AdminManageUserPage/AdminManageUser"))
 const AdminManageTestPage = lazy(() => import("../pages/AdminManageTestPage"))
 const AdminDashboardPage = lazy(() => import("../pages/AdminDashboardPage"))
 const AdminLayout = lazy(() => import('../components/Layout/AdminLayout'));
