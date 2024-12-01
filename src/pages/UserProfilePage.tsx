@@ -8,7 +8,7 @@ import React, { useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { SkillInsightsProps, SuggestionsForUser, TopicRecord, UserDetailResultRow } from "../utils/types/type";
 import formatDate from "../utils/formatDateToString";
-import { detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
+import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
 import { DataTable } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { Stepper, StepperRefAttributes } from 'primereact/stepper';
@@ -233,17 +233,7 @@ function CountSkillScoreTemplate(rowData: { totalReadingScore: number, totalList
     )
 }
 
-// Hàm CountAnswerTypeTemplate nhận rowData và hiển thị thống kê số lượng câu trả lời đúng, sai và bỏ qua
-function CountAnswerTypeTemplate(rowData: { totalCorrectAnswer: number, totalIncorrectAnswer: number, totalSkipAnswer: number }) {
-    return (
-        <div className="flex flex-wrap justify-content-around sm:flex-column md:flex-row">
-            <p>✅ {rowData.totalCorrectAnswer}</p> {/* Số lượng đúng */}
-            <p>❌ {rowData.totalIncorrectAnswer}</p> {/* Số lượng sai */}
-            <p>😵 {rowData.totalSkipAnswer}</p> {/* Số lượng bỏ qua */}
-        </div>
 
-    )
-}
 
 //---[6]-------------------------------------------------------------------------------------------------------------------------------------------
 function TimeSpent(timeSpentOnParts: number[], smallestAmount: number) {

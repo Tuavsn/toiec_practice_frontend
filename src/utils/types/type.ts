@@ -275,8 +275,33 @@ export type TestRecord = {
   userAnswer: AnswerRecord[];
   type: TestType
 }
+export interface TestDetailPageData {
+  id: string;
+  name: string;
+  totalUserAttempt: number;
+  totalQuestion: number;
+  totalScore: number;
+  limitTime: number;
+  resultsOverview: ResultOverview[];
+  topicsOverview: TopicOverview[];
+}
+interface ResultOverview {
+  createdAt: Date; // Use ISO string for Instant in Java
+  result: ResultID; // e.g., "x/200", "x/30"
+  totalTime: number;
+  totalReadingScore: number;
+  totalListeningScore: number;
+  totalCorrectAnswer: number;
+  totalIncorrectAnswer: number;
+  totalSkipAnswer: number;
+  type: TestType; // "practice" or "fulltest"
+  parts: string; // "Practice parts"
+}
 
-
+interface TopicOverview {
+  partNum: number;
+  topicNames: string[];
+}
 
 export type TestResultSummary = {
   id: ResultID;

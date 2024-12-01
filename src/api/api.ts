@@ -1,4 +1,4 @@
-import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureRow, PracticePaper, QuestionRow, ResultID, TableData, Test, TestCard, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
+import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureRow, PracticePaper, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -71,9 +71,38 @@ export const callGetQuestionRows = async (testId: TestID, currentPageIndex: numb
     return response.data;
 }
 
-export const callPutQuestionUpdate = async (formData: UpdateQuestionForm): Promise<boolean> => {
+export const callPutQuestionUpdate = async (formData: UpdateQuestionForm, resources: ResourceIndex[]): Promise<boolean> => {
     try {
-        await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/questions`, formData);
+        // 1. Upload resources and get their URLs
+        const resourceUrls = await Promise.all(
+            resources.map((r) => callPostConvertResourceToLink(r.file))
+        );
+
+        // 2. Update question with the resources
+        await callPostQuestionResource(formData.id, resourceUrls, resources)
+
+
+        // 3. Update the question form data
+        await axios.post(`${import.meta.env.VITE_API_URL}/questions`, formData);
+
+        return true;
+    } catch (error) {
+        console.error("Error updating question:", error);
+        return false;
+    }
+};
+
+const callPostQuestionResource = async (questionID: QuestionID, url: string[], resources: ResourceIndex[]): Promise<boolean> => {
+    try {
+        const res = resources.map((r, i) => {
+            return {
+                type: r.type,
+                content: r.file ? url[i] : r.content
+            } as Resource
+        })
+        await axios.post(`${import.meta.env.VITE_API_URL}/questions/${questionID}/update/resource`,
+            { res }
+        );
         return true;
     } catch (error) {
         return false;
@@ -368,5 +397,14 @@ export const callPostUpdateTest = async (testRow: TestRow): Promise<boolean> => 
         return true
     } catch (error) {
         return false
+    }
+}
+
+export const callGetTestDetailPageData = async (testID: TestID): Promise<TestDetailPageData | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TestDetailPageData>>(`${import.meta.env.VITE_API_URL}/tests/${testID}/info`);
+        return response.data.data;
+    } catch (error) {
+        return null;
     }
 }
