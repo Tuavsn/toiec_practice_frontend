@@ -381,12 +381,20 @@ export type DialogLectureProps = {
   job: DialogLectureJobType,
 }
 
-export type DialogUserProps = {
-  currentSelectedUser: UserRow,
-  dispatch: Dispatch<UserHookAction>,
-  job: DialogUserJobType,
+export type DialogRowProps<RowModel> = {
+  currentSelectedRow: RowModel,
+  dispatch: Dispatch<RowHookAction<RowModel>>,
+  job: DialogRowJobType,
 }
 
+export type DialogUpdateCategoryBodyProps = {
+  currentSelectedRow: CategoryRow,
+  dispatch: Dispatch<RowHookAction<CategoryRow>>,
+}
+export type DialogUpdateTestBodyProps = {
+  currentSelectedRow: TestRow,
+  dispatch: Dispatch<RowHookAction<TestRow>>,
+}
 export type DialogUpdateLectureBodyProps = {
   currentSelectedLecture: LectureRow,
   dispatch: Dispatch<LectureHookAction>,
@@ -400,10 +408,10 @@ export type RenderLectureDialogParams = {
   topicListRef: React.MutableRefObject<Topic[]>
 }
 
-export type RenderUserDialogParams = {
-  job: DialogUserJobType,
-  currentSelectedUser: UserRow,
-  dispatch: Dispatch<UserHookAction>,
+export type RenderRowDialogParams<RowModel> = {
+  job: DialogRowJobType,
+  currentSelectedRow: RowModel,
+  dispatch: Dispatch<RowHookAction<RowModel>>,
 }
 
 export type SaveTextParams = {
@@ -431,10 +439,10 @@ export type handeDeleteLectureParams = {
   dispatch: React.Dispatch<LectureHookAction>,
 }
 
-export type handeDeleteUserParams = {
-  userID: UserID,
+export type handeDeleteRowParams<RowModel> = {
+  rowID: string,
   toast: React.MutableRefObject<Toast | null>,
-  dispatch: React.Dispatch<UserHookAction>,
+  dispatch: React.Dispatch<RowHookAction<RowModel>>,
 }
 
 export type AdminLectureTableProps = {
@@ -442,23 +450,27 @@ export type AdminLectureTableProps = {
   dispatch: Dispatch<LectureHookAction>,
 }
 
-export type AdminUserTableProps = {
-  users: UserRow[],
-  dispatch: Dispatch<UserHookAction>,
+export type AdminRowTableProps<RowModel> = {
+  rows: RowModel[],
+  dispatch: Dispatch<RowHookAction<RowModel>>,
 }
 
 export type LectureActionButtonProps = {
   currentSelectedLecture: LectureRow,
   dispatch: Dispatch<LectureHookAction>,
 }
-
-export type UserActionButtonProps = {
-  currentSelectedUser: UserRow,
-  dispatch: Dispatch<UserHookAction>,
+export type handeSaveRowParams<RowModel> = {
+  row: RowModel
+  toast: React.MutableRefObject<Toast | null>,
+  dispatch: React.Dispatch<RowHookAction<RowModel>>,
+}
+export type RowActionButtonProps<RowModel> = {
+  currentSelectedRow: RowModel,
+  dispatch: Dispatch<RowHookAction<RowModel>>,
 }
 export type DialogDeleteLectureBodyProps = LectureActionButtonProps;
 
-export type DialogDeleteUserBodyProps = UserActionButtonProps;
+export type DialogDeleteRowBodyProps<RowModel> = RowActionButtonProps<RowModel>;
 
 export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;
@@ -578,7 +590,7 @@ export type TestType = 'fulltest' | 'practice' | 'survival';
 export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
 export type ExerciseType = "partNum=1" | "partNum=2" | "partNum=3" | "partNum=4" | "partNum=5" | "partNum=6" | "partNum=7" | "TOPIC=grammar" | "TOPIC=vocabulary";
 export type DialogLectureJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE' | 'PAGE_DESIGNER' | 'QUESTION_EDITOR';
-export type DialogUserJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE';
+export type DialogRowJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE';
 export type Name_ID<T extends string> = T;
 
 //-----------------------------reducer---------------------
@@ -589,19 +601,25 @@ export interface LectureHookState {
   job: DialogLectureJobType,
   currentSelectedLecture: LectureRow
 }
-
+export interface CategoryHookState {
+  isRefresh: boolean;
+  lectures: CategoryRow[],
+  currentPageIndex: number,
+  job: DialogRowJobType,
+  currentSelectedCategory: CategoryRow
+}
 export interface TestReviewHookState {
   testReviewAnswerSheet: TestReviewAnswerSheet,
   isUserAnswerSheetVisible: boolean,
   currentPageIndex: number,
   pageMapper: QuestionPage[],
 }
-export type UserHookState = {
-  users: UserRow[],
+export type RowHookState<RowModel> = {
+  rows: RowModel[],
   isRefresh: boolean;
   currentPageIndex: number,
-  job: DialogUserJobType,
-  currentSelectedUser: UserRow,
+  job: DialogRowJobType,
+  currentSelectedRow: RowModel,
 }
 
 type FetchLecture = {
@@ -609,15 +627,15 @@ type FetchLecture = {
   pageIndex: number
 }
 
-export type UserHookAction =
-  | { type: 'FETCH_USERS_SUCCESS'; payload: [UserRow[], number] }
+export type RowHookAction<RowModel> =
+  | { type: 'FETCH_ROWS_SUCCESS'; payload: [RowModel[], number] }
   | { type: 'SET_PAGE'; payload: number }
   | { type: 'REFRESH_DATA' }
-  | { type: 'SET_CURRENT_LECTURE'; payload: UserRow }
-  | { type: 'TOGGLE_DIALOG'; payload: DialogUserJobType }
-  | { type: 'OPEN_UPDATE_DIALOG'; payload: UserRow }
-  | { type: 'OPEN_DELETE_DIALOG'; payload: UserRow }
-  | { type: 'OPEN_CREATE_DIALOG'; payload: UserRow }
+  | { type: 'SET_CURRENT_ROW'; payload: RowModel }
+  | { type: 'TOGGLE_DIALOG'; payload: DialogRowJobType }
+  | { type: 'OPEN_UPDATE_DIALOG'; payload: RowModel }
+  | { type: 'OPEN_DELETE_DIALOG'; payload: RowModel }
+  | { type: 'OPEN_CREATE_DIALOG'; payload: RowModel }
 export type LectureHookAction =
   | { type: 'FETCH_LECTURE_SUCCESS'; payload: FetchLecture }
   | { type: 'FETCH_TOPIC_SUCCESS'; payload: Topic[] }

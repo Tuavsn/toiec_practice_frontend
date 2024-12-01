@@ -1,10 +1,10 @@
 import { DataTable } from "primereact/datatable";
 import React from "react";
-import { AdminRowTableProps, UserRow } from "../../utils/types/type";
-import { RenderAdminUserColumns } from "./ColumnManageUserPage";
+import { AdminRowTableProps, CategoryRow } from "../../utils/types/type";
+import { RenderAdminCategoryColumns } from "./ColumnManageCategoryPage";
 
-// Thành phần AdminUserTable sử dụng React.FC với kiểu AdminUserTableProps
-const AdminUserTable: React.FC<AdminRowTableProps<UserRow>> = (props) => {
+// Thành phần AdminCategoryTable sử dụng React.FC với kiểu AdminCategoryTableProps
+const AdminCategoryTable: React.FC<AdminRowTableProps<CategoryRow>> = (props) => {
 
     return (
         // DataTable là một bảng dữ liệu, hiển thị danh sách bài giảng (lectures) từ props
@@ -14,12 +14,12 @@ const AdminUserTable: React.FC<AdminRowTableProps<UserRow>> = (props) => {
             loading={props.rows.length <= 0} // Hiển thị trạng thái "loading" nếu danh sách bài giảng rỗng
             dataKey="id" // Sử dụng thuộc tính "id" làm khóa chính cho các hàng trong bảng
         >
-            {/* Gọi hàm RenderAdminUserColumns để render các cột bảng, truyền dispatch qua props */}
-            {RenderAdminUserColumns(props.dispatch)}
+            {/* Gọi hàm RenderAdminCategoryColumns để render các cột bảng, truyền dispatch qua props */}
+            {RenderAdminCategoryColumns(props.dispatch)}
         </DataTable>
     )
 };
 
 
-export default AdminUserTable
+export default AdminCategoryTable
 

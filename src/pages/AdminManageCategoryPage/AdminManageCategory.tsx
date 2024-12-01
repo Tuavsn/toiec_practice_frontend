@@ -1,36 +1,39 @@
 import { Paginator } from "primereact/paginator";
-import useUser from "../../hooks/UserHook";
 import React from "react";
-import AdminUserTable from "./AdminUserTable";
-import { DialogUserActionButton } from "./DialogUserRelate";
+import AdminCategoryTable from "./AdminCategoryTable";
+import { DialogCategoryActionButton } from "./DialogCategoryRelate";
+import useCategory from "../../hooks/CateogoryHook";
+import { CustomBreadCrumb } from "../../components/Common/Index";
+import { Card } from "primereact/card";
 
 
-function AdminManageUserPage() {
+function AdminManageCategoryPage() {
     const {
         state,
         dispatch,
         totalItems,
         onPageChange
-    } = useUser();
+    } = useCategory();
 
     return (
-        <div className="card">                                          {/* Thẻ div được áp dụng class CSS "card" */}
-            {/* Thành phần DialogUserActionButton quản lý hành động liên quan đến bài giảng hiện tại */}
-            <DialogUserActionButton
+        <Card title={<CustomBreadCrumb />}>
+
+            {/* Thành phần DialogCategoryActionButton quản lý hành động liên quan đến bài giảng hiện tại */}
+            <DialogCategoryActionButton
                 currentSelectedRow={state.currentSelectedRow}   // Bài giảng hiện được chọn
                 job={state.job}                                         // Công việc hiện tại (job)
                 dispatch={dispatch}                                     // Hàm dispatch để cập nhật trạng thái
             />
 
-            {/* Thành phần AdminUserTable hiển thị danh sách các bài giảng */}
-            <AdminUserTable
+            {/* Thành phần AdminCategoryTable hiển thị danh sách các bài giảng */}
+            <AdminCategoryTable
                 dispatch={dispatch}                                     // Hàm dispatch để quản lý các hành động trong bảng
                 rows={state.rows}                               // Dữ liệu các bài giảng để hiển thị
             />
 
             <Paginator first={state.currentPageIndex * 5} rows={5} totalRecords={totalItems.current} onPageChange={onPageChange} />
-        </div>
+        </Card>
     );
 }
 
-export default React.memo(AdminManageUserPage)
+export default React.memo(AdminManageCategoryPage)

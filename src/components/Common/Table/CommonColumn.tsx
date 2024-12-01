@@ -65,7 +65,7 @@ export function typeUserResultRowBodyTemplate(rowData: UserResultRow) {
             {rowData.type === "practice" &&
                 rowData.parts.map((part, index) => {
                     return (
-                        <Tag key={"tag" + index} value={(part) + ""} severity={getUserResultRowSeverity(rowData)}></Tag>
+                        <Tag key={"tag" + index} value={part} severity={getUserResultRowSeverity(rowData)}></Tag>
                     )
                 })
 
