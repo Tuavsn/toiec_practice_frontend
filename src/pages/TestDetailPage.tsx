@@ -1,14 +1,14 @@
+import { Button } from "primereact/button";
+import { Checkbox } from "primereact/checkbox";
+import { Chip } from "primereact/chip";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
-import { TestID, UserResultRow } from "../utils/types/type";
 import React, { memo } from "react";
-import formatDate from "../utils/formatDateToString";
-import { Checkbox } from "primereact/checkbox";
-import { useCheckBox } from "../hooks/TestDetailPaperHook";
-import { Chip } from "primereact/chip";
-import { Button } from "primereact/button";
+import { useNavigate, useParams } from "react-router-dom";
 import { detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
+import { useCheckBox } from "../hooks/TestDetailPaperHook";
+import formatDate from "../utils/formatDateToString";
+import { TestID, UserResultRow } from "../utils/types/type";
 
 function TestDetailPage() {
 
@@ -20,7 +20,7 @@ function TestDetailPage() {
         <Column key="col-createdAt" field="createdAt" header="Ngày làm" body={(rowData: UserResultRow) => formatDate(rowData.createdAt)} sortable filter />,
         <Column key="col-correct_count" field="totalCorrectAnswer" header="Kết quả" sortable filter />,
         <Column key="col-time" field="totalTime" header="Thời gian làm bài" sortable filter />,
-        <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} />,
+        <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} bodyClassName="flex justify-content-center gap-1" className="justify-content-center" />,
         <Column key="col-detail" body={detailUserResultRowBodyTemplate} />,
     ];
 
@@ -56,29 +56,7 @@ function TestDetailPage() {
     return (
         <main className="pt-8">
             <h1 className="text-center my-4">Thông tin đề {id}</h1>
-            <section>
-                <table>
-                    <tbody>
-
-                        <tr className="mb-3">
-                            <td>
-                                <h3 className="inline">Thời gian làm bài:   </h3>
-                            </td>
-                            <td>
-                                <h4 className="inline  pl-4">200p</h4>
-                            </td>
-                        </tr>
-                        <tr className="mb-3">
-                            <td>
-                                <h3 className="inline"> Số người đã luyện tập:  </h3>
-                            </td>
-                            <td>
-                                <h4 className="inline pl-4">500,000 người</h4>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
+            {TestInfoBox(90, 50)}
             <section>
                 <h3>Kết quả làm bài của bạn:</h3>
                 <DataTable size={'small'} value={data} showGridlines stripedRows scrollable scrollHeight="600px">
@@ -112,7 +90,7 @@ function DecodeCheckBoxesToUrl(parts: boolean[]): string {
 }
 
 const PartChooser: React.FC<{ testID: TestID }> = memo(
-    ({testID}) => {
+    ({ testID }) => {
         const { parts, onPartSelectChange } = useCheckBox();
         const navigate = useNavigate();
         const checkboxes = Array.from({ length: 8 }, (_, index) => {
@@ -149,6 +127,33 @@ const PartChooser: React.FC<{ testID: TestID }> = memo(
     }
 )
 
+function TestInfoBox(limitTime: number, totalAttempt: number) {
+    return (
+        <section className="bg-gray-300 shadow-5 p-3">
+            <table>
+                <tbody>
+
+                    <tr className="mb-3">
+                        <td>
+                            <h3 className="inline">Thời gian làm bài:   </h3>
+                        </td>
+                        <td>
+                            <h4 className="inline  pl-4">{limitTime} phút ⏰</h4>
+                        </td>
+                    </tr>
+                    <tr className="mb-3">
+                        <td>
+                            <h3 className="inline"> Số người đã luyện tập:  </h3>
+                        </td>
+                        <td>
+                            <h4 className="inline pl-4">{totalAttempt} người 👤</h4>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    )
+}
 
 
 function GetFakeUserResult(): UserResultRow[] {

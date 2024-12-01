@@ -1,5 +1,5 @@
 import { TreeNode } from "primereact/treenode";
-import { CategoryID, CategoryRow, LectureHookState, LectureRow, TestResultSummary, TestReviewHookState, TestRow, UserHookState, UserRow } from "./type";
+import { CategoryRow, LectureHookState, LectureRow, RowHookState, TestResultSummary, TestReviewHookState, TestRow, UserRow } from "./type";
 const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
@@ -53,21 +53,21 @@ export const emptyCategoryRow: CategoryRow = {
     active: true
 } as const;
 
-export function emptyTestRow(category_id: CategoryID): TestRow {
-    return {
-        id: '',
-        name: '',
-        active: true,
-        idCategory: category_id,
-        totalTestAttempt: 0,
-        totalQuestion: 200,
-        totalScore: 990,
-        limitTime: 90,
-        totalUserAttempt: 0,
-        createdAt: emptyDate,
-        updatedAt: emptyDate
-    } as const
-}
+
+export const emptyTestRow: TestRow = {
+    id: '',
+    name: '',
+    active: true,
+    idCategory: "",
+    totalTestAttempt: 0,
+    totalQuestion: 200,
+    totalScore: 990,
+    limitTime: 90,
+    totalUserAttempt: 0,
+    createdAt: emptyDate,
+    updatedAt: emptyDate
+} as const
+
 
 export const initialLectureState: LectureHookState = {
     job: "",
@@ -84,13 +84,29 @@ export const initialTestReviewState: TestReviewHookState = {
     pageMapper: []
 } as const
 
-export const initialUserState: UserHookState = {
-    users: [],
+export const initialUserState: RowHookState<UserRow> = {
+    rows: [],
     isRefresh: false,
     currentPageIndex: 0,
     job: "",
-    currentSelectedUser: emptyUserRow
+    currentSelectedRow: emptyUserRow
 } as const
+
+export const initialCategoryState: RowHookState<CategoryRow> = {
+    rows: [],
+    isRefresh: false,
+    currentPageIndex: 0,
+    job: "",
+    currentSelectedRow: emptyCategoryRow
+} as const
+
+export const initialTestState: RowHookState<TestRow> = {
+    rows: [],
+    isRefresh: false,
+    currentPageIndex: 0,
+    job: "",
+    currentSelectedRow: emptyTestRow
+}
 
 export const emptyQuestionTreeNode: TreeNode = {
     key: "",

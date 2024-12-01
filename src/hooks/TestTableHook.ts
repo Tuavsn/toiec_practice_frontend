@@ -1,18 +1,17 @@
 import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useReducer, useRef } from "react";
-import { callGetUserRow } from "../api/api";
+import { callGetTestRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
-import { initialUserState } from "../utils/types/emptyValue";
-import { RowHookAction, RowHookState, UserRow } from "../utils/types/type";
+import { emptyTestRow, initialTestState } from "../utils/types/emptyValue";
+import { TestRow, RowHookAction, RowHookState, CategoryID, Name_ID } from "../utils/types/type";
+import { useParams } from "react-router-dom";
+import SplitNameIDFromURL from "../utils/splitNameIDFromURL";
 
-
-
-
-const reducer = (state: RowHookState<UserRow>, action: RowHookAction<UserRow>): RowHookState<UserRow> => {
+const reducer = (state: RowHookState<TestRow>, action: RowHookAction<TestRow>): RowHookState<TestRow> => {
     switch (action.type) {
         case 'FETCH_ROWS_SUCCESS':
-            const [newUsers, newPageIndex] = action.payload;
-            return { ...state, rows: newUsers, currentPageIndex: newPageIndex }
+            const [newCateogories, newPageIndex] = action.payload;
+            return { ...state, rows: newCateogories, currentPageIndex: newPageIndex }
         case 'SET_PAGE':
             return { ...state, currentPageIndex: action.payload }
         case 'REFRESH_DATA':
@@ -30,16 +29,20 @@ const reducer = (state: RowHookState<UserRow>, action: RowHookAction<UserRow>): 
             return state;
     }
 };
-export default function useUser() {
 
-    const [state, dispatch] = useReducer(reducer, initialUserState);
+export default function useTest() {
+
+    const [state, dispatch] = useReducer(reducer, initialTestState);
     const totalItems = useRef(0);
     const { toast } = useToast();
-    const fetchUsers = useCallback(async (pageNumber: number) => {
+    const { category_name_id = "no idCategory found" } = useParams<{ category_name_id: Name_ID<CategoryID> }>();
+    const [, category_id] = SplitNameIDFromURL(category_name_id);
+    emptyTestRow.idCategory = category_id;
+    const fetchTests = useCallback(async (pageNumber: number) => {
 
-        const response = await callGetUserRow(pageNumber);
+        const response = await callGetTestRow(category_id, pageNumber);
         if (!response) {
-            toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Không thể tải được danh sách người dùng" });
+            toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Không thể tải được danh sách bộ đề" });
             return;
         }
         dispatch({ type: "FETCH_ROWS_SUCCESS", payload: [response.result, pageNumber] });
@@ -48,12 +51,12 @@ export default function useUser() {
     }, [])
     useEffect(() => {
 
-        fetchUsers(state.currentPageIndex);
+        fetchTests(state.currentPageIndex);
 
     }, [state.isRefresh]);
 
     const onPageChange = (e: PaginatorPageChangeEvent) => {
-        fetchUsers(e.page)
+        fetchTests(e.page)
     }
 
     return {
@@ -61,7 +64,7 @@ export default function useUser() {
         dispatch,
         totalItems,
         onPageChange,
+
     }
 }
-
 

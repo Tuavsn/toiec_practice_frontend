@@ -38,9 +38,9 @@ export function statusBodyTemplate<Model extends { active: boolean }>(rowData: M
     return <Tag value={(rowData.active) + ""} severity={getSeverity(rowData)}></Tag>;
 };
 
-export function detailUserResultRowBodyTemplate(row: UserResultRow) {
+export function detailUserResultRowBodyTemplate(row: { id: string }) {
     return (
-        <Link className="text-blue-500" to={"/" + row.id}>Xem chi tiết</Link>
+        <Link className="text-blue-500" to={`test/${row.id}/review`}>Xem chi tiết</Link>
     )
 }
 
@@ -65,7 +65,7 @@ export function typeUserResultRowBodyTemplate(rowData: UserResultRow) {
             {rowData.type === "practice" &&
                 rowData.parts.map((part, index) => {
                     return (
-                        <Tag key={"tag" + index} value={(part) + ""} severity={getUserResultRowSeverity(rowData)}></Tag>
+                        <Tag key={"tag" + index} value={part} severity={getUserResultRowSeverity(rowData)}></Tag>
                     )
                 })
 

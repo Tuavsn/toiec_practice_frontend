@@ -1,4 +1,4 @@
-import { ApiResponse, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureRow, PracticePaper, QuestionRow, ResultID, TableData, Test, TestCard, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
+import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureRow, PracticePaper, QuestionRow, ResultID, TableData, Test, TestCard, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -6,20 +6,18 @@ export const loginUrl = `${host}/oauth2/authorize/google`;
 
 
 
-export const callCreateCateogry = async (format: string, year: number) => {
-
-    const response = await axios.post<ApiResponse<CategoryRow>>(
-        `${import.meta.env.VITE_API_URL}/categories`,
-        { format, year }
-    );
-    return response.data;
-
+export const callCreateCateogry = async (category: CategoryRow): Promise<boolean> => {
+    try {
+        await axios.post<ApiResponse<CategoryRow>>(
+            `${import.meta.env.VITE_API_URL}/categories`,
+            { format: category.format, year: category.year }
+        );
+        return true
+    } catch (e) {
+        return false;
+    }
 }
 
-
-export const callGetCategory = () => {
-    return axios.get<ApiResponse<CategoryRow[]>>(`${import.meta.env.VITE_API_URL}/categories`);
-}
 export const callDeleteRow = async (urlApi: string, id: string): Promise<boolean> => {
     try {
         await axios.post(`${import.meta.env.VITE_API_URL}/${urlApi}/${id}`, { active: false, isActive: false });
@@ -49,21 +47,7 @@ export const callGetTestPaper = async (testId: TestID, parts: string): Promise<A
     const response = await axios.get<ApiResponse<TestPaper>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}`);
     return response.data;
 }
-export const callPostTest = async (testRow: TestRow): Promise<TestRow | Error> => {
-    try {
-        const response = await axios.post<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests`, {
-            name: testRow.name,
-            categoryId: testRow.idCategory,
-            totalUserAttempt: testRow.totalUserAttempt,
-            totalQuestion: testRow.totalQuestion,
-            totalScore: testRow.totalScore,
-            limitTime: testRow.limitTime,
-        });
-        return response.data.data;
-    } catch (error) {
-        return (error as Error)
-    }
-}
+
 export const callPostTestRecord = async (testRecord: TestRecord): Promise<ApiResponse<{ resultId: ResultID }>> => {
     const response = await axios.post(`${import.meta.env.VITE_API_URL}/tests/submit`, testRecord)
     return response.data;
@@ -295,6 +279,55 @@ export const callGetUserRow = async (currentPageIndex: number, pageSize: number 
 
 }
 
+export const callGetCategoryRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<CategoryRow> | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<CategoryRow>>>(`${import.meta.env.VITE_API_URL}/categories?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        return response.data.data;
+    } catch (error) {
+        return null;
+    }
+}
+export const callGetTestRow = async (categoryID: CategoryID, currentPageIndex: number, pageSize: number = 5): Promise<TableData<TestRow> | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<TestRow>>>(`${import.meta.env.VITE_API_URL}/categories/${categoryID}/tests?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        return response.data.data;
+    } catch (error) {
+        return null;
+    }
+}
+
+export const callPostUpdateCategoryRow = async (category: CategoryRow): Promise<boolean> => {
+    try {
+        await axios.post(`${import.meta.env.VITE_API_URL}/categories/${category.id}`, {
+            format: category.format,
+            year: category.year
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+export const callPostDeleteCategoryRow = async (category: CategoryRow): Promise<boolean> => {
+    try {
+        await axios.post(`${import.meta.env.VITE_API_URL}/categories/${category.id}`, {
+            isActive: false
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+export const callPostDeleteTestRow = async (test: TestRow): Promise<boolean> => {
+    try {
+        await axios.post(`${import.meta.env.VITE_API_URL}/tests/${test.id}`, {
+            isActive: false
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
 export const callPutUpdateUserRow = async (user: UserRow): Promise<boolean> => {
     try {
         await axios.put(`${import.meta.env.VITE_API_URL}/users/${user.id}/status`, {
@@ -303,5 +336,37 @@ export const callPutUpdateUserRow = async (user: UserRow): Promise<boolean> => {
         return true;
     } catch (error) {
         return false;
+    }
+}
+
+
+export const callPostTest = async (testRow: TestRow): Promise<boolean> => {
+    try {
+        axios.post<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests`, {
+            name: testRow.name,
+            categoryId: testRow.idCategory,
+            totalUserAttempt: testRow.totalUserAttempt,
+            totalQuestion: testRow.totalQuestion,
+            totalScore: testRow.totalScore,
+            limitTime: testRow.limitTime,
+        });
+        return true
+    } catch (error) {
+        return false
+    }
+}
+export const callPostUpdateTest = async (testRow: TestRow): Promise<boolean> => {
+    try {
+        axios.post<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests/${testRow.id}`, {
+            name: testRow.name,
+            categoryId: testRow.idCategory,
+            totalUserAttempt: testRow.totalUserAttempt,
+            totalQuestion: testRow.totalQuestion,
+            totalScore: testRow.totalScore,
+            limitTime: testRow.limitTime,
+        });
+        return true
+    } catch (error) {
+        return false
     }
 }
