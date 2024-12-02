@@ -301,24 +301,33 @@ function UserAnswerToHTML(question: UserAnswerRecord): JSX.Element {
 
             })
             }
-            <Accordion>
-                <AccordionTab header="Dịch nghĩa">
+
+            <TranscriptAndExplain question={question} />
+
+
+        </div>
+    );
+}
+
+function TranscriptAndExplain({ question }: { question: UserAnswerRecord }) {
+    return (
+        <Accordion>
+            {question.transcript &&
+                <AccordionTab header="Transcript">
                     <div className="card">
                         {question.transcript}
                     </div>
                 </AccordionTab>
-            </Accordion>
-
-            <Accordion>
+            }
+            {question.explanation &&
                 <AccordionTab header="Giải thích đáp án">
                     <div className="card">
                         {question.explanation}
                     </div>
                 </AccordionTab>
-            </Accordion>
-
-        </div>
-    );
+            }
+        </Accordion>
+    )
 }
 
 function PracticeAnswerToHTML(question: PracticeQuestion, userAnswer: string, updateUserAnswerSheet: (qID: QuestionID, answer: string) => void) {
@@ -415,6 +424,7 @@ export function ConvertUserAnswerRecordToHTML(question: UserAnswerRecord): [JSX.
                 UserAnswerToHTML(subq)
             );
         }
+        resoursesElement.push(<TranscriptAndExplain question={question} />)
     } else {
         // Nếu là câu hỏi đơn lẻ, thêm nội dung câu hỏi
         questionsElement.push(

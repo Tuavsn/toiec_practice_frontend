@@ -170,22 +170,22 @@ const ActivityLog: React.FC<ActivityLogProps> = React.memo(
                 <h1>Lịch sử hoạt động</h1>
                 <DataTable dataKey="resultId" loading={!userResultRows.length} showGridlines paginator totalRecords={userResultRows.length} rows={5} size="small" value={userResultRows} >
                     {/* // Cột ngày làm việc, hiển thị ngày từ trường createdAt và cho phép lọc, sắp xếp */}
-                    <Column key="col-createdAt" field="createdAt" header="Ngày làm" body={(rowData: UserDetailResultRow) => formatDate(rowData.createdAt)} sortable filter />
+                    <Column key="col-createdAt" alignHeader='center' field="createdAt" header="Ngày làm" body={(rowData: UserDetailResultRow) => formatDate(rowData.createdAt)} sortable filter />
 
                     {/* // Cột tên đề thi, hiển thị theo trường testFormatAndYear, có thể lọc, sắp xếp */}
-                    <Column key="col-testName" field="testName" header="Đề" sortable filter />
+                    <Column key="col-testName" alignHeader='center' field="testName" header="Đề" sortable filter />
 
                     {/* // Cột kết quả, sử dụng template CountSkillScoreTemplate để hiển thị điểm đọc và nghe */}
-                    <Column key="col-skill_count" header="Kết quả" body={CountSkillScoreTemplate} sortable filter />
+                    <Column key="col-skill_count" alignHeader='center' header="Kết quả" body={CountSkillScoreTemplate}/>
 
                     {/* // Cột thống kê trả lời, hiển thị số lượng đúng, sai, bỏ qua bằng template CountAnswerTypeTemplate */}
-                    <Column key="col-answer_count" header="thống kê" body={CountAnswerTypeTemplate} sortable filter />
+                    <Column key="col-answer_count" alignHeader='center' header="thống kê" body={CountAnswerTypeTemplate} />
 
                     {/* // Cột thời gian làm bài, lấy dữ liệu từ trường totalTime và cho phép sắp xếp */}
-                    <Column key="col-time" field="totalTime" header="Thời gian làm" body={(data) => convertSecondsToString(data.totalTime)} sortable filter />
+                    <Column key="col-time" alignHeader='center' field="totalTime" header="Thời gian làm" body={(data) => convertSecondsToString(data.totalTime)} sortable filter />
 
                     {/* // Cột loại bài kiểm tra, dùng template UserResultTemplate để hiển thị thông tin loại */}
-                    <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} />
+                    <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} alignHeader='center'/>
 
                     {/* // Cột chi tiết, hiển thị chi tiết kết quả người dùng qua template UserResultTemplate */}
                     <Column key="col-detail" body={(data) => detailUserResultRowBodyTemplate({ id: data.resultId })} />
@@ -198,12 +198,18 @@ const ActivityLog: React.FC<ActivityLogProps> = React.memo(
 )
 
 // Hàm CountSkillScoreTemplate nhận rowData và trả về hiển thị điểm nghe và đọc của người dùng
-function CountSkillScoreTemplate(rowData: { totalReadingScore: number, totalListeningScore: number }) {
+function CountSkillScoreTemplate(rowData: UserDetailResultRow) {
     return (
-        <div className="flex flex-wrap justify-content-around">
-            <p className="">👂 {rowData.totalListeningScore}</p> {/* Điểm nghe */}
-            <p className="">📖 {rowData.totalReadingScore}</p> {/* Điểm đọc */}
-        </div>
+        <section>
+            <div className='text-center bg-blue-200 p-2'>
+
+                {rowData.result}
+            </div>
+            <div className="flex flex-wrap justify-content-around">
+                <span className="text-center bg-green-200 flex-1 p-2">👂 {rowData.totalListeningScore}</span> {/* Điểm nghe */}
+                <span className="text-center bg-orange-200 flex-1 p-2">📖 {rowData.totalReadingScore}</span> {/* Điểm đọc */}
+            </div>
+        </section>
     )
 }
 
