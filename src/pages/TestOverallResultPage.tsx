@@ -14,7 +14,7 @@ export default function TestOverallResultPage() {
         <main className="pt-8 w-full family-font">
             <Card title={`Kết quả thi: ${overallDetail.type} phần ${overallDetail.parts}`}>
                 <section className="flex flex-wrap justify-content-around gap-3">
-                    <table className="bg-gray-300 p-2 border-round-md flex-1 shadow-4">
+                    <table className="bg-gray-300 p-2 border-round-md flex-1 shadow-4 glassmorphism">
                         <tbody>
                             <tr>
                                 <td>Kết quả làm bài:</td>
@@ -44,14 +44,20 @@ export default function TestOverallResultPage() {
                         <h1>{overallDetail.totalSkipAnswer}</h1>
                         câu hỏi
                     </div>
+                    <div className="shadow-4 p-3 text-center border-round-md flex-1">
+                        🏆
+                        <p className="text-blue-300">Tổng điểm</p>
+                        <h1>{overallDetail.totalListeningScore + overallDetail.totalReadingScore}</h1>
+                        điểm
+                    </div>
                 </section>
                 <section className="flex gap-4 mt-4">
-                    <div className="flex-1 justify-content-center bg-orange-100 shadow-5 border-round-lg">
+                    <div className="flex-1 justify-content-center bg-orange-100 shadow-5 border-round-lg glassmorphism">
                         <h1 className="text-center text-blue-500">Listening</h1>
                         <h1 className="text-center">{overallDetail.totalListeningScore} / 495</h1>
 
                     </div>
-                    <div className="flex-1 justify-content-center bg-orange-100 shadow-5 border-round-lg">
+                    <div className="flex-1 justify-content-center bg-orange-100 shadow-5 border-round-lg glassmorphism">
                         <h1 className="text-center text-blue-500">Reading</h1>
                         <h1 className="text-center">{overallDetail.totalReadingScore} / 495</h1>
                     </div>

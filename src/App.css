@@ -73,3 +73,41 @@ h6,
     padding: 8px; /* Optional: Adds some spacing for better readability */
     text-align: center;
 }
+
+.glassmorphism {
+    background: rgba(255, 255, 255, 0.1); /* Transparent white */
+    backdrop-filter: blur(10px); /* Blur effect */
+    border-radius: 15px; /* Rounded corners */
+    padding: 20px; /* Padding inside the container */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border */
+    position: relative; /* To position the shiny stripe */
+    overflow: hidden; /* Prevent the shiny stripe from overflowing */
+  }
+  
+  .glassmorphism::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50%; /* Position the stripe off-screen */
+    width: 200%; /* Make the stripe twice as wide */
+    height: 100%; /* Full height of the element */
+    background: rgba(255, 255, 255, 0.4); /* Light reflective stripe */
+    transform: skewX(-30deg); /* Skew the stripe for a glossy look */
+    opacity: 0; /* Start with the stripe hidden */
+    transition: opacity 0.3s ease; /* Smooth transition for opacity */
+  }
+  
+  .glassmorphism:hover::after {
+    opacity: 1; /* Show the stripe on hover */
+    animation: shine 1s forwards; /* Run animation only once */
+  }
+  
+  @keyframes shine {
+    0% {
+      left: -50%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
