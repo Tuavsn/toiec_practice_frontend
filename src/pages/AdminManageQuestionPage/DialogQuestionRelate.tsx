@@ -89,6 +89,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                 if (success) {
                     if (success) {
                         toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
+                        
                     } else {
                         toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Có lỗi khi lưu" });
                     }

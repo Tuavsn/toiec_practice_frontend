@@ -39,7 +39,7 @@ export function statusBodyTemplate<Model extends { active: boolean }>(rowData: M
 
 export function detailUserResultRowBodyTemplate(row: { id: string }) {
     return (
-        <Link className="text-blue-500" to={`test/${row.id}/review`}>Xem chi tiết</Link>
+        <Link className="text-blue-500" to={`/test/${row.id}/review`}>Xem chi tiết</Link>
     )
 }
 

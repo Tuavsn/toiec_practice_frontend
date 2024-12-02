@@ -1,4 +1,4 @@
-import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureRow, PracticePaper, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
+import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureRow, PracticePaper, ProfileHookState, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -55,7 +55,7 @@ export const callPostTestRecord = async (testRecord: TestRecord): Promise<ApiRes
 
 export const callGetUserDetailResultList = async (pageNumber: number = 0, pageSize: number = 5): Promise<ApiResponse<TableData<TestResultSummary>>> => {
 
-    const response = await axios.get<ApiResponse<TableData<TestResultSummary>>>(`${import.meta.env.VITE_API_URL}/result?current=${pageNumber + 1}&pageSize=${pageSize}&type=FULL_TEST`);
+    const response = await axios.get<ApiResponse<TableData<TestResultSummary>>>(`${import.meta.env.VITE_API_URL}/results?current=${pageNumber + 1}&pageSize=${pageSize}&type=FULL_TEST`);
 
     return response.data;
 }
@@ -403,6 +403,15 @@ export const callPostUpdateTest = async (testRow: TestRow): Promise<boolean> => 
 export const callGetTestDetailPageData = async (testID: TestID): Promise<TestDetailPageData | null> => {
     try {
         const response = await axios.get<ApiResponse<TestDetailPageData>>(`${import.meta.env.VITE_API_URL}/tests/${testID}/info`);
+        return response.data.data;
+    } catch (error) {
+        return null;
+    }
+}
+
+export const callGetProfile = async (): Promise<ProfileHookState | null> => {
+    try {
+        const response = await axios.get<ApiResponse<ProfileHookState>>(`${import.meta.env.VITE_API_URL}/auth/account`);
         return response.data.data;
     } catch (error) {
         return null;
