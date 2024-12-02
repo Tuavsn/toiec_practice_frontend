@@ -1,8 +1,7 @@
 import { Tag } from "primereact/tag";
-import React from "react";
 import { Link } from "react-router-dom";
 import formatDate from "../../../utils/formatDateToString";
-import { UserResultRow } from "../../../utils/types/type";
+import { TestType } from "../../../utils/types/type";
 
 export function timeStampBodyTemplate<Model extends { createdAt: Date, updatedAt: Date }>(rowData: Model) {
     return (
@@ -40,11 +39,11 @@ export function statusBodyTemplate<Model extends { active: boolean }>(rowData: M
 
 export function detailUserResultRowBodyTemplate(row: { id: string }) {
     return (
-        <Link className="text-blue-500" to={`test/${row.id}/review`}>Xem chi tiết</Link>
+        <Link className="text-blue-500" to={`/test/${row.id}/review`}>Xem chi tiết</Link>
     )
 }
 
-export function getUserResultRowSeverity(row: UserResultRow) {
+export function getUserResultRowSeverity(row: { type: TestType }) {
     switch (row.type) {
         case "fulltest":
             return 'success';
@@ -56,20 +55,33 @@ export function getUserResultRowSeverity(row: UserResultRow) {
     }
 };
 
-export function typeUserResultRowBodyTemplate(rowData: UserResultRow) {
+export function typeUserResultRowBodyTemplate(rowData: { type: TestType, parts: string }) {
+    const TagElements: JSX.Element[] = Array(rowData.parts.length);
+    for (const c of rowData.parts) {
+        TagElements.push(<Tag key={"tag" + c} value={c} severity={getUserResultRowSeverity(rowData)}></Tag>
+        )
+    }
     return (
-        <React.Fragment>
+
+        <div className="flex justify-content-around">
             {rowData.type === "fulltest" &&
                 <Tag value={"Thi thử"} severity={getUserResultRowSeverity(rowData)}></Tag>
             }
             {rowData.type === "practice" &&
-                rowData.parts.map((part, index) => {
-                    return (
-                        <Tag key={"tag" + index} value={part} severity={getUserResultRowSeverity(rowData)}></Tag>
-                    )
-                })
+                TagElements
 
             }
-        </React.Fragment>
+        </div>
     );
 };
+// Hàm CountAnswerTypeTemplate nhận rowData và hiển thị thống kê số lượng câu trả lời đúng, sai và bỏ qua
+export function CountAnswerTypeTemplate(rowData: { totalCorrectAnswer: number, totalIncorrectAnswer: number, totalSkipAnswer: number }) {
+    return (
+        <div className="flex flex-wrap justify-content-around sm:flex-column md:flex-row">
+            <p>✅ {rowData.totalCorrectAnswer}</p> {/* Số lượng đúng */}
+            <p>❌ {rowData.totalIncorrectAnswer}</p> {/* Số lượng sai */}
+            <p>😵 {rowData.totalSkipAnswer}</p> {/* Số lượng bỏ qua */}
+        </div>
+
+    )
+}

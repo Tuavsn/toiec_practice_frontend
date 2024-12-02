@@ -236,13 +236,20 @@ export interface UserResultRow {
   parts: number[];  // Practice parts
 }
 
-export type UserDetailResultRow = UserResultRow & {
-  testFormatAndYear: string,
-  totalReadingScore: number,
-  totalListeningScore: number,
-  totalIncorrectAnswer: number,
-  totalSkipAnswer: number,
-
+export type UserDetailResultRow = {
+  createdAt: Date; // ISO 8601 date string
+  testId: TestID;
+  resultId: ResultID;
+  testName: string;
+  result: string; // "1/200" format
+  totalTime: number; // Total time in seconds
+  totalReadingScore: number;
+  totalListeningScore: number;
+  totalCorrectAnswer: number;
+  totalIncorrectAnswer: number;
+  totalSkipAnswer: number;
+  type: TestType; // E.g., "fulltest"
+  parts: string;
 }
 
 export interface TestPaper {
@@ -275,8 +282,58 @@ export type TestRecord = {
   userAnswer: AnswerRecord[];
   type: TestType
 }
+export interface TestDetailPageData {
+  id: string;
+  name: string;
+  totalUserAttempt: number;
+  totalQuestion: number;
+  totalScore: number;
+  limitTime: number;
+  resultsOverview: ResultOverview[];
+  topicsOverview: TopicOverview[];
+}
+export type TopicStat = {
+  topic: Topic; // Assuming Topic is another type or interface
+  totalCorrect: number;
+  totalIncorrect: number;
+  averageTime: number;
+  timeCount: number;
+  totalTime: number;
+};
+export type OverallStat = {
+  averageListeningScore: number;
+  listeningScoreCount: number;
+  averageReadingScore: number;
+  readingScoreCount: number;
+  averageTotalScore: number;
+  totalScoreCount: number;
+  averageTime: number;
+  timeCount: number;
+  highestScore: number;
+};
+export type SkillStat = {
+  skill: string; // "listening", "reading", etc.
+  totalCorrect: number;
+  totalIncorrect: number;
+  totalTime: number;
+};
+interface ResultOverview {
+  createdAt: Date; // Use ISO string for Instant in Java
+  result: ResultID; // e.g., "x/200", "x/30"
+  totalTime: number;
+  totalReadingScore: number;
+  totalListeningScore: number;
+  totalCorrectAnswer: number;
+  totalIncorrectAnswer: number;
+  totalSkipAnswer: number;
+  type: TestType; // "practice" or "fulltest"
+  parts: string; // "Practice parts"
+}
 
-
+interface TopicOverview {
+  partNum: number;
+  topicNames: string[];
+}
 
 export type TestResultSummary = {
   id: ResultID;
@@ -522,7 +579,7 @@ export interface TopicRecord extends DataTableValue {
 }
 
 export interface SkillInsightsProps {
-  parts: TopicRecord[][]
+  parts: TopicStat[]
 }
 export type AnswerRecord = AnswerPair & {
   timeSpent: milisecond;
@@ -568,6 +625,10 @@ export interface DialogQuestionPageProps {
   dialogBodyVisible: JSX.Element | null,
   title: string
 }
+
+export interface ActivityLogProps {
+  userResultRows: UserDetailResultRow[]
+}
 //---------------------------- tên gọi khác
 export type TestAnswerSheet = Map<QuestionNumber, AnswerPair>;
 export type ResultID = string;
@@ -608,6 +669,18 @@ export interface CategoryHookState {
   job: DialogRowJobType,
   currentSelectedCategory: CategoryRow
 }
+
+export type ProfileHookState = {
+  id: UserID,
+  avatar: string,
+  role: Role,
+  target: number,
+  overallStat: OverallStat,
+  topicStats: TopicStat[],
+  skillStats: SkillStat[],
+  results: UserDetailResultRow[],
+}
+
 export interface TestReviewHookState {
   testReviewAnswerSheet: TestReviewAnswerSheet,
   isUserAnswerSheetVisible: boolean,

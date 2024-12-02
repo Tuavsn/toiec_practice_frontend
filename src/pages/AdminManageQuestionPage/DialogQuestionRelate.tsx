@@ -7,7 +7,7 @@ import { InputText } from "primereact/inputtext"
 import { InputTextarea } from "primereact/inputtextarea"
 import { MultiSelect } from "primereact/multiselect"
 import React, { useState } from "react"
-import { callPostConvertResourceToLink, callPutQuestionUpdate } from "../../api/api"
+import { callPutQuestionUpdate } from "../../api/api"
 import { useToast } from "../../context/ToastProvider"
 import { DialogQuestionActionProps, DialogQuestionPageProps, Resource, ResourceIndex, Topic, UpdateQuestionDialogProps, UpdateQuestionForm } from "../../utils/types/type"
 import ResourceSection from "./ResourceSection"
@@ -85,13 +85,13 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
             // toast.current?.show({ severity: 'success', content: "Sửa thành công" });
             // callPutQuestionUpdate(formData);
             const updateQuestion = async () => {
-                await convertResourceFileToLink(resources);
-                const questionUpdatedResponse: any = await callPutQuestionUpdate(formData);
-                if (questionUpdatedResponse) {
-                    if (questionUpdatedResponse.status == 200) {
-                        toast.current?.show({ severity: 'success', content: "Sửa thành công" });
+                const success: boolean = await callPutQuestionUpdate(formData, resources);
+                if (success) {
+                    if (success) {
+                        toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
+                        
                     } else {
-                        toast.current?.show({ severity: 'error', content: questionUpdatedResponse.error });
+                        toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Có lỗi khi lưu" });
                     }
                 }
             }
@@ -234,8 +234,4 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
         );
     }
 )
-async function convertResourceFileToLink(resources: ResourceIndex[]) {
-    const a = await Promise.all(resources.map((r) => callPostConvertResourceToLink(r.file)))
-    console.dir(a);
-}
 

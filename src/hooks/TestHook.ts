@@ -50,7 +50,7 @@ const useTestPage = () => {
         const resultBodyObject: TestRecord = {
             totalSeconds: (Date.now() - timeDoTest.current) / 1000, // khép lại thời gian làm bài ( đơn vị giây)
             testId: id,
-            parts: parts,
+            parts: parts === "0" ? "1234567" : parts,
             type: testType,
             userAnswer: prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current)
         }
