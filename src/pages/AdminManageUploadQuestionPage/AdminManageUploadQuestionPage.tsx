@@ -23,15 +23,14 @@ export function AdminManageUploadQuestionPage() {
             if (file.name.endsWith(".csv") || file.name.endsWith(".xlsx")) {
                 excelFiles.push(file);
             } else {
-                resourceFiles.push(file); // Assume other files are resources
+                resourceFiles.push(file);
             }
         });
-        // const [excelError, resourceError] = await Promise.all([
-        //     callPostImportExcel(test_id, excelFiles),
-        //     callPostImportResource(resourceFiles),
-        // ])
-        const excelError = await callPostImportExcel(test_id, excelFiles);
-        if (excelError) {
+        const [excelError, resourceError] = await Promise.all([
+            callPostImportExcel(test_id, excelFiles),
+            callPostImportResource(resourceFiles),
+        ])
+        if (excelError || resourceError) {
             toast.current?.show({ severity: "error", summary: "Tải câu hỏi", detail: "Lỗi tải lên thất bại!" });
             return;
         }

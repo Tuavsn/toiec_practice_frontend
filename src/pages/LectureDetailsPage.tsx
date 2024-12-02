@@ -6,7 +6,7 @@ import { Link, useParams } from 'react-router-dom';
 import { callGetLectureDoctrine, callGetLectureRow, callGetPracticePaper } from '../api/api';
 import { ConvertThisPracticeQuestionToHTML } from '../utils/convertToHTML';
 import SplitNameIDFromURL from '../utils/splitNameIDFromURL';
-import { ApiResponse, LectureID, Name_ID, PracticeAnswerSheet, PracticePaper, PracticeQuestion, QuestionID } from '../utils/types/type';
+import { LectureID, Name_ID, PracticeAnswerSheet, PracticeQuestion, QuestionID } from '../utils/types/type';
 
 
 // Component chi tiết khóa học
@@ -17,7 +17,7 @@ const CourseDetailsPage: React.FC = () => {
     // Hook useEffect chạy khi component mount
     useEffect(() => {
 
-    }, []);
+    }, [lecture_name_id]);
 
     // Phần giao diện của component
     return (
@@ -64,26 +64,26 @@ export default CourseDetailsPage;
 
 function RelateCoursesTemplate() {
 
-    useEffect(()=>{
+    useEffect(() => {
         callGetLectureRow
     })
 
     return (
         <React.Fragment>
-            <Link className='hover:shadow-2' to={''}>
-                Khóa làm chủ ★★★☆☆
+            <Link to={'/lectures/Câu%20hỏi%20đuôi___67461cba477a82561b5a8fb4'}>
+                <p className='hover:shadow-2 py-2' >Câu hỏi đuôi</p>
             </Link>
             <Divider />
             <Link to={''}>
-                Khóa làm giàu ★★★☆☆
+                <p className='hover:shadow-2 py-2' >Câu hỏi yes/ no</p>
             </Link>
             <Divider />
-            <Link to={''}>
-                khóa làm đẹp ★★★☆☆
+            <Link to={'/lectures/Loại%20tranh%20tả%20người%20và%20vật___67461b11477a82561b5a8fb3'}>
+                <p className='hover:shadow-2 py-2' >Loại tranh tả người và vật</p>
             </Link>
             <Divider />
-            <Link to={''}>
-                khóa làm ăn ★★★☆☆
+            <Link to={'/lectures/Cách%20phân%20biệt%20câu%20hỏi%20when%20liên%20quan%20tới%20thời%20gian___67489285fcdfa12b4133eecd'}>
+                <p className='hover:shadow-2 py-2' >Cách phân biệt câu hỏi when liên quan tới thời gian</p>
             </Link>
         </React.Fragment>
     )

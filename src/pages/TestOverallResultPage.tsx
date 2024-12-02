@@ -18,7 +18,7 @@ export default function TestOverallResultPage() {
                         <tbody>
                             <tr>
                                 <td>Kết quả làm bài:</td>
-                                <td>{overallDetail.totalListeningScore + overallDetail.totalReadingScore}/200</td>
+                                <td>{overallDetail.totalCorrectAnswer} / {overallDetail.totalCorrectAnswer + overallDetail.totalIncorrectAnswer + overallDetail.totalSkipAnswer}</td>
                             </tr>
                             <tr>
                                 <td>Thời gian làm bài:</td>
@@ -43,6 +43,17 @@ export default function TestOverallResultPage() {
                         <p className="text-orange-300">Không trả lời</p>
                         <h1>{overallDetail.totalSkipAnswer}</h1>
                         câu hỏi
+                    </div>
+                </section>
+                <section className="flex gap-4 mt-4">
+                    <div className="flex-1 justify-content-center bg-orange-100 shadow-5 border-round-lg">
+                        <h1 className="text-center text-blue-500">Listening</h1>
+                        <h1 className="text-center">{overallDetail.totalListeningScore} / 495</h1>
+
+                    </div>
+                    <div className="flex-1 justify-content-center bg-orange-100 shadow-5 border-round-lg">
+                        <h1 className="text-center text-blue-500">Reading</h1>
+                        <h1 className="text-center">{overallDetail.totalReadingScore} / 495</h1>
                     </div>
                 </section>
                 <section className="mt-4 flex justify-content-end">

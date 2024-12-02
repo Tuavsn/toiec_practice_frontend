@@ -47,17 +47,17 @@ function RenderDialog(params: RenderRowDialogParams<TestRow>): [string, JSX.Elem
 
         case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa bộ đề" cùng với tên của bộ đề hiện tại và một thông báo xác nhận xóa
 
-            return [`Xóa bộ đề ${params.currentSelectedRow.name}`,
+            return [`Xóa đề ${params.currentSelectedRow.name}`,
             <RenderDeleteTestBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
             ];
         case "CREATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa bộ đề" cùng với tên của bộ đề hiện tại và một thông báo xác nhận xóa
 
-            return [`Xóa bộ đề ${params.currentSelectedRow.name}`,
-            <RenderUpsertCateogoryBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
+            return [`Tạo đề mới`,
+                <RenderUpsertCateogoryBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
             ];
         case "UPDATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa bộ đề" cùng với tên của bộ đề hiện tại và một thông báo xác nhận xóa
 
-            return [`Cập nhật bộ đề ${params.currentSelectedRow.name}`,
+            return [`Cập nhật đề ${params.currentSelectedRow.name}`,
             <RenderUpsertCateogoryBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
             ];
     }
