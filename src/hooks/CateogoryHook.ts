@@ -7,9 +7,10 @@ import { CategoryRow, RowHookAction, RowHookState } from "../utils/types/type";
 
 const reducer = (state: RowHookState<CategoryRow>, action: RowHookAction<CategoryRow>): RowHookState<CategoryRow> => {
     switch (action.type) {
-        case 'FETCH_ROWS_SUCCESS':
+        case 'FETCH_ROWS_SUCCESS': {
             const [newCateogories, newPageIndex] = action.payload;
             return { ...state, rows: newCateogories, currentPageIndex: newPageIndex }
+        }
         case 'SET_PAGE':
             return { ...state, currentPageIndex: action.payload }
         case 'REFRESH_DATA':

@@ -77,7 +77,7 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateTestBodyProps> = React.mem
         const { toast } = useToast();
         const title = useRef<string>(props.currentSelectedRow.id ? "Sửa bộ đề" : "Thêm bộ đề");
 
-        const onInputTextChange = (e: any, field: keyof TestRow) => {
+        const onInputTextChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof TestRow) => {
             const value = e.target.value === null ? '' : e.target.value; // Handle text input
             setFormData((prevRow) => ({
                 ...prevRow,

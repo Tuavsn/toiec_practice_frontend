@@ -10,9 +10,10 @@ import { RowHookAction, RowHookState, UserRow } from "../utils/types/type";
 
 const reducer = (state: RowHookState<UserRow>, action: RowHookAction<UserRow>): RowHookState<UserRow> => {
     switch (action.type) {
-        case 'FETCH_ROWS_SUCCESS':
+        case 'FETCH_ROWS_SUCCESS': {
             const [newUsers, newPageIndex] = action.payload;
             return { ...state, rows: newUsers, currentPageIndex: newPageIndex }
+        }
         case 'SET_PAGE':
             return { ...state, currentPageIndex: action.payload }
         case 'REFRESH_DATA':

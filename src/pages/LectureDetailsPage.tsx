@@ -10,7 +10,7 @@ import { LectureID, Name_ID, PracticeAnswerSheet, PracticeQuestion, QuestionID }
 
 
 // Component chi tiết khóa học
-const CourseDetailsPage: React.FC = () => {
+const LectureDetailsPage: React.FC = () => {
     // Lấy ID của khóa học từ tham số URL
     const { lecture_name_id = "" } = useParams<{ lecture_name_id: Name_ID<LectureID> }>();
     const [lectureName, lectureId] = SplitNameIDFromURL(lecture_name_id);
@@ -49,7 +49,7 @@ const CourseDetailsPage: React.FC = () => {
     );
 };
 
-export default CourseDetailsPage;
+export default LectureDetailsPage;
 
 
 
@@ -63,9 +63,9 @@ export default CourseDetailsPage;
 // }
 
 function RelateCoursesTemplate() {
-    useEffect(() => {
-        callGetLectureRow
-    })
+    // useEffect(() => {
+    //     callGetLectureRow
+    // })
 
     return (
         <React.Fragment>

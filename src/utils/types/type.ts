@@ -174,7 +174,7 @@ export interface Meta {
 
 export interface ApiResponse<T> {
   statusCode: number,
-  message: any,
+  message: string,
   data: T,
   error: string,
 }

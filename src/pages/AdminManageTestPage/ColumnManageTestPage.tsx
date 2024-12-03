@@ -14,7 +14,7 @@ export function RenderAdminTestColumns(dispatch: Dispatch<RowHookAction<TestRow>
         <Column key="col-totalQuestion" field="totalQuestion" header="Total Question" sortable filter style={{ minWidth: '12rem' }} />,
         <Column key="col-totalScore" field="totalScore" header="Total Score" sortable filter style={{ minWidth: '12rem' }} />,
         <Column key="col-limitTime" field="limitTime" header="Limit Time" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-questions" header="questions" body={questionsBodyTemplate} />,
+        <Column key="col-questions" header="questions" body={(data) => <QuestionsBodyTemplate rowData={data} />} />,
         <Column key="col-timestamp" header="Time stamp" body={timeStampBodyTemplate} sortable style={{ minWidth: '10rem' }} />,
         <Column key="col-isActive" field="isActive" header="Active" sortable body={statusBodyTemplate} />,
         <Column key="col-action"/*                        */ header={() => AddNew(dispatch)}/*     */ headerClassName='flex justify-content-center'/*   */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedRow={data} />} />
@@ -44,7 +44,7 @@ function AddNew(dispatch: Dispatch<RowHookAction<TestRow>>) {
     )
 }
 
-function questionsBodyTemplate(rowData: TestRow) {
+const QuestionsBodyTemplate: React.FC<{ rowData: TestRow }> = ({ rowData }) => {
     const navigate = useNavigate();
     const handleClick = () => {
         navigate(`${rowData.name}___${rowData.id}/questions`)
