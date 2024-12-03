@@ -91,6 +91,13 @@ export interface UserAnswerResult extends DataTableValue {
   answer: string;
   solution: string;
   questionNum: QuestionNumber;
+  partNum: number;
+  content: string;
+  resources: Resource[];
+  transcript: string;
+  explanation: string;
+  answers: string[];
+  correctAnswer: string;
 }
 
 // Role Collection
@@ -259,6 +266,7 @@ export interface TestPaper {
 
 export interface QuestionPage {
   questionNum: QuestionNumber,
+  part: number,
   page: number,
 }
 
@@ -268,6 +276,12 @@ export interface UserAnswerResult {
   solution: string;
   timeSpent: number;
   correct: boolean;
+  partNum: number;
+  resources: Resource[];
+  transcript: string;
+  explanation: string;
+  answers: string[];
+  correctAnswer: string;
 }
 
 export interface AnswerPair {

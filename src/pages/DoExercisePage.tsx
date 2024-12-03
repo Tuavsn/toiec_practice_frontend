@@ -52,57 +52,61 @@ function DoExercisePage() {
 
 
     // Render giao diện chính của trang thi
-    return totalQuestions > 0 ? (
+    return (
         <main id="do-test-page" className="w-full">
-            {/* Nút bắt đầu bài thi */}
-            {!start && (
-                <div className="flex justify-content-center h-full align-content-center">
-                    <Button label="Bắt đầu" onClick={() => {
-                        // bắt đầu tính giờ đếm số giây đã trôi qua
-                        timeDoTest.current = Date.now();
-                        // mở giao diện làm bài
-                        startTest();
-                    }} />
-                </div>
-            )}
-
-            {/* Giao diện làm bài thi */}
-            {start && (
-                <section className="flex flex-column justify-content-center">
-                    {/* Phiếu trả lời của người dùng */}
-                    <UserAnswerSheet
-                        visible={isUserAnswerSheetVisible}
-                        setVisible={setIsUserAnswerSheetVisible}
-                        ButtonListElement={createButtonListElement()}
-                    />
-
-                    {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */}
-                    <Toolbar
-                        className="py-1"
-                        start={currentStatusBodyTemplate(userAnswerSheet, totalQuestions, setIsUserAnswerSheetVisible)}
-                        end={
-                            <Button
-                                severity="success"
-                                label="Nộp bài"
-                                onClick={() => onEndTest()}
-                            />
-                        }
-                    />
-
-                    {/* Khu vực chính để hiển thị câu hỏi và các nút điều hướng */}
-                    <div id="test-area-container" className="max-w-screen p-0">
-                        <TestArea
-                            changePage={changePage}
-                            testType={"practice"}
-                            question={questionList[currentPageIndex]}
-                            setTestAnswerSheet={setTestAnswerSheet}
-                            userAnswerSheet={userAnswerSheet}
-                        />
+            {totalQuestions > 0 ? <section className="flex justify-content-center w-full h-full">
+                {/* Nút bắt đầu bài thi */}
+                {!start && (
+                    <div className=" h-screen align-content-center">
+                        <Button className="p-4" label="Bắt đầu" onClick={() => {
+                            // bắt đầu tính giờ đếm số giây đã trôi qua
+                            timeDoTest.current = Date.now();
+                            // mở giao diện làm bài
+                            startTest();
+                        }} />
                     </div>
-                </section>
-            )}
+                )}
+
+                {/* Giao diện làm bài thi */}
+                {start && (
+                    <section className="flex flex-column justify-content-center">
+                        {/* Phiếu trả lời của người dùng */}
+                        <UserAnswerSheet
+                            visible={isUserAnswerSheetVisible}
+                            setVisible={setIsUserAnswerSheetVisible}
+                            ButtonListElement={createButtonListElement()}
+                        />
+
+                        {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */}
+                        <Toolbar
+                            className="py-1"
+                            start={currentStatusBodyTemplate(userAnswerSheet, totalQuestions, setIsUserAnswerSheetVisible)}
+                            end={
+                                <Button
+                                    severity="success"
+                                    label="Nộp bài"
+                                    onClick={() => onEndTest()}
+                                />
+                            }
+                        />
+
+                        {/* Khu vực chính để hiển thị câu hỏi và các nút điều hướng */}
+                        <div id="test-area-container" className="max-w-screen p-0">
+                            <TestArea
+                                changePage={changePage}
+                                testType={"practice"}
+                                question={questionList[currentPageIndex]}
+                                setTestAnswerSheet={setTestAnswerSheet}
+                                userAnswerSheet={userAnswerSheet}
+                            />
+                        </div>
+                    </section>
+                )}
+            </section>
+                : <LoadingSpinner text="Bài kiểm tra đang được khởi tạo...." />
+            }
         </main>
-    ) : <LoadingSpinner text="Bài kiểm tra đang được khởi tạo...." />
+    )
 
 
 }

@@ -307,7 +307,7 @@ function Suggestions(suggestionOnParts: SuggestionsForUser[]) {
 }
 
 function correctPercentTemplate(rowData: TopicStat) {
-    const correctPercent = rowData.totalCorrect / ((rowData.totalCorrect + rowData.totalIncorrect) || 1);
+    const correctPercent = rowData.totalCorrect / ((rowData.totalCorrect + rowData.totalIncorrect) || 1) * 100;
     const colorString = getColorBasedOnValue(correctPercent);
     return (
         <p className="text-center" style={{ backgroundColor: colorString }}>{correctPercent}%</p>

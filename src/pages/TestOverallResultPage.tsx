@@ -1,17 +1,24 @@
 import { Badge } from "primereact/badge";
+import { Button } from "primereact/button";
 import { Card } from "primereact/card";
+import { Dialog } from "primereact/dialog";
+import React, { Dispatch, SetStateAction } from "react";
 import { useTestOverallResult } from "../hooks/TestOverallReviewHook";
 import convertSecondsToString from "../utils/convertSecondsToString";
-import { Button } from "primereact/button";
 
 export default function TestOverallResultPage() {
 
     const {
         overallDetail,
         gotoReviewPage,
+        onClickToView,
+        currentSelectedQuestion,
+        setCurrentSelectedQuestion,
     } = useTestOverallResult();
+    let part = 0;
     return (
         <main className="pt-8 w-full family-font">
+            <DetailQuestionDialog currentSelectedQuestion={currentSelectedQuestion} setCurrentSelectedQuestion={setCurrentSelectedQuestion} />
             <Card title={`Kết quả thi: ${overallDetail.type} phần ${overallDetail.parts}`}>
                 <section className="flex flex-wrap justify-content-around gap-3">
                     <table className="bg-gray-300 p-2 border-round-md flex-1 shadow-4 glassmorphism">
@@ -62,21 +69,30 @@ export default function TestOverallResultPage() {
                         <h1 className="text-center">{overallDetail.totalReadingScore} / 495</h1>
                     </div>
                 </section>
-                <section className="mt-4 flex justify-content-end">
+                <section className="my-4 flex justify-content-end">
                     <Button label="Xem chi tiết bài làm" onClick={gotoReviewPage} />
                 </section>
                 <section>
-                    <h1>Đáp án</h1>
+                    <section className="mt-5 bg-gray-300 shadow-5 p-3">
+                        <h1>Đáp án</h1>
+                    </section>
                     <div className="flex flex-wrap gap-5 justify-content-center">
 
                         {
                             overallDetail.userAnswers.map((userAnswer, index) => {
-
+                                let newPart = false;
+                                if (part != userAnswer.partNum) {
+                                    part = userAnswer.partNum
+                                    newPart = true
+                                }
                                 return (
-                                    <div className="flex-1 align-center shadow-7 p-4" style={{ minWidth: "33%" }} key={index}>
-                                        <Badge className="mr-2" value={userAnswer.questionNum} />
-                                        <div className="pt-2 pl-4">{ConcatLineFromUserAnswerAndIcon(userAnswer.answer, userAnswer.correct)}</div>
-                                    </div>
+                                    <React.Fragment key={`q_${index}`}>
+                                        {newPart && <><h1 className="w-full text-blue-600">Part {userAnswer.partNum}</h1></>}
+                                        <div className="flex-1 align-center shadow-7 p-4" style={{ minWidth: "33%", maxWidth: "50%" }} key={index} onClick={() => onClickToView(userAnswer)}>
+                                            <Badge className="mr-2" value={userAnswer.questionNum} />
+                                            <div className="pt-2 pl-4">{ConcatLineFromUserAnswerAndIcon(userAnswer.answer, userAnswer.correct)}</div>
+                                        </div>
+                                    </React.Fragment>
                                 )
                             })
                         }
@@ -105,27 +121,16 @@ function ConcatLineFromUserAnswerAndIcon(userAnswer: string, isCorrect: boolean)
     const line = `${userAnswer} ${symbol}`;
     return line;
 }
-
-// function getColorButtonOnAnswerSheet(isCorrect: boolean, isOnPage: boolean): "success" | "danger" | "info" {
-//     const returnString = isCorrect ? 'success' : 'danger';
-//     return isOnPage ? 'info' : returnString;
-// }
-
-// async function fetchQuestionsData(defaultValue: TestResultSummary): Promise<TestResultSummary> {
-//     try {
-//         const response = await fetch("https://dummyjson.com/c/a600-c342-4b74-8f2d");
-
-//         if (!response.ok) {
-//             throw new Error('Network response was not ok');
-//         }
-
-//         // Get the full response and cast it to ApiResponse<TestPaper>
-//         const apiResponse: ApiResponse<TestResultSummary> = await response.json();
-
-//         // Return the data part of the response
-//         return apiResponse.data;
-//     } catch (error) {
-//         console.error('There was a problem with the fetch operation:', error);
-//         return defaultValue;
-//     }
-// }
+export type DetailQuestionDialogProps = {
+    currentSelectedQuestion: JSX.Element | null;
+    setCurrentSelectedQuestion: Dispatch<SetStateAction<JSX.Element | null>>
+}
+const DetailQuestionDialog: React.FC<DetailQuestionDialogProps> = React.memo(
+    ({ currentSelectedQuestion, setCurrentSelectedQuestion }) => {
+        return (
+            <Dialog style={{width:"50vw"}} visible={currentSelectedQuestion != null} onHide={() => setCurrentSelectedQuestion(null)}>
+                {currentSelectedQuestion}
+            </Dialog>
+        )
+    }
+)

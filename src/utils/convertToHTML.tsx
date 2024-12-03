@@ -4,7 +4,7 @@ import { Divider } from "primereact/divider";
 import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord } from "./types/type";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "./types/type";
 import { Chip } from "primereact/chip";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
@@ -12,11 +12,11 @@ export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[
     for (const q of questionList) {
         if (q.subQuestions.length) {
             for (const sq of q.subQuestions) {
-                questionPages.push({ questionNum: sq.questionNum, page: pageNum } as QuestionPage)
+                questionPages.push({ questionNum: sq.questionNum, page: pageNum, part: sq.partNum } as QuestionPage)
             }
         }
         else {
-            questionPages.push({ questionNum: q.questionNum, page: pageNum } as QuestionPage)
+            questionPages.push({ questionNum: q.questionNum, page: pageNum, part: q.partNum } as QuestionPage)
         }
         pageNum += 1;
     }
@@ -29,11 +29,11 @@ export function MappingPageWithQuestionNumReview(questionList: TestReviewAnswerS
     for (const q of questionList) {
         if (q.subUserAnswer.length) {
             for (const sq of q.subUserAnswer) {
-                questionPages.push({ questionNum: sq.questionNum, page: pageNum } as QuestionPage)
+                questionPages.push({ questionNum: sq.questionNum, page: pageNum, part: sq.partNum } as QuestionPage)
             }
         }
         else {
-            questionPages.push({ questionNum: q.questionNum, page: pageNum } as QuestionPage)
+            questionPages.push({ questionNum: q.questionNum, page: pageNum, part: q.partNum } as QuestionPage)
         }
         pageNum += 1;
     }
@@ -269,9 +269,7 @@ export function ConvertSolutionToHTML(question: UserAnswerRecord): JSX.Element {
     return <ol start={start}>{solutionElement}</ol>
 }
 
-function UserAnswerToHTML(question: UserAnswerRecord): JSX.Element {
-
-
+export function UserAnswerToHTML(question: UserAnswerRecord): JSX.Element {
     return (
         <div key={"answer" + question.questionNum} className="flex flex-column gap-3 my-3">
             {question.answers.map((answer, index) => {
@@ -302,27 +300,71 @@ function UserAnswerToHTML(question: UserAnswerRecord): JSX.Element {
             })
             }
 
-            <TranscriptAndExplain question={question} />
+            <TranscriptAndExplain transcript={question.transcript} explanation={question.explanation} />
 
 
         </div>
     );
 }
 
-function TranscriptAndExplain({ question }: { question: UserAnswerRecord }) {
+
+export function UserReviewSingleAnswerToHTML(question: UserAnswerResult): JSX.Element {
+    return (
+        <section>
+            {ResourcesToHTML(question.resources, question.questionNum)}
+            <br />
+            <h5 key={"h5" + question.questionNum} > {question.questionNum}.{question.content} </h5>
+            <div key={"answer" + question.questionNum} className="flex flex-column gap-3 my-3">
+                {question.answers.map((answer, index) => {
+                    let colorBackground = '';
+                    if (answer === question.correctAnswer) {
+                        colorBackground = 'bg-green-500';
+
+                    } else if (answer === question.answer) {
+                        colorBackground = 'bg-red-500';
+                    }
+                    return (
+                        <div key={"answerbox" + index} className={"flex align-items-center py-3 " + colorBackground}>
+                            <input
+                                style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }}
+                                type="radio"
+                                id={"id" + question.questionNum + index} // Unique ID for each radio button
+                                name={`answer-${question.questionNum}`}   // Use a unique name for grouping per question
+                                value={answer}            // Value of the radio button
+                                readOnly
+                                checked={question.answer === answer}
+                            />
+                            <label htmlFor={"id" + question.questionNum + index} style={{ marginLeft: '8px' }}>
+                                {answer}
+                            </label>
+                        </div>
+                    );
+
+                })
+                }
+
+                <TranscriptAndExplain transcript={question.transcript} explanation={question.explanation} />
+
+
+            </div>
+        </section>
+    );
+}
+
+function TranscriptAndExplain({ transcript, explanation }: { transcript: string, explanation: string }) {
     return (
         <Accordion>
-            {question.transcript &&
+            {transcript &&
                 <AccordionTab header="Transcript">
                     <div className="card">
-                        {question.transcript}
+                        {transcript}
                     </div>
                 </AccordionTab>
             }
-            {question.explanation &&
+            {explanation &&
                 <AccordionTab header="Giải thích đáp án">
                     <div className="card">
-                        {question.explanation}
+                        {explanation}
                     </div>
                 </AccordionTab>
             }
@@ -424,7 +466,7 @@ export function ConvertUserAnswerRecordToHTML(question: UserAnswerRecord): [JSX.
                 UserAnswerToHTML(subq)
             );
         }
-        resoursesElement.push(<TranscriptAndExplain question={question} />)
+        resoursesElement.push(<TranscriptAndExplain transcript={question.transcript} explanation={question.explanation} />)
     } else {
         // Nếu là câu hỏi đơn lẻ, thêm nội dung câu hỏi
         questionsElement.push(
