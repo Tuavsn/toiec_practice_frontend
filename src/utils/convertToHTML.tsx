@@ -4,7 +4,7 @@ import { Divider } from "primereact/divider";
 import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord } from "./types/type";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "./types/type";
 import { Chip } from "primereact/chip";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
@@ -12,11 +12,11 @@ export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[
     for (const q of questionList) {
         if (q.subQuestions.length) {
             for (const sq of q.subQuestions) {
-                questionPages.push({ questionNum: sq.questionNum, page: pageNum } as QuestionPage)
+                questionPages.push({ questionNum: sq.questionNum, page: pageNum, part: sq.partNum } as QuestionPage)
             }
         }
         else {
-            questionPages.push({ questionNum: q.questionNum, page: pageNum } as QuestionPage)
+            questionPages.push({ questionNum: q.questionNum, page: pageNum, part: q.partNum } as QuestionPage)
         }
         pageNum += 1;
     }
@@ -29,11 +29,11 @@ export function MappingPageWithQuestionNumReview(questionList: TestReviewAnswerS
     for (const q of questionList) {
         if (q.subUserAnswer.length) {
             for (const sq of q.subUserAnswer) {
-                questionPages.push({ questionNum: sq.questionNum, page: pageNum } as QuestionPage)
+                questionPages.push({ questionNum: sq.questionNum, page: pageNum, part: sq.partNum } as QuestionPage)
             }
         }
         else {
-            questionPages.push({ questionNum: q.questionNum, page: pageNum } as QuestionPage)
+            questionPages.push({ questionNum: q.questionNum, page: pageNum, part: q.partNum } as QuestionPage)
         }
         pageNum += 1;
     }
@@ -250,6 +250,41 @@ export function ConvertTopicToHTML(question: UserAnswerRecord): JSX.Element {
     return <>{topicElement}</>
 }
 
+export function ConvertReviewTopicToHTML(question: UserAnswerResult): JSX.Element {
+    return <>
+        {
+            question.listTopics.map((topic, index) => {
+                return (
+                    <React.Fragment key={"topicquest_" + index}>
+                        <Chip key={"topicq_" + index} label={topic.name} />
+                        <p className="pl-6">&#8627;{topic.solution}</p>
+                    </React.Fragment>
+                )
+            })
+        }
+    </>
+
+}
+
+function ConvertToTopicTag(question: UserAnswerResult): JSX.Element {
+    return <>
+        {
+            question.listTopics.map((topic, index) => {
+                return (
+                    <React.Fragment key={"topicquest_" + index}>
+                        <Chip key={"topicq_" + index} label={topic.name} />
+                    </React.Fragment>
+                )
+            })
+        }
+    </>
+}
+export function ConvertReviewSolutionToHTML(question: UserAnswerResult): JSX.Element {
+    return <>
+        {question.solution && question.solution.trim() && <li>{question.solution}</li>}
+    </>
+}
+
 export function ConvertSolutionToHTML(question: UserAnswerRecord): JSX.Element {
 
     let start = question.questionNum;
@@ -269,9 +304,7 @@ export function ConvertSolutionToHTML(question: UserAnswerRecord): JSX.Element {
     return <ol start={start}>{solutionElement}</ol>
 }
 
-function UserAnswerToHTML(question: UserAnswerRecord): JSX.Element {
-
-
+export function UserAnswerToHTML(question: UserAnswerRecord): JSX.Element {
     return (
         <div key={"answer" + question.questionNum} className="flex flex-column gap-3 my-3">
             {question.answers.map((answer, index) => {
@@ -302,27 +335,83 @@ function UserAnswerToHTML(question: UserAnswerRecord): JSX.Element {
             })
             }
 
-            <TranscriptAndExplain question={question} />
+            <TranscriptAndExplain transcript={question.transcript} explanation={question.explanation} />
 
 
         </div>
     );
 }
 
-function TranscriptAndExplain({ question }: { question: UserAnswerRecord }) {
+
+export function UserReviewSingleAnswerToHTML(question: UserAnswerResult): SelectedQuestionDialogTestOverallPage {
+    const title: JSX.Element = <h5>Phần {question.partNum} - Câu {question.questionNum}</h5>
+    const body: JSX.Element =
+        <section>
+            <div className="mb-6">
+                {ConvertToTopicTag(question)}
+
+            </div>
+            {ResourcesToHTML(question.resources, question.questionNum)}
+            <br />
+            <h5 key={"h5" + question.questionNum} > {question.questionNum}.{question.content}  ({question.timeSpent} giây)</h5>
+            <div key={"answer" + question.questionNum} className="flex flex-column gap-3 my-3">
+                {question.answers.map((answer, index) => {
+                    let colorBackground = '';
+                    if (answer === question.correctAnswer) {
+                        colorBackground = 'bg-green-500';
+
+                    } else if (answer === question.answer) {
+                        colorBackground = 'bg-red-500';
+                    }
+                    return (
+                        <div key={"answerbox" + index} className={"flex align-items-center py-3 " + colorBackground}>
+                            <input
+                                style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }}
+                                type="radio"
+                                id={"id" + question.questionNum + index} // Unique ID for each radio button
+                                name={`answer-${question.questionNum}`}   // Use a unique name for grouping per question
+                                value={answer}            // Value of the radio button
+                                readOnly
+                                checked={question.answer === answer}
+                            />
+                            <label htmlFor={"id" + question.questionNum + index} style={{ marginLeft: '8px' }}>
+                                {answer}
+                            </label>
+                        </div>
+                    );
+
+                })
+                }
+
+                <TranscriptAndExplain transcript={question.transcript} explanation={question.explanation} />
+
+
+            </div>
+            <Card title="Chủ đề trong câu hỏi">
+                {ConvertReviewTopicToHTML(question)}
+
+            </Card>
+            <Card title="Gợi ý giúp bạn cải thiện tốt hơn">
+                {ConvertReviewSolutionToHTML(question)}
+            </Card>
+        </section>
+    return { body: body, title: title }
+}
+
+function TranscriptAndExplain({ transcript, explanation }: { transcript: string, explanation: string }) {
     return (
         <Accordion>
-            {question.transcript &&
+            {transcript &&
                 <AccordionTab header="Transcript">
                     <div className="card">
-                        {question.transcript}
+                        {transcript}
                     </div>
                 </AccordionTab>
             }
-            {question.explanation &&
+            {explanation &&
                 <AccordionTab header="Giải thích đáp án">
                     <div className="card">
-                        {question.explanation}
+                        {explanation}
                     </div>
                 </AccordionTab>
             }
@@ -424,7 +513,7 @@ export function ConvertUserAnswerRecordToHTML(question: UserAnswerRecord): [JSX.
                 UserAnswerToHTML(subq)
             );
         }
-        resoursesElement.push(<TranscriptAndExplain question={question} />)
+        resoursesElement.push(<TranscriptAndExplain transcript={question.transcript} explanation={question.explanation} />)
     } else {
         // Nếu là câu hỏi đơn lẻ, thêm nội dung câu hỏi
         questionsElement.push(

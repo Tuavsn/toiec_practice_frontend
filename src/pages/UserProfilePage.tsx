@@ -307,7 +307,7 @@ function Suggestions(suggestionOnParts: SuggestionsForUser[]) {
 }
 
 function correctPercentTemplate(rowData: TopicStat) {
-    const correctPercent = rowData.totalCorrect / ((rowData.totalCorrect + rowData.totalIncorrect) || 1);
+    const correctPercent = rowData.totalCorrect / ((rowData.totalCorrect + rowData.totalIncorrect) || 1) * 100;
     const colorString = getColorBasedOnValue(correctPercent);
     return (
         <p className="text-center" style={{ backgroundColor: colorString }}>{correctPercent}%</p>
@@ -337,6 +337,6 @@ function getCurrentTitle(score: number): string {
     } else if (score >= 10 && score <= 250) {
         return "Basic Proficiency";
     } else {
-        return "Score out of range"; // In case the score doesn't fit into any of the ranges
+        return "Score out of range";
     }
 }

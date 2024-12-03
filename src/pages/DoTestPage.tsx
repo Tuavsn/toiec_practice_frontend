@@ -36,25 +36,34 @@ function DoTestPage() {
         if (userAnswerSheet.size <= 0) {
             return [<h1 key={"error-button-list"}>Lỗi rồi</h1>];
         }
+        let part = 0;
         return pageMapper.map((pq, index) => {
             const isOnPage = currentPageIndex === pq.page;
             const text = userAnswerSheet.get(pq.questionNum)?.userAnswer ?? "";
             const isDisabled = checkIsAllowToChangePage(testType, questionList, pq.page, currentPageIndex);
-
+            let newPart = false;
+            if (part != pq.part) {
+                part = pq.part;
+                newPart = true
+            }
             return (
-                <Button
-                    disabled={isDisabled}
-                    key={"answer_" + index}
-                    style={{ width: '60px', aspectRatio: '1/1' }}
-                    className={"border-round-md border-solid text-center p-2"}
-                    label={pq.questionNum.toString()}
-                    severity={getColorButtonOnAnswerSheet(text, isOnPage)} // Cập nhật màu sắc nút theo câu trả lời
-                    onClick={() => {
-                        if (!isOnPage) {
-                            setCurrentPageIndex(pq.page);
-                        }
-                    }}
-                />
+                <React.Fragment key="section for each question">
+
+                    {newPart && <><h5 className="w-full text-blue-600">Part {pq.part}</h5></>}
+                    <Button
+                        disabled={isDisabled}
+                        key={"answer_" + index}
+                        style={{ width: '60px', aspectRatio: '1/1' }}
+                        className={"border-round-md border-solid text-center p-2"}
+                        label={pq.questionNum.toString()}
+                        severity={getColorButtonOnAnswerSheet(text, isOnPage)} // Cập nhật màu sắc nút theo câu trả lời
+                        onClick={() => {
+                            if (!isOnPage) {
+                                setCurrentPageIndex(pq.page);
+                            }
+                        }}
+                    />
+                </React.Fragment>
 
             );
         })
@@ -62,72 +71,77 @@ function DoTestPage() {
 
 
     // Render giao diện chính của trang thi
-    return totalQuestions > 0 && isOnTest ? (
+    return (
         <main id="do-test-page" className="w-full h-full">
-            {/* Nút bắt đầu bài thi */}
-            {!start && (
-                <div className="flex justify-content-center min-h-screen">
-                    <span className="align-content-center">
+            {(totalQuestions > 0 && isOnTest) ?
+                <section>
+                    {/* Nút bắt đầu bài thi */}
+                    {!start && (
+                        <div className="flex justify-content-center min-h-screen">
+                            <span className="align-content-center">
 
-                        <Button label="Bắt đầu" onClick={() => {
-                            // bắt đầu tính giờ đếm số giây đã trôi qua
-                            timeDoTest.current = Date.now();
-                            // mở giao diện làm bài
-                            startTest();
-                        }} />
-                    </span>
-                </div>
-            )}
+                                <Button label="Bắt đầu" onClick={() => {
+                                    // bắt đầu tính giờ đếm số giây đã trôi qua
+                                    timeDoTest.current = Date.now();
+                                    // mở giao diện làm bài
+                                    startTest();
+                                }} />
+                            </span>
+                        </div>
+                    )}
 
-            {/* Giao diện làm bài thi */}
-            {start && (
-                <section className="flex flex-column justify-content-center">
-                    {/* Phiếu trả lời của người dùng */}
-                    <UserAnswerSheet
-                        visible={isUserAnswerSheetVisible}
-                        setVisible={setIsUserAnswerSheetVisible}
-                        ButtonListElement={createButtonListElement()}
-                    />
-
-                    {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */}
-                    <Toolbar
-                        className="py-1"
-                        start={currentStatusBodyTemplate(userAnswerSheet, totalQuestions, setIsUserAnswerSheetVisible)}
-                        center={
-                            <SimpleTimeCountDown
-                                onTimeUp={() => onEndTest()}
-                                timeLeftInSecond={3000}
+                    {/* Giao diện làm bài thi */}
+                    {start && (
+                        <section className="flex flex-column justify-content-center">
+                            {/* Phiếu trả lời của người dùng */}
+                            <UserAnswerSheet
+                                visible={isUserAnswerSheetVisible}
+                                setVisible={setIsUserAnswerSheetVisible}
+                                ButtonListElement={createButtonListElement()}
                             />
-                        }
-                        end={
-                            <Button
-                                severity="success"
-                                label="Nộp bài"
-                                onClick={() => onEndTest()}
-                            />
-                        }
-                    />
 
-                    {/* Khu vực chính để hiển thị câu hỏi và các nút điều hướng */}
-                    <div id="test-area-container" className="max-w-screen p-0">
-                        <TestArea
-                            changePage={changePage}
-                            testType={testType}
-                            question={questionList[currentPageIndex]}
-                            setTestAnswerSheet={setTestAnswerSheet}
-                            userAnswerSheet={userAnswerSheet}
-                        />
-                    </div>
+                            {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */}
+                            <Toolbar
+                                className="py-1"
+                                start={currentStatusBodyTemplate(userAnswerSheet, totalQuestions, setIsUserAnswerSheetVisible)}
+                                center={
+                                    <SimpleTimeCountDown
+                                        onTimeUp={() => onEndTest()}
+                                        timeLeftInSecond={3000}
+                                    />
+                                }
+                                end={
+                                    <Button
+                                        severity="success"
+                                        label="Nộp bài"
+                                        onClick={() => onEndTest()}
+                                    />
+                                }
+                            />
+
+                            {/* Khu vực chính để hiển thị câu hỏi và các nút điều hướng */}
+                            <div id="test-area-container" className="max-w-screen p-0">
+                                <TestArea
+                                    changePage={changePage}
+                                    testType={testType}
+                                    question={questionList[currentPageIndex]}
+                                    setTestAnswerSheet={setTestAnswerSheet}
+                                    userAnswerSheet={userAnswerSheet}
+                                />
+                            </div>
+                        </section>
+                    )}
                 </section>
-            )}
+                : <section className="w-screen h-screen flex justify-content-center"><LoadingSpinner text="Xin vui lòng chờ...." /></section>
+            }
         </main>
-    ) : <LoadingSpinner text="Xin vui lòng chờ...." />
+    )
 
 
 }
 
 
-
+//
 
 
 export default memo(DoTestPage);
