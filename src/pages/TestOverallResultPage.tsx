@@ -5,6 +5,7 @@ import { Dialog } from "primereact/dialog";
 import React, { Dispatch, SetStateAction } from "react";
 import { useTestOverallResult } from "../hooks/TestOverallReviewHook";
 import convertSecondsToString from "../utils/convertSecondsToString";
+import { SelectedQuestionDialogTestOverallPage } from "../utils/types/type";
 
 export default function TestOverallResultPage() {
 
@@ -88,7 +89,7 @@ export default function TestOverallResultPage() {
                                 return (
                                     <React.Fragment key={`q_${index}`}>
                                         {newPart && <><h1 className="w-full text-blue-600">Part {userAnswer.partNum}</h1></>}
-                                        <div className="flex-1 align-center shadow-7 p-4" style={{ minWidth: "33%", maxWidth: "50%" }} key={index} onClick={() => onClickToView(userAnswer)}>
+                                        <div className="flex-1 align-center shadow-7 p-4 cursor-pointer" style={{ minWidth: "33%", maxWidth: "50%" }} key={index} onClick={() => onClickToView(userAnswer)}>
                                             <Badge className="mr-2" value={userAnswer.questionNum} />
                                             <div className="pt-2 pl-4">{ConcatLineFromUserAnswerAndIcon(userAnswer.answer, userAnswer.correct)}</div>
                                         </div>
@@ -122,14 +123,14 @@ function ConcatLineFromUserAnswerAndIcon(userAnswer: string, isCorrect: boolean)
     return line;
 }
 export type DetailQuestionDialogProps = {
-    currentSelectedQuestion: JSX.Element | null;
-    setCurrentSelectedQuestion: Dispatch<SetStateAction<JSX.Element | null>>
+    currentSelectedQuestion: SelectedQuestionDialogTestOverallPage;
+    setCurrentSelectedQuestion: Dispatch<SetStateAction<SelectedQuestionDialogTestOverallPage>>
 }
 const DetailQuestionDialog: React.FC<DetailQuestionDialogProps> = React.memo(
     ({ currentSelectedQuestion, setCurrentSelectedQuestion }) => {
         return (
-            <Dialog style={{width:"50vw"}} visible={currentSelectedQuestion != null} onHide={() => setCurrentSelectedQuestion(null)}>
-                {currentSelectedQuestion}
+            <Dialog style={{ width: "50vw" }} header={currentSelectedQuestion.title} visible={currentSelectedQuestion.body != null} onHide={() => setCurrentSelectedQuestion({ body: null, title: null })}>
+                {currentSelectedQuestion.body}
             </Dialog>
         )
     }

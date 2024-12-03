@@ -73,7 +73,7 @@ function DoTestPage() {
     // Render giao diện chính của trang thi
     return (
         <main id="do-test-page" className="w-full h-full">
-            {totalQuestions > 0 && isOnTest ?
+            {(totalQuestions > 0 && isOnTest) ?
                 <section>
                     {/* Nút bắt đầu bài thi */}
                     {!start && (
@@ -132,7 +132,7 @@ function DoTestPage() {
                         </section>
                     )}
                 </section>
-                : <LoadingSpinner text="Xin vui lòng chờ...." />
+                : <section className="w-screen h-screen flex justify-content-center"><LoadingSpinner text="Xin vui lòng chờ...." /></section>
             }
         </main>
     )

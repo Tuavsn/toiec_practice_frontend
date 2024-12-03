@@ -10,7 +10,7 @@ export function RenderAdminUserColumns(dispatch: Dispatch<RowHookAction<UserRow>
         <Column key="col-email"/* */ field="email"/*      */ header="Email"/*    */ filter/* */ sortable />,
 
         <Column key="col-role"/*  */ field="role.name"/*  */ header="Vai trò"/*  */ filter/* */ sortable/*  */ style={{ width: "5rem" }}/*  */ bodyClassName="text-center"/**/ />,
-        <Column key="col-active"/**/ field="role.active"/**/ header="Hoạt động"/**/ filter/* */ sortable/*  */ style={{ width: "5rem" }}/*  */ bodyClassName="text-center"/**/ body={data => statusBodyTemplate(data.role)} />,
+        <Column key="col-active"/**/ field="active"/*     */ header="Hoạt động"/**/ filter/* */ sortable/*  */ style={{ width: "5rem" }}/*  */ bodyClassName="text-center"/**/ body={statusBodyTemplate} />,
 
         <Column key="col-action"/* */ headerClassName='flex justify-content-end'/*                                                                                          */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedRow={data} />} />
     ];

@@ -136,7 +136,6 @@ const PracticeSection: React.FC<{ lectureID: LectureID }> = React.memo(
             setUserAnswerSheet(newAnswerSheet);
             if (newAnswerSheet.size >= totalQuestions.current) {
                 alert("làm xong");
-                console.log(JSON.stringify(newAnswerSheet, null, 2));
 
             }
         }

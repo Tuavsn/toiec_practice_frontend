@@ -263,7 +263,10 @@ export interface TestPaper {
   totalQuestion: number,
   listMultipleChoiceQuestions: MultipleChoiceQuestion[]
 }
-
+export interface SelectedQuestionDialogTestOverallPage {
+  body: JSX.Element | null;
+  title: JSX.Element | null;
+}
 export interface QuestionPage {
   questionNum: QuestionNumber,
   part: number,
@@ -281,6 +284,7 @@ export interface UserAnswerResult {
   transcript: string;
   explanation: string;
   answers: string[];
+  listTopics: Topic[];
   correctAnswer: string;
 }
 

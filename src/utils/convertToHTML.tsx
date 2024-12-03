@@ -4,7 +4,7 @@ import { Divider } from "primereact/divider";
 import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "./types/type";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "./types/type";
 import { Chip } from "primereact/chip";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
@@ -250,6 +250,41 @@ export function ConvertTopicToHTML(question: UserAnswerRecord): JSX.Element {
     return <>{topicElement}</>
 }
 
+export function ConvertReviewTopicToHTML(question: UserAnswerResult): JSX.Element {
+    return <>
+        {
+            question.listTopics.map((topic, index) => {
+                return (
+                    <React.Fragment key={"topicquest_" + index}>
+                        <Chip key={"topicq_" + index} label={topic.name} />
+                        <p className="pl-6">&#8627;{topic.solution}</p>
+                    </React.Fragment>
+                )
+            })
+        }
+    </>
+
+}
+
+function ConvertToTopicTag(question: UserAnswerResult): JSX.Element {
+    return <>
+        {
+            question.listTopics.map((topic, index) => {
+                return (
+                    <React.Fragment key={"topicquest_" + index}>
+                        <Chip key={"topicq_" + index} label={topic.name} />
+                    </React.Fragment>
+                )
+            })
+        }
+    </>
+}
+export function ConvertReviewSolutionToHTML(question: UserAnswerResult): JSX.Element {
+    return <>
+        {question.solution && question.solution.trim() && <li>{question.solution}</li>}
+    </>
+}
+
 export function ConvertSolutionToHTML(question: UserAnswerRecord): JSX.Element {
 
     let start = question.questionNum;
@@ -308,12 +343,17 @@ export function UserAnswerToHTML(question: UserAnswerRecord): JSX.Element {
 }
 
 
-export function UserReviewSingleAnswerToHTML(question: UserAnswerResult): JSX.Element {
-    return (
+export function UserReviewSingleAnswerToHTML(question: UserAnswerResult): SelectedQuestionDialogTestOverallPage {
+    const title: JSX.Element = <h5>Phần {question.partNum} - Câu {question.questionNum}</h5>
+    const body: JSX.Element =
         <section>
+            <div className="mb-6">
+                {ConvertToTopicTag(question)}
+
+            </div>
             {ResourcesToHTML(question.resources, question.questionNum)}
             <br />
-            <h5 key={"h5" + question.questionNum} > {question.questionNum}.{question.content} </h5>
+            <h5 key={"h5" + question.questionNum} > {question.questionNum}.{question.content}  ({question.timeSpent} giây)</h5>
             <div key={"answer" + question.questionNum} className="flex flex-column gap-3 my-3">
                 {question.answers.map((answer, index) => {
                     let colorBackground = '';
@@ -347,8 +387,15 @@ export function UserReviewSingleAnswerToHTML(question: UserAnswerResult): JSX.El
 
 
             </div>
+            <Card title="Chủ đề trong câu hỏi">
+                {ConvertReviewTopicToHTML(question)}
+
+            </Card>
+            <Card title="Gợi ý giúp bạn cải thiện tốt hơn">
+                {ConvertReviewSolutionToHTML(question)}
+            </Card>
         </section>
-    );
+    return { body: body, title: title }
 }
 
 function TranscriptAndExplain({ transcript, explanation }: { transcript: string, explanation: string }) {

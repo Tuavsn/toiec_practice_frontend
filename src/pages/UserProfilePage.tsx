@@ -337,6 +337,6 @@ function getCurrentTitle(score: number): string {
     } else if (score >= 10 && score <= 250) {
         return "Basic Proficiency";
     } else {
-        return "Score out of range"; // In case the score doesn't fit into any of the ranges
+        return "Score out of range";
     }
 }
