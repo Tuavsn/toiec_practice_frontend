@@ -10,7 +10,7 @@ import { LectureID, Name_ID, PracticeAnswerSheet, PracticeQuestion, QuestionID }
 
 
 // Component chi tiết khóa học
-const CourseDetailsPage: React.FC = () => {
+const LectureDetailsPage: React.FC = () => {
     // Lấy ID của khóa học từ tham số URL
     const { lecture_name_id = "" } = useParams<{ lecture_name_id: Name_ID<LectureID> }>();
     const [lectureName, lectureId] = SplitNameIDFromURL(lecture_name_id);
@@ -49,7 +49,7 @@ const CourseDetailsPage: React.FC = () => {
     );
 };
 
-export default CourseDetailsPage;
+export default LectureDetailsPage;
 
 
 
@@ -63,26 +63,25 @@ export default CourseDetailsPage;
 // }
 
 function RelateCoursesTemplate() {
-
-    useEffect(() => {
-        callGetLectureRow
-    })
+    // useEffect(() => {
+    //     callGetLectureRow
+    // })
 
     return (
         <React.Fragment>
-            <Link to={'/lectures/Câu%20hỏi%20đuôi___67461cba477a82561b5a8fb4'}>
+            <Link target="_blank" rel="noopener noreferrer" to={'/lectures/Câu%20hỏi%20đuôi___67461cba477a82561b5a8fb4'}>
                 <p className='hover:shadow-2 py-2' >Câu hỏi đuôi</p>
             </Link>
             <Divider />
-            <Link to={''}>
+            <Link target="_blank" rel="noopener noreferrer" to={''}>
                 <p className='hover:shadow-2 py-2' >Câu hỏi yes/ no</p>
             </Link>
             <Divider />
-            <Link to={'/lectures/Loại%20tranh%20tả%20người%20và%20vật___67461b11477a82561b5a8fb3'}>
+            <Link target="_blank" rel="noopener noreferrer" to={'/lectures/Loại%20tranh%20tả%20người%20và%20vật___67461b11477a82561b5a8fb3'}>
                 <p className='hover:shadow-2 py-2' >Loại tranh tả người và vật</p>
             </Link>
             <Divider />
-            <Link to={'/lectures/Cách%20phân%20biệt%20câu%20hỏi%20when%20liên%20quan%20tới%20thời%20gian___67489285fcdfa12b4133eecd'}>
+            <Link target="_blank" rel="noopener noreferrer" to={'/lectures/Cách%20phân%20biệt%20câu%20hỏi%20when%20liên%20quan%20tới%20thời%20gian___67489285fcdfa12b4133eecd'}>
                 <p className='hover:shadow-2 py-2' >Cách phân biệt câu hỏi when liên quan tới thời gian</p>
             </Link>
         </React.Fragment>

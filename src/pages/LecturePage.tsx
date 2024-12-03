@@ -10,7 +10,7 @@ import { callGetLectureRow } from "../api/api";
 import { LoadingSpinner } from "../components/Common/Index";
 import { LectureRow, Topic } from "../utils/types/type";
 
-export default function CoursePage() {
+export default function LecturePage() {
 
     const navigate = useNavigate();
     const [state, dispatch] = useReducer(reducer, initialState);

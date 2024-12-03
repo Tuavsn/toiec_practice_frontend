@@ -3,7 +3,7 @@ import { Toolbar } from "primereact/toolbar"
 import React from "react"
 import { Link } from "react-router-dom"
 
-export const ToolbarQuestion: React.FC<{}> = React.memo(
+export const ToolbarQuestion: React.FC = React.memo(
     () => {
         return (
             <div className="card pb-5">

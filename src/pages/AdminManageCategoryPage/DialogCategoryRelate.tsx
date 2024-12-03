@@ -106,7 +106,7 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateCategoryBodyProps> = React
                     }
                 </section>
                 {/* Save Button */}
-                <div className="field flex justify-content-end">
+                <div className="field flex justify-content-end mt-5">
                     <Button label="Lưu" icon="pi pi-save" onClick={() => handleSave({ row: { ...props.currentSelectedRow, format: formatValue, year: yearValue }, dispatch: props.dispatch, toast })} />
                 </div>
 
@@ -119,6 +119,10 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateCategoryBodyProps> = React
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // khi nhấn nút Lưu
 async function handleSave(params: handeSaveRowParams<CategoryRow>) {
+    if (!params.row.format.trim()) {
+        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "tên bộ đề thi không được phép để trống" });
+        return;
+    }
     let success = false;
     if (params.row.id) {
         success = await callPostUpdateCategoryRow(params.row);

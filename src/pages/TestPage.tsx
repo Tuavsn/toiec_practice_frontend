@@ -20,7 +20,9 @@ export default function TestPage() {
     } = useTestCard();
     return (
         <main className="pt-8">
-            <h1>Thư viện đề thi</h1>
+            <section className="mt-5 bg-gray-300 shadow-5 p-3 glassmorphism">
+                <h1 className="pl-4">Thư viện đề thi</h1>
+            </section>
             <nav className="my-4">
                 {
                     categoryLabels.map((category, index) =>
@@ -69,7 +71,7 @@ export default function TestPage() {
                             </p>
                             <div className="flex justify-content-center">
 
-                                <Button label="View Details" onClick={() => navigate(`/test/${testCard.id}`)} />
+                                <Button label="Xem chi tiết" onClick={() => navigate(`/test/${testCard.id}`)} />
                             </div>
                         </div>
                     </Card>
@@ -77,8 +79,8 @@ export default function TestPage() {
                 ))}
             </div>
             <Paginator
-                first={pageIndex * 4}
-                rows={4}
+                first={pageIndex * 8}
+                rows={8}
                 totalRecords={totalItemsRef.current}
                 onPageChange={onPageChange}
             />

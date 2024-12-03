@@ -1,6 +1,6 @@
 import { Button } from "primereact/button"
 import { Dialog } from "primereact/dialog"
-import { Dropdown } from "primereact/dropdown"
+import { Dropdown, DropdownChangeEvent } from "primereact/dropdown"
 import { Fieldset } from "primereact/fieldset"
 import { InputNumber } from "primereact/inputnumber"
 import { InputText } from "primereact/inputtext"
@@ -75,7 +75,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
             id: currentSelectedQuestion.current.key as string,
         });
 
-        const handleChange = (e: { target: { name: any; value: any; }; }) => {
+        const handleChange = (e: { target: { name: any; value: any } } ) => {
             const { name, value } = e.target;
             setFormData({ ...formData, [name]: value });
         };

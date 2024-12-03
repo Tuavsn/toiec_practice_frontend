@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { callGetExercisePaper, callPostTestRecord } from "../api/api";
 import { MappingPageWithQuestionNum } from "../utils/convertToHTML";
 import prepareForTest from "../utils/prepareForTest";
-import { ApiResponse, ExerciseType, milisecond, QuestionNumber, QuestionRow, ResultID, TableData, TestRecord } from "../utils/types/type";
+import {  ExerciseType, milisecond, QuestionNumber, QuestionRow, ResultID, TestRecord } from "../utils/types/type";
 import { useMultipleQuestion } from "./MultipleQuestionHook";
 
 const useExercisePage = () => {
