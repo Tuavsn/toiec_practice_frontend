@@ -155,14 +155,8 @@ export const callGetCategoryLabel = async (): Promise<ApiResponse<CategoryLabel[
 }
 
 export const callGetTestCard = async (format: string, year: number, pageIndex: number): Promise<ApiResponse<TableData<TestCard>>> => {
-    const response = await axios.get<ApiResponse<TableData<TestCard>>>(`${import.meta.env.VITE_API_URL}/categories/tests?format=${format}&year=${year}&current=${pageIndex + 1}&pageSize=4`);
+    const response = await axios.get<ApiResponse<TableData<TestCard>>>(`${import.meta.env.VITE_API_URL}/categories/tests?format=${format}&year=${year}&current=${pageIndex + 1}&pageSize=8`);
     return response.data;
-}
-export const callGetLectureCards = async (pageIndex: number): Promise<ApiResponse<TableData<LectureCard>>> => {
-    const urls = ["https://dummyjson.com/c/c7f2-48ee-4d53-9e8e", "https://dummyjson.com/c/c1de-8a5a-43d6-993c", "https://dummyjson.com/c/6b97-4215-4c8b-9f10"]
-    const response = await fetch(urls[pageIndex]);
-    const data: ApiResponse<TableData<LectureCard>> = await response.json();
-    return data;
 }
 
 export const callGetPracticePaper = async (lectureId: LectureID): Promise<ApiResponse<PracticePaper>> => {

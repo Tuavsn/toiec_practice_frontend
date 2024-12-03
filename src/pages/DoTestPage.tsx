@@ -107,7 +107,7 @@ function DoTestPage() {
                                 center={
                                     <SimpleTimeCountDown
                                         onTimeUp={() => onEndTest()}
-                                        timeLeftInSecond={3000}
+                                        timeLeftInSecond={7200}
                                     />
                                 }
                                 end={

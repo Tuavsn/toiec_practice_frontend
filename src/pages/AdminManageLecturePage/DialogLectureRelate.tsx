@@ -104,7 +104,7 @@ const RenderUpdateLectureBody: React.FC<DialogUpdateLectureBodyProps> = React.me
         const inputRef = useRef<HTMLInputElement | null>(null);
         const [topicIds, setTopicIds] = useState<TopicID[]>(props.currentSelectedLecture.topic.map(t => t.id));
         const { toast } = useToast();
-        const title = useRef<string>(props.currentSelectedLecture.id ? "Sửa câu hỏi" : "Thêm câu hỏi");
+        const title = useRef<string>(props.currentSelectedLecture.id ? "Sửa bài giảng" : "Thêm bài giảng");
         return (
             <Fieldset legend={title.current} >
                 <section className='flex flex-column gap-4 justify-content-space'>
@@ -146,6 +146,10 @@ const RenderUpdateLectureBody: React.FC<DialogUpdateLectureBodyProps> = React.me
 
 // khi nhấn nút Lưu
 async function handleSave(params: handeSaveLectureParams) {
+    if (!params.title.trim() || !params.topicIds.length) {
+        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "tên bài giảng cùng danh sách chủ đề không được phép để trống" });
+        return;
+    }
     let success = false;
     if (params.lectureID) {
         success = await callPutLectureDetailUpdate(params.lectureID, params.title, params.topicIds);

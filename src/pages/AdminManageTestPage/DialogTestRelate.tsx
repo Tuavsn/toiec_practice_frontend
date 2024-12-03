@@ -126,7 +126,7 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateTestBodyProps> = React.mem
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end">
-                    <Button label="Lưu" icon="pi pi-save" onClick={() => handleSave({ row: formData, dispatch: props.dispatch, toast })} />
+                    <Button label="Lưu" icon="pi pi-save" onClick={() => { handleSave({ row: formData, dispatch: props.dispatch, toast }) }} />
                 </div>
 
             </Fieldset>
@@ -138,6 +138,10 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateTestBodyProps> = React.mem
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // khi nhấn nút Lưu
 async function handleSave(params: handeSaveRowParams<TestRow>) {
+    if (!params.row.name.trim()) {
+        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "Tên đề thi không được phép để trống" });
+        return;
+    }
     let success = false;
     if (params.row.id) {
         success = await callPostUpdateTest(params.row);
