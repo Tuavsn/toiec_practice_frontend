@@ -34,7 +34,7 @@ export function useQuestionTable() {
     // === Khởi tạo các trạng thái cần thiết ===
     const [currentPageIndex, setCurrentPageIndex] = useState(-1);             // Lưu trang hiện tại
     const [isVisible, setIsVisible] = useState<boolean>(false); // Trạng thái hiển thị của Dialog
-    const currentSelectedQuestion = useRef<TreeNode>({});     // Câu hỏi hiện tại được chọn
+    const currentSelectedQuestion = useRef<TreeNode>({ key: "", data: "" });     // Câu hỏi hiện tại được chọn
     const [nodes, setNodes] = useState<TreeNode[]>([]); // Lưu dữ liệu câu hỏi dạng TreeNode
     const [title, setTitle] = useState<string>("Xóa");  // Tiêu đề của Dialog
     const totalItems = useRef<number>(0);        // Lưu tổng số mục, không gây render lại

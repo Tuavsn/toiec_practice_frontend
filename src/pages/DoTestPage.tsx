@@ -5,6 +5,7 @@ import '../App.css';
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useTestPage from "../hooks/TestHook";
 import { MultipleChoiceQuestion, SimpleTimeCountDownProps, TestAnswerSheet, TestType } from "../utils/types/type";
+import { Dialog } from "primereact/dialog";
 
 function DoTestPage() {
 
@@ -19,18 +20,23 @@ function DoTestPage() {
         userAnswerSheet,
         totalQuestions,
         questionList,
+        setVisiable,
         pageMapper,
         changePage,
+        toggleFlag,
         timeDoTest,
+        timeLimit,
+        isVisible,
         onEndTest,
         startTest,
         isOnTest,
         testType,
+        flags,
         start,
     } = useTestPage();
-
-
-
+    const answeredCount = Array.from(userAnswerSheet.values()).filter(
+        (answerPair) => answerPair.userAnswer !== ""
+    ).length;
     // Tạo danh sách nút điều hướng dựa trên pageMapper
     const createButtonListElement = (): JSX.Element[] => {
         if (userAnswerSheet.size <= 0) {
@@ -46,8 +52,9 @@ function DoTestPage() {
                 part = pq.part;
                 newPart = true
             }
+
             return (
-                <React.Fragment key="section for each question">
+                <React.Fragment key={`section for each question${index}`}>
 
                     {newPart && <><h5 className="w-full text-blue-600">Part {pq.part}</h5></>}
                     <Button
@@ -56,12 +63,13 @@ function DoTestPage() {
                         style={{ width: '60px', aspectRatio: '1/1' }}
                         className={"border-round-md border-solid text-center p-2"}
                         label={pq.questionNum.toString()}
-                        severity={getColorButtonOnAnswerSheet(text, isOnPage)} // Cập nhật màu sắc nút theo câu trả lời
+                        severity={getColorButtonOnAnswerSheet(text, isOnPage, flags[index])} // Cập nhật màu sắc nút theo câu trả lời
                         onClick={() => {
                             if (!isOnPage) {
                                 setCurrentPageIndex(pq.page);
                             }
                         }}
+
                     />
                 </React.Fragment>
 
@@ -103,19 +111,22 @@ function DoTestPage() {
                             {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */}
                             <Toolbar
                                 className="py-1"
-                                start={currentStatusBodyTemplate(userAnswerSheet, totalQuestions, setIsUserAnswerSheetVisible)}
+                                start={currentStatusBodyTemplate(answeredCount, totalQuestions, setIsUserAnswerSheetVisible)}
                                 center={
                                     <SimpleTimeCountDown
                                         onTimeUp={() => onEndTest()}
-                                        timeLeftInSecond={7200}
+                                        timeLeftInSecond={timeLimit.current}
                                     />
                                 }
                                 end={
-                                    <Button
-                                        severity="success"
-                                        label="Nộp bài"
-                                        onClick={() => onEndTest()}
-                                    />
+                                    <div className=" flex gap-1">
+                                        <Button severity={flags[currentPageIndex] ? "info" : "secondary"} label="🚩" onClick={() => toggleFlag(currentPageIndex)} />
+                                        <Button
+                                            severity="success"
+                                            label="Nộp bài"
+                                            onClick={() => setVisiable(true)}
+                                        />
+                                    </div>
                                 }
                             />
 
@@ -129,6 +140,14 @@ function DoTestPage() {
                                     userAnswerSheet={userAnswerSheet}
                                 />
                             </div>
+                            <Dialog visible={isVisible} header={<b>Bạn có chắc muốn nộp bài</b>} onHide={() => setVisiable(false)}>
+                                <div className="flex flex-column gap-4">
+                                    {answeredCount < totalQuestions && <h1>Bạn có {totalQuestions - answeredCount} câu chưa làm !</h1>}
+                                    <div className="flex justify-content-end">
+                                        <Button severity="success" label="Chấp nhận nộp bài" onClick={onEndTest} />
+                                    </div>
+                                </div>
+                            </Dialog>
                         </section>
                     )}
                 </section>
@@ -152,15 +171,20 @@ function checkIsAllowToChangePage(testType: TestType, questionList: MultipleChoi
         (questionList[currentPageIndex].partNum <= 4 || questionList[page].partNum <= 4);
 }
 
-function getColorButtonOnAnswerSheet(answer: string, isOnPage: boolean): 'info' | 'secondary' | 'warning' {
-    const returnString = answer ? 'info' : 'secondary';
-    return isOnPage ? 'warning' : returnString;
+type ColorString = 'info' | 'secondary' | 'warning' | 'help';
+function getColorButtonOnAnswerSheet(answer: string, isOnPage: boolean, isFlag: boolean): ColorString {
+    let returnString: ColorString = 'secondary';
+    if (answer) {
+        returnString = 'info'
+    }
+    if (isFlag) {
+        returnString = 'warning';
+    }
+    return isOnPage ? 'help' : returnString;
 }
 
-function currentStatusBodyTemplate(userAnswers: TestAnswerSheet, totalQuestions: number, setVisible: React.Dispatch<React.SetStateAction<boolean>>) {
-    const answeredCount = Array.from(userAnswers.values()).filter(
-        (answerPair) => answerPair.userAnswer !== ""
-    ).length;
+function currentStatusBodyTemplate(answeredCount: number, totalQuestions: number, setVisible: React.Dispatch<React.SetStateAction<boolean>>) {
+
     return (
         <Button severity="help" label={`Số câu đã trả lời: ${answeredCount} / ${totalQuestions}`} icon="pi pi-arrow-right" onClick={() => setVisible(true)} />
     )

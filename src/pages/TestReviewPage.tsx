@@ -145,21 +145,29 @@ const UserAnswerSheet: React.FC<UserAnswerSheetReviewProps> = React.memo(({ stat
         if (state.testReviewAnswerSheet.length <= 0) {
             return [<h1 key="error-button-list">Lỗi rồi</h1>];
         }
+        let part = 0;
         return state.pageMapper.map((pq, index) => {
             const isOnPage = state.currentPageIndex === pq.page;
-
+            let newPart = false;
+            if (part != pq.part) {
+                part = pq.part;
+                newPart = true
+            }
             return (
-                <Button
-                    key={`answer_${index}`}
-                    style={{ width: "60px", aspectRatio: "1/1" }}
-                    className="border-round-md border-solid text-center p-2"
-                    label={pq.questionNum.toString()}
-                    severity={getColorButtonOnAnswerSheet(
-                        state.testReviewAnswerSheet[pq.page],
-                        isOnPage
-                    )}
-                    onClick={() => handlePageChange(pq.page)}
-                />
+                <React.Fragment key={`section for each question ${index}`}>
+                    {newPart && <><h5 className="w-full text-blue-600">Part {pq.part}</h5></>}
+                    <Button
+                        key={`answer_${index}`}
+                        style={{ width: "60px", aspectRatio: "1/1" }}
+                        className="border-round-md border-solid text-center p-2"
+                        label={pq.questionNum.toString()}
+                        severity={getColorButtonOnAnswerSheet(
+                            state.testReviewAnswerSheet[pq.page],
+                            isOnPage
+                        )}
+                        onClick={() => handlePageChange(pq.page)}
+                    />
+                </React.Fragment>
             );
         });
     }, [state.pageMapper, state.currentPageIndex, state.testReviewAnswerSheet, handlePageChange]);

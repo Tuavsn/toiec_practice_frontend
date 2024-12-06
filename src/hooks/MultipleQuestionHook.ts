@@ -11,6 +11,8 @@ export function useMultipleQuestion() {
     const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
     const [userAnswerSheet, setUserAnswerSheet] = useState<TestAnswerSheet>(new Map<QuestionNumber, AnswerPair>());
     const { isOnTest, setIsOnTest } = useTestState();
+    const [flags, setFlags] = useState<boolean[]>([]);
+    const [isVisible, setVisiable] = useState<boolean>(false);
     // Sử dụng hook điều hướng
     const navigate = useNavigate();
 
@@ -37,7 +39,7 @@ export function useMultipleQuestion() {
         }
     }, [currentPageIndex, questionList.length]);
 
-    const startTest = () =>{
+    const startTest = () => {
         setStart(true);
         timeDoTest.current = lastTimeStampRef.current = Date.now();
     }
@@ -105,12 +107,16 @@ export function useMultipleQuestion() {
         setPageMapper,
         questionList,
         setIsOnTest,
+        setVisiable,
         pageMapper,
         changePage,
         timeDoTest,
         startTest,
+        isVisible,
         isOnTest,
         navigate,
+        setFlags,
+        flags,
         start,
     }
 }

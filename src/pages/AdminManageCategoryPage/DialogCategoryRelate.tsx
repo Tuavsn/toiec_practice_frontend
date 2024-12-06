@@ -92,7 +92,7 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateCategoryBodyProps> = React
 
                     {
                         <Calendar
-                            value={props.currentSelectedRow.year ? new Date(props.currentSelectedRow.year, 0, 1) : null}  // Convert year number to Date object (Jan 1st)
+                            value={yearValue ? new Date(yearValue, 0, 1) : null}  // Convert year number to Date object (Jan 1st)
                             onChange={(e) => {
                                 const selectedYear = e.value?.getFullYear() ?? null;
                                 if (selectedYear !== null) {

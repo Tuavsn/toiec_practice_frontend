@@ -36,7 +36,7 @@ export default function UserRoutes() {
                 {/* Test Detail Page */}
                 <Route path="/test/:id" element={<TestDetailPage />} />
                 {/* Do Test  Page */}
-                <Route path="/dotest/:id/:testType/:parts" element={<DoTestPage />} />
+                <Route path="/dotest/:time/:id/:testType/:parts" element={<DoTestPage />} />
                 {/* Test Review Page */}
                 <Route path="/test/:id/review" element={<TestOverallResultPage />} />
                 <Route path="/test/:id/review/detail" element={<TestReviewPage />} />

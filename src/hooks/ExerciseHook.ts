@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { callGetExercisePaper, callPostTestRecord } from "../api/api";
 import { MappingPageWithQuestionNum } from "../utils/convertToHTML";
 import prepareForTest from "../utils/prepareForTest";
-import {  ExerciseType, milisecond, QuestionNumber, QuestionRow, ResultID, TestRecord } from "../utils/types/type";
+import { ExerciseType, milisecond, QuestionNumber, QuestionRow, ResultID, TestRecord } from "../utils/types/type";
 import { useMultipleQuestion } from "./MultipleQuestionHook";
 
 const useExercisePage = () => {
@@ -47,8 +47,8 @@ const useExercisePage = () => {
         updateTimeSpentOnEachQuestionInCurrentPage();
         const resultBodyObject: TestRecord = {
             totalSeconds: (Date.now() - timeDoTest.current) / 1000, // khép lại thời gian làm bài ( đơn vị giây)
-            testId: "671a25094dbe5f4c165c31dc",
-            parts: exerciseType,
+            testId: "",
+            parts: exerciseType.split("=")[1],
             type: "practice",
             userAnswer: prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current)
         }
