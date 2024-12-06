@@ -47,7 +47,6 @@ export default function useTest() {
         }
         dispatch({ type: "FETCH_ROWS_SUCCESS", payload: [response.result, pageNumber] });
         totalItems.current = response.meta.totalItems;
-        console.table(response.result);
     }, [])
     useEffect(() => {
 

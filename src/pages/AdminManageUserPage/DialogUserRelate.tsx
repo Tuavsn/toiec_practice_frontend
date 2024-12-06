@@ -44,7 +44,7 @@ function RenderDialog(params: RenderRowDialogParams<UserRow>): [string, JSX.Elem
 
         case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa người dùng" cùng với tên của người dùng hiện tại và một thông báo xác nhận xóa
 
-            return [`Xóa người dùng ${params.currentSelectedRow.name}`,
+            return [`Xóa người dùng:  ${params.currentSelectedRow.email.split('@')[0]}`,
             <RenderDeleteUserBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
             ];
 
@@ -74,7 +74,7 @@ const RenderDeleteUserBody: React.FC<DialogDeleteRowBodyProps<UserRow>> = React.
         return (
             <React.Fragment>
 
-                <h1 className='text-center'>Bạn có chắc muốn xóa <q>{props.currentSelectedRow.name}</q> ?</h1>
+                <h1 className='text-center'>Bạn có chắc muốn xóa <q>{props.currentSelectedRow.email.split('@')[0]}</q> ?</h1>
                 <div className="flex justify-content-end">
                     <Button label="Xóa" icon="pi pi-save" onClick={() => handleDelete({ rowID: props.currentSelectedRow.id, dispatch: props.dispatch, toast })} />
                 </div>

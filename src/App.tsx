@@ -20,7 +20,7 @@ import { ToastProvider } from './context/ToastProvider';
 function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<LoadingSpinner text="Trang Toeic đang tải...." />}>
+      <Suspense fallback={<main className='flex justify-content-center h-screen'><LoadingSpinner text="Trang Toeic đang tải...." /></main>}>
         <ToastProvider>
           <Container>
             <Routes>

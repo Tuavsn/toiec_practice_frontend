@@ -19,23 +19,25 @@ export default function LecturePage() {
 
     useEffect(() => {
         const fetchLectures = async (pageIndex: number) => {
-            
-                const response = await callGetLectureRow(pageIndex);
-                if(response instanceof Error){
-                    return;
-                }
-                totalItemsRef.current = response.meta.totalItems;
-                dispatch({ type: "FETCH_SUCCESS", payload: response.result });
+
+            const response = await callGetLectureRow(pageIndex);
+            if (response instanceof Error) {
+                return;
+            }
+            totalItemsRef.current = response.meta.totalItems;
+            dispatch({ type: "FETCH_SUCCESS", payload: response.result });
         }
         fetchLectures(state.currentPageIndex);
     }, [state.currentPageIndex])
     if (state.lectures.length === 0) {
-        return <LoadingSpinner text="Các bài giảng đang được tải lên" />
+        return <main className="flex justify-content-center h-screen"><LoadingSpinner text="Các bài giảng đang được tải lên" /></main>
     }
     return (
-        <div className="p-p-4">
-            <h1 className="text-center text-4xl mt-4 pt-5">CÁC BÀI GIẢNG NÊN THỬ</h1>
-            <div className="flex justify-content-end flex-wrap ">
+        <div className="p-4">
+            <section className="mt-5 bg-gray-300 shadow-5 p-3 glassmorphism">
+                <h1 className="pl-4">Các bài giảng nên thử</h1>
+            </section>
+            <div className="flex justify-content-end flex-wrap mt-4">
                 <div className="flex align-items-center justify-content-center m-2">
                     <IconField iconPosition="left">
                         <InputIcon className="pi pi-search"> </InputIcon>
@@ -97,6 +99,6 @@ const reducer = (state: State, action: Action): State => {
     }
 }
 
-function getTopicName(topics:Topic[]): string{
-    return topics.map(t=>t.name).join(" ,")
+function getTopicName(topics: Topic[]): string {
+    return topics.map(t => t.name).join(" ,")
 }

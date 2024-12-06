@@ -10,8 +10,8 @@ import useTopicRef from "./TopicHook";
 export function useQuestion() {
 
     const [resourceDialogBodyVisible, setResourceDialogBodyVisible] = useState<JSX.Element | null>(null);
-    const [topicDialogBodyVisible, setTopicDialogBodyVisible]       = useState<JSX.Element | null>(null);
-    const [contextDialogBodyVisible, setContextDialogBodyVisible]   = useState<JSX.Element | null>(null);
+    const [topicDialogBodyVisible, setTopicDialogBodyVisible] = useState<JSX.Element | null>(null);
+    const [contextDialogBodyVisible, setContextDialogBodyVisible] = useState<JSX.Element | null>(null);
 
 
 
@@ -30,15 +30,15 @@ export function useQuestionTable() {
     // === Lấy test_id từ URL ===
     // Lấy test_id từ URL thông qua hook useParams, nếu không có thì mặc định là "no_idTest_found"
     const { test_name_id = "no_idTest_found" } = useParams<{ test_name_id: Name_ID<TestID> }>();
-    const [,test_id] = SplitNameIDFromURL(test_name_id);
+    const [, test_id] = SplitNameIDFromURL(test_name_id);
     // === Khởi tạo các trạng thái cần thiết ===
-    const [currentPageIndex, setCurrentPageIndex]   = useState(-1);             // Lưu trang hiện tại
-    const [isVisible, setIsVisible]                 = useState<boolean>(false); // Trạng thái hiển thị của Dialog
-    const currentSelectedQuestion                   = useRef<TreeNode>({});     // Câu hỏi hiện tại được chọn
-    const [nodes, setNodes]                         = useState<TreeNode[]>([]); // Lưu dữ liệu câu hỏi dạng TreeNode
-    const [title, setTitle]                         = useState<string>("Xóa");  // Tiêu đề của Dialog
-    const totalItems                                = useRef<number>(0);        // Lưu tổng số mục, không gây render lại
-    const topics                                    = useTopicRef();            // Lưu danh sách chủ đề
+    const [currentPageIndex, setCurrentPageIndex] = useState(-1);             // Lưu trang hiện tại
+    const [isVisible, setIsVisible] = useState<boolean>(false); // Trạng thái hiển thị của Dialog
+    const currentSelectedQuestion = useRef<TreeNode>({});     // Câu hỏi hiện tại được chọn
+    const [nodes, setNodes] = useState<TreeNode[]>([]); // Lưu dữ liệu câu hỏi dạng TreeNode
+    const [title, setTitle] = useState<string>("Xóa");  // Tiêu đề của Dialog
+    const totalItems = useRef<number>(0);        // Lưu tổng số mục, không gây render lại
+    const topics = useTopicRef();            // Lưu danh sách chủ đề
 
     // === Hàm lấy dữ liệu câu hỏi theo trang ===
     const fetchQuestionByPage = useCallback(async (pageIndex: number) => {
@@ -50,13 +50,13 @@ export function useQuestionTable() {
 
         // Chuyển đổi dữ liệu thành dạng TreeNode và cập nhật state
         setNodes(ConvertQuestionRowListToTreeNodeList(responseData.data.result));
-
+        // processQuestions(responseData.data.result);
         // Cập nhật lại trang hiện tại
         setCurrentPageIndex(pageIndex);
-    }, []); 
+    }, []);
 
     // === useEffect để gọi fetchQuestionByPage khi khởi tạo ===
-    useEffect(() => {fetchQuestionByPage(0)}, []); // Gọi hàm fetch dữ liệu câu hỏi lần đầu
+    useEffect(() => { fetchQuestionByPage(0) }, []); // Gọi hàm fetch dữ liệu câu hỏi lần đầu
 
 
 
@@ -83,20 +83,20 @@ export function useQuestionTable() {
 
 // Hàm chuyển đổi danh sách QuestionRow thành danh sách TreeNode
 export function ConvertQuestionRowListToTreeNodeList(QuestionRowList: QuestionRow[]): TreeNode[] {
-    
+
     // Duyệt qua từng QuestionRow trong danh sách và chuyển đổi thành TreeNode
     const questionNodeList = QuestionRowList.map((questionRow): TreeNode => {
         return {
             // Chuyển đổi QuestionRow thành TreeNode, bao gồm cả id
             ...ConvertQuestionRowToNode(questionRow, questionRow.id),
-            
+
             // Nếu có các subQuestions, chuyển đổi chúng thành TreeNode
-            children: questionRow.subQuestions.length 
+            children: questionRow.subQuestions.length
                 ? questionRow.subQuestions.map((subquest): TreeNode => {
                     return {
                         ...ConvertQuestionRowToNode(subquest, subquest.id)
                     }
-                }) 
+                })
                 : undefined
         }
     });
@@ -155,7 +155,7 @@ function GroupQuestionNumber(questionRow: QuestionRow): string {
 
 // Hàm xác định dải số câu hỏi cho một phần, từ câu đầu tiên đến câu cuối cùng
 function GroupQuestionNumberForPart(questionNodeArray: TreeNode[]): string {
-    
+
     // Lấy số câu hỏi đầu tiên và cuối cùng trong mảng questionNodeArray
     let start = questionNodeArray[0].data.questionNum, // Số câu hỏi đầu tiên
         end = questionNodeArray.at(-1)!.data.questionNum; // Số câu hỏi cuối cùng
@@ -172,3 +172,7 @@ function GroupQuestionNumberForPart(questionNodeArray: TreeNode[]): string {
     // Trả về dải số câu hỏi theo định dạng "start → end"
     return `${start} → ${end}`;
 }
+
+
+
+// test
