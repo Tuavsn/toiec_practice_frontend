@@ -14,6 +14,8 @@ const reducer = (state: RowHookState<UserRow>, action: RowHookAction<UserRow>): 
             const [newUsers, newPageIndex] = action.payload;
             return { ...state, rows: newUsers, currentPageIndex: newPageIndex }
         }
+        case 'RESET_ROWS':
+            return { ...state, rows: [] }
         case 'SET_PAGE':
             return { ...state, currentPageIndex: action.payload }
         case 'REFRESH_DATA':
@@ -54,6 +56,7 @@ export default function useUser() {
     }, [state.isRefresh]);
 
     const onPageChange = (e: PaginatorPageChangeEvent) => {
+        dispatch({type:"RESET_ROWS"});
         fetchUsers(e.page)
     }
 

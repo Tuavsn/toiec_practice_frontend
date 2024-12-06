@@ -41,6 +41,7 @@ export function useMultipleQuestion() {
 
     const startTest = () => {
         setStart(true);
+        setIsOnTest(true);
         timeDoTest.current = lastTimeStampRef.current = Date.now();
     }
 

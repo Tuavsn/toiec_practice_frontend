@@ -1,9 +1,10 @@
 import { PaginatorPageChangeEvent } from "primereact/paginator";
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import { callGetLectureRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
 import { initialLectureState } from "../utils/types/emptyValue";
 import { LectureHookAction, LectureHookState } from "../utils/types/type";
+import SetWebPageTitle from "../utils/setTitlePage";
 
 
 const reducer = (state: LectureHookState, action: LectureHookAction): LectureHookState => {
@@ -46,6 +47,7 @@ export default function useLecture() {
         totalItems.current = response.meta.totalItems;
 
     }, [])
+    useLayoutEffect(() => SetWebPageTitle("Quản lý bài giảng"), []);
     useEffect(() => {
 
         fetchLectures(state.currentPageIndex);

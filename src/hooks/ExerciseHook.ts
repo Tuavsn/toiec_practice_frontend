@@ -5,6 +5,7 @@ import { MappingPageWithQuestionNum } from "../utils/convertToHTML";
 import prepareForTest from "../utils/prepareForTest";
 import { ExerciseType, milisecond, QuestionNumber, QuestionRow, ResultID, TestRecord } from "../utils/types/type";
 import { useMultipleQuestion } from "./MultipleQuestionHook";
+import SetWebPageTitle from "../utils/setTitlePage";
 
 const useExercisePage = () => {
 
@@ -57,6 +58,7 @@ const useExercisePage = () => {
     }
     // Gọi API để lấy dữ liệu bài thi khi component được mount
     useEffect(() => {
+        SetWebPageTitle("Luyện tập")
         // Nếu đã có một yêu cầu đang thực hiện, thì hủy nó
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();

@@ -32,7 +32,7 @@ export default function Header() {
 
     // Nếu người dùng có vai trò ADMIN, thêm mục Dashboard vào danh sách
     if (localStorage.getItem('role') === 'ADMIN') {
-        HeaderItems.push({ label: 'Dashboard', icon: 'pi pi-cog', command: () => handleCommand('/dashboard/') });
+        HeaderItems.push({ label: 'Quản lý', icon: 'pi pi-cog', command: () => handleCommand('/dashboard/') });
     }
     // tắt bảng hiển thị khi nhấn vào biểu tượng người dùng
     const toggleOverlayPanel = (e: MouseEvent) => {

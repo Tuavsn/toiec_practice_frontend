@@ -1,9 +1,10 @@
 import { PaginatorPageChangeEvent } from "primereact/paginator";
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import { callGetCategoryRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
 import { initialCategoryState } from "../utils/types/emptyValue";
 import { CategoryRow, RowHookAction, RowHookState } from "../utils/types/type";
+import SetWebPageTitle from "../utils/setTitlePage";
 
 const reducer = (state: RowHookState<CategoryRow>, action: RowHookAction<CategoryRow>): RowHookState<CategoryRow> => {
     switch (action.type) {
@@ -45,6 +46,7 @@ export default function useCategory() {
         totalItems.current = response.meta.totalItems;
 
     }, [])
+    useLayoutEffect(() => SetWebPageTitle("Quản lý bộ đề"), []);
     useEffect(() => {
 
         fetchCategorys(state.currentPageIndex);

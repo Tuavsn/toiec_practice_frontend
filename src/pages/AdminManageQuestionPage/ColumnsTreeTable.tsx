@@ -107,11 +107,11 @@ export const ActionBodyTemplate: React.FC<QuestionActionButtonProps> = React.mem
                 }} />
 
                 {/* Nút xóa */}
-                <Button icon="pi pi-trash" rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => {
+                {/* <Button icon={`pi ${questionNode.data.active ? "pi-trash" : "pi-sync"}`} rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => {
                     currentSelectedQuestion.current = questionNode
                     setTitle("Xóa"); // Thiết lập tiêu đề cho Dialog là "Xóa"
                     setIsVisible(true); // Hiển thị Dialog
-                }} />
+                }} /> */}
             </div>
         )
     }

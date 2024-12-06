@@ -3,13 +3,14 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { useNavigate } from "react-router-dom";
 import { callGetCategoryLabel, callGetTestCard } from "../api/api";
 import { CategoryLabel, TestCard } from "../utils/types/type";
+import SetWebPageTitle from "../utils/setTitlePage";
 
 export function useTestCard() {
     const navigate = useNavigate();
     const [currentFormatIndex, setCurrentFormatIndex] = useState<number>(0);
     const [currentYear, setCurrentYear] = useState<number>(0);
-    const [testCards, setTestCards] = useState<TestCard[]>(defaultTest);
-    const [categoryLabels, setCategoryLabels] = useState<CategoryLabel[]>(defaultLabel);
+    const [testCards, setTestCards] = useState<TestCard[]|null>(null);
+    const [categoryLabels, setCategoryLabels] = useState<CategoryLabel[]>([]);
     const [pageIndex, setPageIndex] = useState(0);
     const totalItemsRef = useRef<number>(-1);
 
@@ -22,6 +23,7 @@ export function useTestCard() {
     // === Hàm lấy dữ liệu thẻ bài kiểm tra theo trang, không thay đổi pageIndex trong hàm này ===
     const fetchTestCardByPage = useCallback(async (selectedFormat: string, selectedYear: number, page: number) => {
         try {
+            setTestCards(null);
             // Gọi API để lấy dữ liệu thẻ bài kiểm tra
             const responseData = await callGetTestCard(selectedFormat, selectedYear, page);
 
@@ -37,6 +39,7 @@ export function useTestCard() {
 
     // === Hàm lấy dữ liệu nhãn danh mục ban đầu và thiết lập trang ===
     useLayoutEffect(() => {
+        SetWebPageTitle("Thư viện đề thi")
         const fetchCategoryLabels = async () => {
             try {
                 const responseData = await callGetCategoryLabel();
@@ -62,7 +65,7 @@ export function useTestCard() {
     // === Tự động gọi lại khi thay đổi format, năm hoặc chỉ số trang hiện tại ===
     useEffect(() => {
 
-        if (categoryLabels[0].format != "NOT_FOUND") {
+        if (categoryLabels.length !== 0) {
             // Gọi API khi format, năm hoặc trang thay đổi, nhưng không thay đổi pageIndex
             fetchTestCardByPage(categoryLabels[currentFormatIndex].format, currentYear, pageIndex);
         }
@@ -81,19 +84,3 @@ export function useTestCard() {
         navigate,
     };
 }
-
-const defaultLabel: CategoryLabel[] = [
-    {
-        format: "NOT_FOUND",
-        year: [2024],
-    }
-] as const
-
-const defaultTest: TestCard[] = [
-    {
-        id: "#",
-        format: "",
-        year: 0,
-        name: '',
-    }
-] as const

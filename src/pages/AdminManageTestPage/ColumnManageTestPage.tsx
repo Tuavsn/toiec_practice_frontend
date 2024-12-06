@@ -9,14 +9,11 @@ import { emptyTestRow } from "../../utils/types/emptyValue";
 export function RenderAdminTestColumns(dispatch: Dispatch<RowHookAction<TestRow>>): JSX.Element[] {
     return [
 
-        <Column key="col-name" field="name" header="Name" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-totalTestAttempt" field="totalUserAttempt" header="Total Attempt" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-totalQuestion" field="totalQuestion" header="Total Question" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-totalScore" field="totalScore" header="Total Score" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-limitTime" field="limitTime" header="Limit Time" sortable filter style={{ minWidth: '12rem' }} />,
-        <Column key="col-questions" header="questions" body={(data) => <QuestionsBodyTemplate rowData={data} />} />,
-        <Column key="col-timestamp" header="Time stamp" body={timeStampBodyTemplate} sortable style={{ minWidth: '10rem' }} />,
-        <Column key="col-isActive" field="isActive" header="Active" sortable body={statusBodyTemplate} />,
+        <Column key="col-name" field="name" header="Tên" sortable filter style={{ minWidth: '12rem' }} />,
+        <Column key="col-totalTestAttempt" field="totalUserAttempt" header="Tổng lượt người" sortable filter/>,
+        <Column key="col-testDetail" header="Thông tin" sortable filter body={InfoBodyTemplate} />,
+        <Column key="col-questions" header="Câu hỏi" alignHeader="center" body={(data) => <QuestionsBodyTemplate rowData={data} />} />,
+        <Column key="col-isActive" field="isActive" header="Trạng thái" sortable body={statusBodyTemplate} />,
         <Column key="col-action"/*                        */ header={() => AddNew(dispatch)}/*     */ headerClassName='flex justify-content-center'/*   */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedRow={data} />} />
     ];
 }
@@ -31,7 +28,7 @@ export const ActionBodyTemplate: React.FC<RowActionButtonProps<TestRow>> = React
                 <Button icon="pi pi-pencil" rounded outlined style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_UPDATE_DIALOG", payload: currentSelectedRow }); }} />
 
                 {/* Nút xóa: Khi nhấn, dispatch hành động để mở hộp thoại xóa bài giảng */}
-                <Button icon="pi pi-trash" rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedRow }); }} />
+                <Button icon={`pi ${currentSelectedRow.active ? "pi-trash" : "pi-sync"}`} rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedRow }); }} />
 
             </div>
         )
@@ -52,5 +49,15 @@ const QuestionsBodyTemplate: React.FC<{ rowData: TestRow }> = ({ rowData }) => {
 
     return (
         <Button severity="info" label='Chi Tiết' className="w-full text-center" onClick={handleClick}></Button>
+    )
+}
+
+function InfoBodyTemplate(testRow: TestRow) {
+    return (
+        <div>
+            <p><b>Số câu: </b>{testRow.totalQuestion}</p>
+            <p><b>Điểm tối đa: </b>{testRow.totalScore}</p>
+            <p><b>Thời gian làm: </b>{testRow.limitTime}</p>
+        </div>
     )
 }

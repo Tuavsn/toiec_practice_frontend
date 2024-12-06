@@ -35,10 +35,10 @@ export const ActionBodyTemplate: React.FC<LectureActionButtonProps> = React.memo
                 <Button icon="pi pi-code" rounded outlined severity="info" style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_PAGE_DESIGNER_DIALOG", payload: currentSelectedLecture }); }} />
 
                 {/* Nút sửa câu hỏi: Dẫn đến trang câu hỏi của bài giảng hiện tại */}
-                <Link to={currentSelectedLecture.id}><Button icon="pi pi-question-circle" rounded outlined severity="help" style={{ width: "50px", height: "50px" }} link /></Link>
+                {/* <Link to={currentSelectedLecture.id}><Button icon="pi pi-question-circle" rounded outlined severity="help" style={{ width: "50px", height: "50px" }} link /></Link> */}
 
                 {/* Nút xóa: Khi nhấn, dispatch hành động để mở hộp thoại xóa bài giảng */}
-                <Button icon="pi pi-trash" rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedLecture }); }} />
+                <Button icon={`pi ${currentSelectedLecture.active ? "pi-trash" : "pi-sync"}`} rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedLecture }); }} />
 
             </div>
         )

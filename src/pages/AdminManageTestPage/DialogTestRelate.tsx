@@ -76,7 +76,7 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateTestBodyProps> = React.mem
         const [formData, setFormData] = useState<TestRow>(props.currentSelectedRow);
         const { toast } = useToast();
         const title = useRef<string>(props.currentSelectedRow.id ? "Sửa bộ đề" : "Thêm bộ đề");
-
+        const [isDisabled, setIsDisabled] = useState(false);
         const onInputTextChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof TestRow) => {
             const value = e.target.value === null ? '' : e.target.value; // Handle text input
             setFormData((prevRow) => ({
@@ -126,7 +126,7 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateTestBodyProps> = React.mem
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end">
-                    <Button label="Lưu" icon="pi pi-save" onClick={() => { handleSave({ row: formData, dispatch: props.dispatch, toast }) }} />
+                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => { handleSave({ row: formData, dispatch: props.dispatch, toast,setIsDisabled }) }} />
                 </div>
 
             </Fieldset>
@@ -142,13 +142,14 @@ async function handleSave(params: handeSaveRowParams<TestRow>) {
         params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "Tên đề thi không được phép để trống" });
         return;
     }
+    params.setIsDisabled(true);
     let success = false;
     if (params.row.id) {
         success = await callPostUpdateTest(params.row);
     } else {
         success = await callPostTest(params.row);
     }
-
+    params.setIsDisabled(false);
     if (success) {
         params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
         params.dispatch({ type: "REFRESH_DATA" });

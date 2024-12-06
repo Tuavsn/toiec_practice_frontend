@@ -24,7 +24,6 @@ export default function UserProfilePage() {
     const {
         state
     } = useProfile();
-    useProfile()
     return (
         <main className="pt-8 flex gap-3 flex-column">
             <div key="area-1">
@@ -176,16 +175,16 @@ const ActivityLog: React.FC<ActivityLogProps> = React.memo(
                     <Column key="col-testName" alignHeader='center' field="testName" header="Đề" sortable filter />
 
                     {/* // Cột kết quả, sử dụng template CountSkillScoreTemplate để hiển thị điểm đọc và nghe */}
-                    <Column key="col-skill_count" alignHeader='center' header="Kết quả" body={CountSkillScoreTemplate}/>
+                    <Column key="col-skill_count" alignHeader='center' header="Kết quả" body={CountSkillScoreTemplate} />
 
                     {/* // Cột thống kê trả lời, hiển thị số lượng đúng, sai, bỏ qua bằng template CountAnswerTypeTemplate */}
-                    <Column key="col-answer_count" alignHeader='center' header="thống kê" body={CountAnswerTypeTemplate} />
+                    <Column key="col-answer_count" alignHeader='center' header="Thống kê" body={CountAnswerTypeTemplate} />
 
                     {/* // Cột thời gian làm bài, lấy dữ liệu từ trường totalTime và cho phép sắp xếp */}
                     <Column key="col-time" alignHeader='center' field="totalTime" header="Thời gian làm" body={(data) => convertSecondsToString(data.totalTime)} sortable filter />
 
                     {/* // Cột loại bài kiểm tra, dùng template UserResultTemplate để hiển thị thông tin loại */}
-                    <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} alignHeader='center'/>
+                    <Column key="col-type" header="Phần thi" body={typeUserResultRowBodyTemplate} alignHeader='center' />
 
                     {/* // Cột chi tiết, hiển thị chi tiết kết quả người dùng qua template UserResultTemplate */}
                     <Column key="col-detail" body={(data) => detailUserResultRowBodyTemplate({ id: data.resultId })} />
@@ -307,7 +306,7 @@ function Suggestions(suggestionOnParts: SuggestionsForUser[]) {
 }
 
 function correctPercentTemplate(rowData: TopicStat) {
-    const correctPercent = rowData.totalCorrect / ((rowData.totalCorrect + rowData.totalIncorrect) || 1) * 100;
+    const correctPercent = Math.round(rowData.totalCorrect / ((rowData.totalCorrect + rowData.totalIncorrect) || 1) * 10000) / 100;
     const colorString = getColorBasedOnValue(correctPercent);
     return (
         <p className="text-center" style={{ backgroundColor: colorString }}>{correctPercent}%</p>
@@ -325,18 +324,19 @@ function getColorBasedOnValue(value: number): string {
 
 function getCurrentTitle(score: number): string {
     if (score >= 905 && score <= 990) {
-        return "International Professional Proficiency";
+        return "Chuyên nghiệp quốc tế";
     } else if (score >= 785 && score <= 900) {
-        return "Working Proficiency Plus";
+        return "Tiếng anh nâng cao";
     } else if (score >= 605 && score <= 780) {
-        return "Limited Working Proficiency";
+        return "Tiếng anh trung cấp";
     } else if (score >= 405 && score <= 600) {
-        return "Elementary Proficiency Plus";
+        return "Tiếng anh sơ cấp";
     } else if (score >= 255 && score <= 400) {
-        return "Elementary Proficiency";
+        return "Tiếng anh cơ bản";
     } else if (score >= 10 && score <= 250) {
-        return "Basic Proficiency";
+        return "Mới bắt đầu";
     } else {
-        return "Score out of range";
+        return "Điểm ngoài phạm vi";
     }
+
 }
