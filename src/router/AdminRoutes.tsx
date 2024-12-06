@@ -8,7 +8,6 @@ const AdminManageLecturePage = lazy(() => import("../pages/AdminManageLecturePag
 const AdminManageCategoryPage = lazy(() => import("../pages/AdminManageCategoryPage/AdminManageCategory"))
 const AdminManageAccountPage = lazy(() => import("../pages/AdminManageUserPage/AdminManageUser"))
 const AdminManageTestPage = lazy(() => import("../pages/AdminManageTestPage/AdminManageTest"))
-const AdminDashboardPage = lazy(() => import("../pages/AdminDashboardPage"))
 const AdminLayout = lazy(() => import('../components/Layout/AdminLayout'));
 const TempAdminPage = lazy(() => import("../pages/TempAdminPage"))
 
@@ -20,7 +19,7 @@ export default function AdminRoutes() {
     <AdminLayout>
       <Suspense fallback={<LoadingSpinner text="Trang quản trị đang tải...." />}>
         <Routes>
-          <Route path="/" element={<AdminDashboardPage />} /> {/* Trang chủ quản trị */}
+          <Route path="/" element={<AdminManageAccountPage />} /> {/* Trang chủ quản trị */}
           <Route path="test-analyst" element={<TempAdminPage text="phân tích bài thi" />} />
 
           {/* Nested route for category and tests */}

@@ -43,10 +43,12 @@ function RenderDialog(params: RenderRowDialogParams<UserRow>): [string, JSX.Elem
     switch (params.job) {
 
         case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa người dùng" cùng với tên của người dùng hiện tại và một thông báo xác nhận xóa
-
-            return [`Xóa người dùng:  ${params.currentSelectedRow.email.split('@')[0]}`,
-            <RenderDeleteUserBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
-            ];
+            {
+                const text = params.currentSelectedRow.active ? "Xóa người dùng" : "Khôi phục";
+                return [`${text}:  ${params.currentSelectedRow.email.split('@')[0]}`,
+                <RenderDeleteUserBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
+                ];
+            }
 
     }
 
@@ -71,12 +73,13 @@ function RenderDialog(params: RenderRowDialogParams<UserRow>): [string, JSX.Elem
 const RenderDeleteUserBody: React.FC<DialogDeleteRowBodyProps<UserRow>> = React.memo(
     (props) => {
         const { toast } = useToast();
+        const text = props.currentSelectedRow.active ? "xóa" : "khôi phục";
         return (
             <React.Fragment>
 
-                <h1 className='text-center'>Bạn có chắc muốn xóa <q>{props.currentSelectedRow.email.split('@')[0]}</q> ?</h1>
+                <h1 className='text-center'>Bạn có chắc muốn {text} <q>{props.currentSelectedRow.email.split('@')[0]}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button label="Xóa" icon="pi pi-save" onClick={() => handleDelete({ rowID: props.currentSelectedRow.id, dispatch: props.dispatch, toast })} />
+                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ rowID: props.currentSelectedRow.id, dispatch: props.dispatch, toast })} />
                 </div>
             </React.Fragment>
         )
@@ -95,9 +98,9 @@ async function handleDelete(params: handeDeleteRowParams<UserRow>) {
 
 
     if (success) {
-        params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Xóa thành công" });
+        params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
         params.dispatch({ type: "REFRESH_DATA" });
     } else {
-        params.toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Xóa thất bại" });
+        params.toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Thao tác thất bại" });
     }
 };

@@ -1,20 +1,22 @@
 import { Card } from "primereact/card";
+import { Steps } from "primereact/steps";
+import { useLayoutEffect } from "react";
+import android from "../assets/android_flatform.jpg";
+import logo from "../assets/Header-Logo.png";
+import ios from "../assets/ios_flatform.jpg";
+import roadmap from "../assets/roadmap-ico.png";
+import roadmappic from "../assets/roadmap.png";
+import sheetico from "../assets/sheet_ico.svg";
+import slideico from "../assets/slide_ico.svg";
+import testico from "../assets/test_ico.svg";
+import website from "../assets/website_flatform.jpg";
 import {
     Banner
 } from "../components/User/index";
-import website from "../assets/website_flatform.jpg"
-import android from "../assets/android_flatform.jpg"
-import ios from "../assets/ios_flatform.jpg"
-import roadmap from "../assets/roadmap-ico.png"
-import slideico from "../assets/slide_ico.svg"
-import testico from "../assets/test_ico.svg"
-import sheetico from "../assets/sheet_ico.svg"
-import logo from "../assets/Header-Logo.png"
-import roadmappic from "../assets/roadmap.png"
-import { Steps } from "primereact/steps";
+import SetWebPageTitle from "../utils/setTitlePage";
 
 export default function HomePage() {
-
+    useLayoutEffect(()=> SetWebPageTitle("Trang chủ"),[])
     return (
         <>
             <Banner />

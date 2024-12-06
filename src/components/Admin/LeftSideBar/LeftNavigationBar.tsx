@@ -6,13 +6,7 @@ export default function LeftNavigationBar() {
     const navigate = useNavigate(); // Use the hook to get the navigate function
 
     const MenuItems = [
-        {
-            label: 'Thống kê',
-            items: [
-                { label: 'Thống kê bài làm', icon: 'pi pi-chart-pie', command: () => navigate('/dashboard/test-analyst') },
-                // { label: 'Thống kê tài khoản', icon: 'pi pi-users', command: () => navigate('/dashboard/user-analyst') },
-            ]
-        },
+
         {
             label: 'Quản lý đề thi',
             items: [

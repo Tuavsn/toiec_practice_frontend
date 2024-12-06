@@ -9,6 +9,8 @@ const AdminTestTable: React.FC<AdminRowTableProps<TestRow>> = (props) => {
     return (
         // DataTable là một bảng dữ liệu, hiển thị danh sách các đề từ props
         <DataTable
+            emptyMessage="Không có đề thi"
+            stripedRows
             value={props.rows} // Dữ liệu nguồn từ tests
             size="small" // Kích thước của bảng được thiết lập là nhỏ
             loading={props.rows.length <= 0} // Hiển thị trạng thái "loading" nếu danh sách đề thi rỗng

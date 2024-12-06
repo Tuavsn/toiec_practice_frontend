@@ -36,10 +36,6 @@ export default function LoginDialog() {
                                 <img src={GoogleLogo} className="w-2rem" />
                                 <p className="my-0 ml-2 font-bold text-lg text-gray-500">Đăng nhập với Google</p>
                             </Button>
-                            <Button type="button" outlined className="w-full flex justify-content-center">
-                                <img src={FacebookLogo} className="w-2rem" />
-                                <p className="my-0 ml-2 font-bold text-lg text-gray-500">Đăng nhập với Facebook</p>
-                            </Button>
                             <Button 
                                 type="button" outlined className="absolute top-0 right-0 m-2 border-none" 
                                 onClick={(e) => hide(e)}

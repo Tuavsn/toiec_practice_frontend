@@ -1,8 +1,9 @@
 import { BreadCrumb } from 'primereact/breadcrumb';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+
 interface CustomBreadCrumItem {
     label: string,
-    url: string;
+    template: React.ReactNode;
 }
 export default function CustomBreadCrumb() {
     const location = useLocation(); // Lấy URL hiện tại từ React Router
@@ -34,14 +35,18 @@ const generateBreadcrumbs = (path: string) => {
             accumulatedPath += `/${name}`
             breadcrumbs.push({
                 label: name.replace(/-/g, ' '),  // Hiển thị tên với khoảng trắng thay vì dấu "-"
-                url: accumulatedPath,            // Đường dẫn URL với cả "name" và "id"
+                template: NavigateBreadcrumb(accumulatedPath, name.replace(/-/g, ' '))           // Đường dẫn URL với cả "name" và "id"
             });
         } else {
             accumulatedPath += `/${name}___${id}`; // Tạo URL đầy đủ cho từng segment
-            breadcrumbs.at(-1)!.label += `:${decodeURIComponent(name) }`; 
+            breadcrumbs.at(-1)!.label += `:${decodeURIComponent(name)}`;
 
         }
     });
 
     return breadcrumbs;
 };
+
+function NavigateBreadcrumb(path: string, name: string): JSX.Element {
+    return <Link to={path}>{name}</Link>
+}

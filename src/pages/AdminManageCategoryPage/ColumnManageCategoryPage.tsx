@@ -11,10 +11,10 @@ export function RenderAdminCategoryColumns(dispatch: Dispatch<RowHookAction<Cate
 
         <Column key="col-format"/* */ field="format"/*    */ header="Format"/*   */ filter/* */ sortable />,
 
-        <Column key="col-year"/*  */ field="year"/*       */ header="Năm"/*      */ filter/* */ sortable/*    */ bodyClassName="text-center"/**/ />,
-        <Column key="col-active"/**/ field="active"/*     */ header="Hoạt động"/*            */ sortable/*    */ bodyClassName="text-center"/**/ body={statusBodyTemplate} />,
-        <Column key="col-test"/*                          */ header="Đề thi"/*                                */ bodyClassName="text-center"/**/ body={testsBodyTemplate} />,
-        <Column key="col-action"/*                        */ header={() => AddNew(dispatch)}/*     */ headerClassName='flex justify-content-center'/*   */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedRow={data} />} />
+        <Column key="col-year"/*  */ field="year"/*       */ header="Năm"/*      */ filter/* */ sortable/*   */ alignHeader="center"/>,
+        <Column key="col-active"/**/ field="active"/*     */ header="Hoạt động"/*            */ /*    */ bodyClassName="text-center"/**/ body={statusBodyTemplate} alignHeader="center"/>,
+        <Column key="col-test"/*                          */ header="Đề thi"/*                                */ bodyClassName="text-center"/**/ body={testsBodyTemplate} alignHeader="center"/>,
+        <Column key="col-action"/*                        */ header={() => AddNew(dispatch)}/*     */ headerClassName='flex justify-content-center'/*   */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedRow={data} />}  />
     ];
 }
 // Thành phần ActionBodyTemplate sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)
@@ -28,7 +28,7 @@ export const ActionBodyTemplate: React.FC<RowActionButtonProps<CategoryRow>> = R
                 <Button icon="pi pi-pencil" rounded outlined style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_UPDATE_DIALOG", payload: currentSelectedRow }); }} />
 
                 {/* Nút xóa: Khi nhấn, dispatch hành động để mở hộp thoại xóa bài giảng */}
-                <Button icon="pi pi-trash" rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedRow }); }} />
+                {/* <Button icon={`pi ${currentSelectedRow.active ? "pi-trash" : "pi-sync"}`} rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedRow }); }} /> */}
 
             </div>
         )

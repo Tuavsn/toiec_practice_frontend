@@ -34,7 +34,7 @@ export function getSeverity<Model extends { active: boolean }>(category: Model) 
 };
 
 export function statusBodyTemplate<Model extends { active: boolean }>(rowData: Model) {
-    return <Tag value={(rowData.active) + ""} severity={getSeverity(rowData)}></Tag>;
+    return <Tag className="text-center" value={(rowData.active) ? "Hoạt động" : "Đã ẩn"} severity={getSeverity(rowData)}></Tag>;
 };
 
 export function detailUserResultRowBodyTemplate(row: { id: string }) {

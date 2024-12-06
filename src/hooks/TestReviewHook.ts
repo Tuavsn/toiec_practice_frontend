@@ -4,6 +4,7 @@ import { initialTestReviewState } from "../utils/types/emptyValue";
 import { ResultID, TestReviewAnswerSheet, TestReviewHookAction, TestReviewHookState } from "../utils/types/type";
 import { callGetReviewTestPaper } from "../api/api";
 import { useParams } from "react-router-dom";
+import SetWebPageTitle from "../utils/setTitlePage";
 
 
 // Reducer để quản lý trạng thái của TestReview
@@ -39,6 +40,7 @@ export default function useTestReview() {
 
     // Sử dụng useEffect để tải dữ liệu
     useEffect(() => {
+        SetWebPageTitle("Chi tiết kết quả bài làm")
         // Thử tải dữ liệu từ sessionStorage
         const loadFromSessionStorage = () => {
             try {

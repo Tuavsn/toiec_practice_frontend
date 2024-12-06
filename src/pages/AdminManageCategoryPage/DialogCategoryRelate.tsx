@@ -76,6 +76,7 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateCategoryBodyProps> = React
         const [formatValue, setFormat] = useState<string>(props.currentSelectedRow.format);
         const [yearValue, setYear] = useState<number>(props.currentSelectedRow.year);
         const { toast } = useToast();
+        const [isDisabled, setIsDisabled] = useState(false);
         const title = useRef<string>(props.currentSelectedRow.id ? "Sửa bộ đề" : "Thêm bộ đề");
         return (
             <Fieldset legend={title.current} >
@@ -107,7 +108,7 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateCategoryBodyProps> = React
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end mt-5">
-                    <Button label="Lưu" icon="pi pi-save" onClick={() => handleSave({ row: { ...props.currentSelectedRow, format: formatValue, year: yearValue }, dispatch: props.dispatch, toast })} />
+                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => handleSave({ row: { ...props.currentSelectedRow, format: formatValue, year: yearValue }, dispatch: props.dispatch, toast, setIsDisabled })} />
                 </div>
 
             </Fieldset>
@@ -123,13 +124,14 @@ async function handleSave(params: handeSaveRowParams<CategoryRow>) {
         params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "tên bộ đề thi không được phép để trống" });
         return;
     }
+    params.setIsDisabled(true);
     let success = false;
     if (params.row.id) {
         success = await callPostUpdateCategoryRow(params.row);
     } else {
         success = await callCreateCateogry(params.row);
     }
-
+    params.setIsDisabled(false);
     if (success) {
         params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
         params.dispatch({ type: "REFRESH_DATA" });
@@ -145,12 +147,13 @@ async function handleSave(params: handeSaveRowParams<CategoryRow>) {
 const RenderDeleteCategoryBody: React.FC<DialogDeleteRowBodyProps<CategoryRow>> = React.memo(
     (props) => {
         const { toast } = useToast();
+        const text = props.currentSelectedRow.active ? "xóa" : "khôi phục";
         return (
             <React.Fragment>
 
-                <h1 className='text-center'>Bạn có chắc muốn xóa <q>{props.currentSelectedRow.format}</q> ?</h1>
+                <h1 className='text-center'>Bạn có chắc muốn {text} <q>{props.currentSelectedRow.format}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button label="Xóa" icon="pi pi-save" onClick={() => handleDelete({ rowID: props.currentSelectedRow.id, dispatch: props.dispatch, toast })} />
+                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ rowID: props.currentSelectedRow.id, dispatch: props.dispatch, toast })} />
                 </div>
             </React.Fragment>
         )
@@ -169,9 +172,9 @@ async function handleDelete(params: handeDeleteRowParams<CategoryRow>) {
 
 
     if (success) {
-        params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Xóa thành công" });
+        params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
         params.dispatch({ type: "REFRESH_DATA" });
     } else {
-        params.toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Xóa thất bại" });
+        params.toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Thao tác thất bại" });
     }
 };

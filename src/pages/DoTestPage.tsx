@@ -1,11 +1,11 @@
 import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
 import { Toolbar } from "primereact/toolbar";
 import React, { memo, useEffect, useState } from "react";
 import '../App.css';
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useTestPage from "../hooks/TestHook";
-import { MultipleChoiceQuestion, SimpleTimeCountDownProps, TestAnswerSheet, TestType } from "../utils/types/type";
-import { Dialog } from "primereact/dialog";
+import { MultipleChoiceQuestion, SimpleTimeCountDownProps, TestType } from "../utils/types/type";
 
 function DoTestPage() {
 
@@ -29,7 +29,6 @@ function DoTestPage() {
         isVisible,
         onEndTest,
         startTest,
-        isOnTest,
         testType,
         flags,
         start,
@@ -81,7 +80,7 @@ function DoTestPage() {
     // Render giao diện chính của trang thi
     return (
         <main id="do-test-page" className="w-full h-full">
-            {(totalQuestions > 0 && isOnTest) ?
+            {(totalQuestions > 0) ?
                 <section>
                     {/* Nút bắt đầu bài thi */}
                     {!start && (

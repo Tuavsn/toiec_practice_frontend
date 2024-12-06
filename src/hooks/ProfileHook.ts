@@ -1,5 +1,6 @@
 import { useEffect, useReducer } from "react";
 import { callGetProfile } from "../api/api";
+import SetWebPageTitle from "../utils/setTitlePage";
 import { OverallStat, ProfileHookState, Role, SuggestionsForUser } from "../utils/types/type";
 
 
@@ -54,6 +55,7 @@ const reducer = (state: ProfileHookState, action: ProfileHookAction): ProfileHoo
 export default function useProfile() {
     const [state, dispatch] = useReducer(reducer, initProfile);
     useEffect(() => {
+        SetWebPageTitle("Trang cá nhân")
         callGetProfile().then(result => {
             if (!result) {
                 return;

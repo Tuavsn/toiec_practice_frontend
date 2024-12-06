@@ -14,10 +14,12 @@ const UserRoutes = lazy(() => import('./router/UserRoutes'));
 import Container from './components/Layout/Container';
 import { LoadingSpinner } from './components/Common/Index';
 import { ToastProvider } from './context/ToastProvider';
+import SetWebPageTitle from './utils/setTitlePage';
 
 
 
 function App() {
+  SetWebPageTitle("UTE TOEIC")
   return (
     <BrowserRouter>
       <Suspense fallback={<main className='flex justify-content-center h-screen'><LoadingSpinner text="Trang Toeic đang tải...." /></main>}>

@@ -104,6 +104,7 @@ const RenderUpdateLectureBody: React.FC<DialogUpdateLectureBodyProps> = React.me
         const inputRef = useRef<HTMLInputElement | null>(null);
         const [topicIds, setTopicIds] = useState<TopicID[]>(props.currentSelectedLecture.topic.map(t => t.id));
         const { toast } = useToast();
+        const [isDisabled, setIsDisabled] = useState(false);
         const title = useRef<string>(props.currentSelectedLecture.id ? "Sửa bài giảng" : "Thêm bài giảng");
         return (
             <Fieldset legend={title.current} >
@@ -129,7 +130,7 @@ const RenderUpdateLectureBody: React.FC<DialogUpdateLectureBodyProps> = React.me
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end">
-                    <Button label="Lưu" icon="pi pi-save" onClick={() => handleSave({ lectureID: props.currentSelectedLecture.id, title: inputRef.current?.value || "", dispatch: props.dispatch, toast, topicIds })} />
+                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => handleSave({ lectureID: props.currentSelectedLecture.id, title: inputRef.current?.value || "", dispatch: props.dispatch, toast, topicIds, setIsDisabled })} />
                 </div>
 
             </Fieldset>
@@ -147,16 +148,17 @@ const RenderUpdateLectureBody: React.FC<DialogUpdateLectureBodyProps> = React.me
 // khi nhấn nút Lưu
 async function handleSave(params: handeSaveLectureParams) {
     if (!params.title.trim() || !params.topicIds.length) {
-        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "tên bài giảng cùng danh sách chủ đề không được phép để trống" });
+        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "Tên bài giảng cùng danh sách chủ đề không được phép để trống" });
         return;
     }
     let success = false;
+    params.setIsDisabled(true);
     if (params.lectureID) {
         success = await callPutLectureDetailUpdate(params.lectureID, params.title, params.topicIds);
     } else {
         success = await callPostLectureDetail(params.title, params.topicIds);
     }
-
+    params.setIsDisabled(false);
     if (success) {
         params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
         params.dispatch({ type: "REFRESH_DATA" });
@@ -171,12 +173,13 @@ async function handleSave(params: handeSaveLectureParams) {
 const RenderDeleteLectureBody: React.FC<DialogDeleteLectureBodyProps> = React.memo(
     (props) => {
         const { toast } = useToast();
+        const text = props.currentSelectedLecture.active ? "xóa" : "khôi phục";
         return (
             <React.Fragment>
 
-                <h1 className='text-center'>Bạn có chắc muốn xóa <q>{props.currentSelectedLecture.name}</q> ?</h1>
+                <h1 className='text-center'>Bạn có chắc muốn {text} <q>{props.currentSelectedLecture.name}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button label="Xóa" icon="pi pi-save" onClick={() => handleDelete({ lectureID: props.currentSelectedLecture.id, dispatch: props.dispatch, toast })} />
+                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ lecture: props.currentSelectedLecture, dispatch: props.dispatch, toast })} />
                 </div>
             </React.Fragment>
         )
@@ -191,13 +194,13 @@ const RenderDeleteLectureBody: React.FC<DialogDeleteLectureBodyProps> = React.me
 
 // khi nhấn nút Xóa
 async function handleDelete(params: handeDeleteLectureParams) {
-    const success = await callDeleteLecture(params.lectureID);
+    const success = await callDeleteLecture(params.lecture);
 
 
     if (success) {
-        params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Xóa thành công" });
+        params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
         params.dispatch({ type: "REFRESH_DATA" });
     } else {
-        params.toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Xóa thất bại" });
+        params.toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Thao tác thất bại" });
     }
 };

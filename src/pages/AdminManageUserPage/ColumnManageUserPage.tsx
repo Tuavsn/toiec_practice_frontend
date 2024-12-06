@@ -9,8 +9,8 @@ export function RenderAdminUserColumns(dispatch: Dispatch<RowHookAction<UserRow>
 
         <Column key="col-email"/* */ field="email"/*      */ header="Email"/*    */ filter/* */ sortable />,
 
-        <Column key="col-role"/*  */ field="role.name"/*  */ header="Vai trò"/*  */ filter/* */ sortable/*  */ style={{ width: "5rem" }}/*  */ bodyClassName="text-center"/**/ />,
-        <Column key="col-active"/**/ field="active"/*     */ header="Hoạt động"/**/ filter/* */ sortable/*  */ style={{ width: "5rem" }}/*  */ bodyClassName="text-center"/**/ body={statusBodyTemplate} />,
+        <Column key="col-role"/*  */ field="role.name"/*  */ header="Vai trò"/*  */ filter/* */ sortable/*  */ /*  ***/ />,
+        <Column key="col-active"/**/ field="active"/*     */ header="Hoạt động"/*            */ sortable/*  */ /*  **/ body={statusBodyTemplate} />,
 
         <Column key="col-action"/* */ headerClassName='flex justify-content-end'/*                                                                                          */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedRow={data} />} />
     ];
@@ -20,13 +20,13 @@ export const ActionBodyTemplate: React.FC<RowActionButtonProps<UserRow>> = React
     ({ currentSelectedRow, dispatch }) => {
         return (
             // Chia các nút hành động ra thành hàng, sử dụng flexbox để căn chỉnh
-            <div className='flex justify-content-around'>
+            <div className='flex gap-2'>
 
                 {/* Nút chỉnh sửa: Khi nhấn, dispatch hành động để mở hộp thoại cập nhật bài giảng */}
                 <Button icon="pi pi-pencil" rounded outlined style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_UPDATE_DIALOG", payload: currentSelectedRow }); }} />
 
                 {/* Nút xóa: Khi nhấn, dispatch hành động để mở hộp thoại xóa bài giảng */}
-                <Button icon="pi pi-trash" rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedRow }); }} />
+                <Button icon={`pi ${currentSelectedRow.active ? "pi-trash" : "pi-sync"}`} rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedRow }); }} />
 
             </div>
         )

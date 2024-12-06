@@ -4,6 +4,7 @@ import { callGetResult, callGetReviewTestPaper } from "../api/api";
 import { UserReviewSingleAnswerToHTML } from "../utils/convertToHTML";
 import { emptyTestResultSummaryValue } from "../utils/types/emptyValue";
 import { ResultID, SelectedQuestionDialogTestOverallPage, TestResultSummary, UserAnswerResult } from "../utils/types/type";
+import SetWebPageTitle from "../utils/setTitlePage";
 
 
 export function useTestOverallResult() {
@@ -14,6 +15,7 @@ export function useTestOverallResult() {
     const [overallDetail, setOverallDetail] = useState<TestResultSummary>(emptyTestResultSummaryValue);
     const [currentSelectedQuestion, setCurrentSelectedQuestion] = useState<SelectedQuestionDialogTestOverallPage>({ body: null, title: null })
     useEffect(() => {
+        SetWebPageTitle("Kết quả bài làm")
         const fetchResult = async () => {
             const response = await callGetResult(id);
             callGetReviewTestPaper(id).then(testReviewAnswerSheet => sessionStorage.setItem("review", JSON.stringify(testReviewAnswerSheet)));

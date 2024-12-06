@@ -5,6 +5,7 @@ import { MappingPageWithQuestionNum } from '../utils/convertToHTML';
 import prepareForTest from '../utils/prepareForTest';
 import { milisecond, QuestionNumber, ResultID, TestID, TestRecord, TestType } from '../utils/types/type';
 import { useMultipleQuestion } from './MultipleQuestionHook';
+import SetWebPageTitle from '../utils/setTitlePage';
 
 //------------------ Custom Hook: useTestPage ------------------//
 
@@ -63,6 +64,7 @@ const useTestPage = () => {
     }
     // Gọi API để lấy dữ liệu bài thi khi component được mount
     useEffect(() => {
+        SetWebPageTitle("Làm bài thi")
         // Nếu đã có một yêu cầu đang thực hiện, thì hủy nó
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();

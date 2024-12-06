@@ -1,18 +1,19 @@
 import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { TreeNode } from "primereact/treenode";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { callGetQuestionRows } from "../api/api";
 import SplitNameIDFromURL from "../utils/splitNameIDFromURL";
 import { Name_ID, QuestionID, QuestionRow, TestID } from "../utils/types/type";
 import useTopicRef from "./TopicHook";
+import SetWebPageTitle from "../utils/setTitlePage";
 
 export function useQuestion() {
 
     const [resourceDialogBodyVisible, setResourceDialogBodyVisible] = useState<JSX.Element | null>(null);
     const [topicDialogBodyVisible, setTopicDialogBodyVisible] = useState<JSX.Element | null>(null);
     const [contextDialogBodyVisible, setContextDialogBodyVisible] = useState<JSX.Element | null>(null);
-
+    useLayoutEffect(() => SetWebPageTitle("Quản lý câu hỏi"), []);
 
 
     return {
@@ -141,7 +142,8 @@ function ConvertQuestionRowToNode(questionRow: QuestionRow, uniqueID: QuestionID
             resources: questionRow.resources,
             //------
             createdAt: questionRow.createdAt,
-            updatedAt: questionRow.updatedAt
+            updatedAt: questionRow.updatedAt,
+            active: questionRow.active
         }
     }
 }

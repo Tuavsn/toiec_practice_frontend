@@ -44,7 +44,7 @@ export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = R
                 style={{ width: "80vw" }}                    // Thiết lập chiều rộng của Dialog
             >
                 {title === "Xóa" ?                          // Kiểm tra nếu tiêu đề là "Xóa"
-                    <h1 className='text-center'>Bạn có chắc muốn xóa câu <q>{currentSelectedQuestion.current.data ? currentSelectedQuestion.current.data.questionNum : 0  }</q></h1> // Hiển thị nội dung xác nhận xóa
+                    <h1 className='text-center'>Bạn có chắc muốn xóa câu <q>{currentSelectedQuestion.current.data ? currentSelectedQuestion.current.data.questionNum : 0}</q></h1> // Hiển thị nội dung xác nhận xóa
                     :
                     <RenderUpdateQuestionBody               // Hiển thị nội dung cập nhật câu hỏi
                         topicList={topicList}               // Truyền danh sách chủ đề vào RenderUpdateQuestionBody
@@ -61,6 +61,7 @@ export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = R
 const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo(
     ({ currentSelectedQuestion, topicList, }) => {
         const { toast } = useToast();
+        const [isDisabled, setIsDisabled] = useState(false);
         const [resources, setResourses] = useState<ResourceIndex[]>((currentSelectedQuestion.current.data.resources as Resource[]).map((res, index) => ({ ...res, index, file: null })))
         const [formData, setFormData] = useState<UpdateQuestionForm>({
             listTopicIds: (currentSelectedQuestion.current.data.topic as Topic[]).map((t) => t.id),
@@ -75,25 +76,24 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
             id: currentSelectedQuestion.current.key as string,
         });
 
-        const handleChange = (e: { target: { name: any; value: any } } ) => {
+        const handleChange = (e: { target: { name: any; value: any } }) => {
             const { name, value } = e.target;
             setFormData({ ...formData, [name]: value });
         };
         // khi nhấn nút Lưu
         const handleSave = () => {
-            console.log("Hello update");
-            // toast.current?.show({ severity: 'success', content: "Sửa thành công" });
-            // callPutQuestionUpdate(formData);
+            setIsDisabled(true);
             const updateQuestion = async () => {
                 const success: boolean = await callPutQuestionUpdate(formData, resources);
                 if (success) {
                     if (success) {
                         toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
-                        
+
                     } else {
                         toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Có lỗi khi lưu" });
                     }
                 }
+                setIsDisabled(false);
             }
             updateQuestion();
         };
@@ -227,7 +227,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                 <ResourceSection resourseIndexes={resources} setResourseIndexes={setResourses} />
                 {/* Save Button */}
                 <div className="field flex justify-content-end mt-7">
-                    <Button className="p-5" label="Lưu" icon="pi pi-save" onClick={handleSave} />
+                    <Button className="p-5" label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={handleSave} />
                 </div>
 
             </Fieldset>

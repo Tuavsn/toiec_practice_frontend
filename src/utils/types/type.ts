@@ -231,6 +231,7 @@ export interface UserRow extends DataTableValue {
   email: string;
   role: Role;
   target: number;
+  active: boolean;
 }
 
 
@@ -507,10 +508,11 @@ export type handeSaveLectureParams = {
   lectureID: LectureID,
   toast: React.MutableRefObject<Toast | null>,
   dispatch: React.Dispatch<LectureHookAction>,
+  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
 export type handeDeleteLectureParams = {
-  lectureID: LectureID,
+  lecture: LectureRow,
   toast: React.MutableRefObject<Toast | null>,
   dispatch: React.Dispatch<LectureHookAction>,
 }
@@ -539,6 +541,7 @@ export type handeSaveRowParams<RowModel> = {
   row: RowModel
   toast: React.MutableRefObject<Toast | null>,
   dispatch: React.Dispatch<RowHookAction<RowModel>>,
+  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>,
 }
 export type RowActionButtonProps<RowModel> = {
   currentSelectedRow: RowModel,
@@ -723,6 +726,7 @@ export type RowHookAction<RowModel> =
   | { type: 'FETCH_ROWS_SUCCESS'; payload: [RowModel[], number] }
   | { type: 'SET_PAGE'; payload: number }
   | { type: 'REFRESH_DATA' }
+  | { type: 'RESET_ROWS' }
   | { type: 'SET_CURRENT_ROW'; payload: RowModel }
   | { type: 'TOGGLE_DIALOG'; payload: DialogRowJobType }
   | { type: 'OPEN_UPDATE_DIALOG'; payload: RowModel }

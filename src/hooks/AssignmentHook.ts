@@ -6,6 +6,7 @@ import { LectureID } from "../utils/types/type";
 import { ConvertQuestionRowListToTreeNodeList } from "./QuestionHook";
 import useTopicRef from "./TopicHook";
 import { callGetAssignmentRows } from "../api/api";
+import SetWebPageTitle from "../utils/setTitlePage";
 
 export function useAssignmentTable() {
     // === Lấy test_id từ URL ===
@@ -36,7 +37,7 @@ export function useAssignmentTable() {
     }, []);
 
     // === useEffect để gọi fetchQuestionByPage khi khởi tạo ===
-    useEffect(() => { fetchQuestionByPage(0) }, []); // Gọi hàm fetch dữ liệu câu hỏi lần đầu
+    useEffect(() => { SetWebPageTitle("Quản lý câu hỏi"); fetchQuestionByPage(0) }, []); // Gọi hàm fetch dữ liệu câu hỏi lần đầu
 
 
 
