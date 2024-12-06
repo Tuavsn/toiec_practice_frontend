@@ -11,17 +11,10 @@ import { useCheckBox } from "../hooks/TestDetailPaperHook";
 import convertSecondsToString from "../utils/convertSecondsToString";
 import formatDate from "../utils/formatDateToString";
 import { TestDetailPageData, TestID } from "../utils/types/type";
+import { Card } from "primereact/card";
+import { emptyTestDetailPageData } from "../utils/types/emptyValue";
 
-const emptyTestDetailPageData: TestDetailPageData = {
-    id: "",
-    name: "",
-    totalUserAttempt: 0,
-    totalQuestion: 0,
-    totalScore: 0,
-    limitTime: 0,
-    resultsOverview: [],
-    topicsOverview: []
-}
+
 
 function TestDetailPage() {
 
@@ -38,7 +31,8 @@ function TestDetailPage() {
     }, [])
     const columns = [
         <Column key="col-createdAt" field="createdAt" header="Ngày làm" bodyClassName="text-center" body={(rowData: { createdAt: Date }) => formatDate(rowData.createdAt)} />,
-        <Column key="col-answer_count" header="thống kê" body={CountAnswerTypeTemplate} sortable filter />, <Column key="col-time" field="totalTime" header="Thời gian làm bài" body={row => convertSecondsToString(row.totalTime)} sortable filter />,
+        <Column key="col-answer_count" header="thống kê" body={CountAnswerTypeTemplate} sortable filter />, 
+        <Column key="col-time" field="totalTime" header="Thời gian làm bài" body={row => convertSecondsToString(row.totalTime)} sortable filter />,
         <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} headerClassName="w-max" />,
         <Column key="col-detail" bodyClassName="text-center" body={row => detailUserResultRowBodyTemplate({ id: row.resultId })} />,
     ];
@@ -66,24 +60,22 @@ function TestDetailPage() {
 
     return (
         <main className="pt-5">
-            <section className="text-center mb-7">
-                <div className="z-0 w-full bg-red-300 p-2 border-round-md relative" style={{transform: "translateY(100%)"}}>a</div>
-                <h1 className="relative z-1 bg-blue-300 p-4 inline text-center border-round-3xl shadow-7" >Thông tin đề <q>{testInfo.name}</q></h1>
-                
-            </section>
-            {TestInfoBox(testInfo.limitTime, testInfo.totalUserAttempt)}
-            <section>
-                <h3>Kết quả làm bài của bạn:</h3>
-                <DataTable size={'small'} value={testInfo.resultsOverview} showGridlines stripedRows
-                    loading={!testInfo.id} paginator totalRecords={testInfo.resultsOverview.length} rows={5} scrollable scrollHeight="600px">
-                    {columns}
-                </DataTable>
-            </section>
-            <PartChooser testID={id} />
-            <section>
-                {showDetailParts}
-            </section>
-        </main>
+            <Card title={`Thông tin đề {testInfo.name}`}>
+
+                {TestInfoBox(testInfo.limitTime, testInfo.totalUserAttempt)}
+                <section>
+                    <h3>Kết quả làm bài của bạn:</h3>
+                    <DataTable size={'small'} value={testInfo.resultsOverview} showGridlines stripedRows
+                        loading={!testInfo.id} paginator totalRecords={testInfo.resultsOverview.length} rows={5} scrollable scrollHeight="600px">
+                        {columns}
+                    </DataTable>
+                </section>
+                <PartChooser testID={id} />
+                <section>
+                    {showDetailParts}
+                </section>
+            </Card>
+        </main >
     )
 }
 
