@@ -92,8 +92,8 @@ const defaultLabel: CategoryLabel[] = [
 const defaultTest: TestCard[] = [
     {
         id: "#",
-        format: "ETS",
-        year: 2024,
-        name: 'đề',
+        format: "",
+        year: 0,
+        name: '',
     }
 ] as const

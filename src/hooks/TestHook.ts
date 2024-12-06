@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { callGetTestPaper, callPostTestRecord } from '../api/api';
 import { MappingPageWithQuestionNum } from '../utils/convertToHTML';
@@ -11,7 +11,7 @@ import { useMultipleQuestion } from './MultipleQuestionHook';
 const useTestPage = () => {
 
     // Lấy tham số từ URL (id của bài thi và các phần của bài thi)
-    const { id = "", parts = "", testType = "fulltest" } = useParams<{ id: TestID, parts: string, testType: TestType }>();
+    const { id = "", parts = "", testType = "fulltest", time = "120" } = useParams<{ id: TestID, parts: string, testType: TestType, time: string }>();
     const {
         updateTimeSpentOnEachQuestionInCurrentPage,
         setIsUserAnswerSheetVisible,
@@ -29,14 +29,19 @@ const useTestPage = () => {
         setPageMapper,
         questionList,
         setIsOnTest,
+        setVisiable,
         pageMapper,
         changePage,
         timeDoTest,
         startTest,
+        isVisible,
         isOnTest,
         navigate,
+        setFlags,
+        flags,
         start,
     } = useMultipleQuestion();
+    const timeLimit = useRef<number>((Number(time) || 120) * 60);
     // Hàm kết thúc bài thi và điều hướng đến trang xem lại
     const onEndTest = useCallback(async () => {
         setIsOnTest(false);
@@ -79,6 +84,7 @@ const useTestPage = () => {
                 prepareForTest.prepareAnswerSheet(responseData.data.listMultipleChoiceQuestions, setUserAnswerSheet, timeSpentListRef);
                 setPageMapper(newPageMapper);
                 setQuestionList(responseData.data.listMultipleChoiceQuestions);
+                setFlags(Array<boolean>(responseData.data.totalQuestion).fill(false));
             } catch (error: any) {
                 // Kiểm tra nếu lỗi là do yêu cầu bị hủy
                 if (error.name === "CanceledError") {
@@ -91,7 +97,11 @@ const useTestPage = () => {
         fetchData();
     }, []);
 
-
+    const toggleFlag = (index: number) => {
+        setFlags((prevFlags) =>
+            prevFlags.map((item, i) => (i === index ? !item : item))
+        );
+    }
     // ---------------- Trả Về Giá Trị từ Hook ---------------- //
 
     return {
@@ -103,13 +113,18 @@ const useTestPage = () => {
         userAnswerSheet,
         totalQuestions,
         questionList,
+        setVisiable,
         pageMapper,
         changePage,
         timeDoTest,
+        toggleFlag,
         onEndTest,
-        isOnTest,
         startTest,
+        timeLimit,
+        isOnTest,
+        isVisible,
         testType,
+        flags,
         start,
     };
 };

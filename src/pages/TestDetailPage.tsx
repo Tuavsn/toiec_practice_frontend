@@ -13,6 +13,7 @@ import formatDate from "../utils/formatDateToString";
 import { TestDetailPageData, TestID } from "../utils/types/type";
 import { Card } from "primereact/card";
 import { emptyTestDetailPageData } from "../utils/types/emptyValue";
+import { InputNumber } from "primereact/inputnumber";
 
 
 
@@ -31,7 +32,7 @@ function TestDetailPage() {
     }, [])
     const columns = [
         <Column key="col-createdAt" field="createdAt" header="Ngày làm" bodyClassName="text-center" body={(rowData: { createdAt: Date }) => formatDate(rowData.createdAt)} />,
-        <Column key="col-answer_count" header="thống kê" body={CountAnswerTypeTemplate} sortable filter />, 
+        <Column key="col-answer_count" header="thống kê" body={CountAnswerTypeTemplate} sortable filter />,
         <Column key="col-time" field="totalTime" header="Thời gian làm bài" body={row => convertSecondsToString(row.totalTime)} sortable filter />,
         <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} headerClassName="w-max" />,
         <Column key="col-detail" bodyClassName="text-center" body={row => detailUserResultRowBodyTemplate({ id: row.resultId })} />,
@@ -60,7 +61,7 @@ function TestDetailPage() {
 
     return (
         <main className="pt-5">
-            <Card title={`Thông tin đề {testInfo.name}`}>
+            <Card title={`Thông tin đề ${testInfo.name}`}>
 
                 {TestInfoBox(testInfo.limitTime, testInfo.totalUserAttempt)}
                 <section>
@@ -100,6 +101,7 @@ function DecodeCheckBoxesToUrl(parts: boolean[]): string {
 const PartChooser: React.FC<{ testID: TestID }> = memo(
     ({ testID }) => {
         const { parts, onPartSelectChange } = useCheckBox();
+        const [timeLimit, setTimeLimit] = useState<number>(120);
         const navigate = useNavigate();
         const checkboxes = Array.from({ length: 8 }, (_, index) => {
             const label = index === 0 ? "Thi thử" : "Phần " + index;
@@ -124,11 +126,12 @@ const PartChooser: React.FC<{ testID: TestID }> = memo(
                         {checkboxes}
                     </span>
                 </section>
-                <div className="flex p-5 justify-content-center">
+                <div className="flex p-5 justify-content-center gap-2">
+                    <InputNumber disabled={parts[0]} inputStyle={{width:"6rem"}}  buttonLayout="horizontal" showButtons  value={parts[0] ?120 :timeLimit} min={10} max={150} onValueChange={(e) => setTimeLimit(e.value ?? 120)} suffix=" phút" />
                     <Button onClick={() => {
 
-                        navigate(`/dotest/${testID}/${DecodeCheckBoxesToUrl(parts)}`)
-                    }} label="Bắt đầu"></Button>
+                        navigate(`/dotest/${timeLimit}/${testID}/${DecodeCheckBoxesToUrl(parts)}`)
+                    }} label="Làm bài"></Button>
                 </div>
             </React.Fragment>
         )

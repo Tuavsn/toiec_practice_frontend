@@ -35,7 +35,7 @@ export const DialogForQuestionPage: React.FC<DialogQuestionPageProps> = React.me
 // Định nghĩa component DialogActionButton sử dụng React.FC với React.memo để tối ưu hiệu suất
 export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = React.memo(
     ({ setIsVisible, isVisible, title, topicList, currentSelectedQuestion }) => {
-
+        console.dir(currentSelectedQuestion.current);
         return (
             <Dialog
                 onHide={() => setIsVisible(false)}           // Đóng Dialog khi sự kiện onHide xảy ra
@@ -44,7 +44,7 @@ export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = R
                 style={{ width: "80vw" }}                    // Thiết lập chiều rộng của Dialog
             >
                 {title === "Xóa" ?                          // Kiểm tra nếu tiêu đề là "Xóa"
-                    <h1 className='text-center'>Bạn có chắc muốn xóa câu <q>{currentSelectedQuestion.current.data.questionNum}</q></h1> // Hiển thị nội dung xác nhận xóa
+                    <h1 className='text-center'>Bạn có chắc muốn xóa câu <q>{currentSelectedQuestion.current.data ? currentSelectedQuestion.current.data.questionNum : 0  }</q></h1> // Hiển thị nội dung xác nhận xóa
                     :
                     <RenderUpdateQuestionBody               // Hiển thị nội dung cập nhật câu hỏi
                         topicList={topicList}               // Truyền danh sách chủ đề vào RenderUpdateQuestionBody
