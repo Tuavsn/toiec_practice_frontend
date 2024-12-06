@@ -18,7 +18,6 @@ export function useTestOverallResult() {
             const response = await callGetResult(id);
             callGetReviewTestPaper(id).then(testReviewAnswerSheet => sessionStorage.setItem("review", JSON.stringify(testReviewAnswerSheet)));
             setOverallDetail(response.data);
-            console.dir(response.data);
         }
         fetchResult();
     }, [])

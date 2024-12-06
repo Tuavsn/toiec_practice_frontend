@@ -1,6 +1,6 @@
 import { Button } from "primereact/button"
 import { Dialog } from "primereact/dialog"
-import { Dropdown, DropdownChangeEvent } from "primereact/dropdown"
+import { Dropdown } from "primereact/dropdown"
 import { Fieldset } from "primereact/fieldset"
 import { InputNumber } from "primereact/inputnumber"
 import { InputText } from "primereact/inputtext"
@@ -44,7 +44,7 @@ export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = R
                 style={{ width: "80vw" }}                    // Thiết lập chiều rộng của Dialog
             >
                 {title === "Xóa" ?                          // Kiểm tra nếu tiêu đề là "Xóa"
-                    <h1 className='text-center'>Bạn có chắc muốn xóa</h1> // Hiển thị nội dung xác nhận xóa
+                    <h1 className='text-center'>Bạn có chắc muốn xóa câu <q>{currentSelectedQuestion.current.data.questionNum}</q></h1> // Hiển thị nội dung xác nhận xóa
                     :
                     <RenderUpdateQuestionBody               // Hiển thị nội dung cập nhật câu hỏi
                         topicList={topicList}               // Truyền danh sách chủ đề vào RenderUpdateQuestionBody

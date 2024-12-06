@@ -38,7 +38,7 @@ export default function UserProfilePage() {
             <Card key="activity-log" className='shadow-7' title="3. Nhật ký học tập"><ActivityLog userResultRows={state.results} /></Card>
             <div key="area-3" className="flex gap-3 flex-wrap">
                 <Card key="time-spent" className="shadow-7 flex-1" style={{ minWidth: "590px" }} title="4. Thời gian học tập theo kỹ năng">{TimeSpent(state.skillStats)}</Card>
-                <Card key="suggestion" className='shadow-7 flex-1' title="7. Đề xuất cải thiện">{Suggestions(GetFakeSuggestionData())}</Card>
+                <Card key="suggestion" className='shadow-7 flex-1' title="5. Đề xuất cải thiện">{Suggestions(GetFakeSuggestionData())}</Card>
 
             </div>
             {/* <Card key="stat" className='shadow-7' title="7. Thống kê"></Card> */}

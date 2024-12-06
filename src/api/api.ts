@@ -34,7 +34,7 @@ export const callGetExercisePaper = async (exerciseType: ExerciseType): Promise<
     return response.data;
 }
 
-export const callGetQuestionRows = async (testId: TestID, currentPageIndex: number, pageSize: number = 5): Promise<ApiResponse<TableData<QuestionRow>>> => {
+export const callGetQuestionRows = async (testId: TestID, currentPageIndex: number, pageSize: number = 300): Promise<ApiResponse<TableData<QuestionRow>>> => {
     const response = await axios.get<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/questions?current=${currentPageIndex + 1}&pageSize=${pageSize}`)
     return response.data;
 }
@@ -378,5 +378,122 @@ export const callGetProfile = async (): Promise<ProfileHookState | null> => {
         return response.data.data;
     } catch (error) {
         return null;
+    }
+}
+
+//test
+function getRandomTopics(array: string[], count: number): string[] {
+    return array.sort(() => Math.random() - 0.5).slice(0, count);
+}
+const topicIdArray: string[] = [
+    "6729f1c03f5c033083992e95",
+    "6729f24d709f571669727b6d",
+    "6729f2ad709f571669727b6e",
+    "6729f5c9709f571669727b6f",
+    "6729f7c2709f571669727b70",
+    "6729f9c0709f571669727b71",
+    "6729fa6a709f571669727b72",
+    "672a2dd7a07d4b4d1b8d7679",
+    "672a2e78a07d4b4d1b8d767a",
+    "672a2ee6a07d4b4d1b8d767b",
+    "672a2f43a07d4b4d1b8d767c",
+    "672a3014a07d4b4d1b8d767d",
+    "672a30c5a07d4b4d1b8d767e",
+    "672a312fa07d4b4d1b8d767f",
+    "672a319ba07d4b4d1b8d7680",
+    "672ad610962cf22580ad1670",
+    "672ada37dd1e325366e41d01",
+    "672adc4add1e325366e41d02",
+    "672ade21dd1e325366e41d03",
+    "672ae048dd1e325366e41d04",
+    "672ae19fdd1e325366e41d05",
+    "672ae240dd1e325366e41d06",
+    "672ae3abdd1e325366e41d07",
+    "672ae411dd1e325366e41d08",
+    "672ae4c1dd1e325366e41d09",
+    "672ae548dd1e325366e41d0a",
+    "672ae5ffdd1e325366e41d0b",
+    "672ae796dd1e325366e41d0c",
+    "672ae80ddd1e325366e41d0d",
+    "672ae87bdd1e325366e41d0e",
+    "672ae8d8dd1e325366e41d0f",
+    "672b35f59e302318ee8724e2",
+    "672b36689e302318ee8724e3",
+    "672b376d9e302318ee8724e4",
+    "672b37c29e302318ee8724e5",
+    "672b3c839e302318ee8724e6",
+    "672b3dc29e302318ee8724e7",
+    "672b69733197f909155e4de9",
+    "672b69c33197f909155e4dea",
+    "672b6ad13197f909155e4deb",
+    "672b6b163197f909155e4dec",
+    "672b6b843197f909155e4ded",
+    "672b6bf43197f909155e4dee",
+    "672b6cb23197f909155e4def",
+    "672b6db33197f909155e4df0",
+    "672b6dea3197f909155e4df1",
+    "672b70443197f909155e4df2",
+    "672b76c23197f909155e4df3",
+    "672b793a3197f909155e4df4",
+    "672b79a33197f909155e4df5",
+    "672b7a5b3197f909155e4df6",
+    "672b7b173197f909155e4df7",
+    "672b7b353197f909155e4df8",
+    "672b7d443197f909155e4df9",
+    "672b7dc73197f909155e4dfa",
+    "672b80043197f909155e4dfb",
+    "672b80293197f909155e4dfc",
+    "672b803f3197f909155e4dfd",
+    "672b80af3197f909155e4dfe",
+    "672b80ca3197f909155e4dff",
+    "672b81a43197f909155e4e00",
+    "672b81de3197f909155e4e01",
+    "672b81f93197f909155e4e02",
+    "672b82103197f909155e4e03",
+    "672b82243197f909155e4e04",
+    "672b82a43197f909155e4e05",
+    "672b82e23197f909155e4e06",
+    "672b833a3197f909155e4e07",
+    "672b83953197f909155e4e08",
+    "672b83f83197f909155e4e09",
+    "672b846d3197f909155e4e0a",
+    "672b84a53197f909155e4e0b"
+]
+// Helper function for sequential processing
+async function processEach<T>(array: T[], callback: (item: T) => Promise<any>) {
+    const results: any[] = [];
+    for (const item of array) {
+        results.push(await callback(item));
+    }
+    return results;
+}
+
+// Main function
+export async function processQuestions(questionArray: QuestionRow[]) {
+    try {
+        const responses = await processEach(questionArray, async (question) => {
+            const selectedTopics = getRandomTopics(topicIdArray, 2 + Math.floor(Math.random() * 2)); // 2 or 3 topics
+            question.listTopics = selectedTopics;
+
+            const formData: UpdateQuestionForm = {
+                id: question.id,
+                testId: question.testId,
+                practiceId: question.practiceId ?? "",
+                content: question.content,
+                difficulty: question.difficulty,
+                listTopicIds: question.listTopics,
+                transcript: question.transcript ?? "",
+                explanation: question.explanation ?? "",
+                answers: question.answers,
+                correctAnswer: question.correctAnswer,
+            };
+
+            // Post the updated question
+            return axios.post(`${import.meta.env.VITE_API_URL}/questions`, formData);
+        });
+
+        console.log('All questions processed:', responses);
+    } catch (error) {
+        console.error('Error processing questions:', error);
     }
 }

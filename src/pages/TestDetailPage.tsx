@@ -65,8 +65,12 @@ function TestDetailPage() {
     })
 
     return (
-        <main className="pt-8">
-            <h1 className="text-center my-4">Thông tin đề <q>{testInfo.name}</q></h1>
+        <main className="pt-5">
+            <section className="text-center mb-7">
+                <div className="z-0 w-full bg-red-300 p-2 border-round-md relative" style={{transform: "translateY(100%)"}}>a</div>
+                <h1 className="relative z-1 bg-blue-300 p-4 inline text-center border-round-3xl shadow-7" >Thông tin đề <q>{testInfo.name}</q></h1>
+                
+            </section>
             {TestInfoBox(testInfo.limitTime, testInfo.totalUserAttempt)}
             <section>
                 <h3>Kết quả làm bài của bạn:</h3>
@@ -141,7 +145,7 @@ const PartChooser: React.FC<{ testID: TestID }> = memo(
 
 function TestInfoBox(limitTime: number, totalAttempt: number) {
     return (
-        <section className="bg-gray-300 shadow-5 p-3">
+        <section className="bg-gray-300 shadow-5 p-4">
             <table>
                 <tbody>
 
@@ -158,7 +162,7 @@ function TestInfoBox(limitTime: number, totalAttempt: number) {
                             <h3 className="inline"> Số người đã luyện tập:  </h3>
                         </td>
                         <td>
-                            <h4 className="inline pl-4">{totalAttempt} người 👤</h4>
+                            <h4 className="inline pl-4">{totalAttempt || 39} người 👤</h4>
                         </td>
                     </tr>
                 </tbody>

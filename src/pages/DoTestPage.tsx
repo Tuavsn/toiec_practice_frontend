@@ -132,7 +132,7 @@ function DoTestPage() {
                         </section>
                     )}
                 </section>
-                : <section className="w-screen h-screen flex justify-content-center"><LoadingSpinner text="Xin vui lòng chờ...." /></section>
+                : <section className="w-full h-screen flex justify-content-center"><LoadingSpinner text="Xin vui lòng chờ...." /></section>
             }
         </main>
     )

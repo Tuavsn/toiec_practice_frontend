@@ -148,7 +148,7 @@ const RenderDeleteCategoryBody: React.FC<DialogDeleteRowBodyProps<CategoryRow>> 
         return (
             <React.Fragment>
 
-                <h1 className='text-center'>Bạn có chắc muốn xóa <q>{props.currentSelectedRow.name}</q> ?</h1>
+                <h1 className='text-center'>Bạn có chắc muốn xóa <q>{props.currentSelectedRow.format}</q> ?</h1>
                 <div className="flex justify-content-end">
                     <Button label="Xóa" icon="pi pi-save" onClick={() => handleDelete({ rowID: props.currentSelectedRow.id, dispatch: props.dispatch, toast })} />
                 </div>

@@ -354,6 +354,7 @@ interface TopicOverview {
 }
 
 export type TestResultSummary = {
+  testName: string;
   id: ResultID;
   testId: TestID;
   totalTime: number;
