@@ -14,6 +14,8 @@ import useProfile, { GetFakeSuggestionData } from "../hooks/ProfileHook";
 import convertSecondsToString from "../utils/convertSecondsToString";
 import formatDate from "../utils/formatDateToString";
 import { ActivityLogProps, SkillInsightsProps, SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from "../utils/types/type";
+import { Navigate } from 'react-router-dom';
+import { IsNotLogIn } from '../utils/AuthCheck';
 // Đăng ký các phần tử Chart.js cần thiết
 ChartJS.register(...registerables);
 // Đăng ký plugin DataLabels
@@ -24,6 +26,9 @@ export default function UserProfilePage() {
     const {
         state
     } = useProfile();
+
+    if(IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+
     return (
         <main className="pt-8 flex gap-3 flex-column">
             <div key="area-1">

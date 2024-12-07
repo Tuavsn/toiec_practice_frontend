@@ -12,7 +12,7 @@ export function RenderAdminCategoryColumns(dispatch: Dispatch<RowHookAction<Cate
         <Column key="col-format"/* */ field="format"/*    */ header="Format"/*   */ filter/* */ sortable />,
 
         <Column key="col-year"/*  */ field="year"/*       */ header="Năm"/*      */ filter/* */ sortable/*   */ alignHeader="center"/>,
-        <Column key="col-active"/**/ field="active"/*     */ header="Hoạt động"/*            */ /*    */ bodyClassName="text-center"/**/ body={statusBodyTemplate} alignHeader="center"/>,
+        <Column key="col-active"/**/ field="active"/*     */ header="Trạng thái"/*            */ /*    */ bodyClassName="text-center"/**/ body={statusBodyTemplate} alignHeader="center"/>,
         <Column key="col-test"/*                          */ header="Đề thi"/*                                */ bodyClassName="text-center"/**/ body={testsBodyTemplate} alignHeader="center"/>,
         <Column key="col-action"/*                        */ header={() => AddNew(dispatch)}/*     */ headerClassName='flex justify-content-center'/*   */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedRow={data} />}  />
     ];

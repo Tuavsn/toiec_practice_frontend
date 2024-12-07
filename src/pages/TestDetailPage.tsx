@@ -4,7 +4,7 @@ import { Chip } from "primereact/chip";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import React, { memo, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { callGetTestDetailPageData } from "../api/api";
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
 import { useCheckBox } from "../hooks/TestDetailPaperHook";
@@ -14,6 +14,7 @@ import { TestDetailPageData, TestID } from "../utils/types/type";
 import { Card } from "primereact/card";
 import { emptyTestDetailPageData } from "../utils/types/emptyValue";
 import { InputNumber } from "primereact/inputnumber";
+import { IsNotLogIn } from "../utils/AuthCheck";
 
 
 
@@ -21,6 +22,9 @@ function TestDetailPage() {
 
     const { id = "" } = useParams<{ id: string }>(); // Access course ID from URL params
     const [testInfo, setTestInfo] = useState<TestDetailPageData>(emptyTestDetailPageData)
+
+    if(IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+
     useEffect(() => {
         callGetTestDetailPageData(id).then(newTestInfo => {
             if (!newTestInfo) {

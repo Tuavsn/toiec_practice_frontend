@@ -6,6 +6,8 @@ import '../App.css';
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useTestPage from "../hooks/TestHook";
 import { MultipleChoiceQuestion, SimpleTimeCountDownProps, TestType } from "../utils/types/type";
+import { Navigate } from "react-router-dom";
+import { IsNotLogIn } from "../utils/AuthCheck";
 
 function DoTestPage() {
 
@@ -33,6 +35,9 @@ function DoTestPage() {
         flags,
         start,
     } = useTestPage();
+
+    if (IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+
     const answeredCount = Array.from(userAnswerSheet.values()).filter(
         (answerPair) => answerPair.userAnswer !== ""
     ).length;

@@ -4,6 +4,8 @@ import { memo, useCallback } from "react";
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useExercisePage from "../hooks/ExerciseHook";
 import { TestAnswerSheet } from "../utils/types/type";
+import { Navigate } from "react-router-dom";
+import { IsNotLogIn } from "../utils/AuthCheck";
 
 function DoExercisePage() {
     // Gọi hook tùy chỉnh để lấy danh sách câu hỏi, ánh xạ trang, tổng số câu hỏi và các hàm điều khiển trạng thái
@@ -23,6 +25,9 @@ function DoExercisePage() {
         onEndTest,
         start,
     } = useExercisePage();
+    
+    if (IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+
     // Tạo danh sách nút điều hướng dựa trên pageMapper
     const createButtonListElement = useCallback((): JSX.Element[] => {
         if (userAnswerSheet.size <= 0) {
