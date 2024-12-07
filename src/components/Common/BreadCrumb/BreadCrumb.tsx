@@ -32,7 +32,6 @@ const generateBreadcrumbs = (path: string) => {
         const [name, id] = segment.split('___'); // Tách "name" và "id" bằng "___"
         if (!id) {
             accumulatedPath += `/${name}`
-            console.log(accumulatedPath);
             const formatName = changeName(name.replace(/-/g, ' '));
 
             breadcrumbs.push({

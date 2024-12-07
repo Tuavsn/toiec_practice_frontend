@@ -524,12 +524,12 @@ export type handeDeleteRowParams<RowModel> = {
 }
 
 export type AdminLectureTableProps = {
-  lectures: LectureRow[],
+  lectures: LectureRow[] | null,
   dispatch: Dispatch<LectureHookAction>,
 }
 
 export type AdminRowTableProps<RowModel> = {
-  rows: RowModel[],
+  rows: RowModel[] | null,
   dispatch: Dispatch<RowHookAction<RowModel>>,
 }
 
@@ -554,6 +554,29 @@ export type DialogDeleteRowBodyProps<RowModel> = RowActionButtonProps<RowModel>;
 export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;
   onTimeUp: () => void;
+}
+
+export interface DoTestPageProps {
+  setIsUserAnswerSheetVisible: React.Dispatch<React.SetStateAction<boolean>>,
+  isUserAnswerSheetVisible: boolean,
+  setTestAnswerSheet: (qNum: QuestionNumber, qID: QuestionID, answer: string) => void,
+  totalQuestions: number,
+  setVisiable: React.Dispatch<React.SetStateAction<boolean>>,
+  changePage: (offset: number) => void,
+  toggleFlag: (index: number) => void,
+  timeDoTest: React.MutableRefObject<number>,
+  timeLimit: React.MutableRefObject<number>,
+  isVisible: boolean,
+  id: TestID,
+  onEndTest: () => Promise<void>,
+  startTest: () => void,
+  start: boolean,
+  userAnswerSheet: TestAnswerSheet,
+  createButtonListElement: () => JSX.Element[],
+  flags: boolean[],
+  currentPageIndex: number,
+  testType: TestType,
+  questionList: MultipleChoiceQuestion[],
 }
 
 export interface DialogQuestionActionProps {
@@ -679,7 +702,7 @@ export type Name_ID<T extends string> = T;
 //-----------------------------reducer---------------------
 export interface LectureHookState {
   isRefresh: boolean;
-  lectures: LectureRow[],
+  lectures: LectureRow[] | null,
   currentPageIndex: number,
   job: DialogLectureJobType,
   currentSelectedLecture: LectureRow
@@ -710,7 +733,7 @@ export interface TestReviewHookState {
   pageMapper: QuestionPage[],
 }
 export type RowHookState<RowModel> = {
-  rows: RowModel[],
+  rows: RowModel[] | null,
   isRefresh: boolean;
   currentPageIndex: number,
   job: DialogRowJobType,

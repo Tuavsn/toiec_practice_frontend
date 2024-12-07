@@ -40,7 +40,7 @@ export const emptyUserRow: UserRow = {
         active: false
     },
     target: 0,
-    isActive: false,
+    active: false,
     createdAt: emptyDate,
     updatedAt: emptyDate
 } as const
@@ -72,7 +72,7 @@ export const emptyTestRow: TestRow = {
 
 export const initialLectureState: LectureHookState = {
     job: "",
-    lectures: [],
+    lectures: null,
     isRefresh: true,
     currentPageIndex: 0,
     currentSelectedLecture: emptyLectureRowValue
@@ -86,7 +86,7 @@ export const initialTestReviewState: TestReviewHookState = {
 } as const
 
 export const initialUserState: RowHookState<UserRow> = {
-    rows: [],
+    rows: null,
     isRefresh: false,
     currentPageIndex: 0,
     job: "",
@@ -94,7 +94,7 @@ export const initialUserState: RowHookState<UserRow> = {
 } as const
 
 export const initialCategoryState: RowHookState<CategoryRow> = {
-    rows: [],
+    rows: null,
     isRefresh: false,
     currentPageIndex: 0,
     job: "",
@@ -102,7 +102,7 @@ export const initialCategoryState: RowHookState<CategoryRow> = {
 } as const
 
 export const initialTestState: RowHookState<TestRow> = {
-    rows: [],
+    rows: null,
     isRefresh: false,
     currentPageIndex: 0,
     job: "",

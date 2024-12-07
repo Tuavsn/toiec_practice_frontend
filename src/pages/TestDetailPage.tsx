@@ -70,7 +70,7 @@ function TestDetailPage() {
                 {TestInfoBox(testInfo.limitTime, testInfo.totalUserAttempt)}
                 <section>
                     <h3>Kết quả làm bài của bạn:</h3>
-                    <DataTable size={'small'} value={testInfo.resultsOverview} showGridlines stripedRows
+                    <DataTable size={'small'} value={testInfo.resultsOverview} showGridlines stripedRows emptyMessage="Không có bài làm nào trước đây"
                         loading={!testInfo.id} paginator totalRecords={testInfo.resultsOverview.length} rows={5} scrollable scrollHeight="600px">
                         {columns}
                     </DataTable>

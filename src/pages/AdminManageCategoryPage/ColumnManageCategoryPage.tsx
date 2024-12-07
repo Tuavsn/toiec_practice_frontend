@@ -9,7 +9,7 @@ import { emptyCategoryRow } from "../../utils/types/emptyValue";
 export function RenderAdminCategoryColumns(dispatch: Dispatch<RowHookAction<CategoryRow>>): JSX.Element[] {
     return [
 
-        <Column key="col-format"/* */ field="format"/*    */ header="Format"/*   */ filter/* */ sortable />,
+        <Column key="col-format"/* */ field="format"/*    */ header="Bộ"/*   */ filter/* */ sortable />,
 
         <Column key="col-year"/*  */ field="year"/*       */ header="Năm"/*      */ filter/* */ sortable/*   */ alignHeader="center"/>,
         <Column key="col-active"/**/ field="active"/*     */ header="Trạng thái"/*            */ /*    */ bodyClassName="text-center"/**/ body={statusBodyTemplate} alignHeader="center"/>,

@@ -11,9 +11,9 @@ const AdminTestTable: React.FC<AdminRowTableProps<TestRow>> = (props) => {
         <DataTable
             emptyMessage="Không có đề thi"
             stripedRows
-            value={props.rows} // Dữ liệu nguồn từ tests
+            value={props.rows?? []} // Dữ liệu nguồn từ tests
             size="small" // Kích thước của bảng được thiết lập là nhỏ
-            loading={props.rows.length <= 0} // Hiển thị trạng thái "loading" nếu danh sách đề thi rỗng
+            loading={props.rows === null} // Hiển thị trạng thái "loading" nếu danh sách đề thi rỗng
             dataKey="id" // Sử dụng thuộc tính "id" làm khóa chính cho các hàng trong bảng
         >
             {/* Gọi hàm RenderAdminTestColumns để render các cột bảng, truyền dispatch qua props */}

@@ -128,6 +128,7 @@ const useTestPage = () => {
         testType,
         flags,
         start,
+        id,
     };
 };
 

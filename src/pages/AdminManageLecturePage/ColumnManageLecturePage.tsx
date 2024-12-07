@@ -16,9 +16,9 @@ export function RenderAdminLectureColumns(dispatch: Dispatch<LectureHookAction>)
 
         <Column key="col-timestamp"/*                                  */ header="Thời gian"/*  */ filter/*           */ sortable/*         */ headerClassName="justify-content-center"/*     */ style={{ width: "9rem" }}/*                                        */ body={timeStampBodyTemplate} />,
 
-        <Column key="col-active"/*           */ field="active"/*       */ header="Hoạt động"/*    */ filter/*          */ sortable/*                                                           */ style={{ width: "5rem" }}/*     */ bodyClassName="text-center"/*   */ body={statusBodyTemplate} />,
+        <Column key="col-active"/*           */ field="active"/*       */ header="Trạng thái"/*                       */ sortable/*         */ bodyClassName="text-center"/*   */ body={statusBodyTemplate}  alignHeader="center"/>,
 
-        <Column key="col-action"/*                                    */ header={() => AddNew(dispatch)}/*                                    */ headerClassName='flex justify-content-end'/*                                                                                      */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedLecture={data} />} />
+        <Column key="col-action"/*                                    */ header={() => AddNew(dispatch)}/*                                  */ headerClassName='flex justify-content-end'/*       */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedLecture={data} />} />
     ];
 }
 // Thành phần ActionBodyTemplate sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)

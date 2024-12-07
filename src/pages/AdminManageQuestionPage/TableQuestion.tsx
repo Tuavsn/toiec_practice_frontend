@@ -47,7 +47,7 @@ const QuestionTreeTable: React.FC<QuestionTableProps> = React.memo(
                 {/* Dialog dùng để hiển thị nội dung xác nhận xóa hoặc cập nhật câu hỏi. */}
                 <DialogQuestionActionButton isVisible={isVisible} title={title} topicList={topics} setIsVisible={setIsVisible} currentSelectedQuestion={currentSelectedQuestion} />
 
-                <TreeTable value={nodes} rows={5} scrollable rowClassName={rowClassName}>
+                <TreeTable emptyMessage="Không có câu hỏi" value={nodes} rows={5} scrollable rowClassName={rowClassName}>
 
                     {RenderColumnsForTable(setContextDialogBody, setResourceDialogBody, setTopicDialogBody, topics, setTitle, setIsVisible, currentSelectedQuestion)}
 

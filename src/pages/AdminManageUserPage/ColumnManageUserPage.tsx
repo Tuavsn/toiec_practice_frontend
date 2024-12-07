@@ -10,7 +10,7 @@ export function RenderAdminUserColumns(dispatch: Dispatch<RowHookAction<UserRow>
         <Column key="col-email"/* */ field="email"/*      */ header="Email"/*    */ filter/* */ sortable />,
 
         <Column key="col-role"/*  */ field="role.name"/*  */ header="Vai trò"/*  */ filter/* */ sortable/*  */ /*  ***/ />,
-        <Column key="col-active"/**/ field="active"/*     */ header="Hoạt động"/*            */ sortable/*  */ /*  **/ body={statusBodyTemplate} />,
+        <Column key="col-active"/**/ field="active"/*     */ header="Trạng thái"/*            */ sortable/*  */ /*  **/ body={statusBodyTemplate} />,
 
         <Column key="col-action"/* */ headerClassName='flex justify-content-end'/*                                                                                          */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedRow={data} />} />
     ];
