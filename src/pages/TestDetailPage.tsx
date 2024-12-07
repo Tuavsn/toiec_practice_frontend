@@ -1,20 +1,20 @@
 import { Button } from "primereact/button";
+import { Card } from "primereact/card";
 import { Checkbox } from "primereact/checkbox";
 import { Chip } from "primereact/chip";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
+import { InputNumber } from "primereact/inputnumber";
 import React, { memo, useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { callGetTestDetailPageData } from "../api/api";
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
 import { useCheckBox } from "../hooks/TestDetailPaperHook";
+import { IsNotLogIn } from "../utils/AuthCheck";
 import convertSecondsToString from "../utils/convertSecondsToString";
 import formatDate from "../utils/formatDateToString";
-import { TestDetailPageData, TestID } from "../utils/types/type";
-import { Card } from "primereact/card";
 import { emptyTestDetailPageData } from "../utils/types/emptyValue";
-import { InputNumber } from "primereact/inputnumber";
-import { IsNotLogIn } from "../utils/AuthCheck";
+import { TestDetailPageData } from "../utils/types/type";
 
 
 
@@ -75,7 +75,7 @@ function TestDetailPage() {
                         {columns}
                     </DataTable>
                 </section>
-                <PartChooser testID={id} />
+                <PartChooser />
                 <section>
                     {showDetailParts}
                 </section>
@@ -102,8 +102,8 @@ function DecodeCheckBoxesToUrl(parts: boolean[]): string {
     return "practice/" + returnString;
 }
 
-const PartChooser: React.FC<{ testID: TestID }> = memo(
-    ({ testID }) => {
+const PartChooser: React.FC = memo(
+    () => {
         const { parts, onPartSelectChange } = useCheckBox();
         const [timeLimit, setTimeLimit] = useState<number>(120);
         const navigate = useNavigate();
@@ -134,7 +134,7 @@ const PartChooser: React.FC<{ testID: TestID }> = memo(
                     <InputNumber disabled={parts[0]} inputStyle={{width:"6rem"}}  buttonLayout="horizontal" showButtons  value={parts[0] ?120 :timeLimit} min={10} max={150} onValueChange={(e) => setTimeLimit(e.value ?? 120)} suffix=" phút" />
                     <Button onClick={() => {
 
-                        navigate(`/dotest/${timeLimit}/${testID}/${DecodeCheckBoxesToUrl(parts)}`)
+                        navigate(`dotest/${timeLimit}/${DecodeCheckBoxesToUrl(parts)}`)
                     }} label="Làm bài"></Button>
                 </div>
             </React.Fragment>
