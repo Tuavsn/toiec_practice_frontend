@@ -6,6 +6,8 @@ import React, { Dispatch, SetStateAction } from "react";
 import { useTestOverallResult } from "../hooks/TestOverallReviewHook";
 import convertSecondsToString from "../utils/convertSecondsToString";
 import { SelectedQuestionDialogTestOverallPage } from "../utils/types/type";
+import { Navigate } from "react-router-dom";
+import { IsNotLogIn } from "../utils/AuthCheck";
 
 export default function TestOverallResultPage() {
 
@@ -16,6 +18,9 @@ export default function TestOverallResultPage() {
         currentSelectedQuestion,
         setCurrentSelectedQuestion,
     } = useTestOverallResult();
+
+    if(IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+
     let part = 0;
     return (
         <main className="pt-8 w-full family-font">

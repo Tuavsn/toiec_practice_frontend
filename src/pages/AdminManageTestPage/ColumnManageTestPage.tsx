@@ -1,10 +1,10 @@
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import React, { Dispatch } from "react";
-import { statusBodyTemplate, timeStampBodyTemplate } from "../../components/Common/Table/CommonColumn";
-import { RowActionButtonProps, RowHookAction, TestRow } from "../../utils/types/type";
 import { useNavigate } from "react-router-dom";
+import { statusBodyTemplate } from "../../components/Common/Table/CommonColumn";
 import { emptyTestRow } from "../../utils/types/emptyValue";
+import { RowActionButtonProps, RowHookAction, TestRow } from "../../utils/types/type";
 
 export function RenderAdminTestColumns(dispatch: Dispatch<RowHookAction<TestRow>>): JSX.Element[] {
     return [
@@ -12,8 +12,8 @@ export function RenderAdminTestColumns(dispatch: Dispatch<RowHookAction<TestRow>
         <Column key="col-name" field="name" header="Tên" sortable filter style={{ minWidth: '12rem' }} />,
         <Column key="col-totalTestAttempt" field="totalUserAttempt" header="Tổng lượt người" sortable filter/>,
         <Column key="col-testDetail" header="Thông tin" sortable filter body={InfoBodyTemplate} />,
-        <Column key="col-questions" header="Câu hỏi" alignHeader="center" body={(data) => <QuestionsBodyTemplate rowData={data} />} />,
         <Column key="col-isActive" field="isActive" header="Trạng thái" sortable body={statusBodyTemplate} />,
+        <Column key="col-questions" header="Câu hỏi" alignHeader="center" body={(data) => <QuestionsBodyTemplate rowData={data} />} />,
         <Column key="col-action"/*                        */ header={() => AddNew(dispatch)}/*     */ headerClassName='flex justify-content-center'/*   */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedRow={data} />} />
     ];
 }

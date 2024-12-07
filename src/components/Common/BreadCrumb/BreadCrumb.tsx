@@ -28,25 +28,38 @@ const generateBreadcrumbs = (path: string) => {
     const segments = path.split('/').filter(Boolean); // Tách các phần của URL theo dấu "/"
     const breadcrumbs: CustomBreadCrumItem[] = [];
     let accumulatedPath = '';
-
     segments.forEach((segment) => {
         const [name, id] = segment.split('___'); // Tách "name" và "id" bằng "___"
         if (!id) {
             accumulatedPath += `/${name}`
+            const formatName = changeName(name.replace(/-/g, ' '));
+
             breadcrumbs.push({
-                label: name.replace(/-/g, ' '),  // Hiển thị tên với khoảng trắng thay vì dấu "-"
-                template: NavigateBreadcrumb(accumulatedPath, name.replace(/-/g, ' '))           // Đường dẫn URL với cả "name" và "id"
+                label: formatName,  // Hiển thị tên với khoảng trắng thay vì dấu "-"
+                template: NavigateBreadcrumb(accumulatedPath, formatName)           // Đường dẫn URL với cả "name" và "id"
             });
         } else {
             accumulatedPath += `/${name}___${id}`; // Tạo URL đầy đủ cho từng segment
-            breadcrumbs.at(-1)!.label += `:${decodeURIComponent(name)}`;
-
         }
     });
-
     return breadcrumbs;
 };
 
 function NavigateBreadcrumb(path: string, name: string): JSX.Element {
     return <Link to={path}>{name}</Link>
+}
+
+function changeName(name: string): string {
+    switch (name) {
+        case "dashboard":
+            return "Quản trị"
+        case "categories":
+            return "Bộ đề"
+        case "tests":
+            return "Đề thi";
+        case "questions":
+            return "Câu hỏi";
+        default:
+            return "Nhà";
+    }
 }

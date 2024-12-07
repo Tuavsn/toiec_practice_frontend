@@ -5,7 +5,9 @@ import React, { memo, useEffect, useState } from "react";
 import '../App.css';
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useTestPage from "../hooks/TestHook";
-import { MultipleChoiceQuestion, SimpleTimeCountDownProps, TestType } from "../utils/types/type";
+import { DoTestPageProps, MultipleChoiceQuestion, SimpleTimeCountDownProps, TestType } from "../utils/types/type";
+import { Link, Navigate } from "react-router-dom";
+import { IsNotLogIn } from "../utils/AuthCheck";
 
 function DoTestPage() {
 
@@ -32,10 +34,12 @@ function DoTestPage() {
         testType,
         flags,
         start,
+        id,
     } = useTestPage();
-    const answeredCount = Array.from(userAnswerSheet.values()).filter(
-        (answerPair) => answerPair.userAnswer !== ""
-    ).length;
+
+    if (IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+
+
     // Tạo danh sách nút điều hướng dựa trên pageMapper
     const createButtonListElement = (): JSX.Element[] => {
         if (userAnswerSheet.size <= 0) {
@@ -77,81 +81,19 @@ function DoTestPage() {
     }
 
 
+
     // Render giao diện chính của trang thi
     return (
-        <main id="do-test-page" className="w-full h-full">
-            {(totalQuestions > 0) ?
-                <section>
-                    {/* Nút bắt đầu bài thi */}
-                    {!start && (
-                        <div className="flex justify-content-center min-h-screen">
-                            <span className="align-content-center">
+        <main id="do-test-page" className="w-full h-full flex flex-column">
+            <RenderMainPage changePage={changePage} isVisible={isVisible} onEndTest={onEndTest}
+                isUserAnswerSheetVisible={isUserAnswerSheetVisible} setVisiable={setVisiable}
+                setIsUserAnswerSheetVisible={setIsUserAnswerSheetVisible} startTest={startTest}
+                setTestAnswerSheet={setTestAnswerSheet} timeDoTest={timeDoTest} start={start}
+                totalQuestions={totalQuestions} timeLimit={timeLimit} toggleFlag={toggleFlag} id={id}
+                createButtonListElement={createButtonListElement} userAnswerSheet={userAnswerSheet}
+                currentPageIndex={currentPageIndex} flags={flags} questionList={questionList} testType={testType}
+            />
 
-                                <Button label="Bắt đầu" onClick={() => {
-                                    // bắt đầu tính giờ đếm số giây đã trôi qua
-                                    timeDoTest.current = Date.now();
-                                    // mở giao diện làm bài
-                                    startTest();
-                                }} />
-                            </span>
-                        </div>
-                    )}
-
-                    {/* Giao diện làm bài thi */}
-                    {start && (
-                        <section className="flex flex-column justify-content-center">
-                            {/* Phiếu trả lời của người dùng */}
-                            <UserAnswerSheet
-                                visible={isUserAnswerSheetVisible}
-                                setVisible={setIsUserAnswerSheetVisible}
-                                ButtonListElement={createButtonListElement()}
-                            />
-
-                            {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */}
-                            <Toolbar
-                                className="py-1"
-                                start={currentStatusBodyTemplate(answeredCount, totalQuestions, setIsUserAnswerSheetVisible)}
-                                center={
-                                    <SimpleTimeCountDown
-                                        onTimeUp={() => onEndTest()}
-                                        timeLeftInSecond={timeLimit.current}
-                                    />
-                                }
-                                end={
-                                    <div className=" flex gap-1">
-                                        <Button severity={flags[currentPageIndex] ? "info" : "secondary"} label="🚩" onClick={() => toggleFlag(currentPageIndex)} />
-                                        <Button
-                                            severity="success"
-                                            label="Nộp bài"
-                                            onClick={() => setVisiable(true)}
-                                        />
-                                    </div>
-                                }
-                            />
-
-                            {/* Khu vực chính để hiển thị câu hỏi và các nút điều hướng */}
-                            <div id="test-area-container" className="max-w-screen p-0">
-                                <TestArea
-                                    changePage={changePage}
-                                    testType={testType}
-                                    question={questionList[currentPageIndex]}
-                                    setTestAnswerSheet={setTestAnswerSheet}
-                                    userAnswerSheet={userAnswerSheet}
-                                />
-                            </div>
-                            <Dialog visible={isVisible} header={<b>Bạn có chắc muốn nộp bài</b>} onHide={() => setVisiable(false)}>
-                                <div className="flex flex-column gap-4">
-                                    {answeredCount < totalQuestions && <h1>Bạn có {totalQuestions - answeredCount} câu chưa làm !</h1>}
-                                    <div className="flex justify-content-end">
-                                        <Button severity="success" label="Chấp nhận nộp bài" onClick={onEndTest} />
-                                    </div>
-                                </div>
-                            </Dialog>
-                        </section>
-                    )}
-                </section>
-                : <section className="w-full h-screen flex justify-content-center"><LoadingSpinner text="Xin vui lòng chờ...." /></section>
-            }
         </main>
     )
 
@@ -223,3 +165,103 @@ const SimpleTimeCountDown: React.FC<SimpleTimeCountDownProps> = React.memo(
         );
     }
 )
+
+
+const RenderMainPage: React.FC<DoTestPageProps> = (props) => {
+    if (props.totalQuestions <= 0) {
+        return (
+            <section>
+                <Link to={`/test/${props.id}`}>
+                    <Button className="fixed" label="Quay về" />
+                </Link>
+                <div className="fixed" style={{left:"50%",top:"50vh",transform: "translate(-50%, -50%)"}}>
+                    <LoadingSpinner text="Xin vui lòng chờ...." />
+                </div>
+            </section>
+
+        )
+    }
+    if (!props.start) {
+        return (
+            <section>
+                {/* Nút bắt đầu bài thi */}
+                <Link to={`/test/${props.id}`}>
+                    <Button className="fixed" label="Quay về" />
+                </Link>
+                <div className="fixed" style={{left:"50%",top:"50vh",transform: "translate(-50%, -50%)"}}>
+                    <div className="text-center">
+
+                        <Button label="Bắt đầu" onClick={() => {
+                            // bắt đầu tính giờ đếm số giây đã trôi qua
+                            props.timeDoTest.current = Date.now();
+                            // mở giao diện làm bài
+                            props.startTest();
+                        }} />
+                    </div>
+                </div>
+            </section>
+        )
+    }
+
+    const answeredCount = Array.from(props.userAnswerSheet.values()).filter(
+        (answerPair) => answerPair.userAnswer !== ""
+    ).length;
+
+
+    return (
+        <section>
+            {/* Giao diện làm bài thi */}
+
+            <section className="flex flex-column justify-content-center">
+                {/* Phiếu trả lời của người dùng */}
+                <UserAnswerSheet
+                    visible={props.isUserAnswerSheetVisible}
+                    setVisible={props.setIsUserAnswerSheetVisible}
+                    ButtonListElement={props.createButtonListElement()}
+                />
+
+                {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */}
+                <Toolbar
+                    className="py-1"
+                    start={currentStatusBodyTemplate(answeredCount, props.totalQuestions, props.setIsUserAnswerSheetVisible)}
+                    center={
+                        <SimpleTimeCountDown
+                            onTimeUp={() => props.onEndTest()}
+                            timeLeftInSecond={props.timeLimit.current}
+                        />
+                    }
+                    end={
+                        <div className=" flex gap-1">
+                            <Button severity={props.flags[props.currentPageIndex] ? "info" : "secondary"} label="🚩" onClick={() => props.toggleFlag(props.currentPageIndex)} />
+                            <Button
+                                severity="success"
+                                label="Nộp bài"
+                                onClick={() => props.setVisiable(true)}
+                            />
+                        </div>
+                    }
+                />
+
+                {/* Khu vực chính để hiển thị câu hỏi và các nút điều hướng */}
+                <div id="test-area-container" className="max-w-screen p-0">
+                    <TestArea
+                        changePage={props.changePage}
+                        testType={props.testType}
+                        question={props.questionList[props.currentPageIndex]}
+                        setTestAnswerSheet={props.setTestAnswerSheet}
+                        userAnswerSheet={props.userAnswerSheet}
+                    />
+                </div>
+                <Dialog visible={props.isVisible} header={<b>Bạn có chắc muốn nộp bài</b>} onHide={() => props.setVisiable(false)}>
+                    <div className="flex flex-column gap-4">
+                        {answeredCount < props.totalQuestions && <h1>Bạn có {props.totalQuestions - answeredCount} câu chưa làm !</h1>}
+                        <div className="flex justify-content-end">
+                            <Button severity="success" label="Chấp nhận nộp bài" onClick={props.onEndTest} />
+                        </div>
+                    </div>
+                </Dialog>
+            </section>
+
+        </section>
+    )
+}

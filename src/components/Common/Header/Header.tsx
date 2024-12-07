@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Logo from "../../../assets/Header-Logo.png";
 import { useTestState } from "../../../context/TestStateProvider";
 import LoginDialog from "../LoginDialog/LoginDialog";
+import { IsNotLogIn } from "../../../utils/AuthCheck";
 
 
 
@@ -20,7 +21,7 @@ export default function Header() {
     const { isOnTest } = useTestState();
 
     // Định nghĩa logo hiển thị ở đầu header
-    const HeaderStart = <a href="#"><img src={Logo} height={70} alt="Logo" onClick={() => handleCommand('/home')}/></a>;
+    const HeaderStart = <a href="#"><img src={Logo} height={70} alt="Logo" onClick={() => handleCommand('/home')} /></a>;
 
     // Định nghĩa danh sách các mục trong header
     const HeaderItems = [
@@ -43,24 +44,24 @@ export default function Header() {
     }
 
     // Định nghĩa nội dung hiển thị ở cuối header
-    const HeaderEnd = localStorage.getItem('access_token') ? (
-        <div className="card flex justify-content-center pr-3">
-            <div className="m-auto pr-2">
-                {localStorage.getItem('email') /* Hiển thị email người dùng */}
-            </div>
-            <Button icon="pi pi-user" rounded text raised severity="info" aria-label="User"
-                onClick={toggleOverlayPanel}
-            />
-            <OverlayPanel ref={op}>
-                <div className="block">
-                    <Button className="block" link onClick={(e) => { toggleOverlayPanel(e); navigate('/profile') }}>Cá nhân</Button>
-                    <Button className="block" link onClick={() => { localStorage.clear(); navigate('/home'); }}>Thoát</Button>
+    const HeaderEnd = IsNotLogIn() ?
+        <LoginDialog /> :
+        (
+            <div className="card flex justify-content-center pr-3">
+                <div className="m-auto pr-2">
+                    {localStorage.getItem('email') /* Hiển thị email người dùng */}
                 </div>
-            </OverlayPanel>
-        </div>
-    ) : (
-        <LoginDialog /> // Hiển thị LoginDialog nếu không có access_token
-    );
+                <Button icon="pi pi-user" rounded text raised severity="info" aria-label="User"
+                    onClick={toggleOverlayPanel}
+                />
+                <OverlayPanel ref={op}>
+                    <div className="block">
+                        <Button className="block" link onClick={(e) => { toggleOverlayPanel(e); navigate('/profile') }}>Cá nhân</Button>
+                        <Button className="block" link onClick={() => { localStorage.clear(); navigate('/home'); }}>Thoát</Button>
+                    </div>
+                </OverlayPanel>
+            </div>
+        )
 
     // Hàm xử lý lệnh điều hướng
     const handleCommand = (path: string) => {

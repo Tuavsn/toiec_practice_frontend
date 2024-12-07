@@ -30,7 +30,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
 
     return (
         <ToastContext.Provider value={{ toast: toastRef }}>
-            <Toast ref={toastRef} />
+            <Toast ref={toastRef} baseZIndex={1208} />
             {children} {/* Render các component con bên trong ToastProvider */}
         </ToastContext.Provider>
     );

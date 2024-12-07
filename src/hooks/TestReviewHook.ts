@@ -34,7 +34,6 @@ const reducer = (state: TestReviewHookState, action: TestReviewHookAction): Test
 
 export default function useTestReview() {
     const [state, dispatch] = useReducer(reducer, initialTestReviewState);
-
     // Lấy ID từ URL
     const { id = "" } = useParams<{ id: ResultID }>();
 
