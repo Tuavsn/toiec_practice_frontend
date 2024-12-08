@@ -1,7 +1,7 @@
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import React, { useRef, useState } from "react";
-import { callCreateCateogry, callPostDeleteCategoryRow, callPostUpdateCategoryRow } from "../../api/api";
+import { callCreateCategory, callPostDeleteCategoryRow, callPostUpdateCategoryRow } from "../../api/api";
 import { useToast } from "../../context/ToastProvider";
 import { DialogDeleteRowBodyProps, DialogRowProps, handeDeleteRowParams, RenderRowDialogParams, CategoryRow, DialogUpdateCategoryBodyProps, handeSaveRowParams } from "../../utils/types/type";
 import { Fieldset } from "primereact/fieldset";
@@ -129,7 +129,7 @@ async function handleSave(params: handeSaveRowParams<CategoryRow>) {
     if (params.row.id) {
         success = await callPostUpdateCategoryRow(params.row);
     } else {
-        success = await callCreateCateogry(params.row);
+        success = await callCreateCategory(params.row);
     }
     params.setIsDisabled(false);
     if (success) {

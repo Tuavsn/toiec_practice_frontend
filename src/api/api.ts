@@ -6,7 +6,7 @@ export const loginUrl = `${host}/oauth2/authorize/google`;
 
 
 
-export const callCreateCateogry = async (category: CategoryRow): Promise<boolean> => {
+export const callCreateCategory = async (category: CategoryRow): Promise<boolean> => {
     try {
         await axios.post<ApiResponse<CategoryRow>>(
             `${import.meta.env.VITE_API_URL}/categories`,
@@ -98,9 +98,13 @@ export const callPostAssignmentQuestion = async (formData: any): Promise<boolean
     }
 }
 
-export const callGetTopics = async (): Promise<ApiResponse<Topic[]>> => {
-    const response = await axios.get<ApiResponse<Topic[]>>(`${import.meta.env.VITE_API_URL}/topics`)
-    return response.data;
+export const callGetTopics = async (): Promise<Topic[] | null> => {
+    try {
+        const response = await axios.get<ApiResponse<Topic[]>>(`${import.meta.env.VITE_API_URL}/topics`);
+        return response.data.data;
+    } catch (e) {
+        return null;
+    }
 }
 
 export const callGetResult = async (id: ResultID): Promise<ApiResponse<TestResultSummary>> => {
@@ -288,6 +292,15 @@ export const callGetTestRow = async (categoryID: CategoryID, currentPageIndex: n
     }
 }
 
+export const callGetTopicRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<Topic> | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<Topic>>>(`${import.meta.env.VITE_API_URL}/topics?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        return response.data.data;
+    } catch (e) {
+        return null;
+    }
+}
+
 export const callPostUpdateCategoryRow = async (category: CategoryRow): Promise<boolean> => {
     try {
         await axios.post(`${import.meta.env.VITE_API_URL}/categories/${category.id}`, {
@@ -302,6 +315,16 @@ export const callPostUpdateCategoryRow = async (category: CategoryRow): Promise<
 export const callPostDeleteCategoryRow = async (category: CategoryRow): Promise<boolean> => {
     try {
         await axios.post(`${import.meta.env.VITE_API_URL}/categories/${category.id}`, {
+            isActive: false
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+export const callPostDeleteTopicRow = async (topic: Topic): Promise<boolean> => {
+    try {
+        await axios.post(`${import.meta.env.VITE_API_URL}/topics/${topic.id}`, {
             isActive: false
         });
         return true;
@@ -356,6 +379,32 @@ export const callPostUpdateTest = async (testRow: TestRow): Promise<boolean> => 
             totalQuestion: testRow.totalQuestion,
             totalScore: testRow.totalScore,
             limitTime: testRow.limitTime,
+        });
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
+export const callPostUpdateTopic = async (topicRow: Topic): Promise<boolean> => {
+    try {
+        axios.post<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
+            name: topicRow.name,
+            solution: topicRow.solution,
+            overallSkill: topicRow.solution,
+        });
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
+export const callPostTopic = async (topicRow: Topic): Promise<boolean> => {
+    try {
+        axios.post<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
+            name: topicRow.name,
+            solution: topicRow.solution,
+            overallSkill: topicRow.solution,
         });
         return true
     } catch (error) {

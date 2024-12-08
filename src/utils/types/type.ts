@@ -468,6 +468,10 @@ export type DialogUpdateCategoryBodyProps = {
   currentSelectedRow: CategoryRow,
   dispatch: Dispatch<RowHookAction<CategoryRow>>,
 }
+export type DialogUpdateTopicBodyProps = {
+  currentSelectedRow: Topic,
+  dispatch: Dispatch<RowHookAction<Topic>>,
+}
 export type DialogUpdateTestBodyProps = {
   currentSelectedRow: TestRow,
   dispatch: Dispatch<RowHookAction<TestRow>>,

@@ -16,7 +16,13 @@ export default function LeftNavigationBar() {
         {
             label: 'Quản lý bài giảng',
             items: [
-                { label: 'Quản lý bài giảng', icon: 'pi pi-folder', command: () => navigate('/dashboard/lecture') },
+                { label: 'Quản lý bài giảng', icon: 'pi pi-graduation-cap', command: () => navigate('/dashboard/lecture') },
+            ]
+        },
+        {
+            label: 'Quản lý chủ đề',
+            items: [
+                { label: 'Quản lý chủ đề', icon: 'pi pi-bookmark', command: () => navigate('/dashboard/topic') },
             ]
         },
         {

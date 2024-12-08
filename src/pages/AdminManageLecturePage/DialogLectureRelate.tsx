@@ -7,7 +7,7 @@ import React, { useRef, useState } from "react";
 import { callDeleteLecture, callPostLectureDetail, callPutLectureDetailUpdate } from "../../api/api";
 import EditCourseRichTextBox from "../../components/Common/richTextBox/richTextBox";
 import { useToast } from "../../context/ToastProvider";
-import useTopicRef from "../../hooks/TopicHook";
+import useTopicRef from "../../hooks/TopicRefHook";
 import { emptyLectureRowValue } from "../../utils/types/emptyValue";
 import { DialogDeleteLectureBodyProps, DialogLectureProps, DialogUpdateLectureBodyProps, handeDeleteLectureParams, handeSaveLectureParams, RenderLectureDialogParams, Topic, TopicID } from "../../utils/types/type";
 
