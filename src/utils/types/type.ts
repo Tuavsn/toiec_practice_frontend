@@ -20,6 +20,12 @@ export interface Lecture extends DataTableValue {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface Comment {
+  id: number;
+  text: string;
+  email: string;
+  userId: string;
+}
 
 export interface Topic {
   createdAt: Date,
