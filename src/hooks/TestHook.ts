@@ -19,8 +19,8 @@ const useTestPage = () => {
         isUserAnswerSheetVisible,
         setCurrentPageIndex,
         setUserAnswerSheet,
-        setTestAnswerSheet,
         abortControllerRef,
+        setTestAnswerSheet,
         setTotalQuestions,
         timeSpentListRef,
         currentPageIndex,
@@ -34,11 +34,13 @@ const useTestPage = () => {
         pageMapper,
         changePage,
         timeDoTest,
+        setIsSumit,
         startTest,
         isVisible,
         isOnTest,
         navigate,
         setFlags,
+        isSumit,
         flags,
         start,
     } = useMultipleQuestion();
@@ -46,6 +48,8 @@ const useTestPage = () => {
     // Hàm kết thúc bài thi và điều hướng đến trang xem lại
     const onEndTest = useCallback(async () => {
         setIsOnTest(false);
+        setIsSumit(true);
+
         sendFinalResultToServer().then((resultId: ResultID) => navigate(`/test/${resultId}/review`));
     }, [userAnswerSheet]);
 
@@ -123,9 +127,10 @@ const useTestPage = () => {
         onEndTest,
         startTest,
         timeLimit,
-        isOnTest,
         isVisible,
+        isOnTest,
         testType,
+        isSumit,
         flags,
         start,
         id,

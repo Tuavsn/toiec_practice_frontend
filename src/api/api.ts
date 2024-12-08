@@ -1,3 +1,4 @@
+import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, PracticePaper, ProfileHookState, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
@@ -109,7 +110,7 @@ export const callGetTopics = async (): Promise<Topic[] | null> => {
 
 export const callGetResult = async (id: ResultID): Promise<ApiResponse<TestResultSummary>> => {
     // nếu dùng pageNumber thì dùng Api
-    const response = await axios.get<ApiResponse<TestResultSummary>>(`${import.meta.env.VITE_API_URL}/results/${id}?current=1&pageSize=99`);
+    const response = await axios.get<ApiResponse<TestResultSummary>>(`${import.meta.env.VITE_API_URL}/results/${id}`);
     return response.data;
 }
 
@@ -195,9 +196,11 @@ export const callGetLectureDoctrine = async (lectureID: LectureID): Promise<stri
     }
 }
 
-export const callDeleteLecture = async (lecture: LectureRow): Promise<boolean> => {
+export const callPutLectureActive = async (lecture: LectureRow): Promise<boolean> => {
     try {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/lectures/${lecture.id}`);
+        await axios.put(`${import.meta.env.VITE_API_URL}/lectures/${lecture.id}/status`, {
+            active: !lecture.active
+        });
         return true;
     } catch (error) {
         return false;
@@ -312,20 +315,20 @@ export const callPostUpdateCategoryRow = async (category: CategoryRow): Promise<
         return false;
     }
 }
-export const callPostDeleteCategoryRow = async (category: CategoryRow): Promise<boolean> => {
+export const callPutCategoryRowActive = async (category: CategoryRow): Promise<boolean> => {
     try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/categories/${category.id}`, {
-            isActive: false
+        await axios.put(`${import.meta.env.VITE_API_URL}/categories/${category.id}/status`, {
+            active: !category.active
         });
         return true;
     } catch (error) {
         return false;
     }
 }
-export const callPostDeleteTopicRow = async (topic: Topic): Promise<boolean> => {
+export const callPutTopicRowActive = async (topic: Topic): Promise<boolean> => {
     try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/topics/${topic.id}`, {
-            isActive: false
+        await axios.post(`${import.meta.env.VITE_API_URL}/topics/${topic.id}/status`, {
+            active: !topic.active
         });
         return true;
     } catch (error) {
@@ -335,7 +338,7 @@ export const callPostDeleteTopicRow = async (topic: Topic): Promise<boolean> => 
 export const callPostDeleteTestRow = async (test: TestRow): Promise<boolean> => {
     try {
         await axios.post(`${import.meta.env.VITE_API_URL}/tests/${test.id}`, {
-            isActive: false
+            active: false
         });
         return true;
     } catch (error) {
@@ -424,6 +427,9 @@ export const callGetTestDetailPageData = async (testID: TestID): Promise<TestDet
 export const callGetProfile = async (): Promise<ProfileHookState | null> => {
     try {
         const response = await axios.get<ApiResponse<ProfileHookState>>(`${import.meta.env.VITE_API_URL}/auth/account`);
+        if (!response.data.data.overallStat) {
+            response.data.data.overallStat = emptyOverallStat;
+        }
         return response.data.data;
     } catch (error) {
         return null;

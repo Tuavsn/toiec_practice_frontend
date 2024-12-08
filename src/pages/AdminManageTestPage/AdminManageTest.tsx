@@ -20,12 +20,12 @@ function AdminManageTestPage() {
 
             {/* Thành phần DialogTestActionButton quản lý hành động liên quan đến đề thi hiện tại */}
             <DialogTestActionButton
-                currentSelectedRow={state.currentSelectedRow}   // Bài giảng hiện được chọn
+                currentSelectedRow={state.currentSelectedRow}   // đề thi hiện được chọn
                 job={state.job}                                         // Công việc hiện tại (job)
                 dispatch={dispatch}                                     // Hàm dispatch để cập nhật trạng thái
             />
 
-            {/* Thành phần AdminTestTable hiển thị danh sách các bài giảng */}
+            {/* Thành phần AdminTestTable hiển thị danh sách các đề thi */}
             <AdminTestTable
                 dispatch={dispatch}                                     // Hàm dispatch để quản lý các hành động trong bảng
                 rows={state.rows}                               // Dữ liệu các đề thi để hiển thị

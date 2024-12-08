@@ -3,8 +3,8 @@ import { Toolbar } from "primereact/toolbar";
 import { memo, useCallback } from "react";
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/Index";
 import useExercisePage from "../hooks/ExerciseHook";
-import { TestAnswerSheet } from "../utils/types/type";
-import { Navigate } from "react-router-dom";
+import { DoExercisePageProps, TestAnswerSheet } from "../utils/types/type";
+import { Link, Navigate } from "react-router-dom";
 import { IsNotLogIn } from "../utils/AuthCheck";
 
 function DoExercisePage() {
@@ -23,9 +23,10 @@ function DoExercisePage() {
         timeDoTest,
         startTest,
         onEndTest,
+        isSumit,
         start,
     } = useExercisePage();
-    
+
     if (IsNotLogIn()) return <Navigate to={"/home?login=true"} />
 
     // Tạo danh sách nút điều hướng dựa trên pageMapper
@@ -59,57 +60,15 @@ function DoExercisePage() {
     // Render giao diện chính của trang thi
     return (
         <main id="do-test-page" className="w-full">
-            {totalQuestions > 0 ? <section className="flex justify-content-center w-full h-full">
-                {/* Nút bắt đầu bài thi */}
-                {!start && (
-                    <div className=" h-screen align-content-center">
-                        <Button className="p-4" label="Bắt đầu" onClick={() => {
-                            // bắt đầu tính giờ đếm số giây đã trôi qua
-                            timeDoTest.current = Date.now();
-                            // mở giao diện làm bài
-                            startTest();
-                        }} />
-                    </div>
-                )}
+           <RenderMainPage changePage={changePage}  onEndTest={onEndTest}
+                isUserAnswerSheetVisible={isUserAnswerSheetVisible} 
+                setIsUserAnswerSheetVisible={setIsUserAnswerSheetVisible} startTest={startTest}
+                setTestAnswerSheet={setTestAnswerSheet} timeDoTest={timeDoTest} start={start} isSumit={isSumit}
+                totalQuestions={totalQuestions}  
+                createButtonListElement={createButtonListElement} userAnswerSheet={userAnswerSheet}
+                currentPageIndex={currentPageIndex}  questionList={questionList} 
+            />
 
-                {/* Giao diện làm bài thi */}
-                {start && (
-                    <section className="flex flex-column justify-content-center">
-                        {/* Phiếu trả lời của người dùng */}
-                        <UserAnswerSheet
-                            visible={isUserAnswerSheetVisible}
-                            setVisible={setIsUserAnswerSheetVisible}
-                            ButtonListElement={createButtonListElement()}
-                        />
-
-                        {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */}
-                        <Toolbar
-                            className="py-1"
-                            start={currentStatusBodyTemplate(userAnswerSheet, totalQuestions, setIsUserAnswerSheetVisible)}
-                            end={
-                                <Button
-                                    severity="success"
-                                    label="Nộp bài"
-                                    onClick={() => onEndTest()}
-                                />
-                            }
-                        />
-
-                        {/* Khu vực chính để hiển thị câu hỏi và các nút điều hướng */}
-                        <div id="test-area-container" className="max-w-screen p-0">
-                            <TestArea
-                                changePage={changePage}
-                                testType={"practice"}
-                                question={questionList[currentPageIndex]}
-                                setTestAnswerSheet={setTestAnswerSheet}
-                                userAnswerSheet={userAnswerSheet}
-                            />
-                        </div>
-                    </section>
-                )}
-            </section>
-                : <LoadingSpinner text="Bài kiểm tra đang được khởi tạo...." />
-            }
         </main>
     )
 
@@ -141,3 +100,88 @@ function currentStatusBodyTemplate(userAnswers: TestAnswerSheet, totalQuestions:
 
 //----------------------------------------------- sub componet
 
+const RenderMainPage: React.FC<DoExercisePageProps> = (props) => {
+    if (props.isSumit) {
+        return (
+            <section>
+                <div className="fixed" style={{ left: "50%", top: "50vh", transform: "translate(-50%, -50%)" }}>
+                    <LoadingSpinner text="Xin vui lòng chờ...." />
+                </div>
+            </section>
+
+        )
+    }
+    if (props.totalQuestions <= 0) {
+        return (
+            <section>
+                <Link to={`/exercise`}>
+                    <Button className="fixed" label="Quay về" />
+                </Link>
+                <div className="fixed" style={{ left: "50%", top: "50vh", transform: "translate(-50%, -50%)" }}>
+                    <LoadingSpinner text="Xin vui lòng chờ...." />
+                </div>
+            </section>
+
+        )
+    }
+    if (!props.start) {
+        return (
+            <section>
+                {/* Nút bắt đầu bài thi */}
+                <Link to={`/exercise`}>
+                    <Button className="fixed" label="Quay về" />
+                </Link>
+                <div className="fixed" style={{ left: "50%", top: "50vh", transform: "translate(-50%, -50%)" }}>
+                    <div className="text-center">
+
+                        <Button label="Bắt đầu" onClick={() => {
+                            // bắt đầu tính giờ đếm số giây đã trôi qua
+                            props.timeDoTest.current = Date.now();
+                            // mở giao diện làm bài
+                            props.startTest();
+                        }} />
+                    </div>
+                </div>
+            </section>
+        )
+    }
+
+    return (
+        <section>
+            {/* Giao diện làm bài thi */}
+
+            <section className="flex flex-column justify-content-center">
+                {/* Phiếu trả lời của người dùng */}
+                <UserAnswerSheet
+                    visible={props.isUserAnswerSheetVisible}
+                    setVisible={props.setIsUserAnswerSheetVisible}
+                    ButtonListElement={props.createButtonListElement()}
+                />
+
+                {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */}
+                <Toolbar
+                    className="py-1"
+                    start={currentStatusBodyTemplate(props.userAnswerSheet, props.totalQuestions, props.setIsUserAnswerSheetVisible)}
+                    end={
+                        <Button
+                            severity="success"
+                            label="Nộp bài"
+                            onClick={() => props.onEndTest()}
+                        />
+                    }
+                />
+
+                {/* Khu vực chính để hiển thị câu hỏi và các nút điều hướng */}
+                <div id="test-area-container" className="max-w-screen p-0">
+                    <TestArea
+                        changePage={props.changePage}
+                        testType={"practice"}
+                        question={props.questionList[props.currentPageIndex]}
+                        setTestAnswerSheet={props.setTestAnswerSheet}
+                        userAnswerSheet={props.userAnswerSheet}
+                    />
+                </div>
+            </section>
+        </section>
+    )
+}

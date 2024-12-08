@@ -5,7 +5,7 @@ import { Fieldset } from "primereact/fieldset";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import React, { useRef, useState } from "react";
-import { callPostDeleteTopicRow, callPostTopic, callPostUpdateTopic } from "../../api/api";
+import { callPutTopicRowActive, callPostTopic, callPostUpdateTopic } from "../../api/api";
 import { useToast } from "../../context/ToastProvider";
 import { emptyTopicRowValue } from "../../utils/types/emptyValue";
 import { DialogDeleteRowBodyProps, DialogRowProps, DialogUpdateTopicBodyProps, handeDeleteRowParams, handeSaveRowParams, RenderRowDialogParams, Topic } from "../../utils/types/type";
@@ -170,7 +170,7 @@ const RenderDeleteTopicBody: React.FC<DialogDeleteRowBodyProps<Topic>> = React.m
 
                 <h1 className='text-center'>Bạn có chắc muốn {text} <q>{props.currentSelectedRow.name}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ rowID: props.currentSelectedRow.id, dispatch: props.dispatch, toast })} />
+                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ row: props.currentSelectedRow, dispatch: props.dispatch, toast })} />
                 </div>
             </React.Fragment>
         )
@@ -185,7 +185,7 @@ const RenderDeleteTopicBody: React.FC<DialogDeleteRowBodyProps<Topic>> = React.m
 
 // khi nhấn nút Xóa
 async function handleDelete(params: handeDeleteRowParams<Topic>) {
-    const success = await callPostDeleteTopicRow({ id: params.rowID } as Topic);
+    const success = await callPutTopicRowActive(params.row);
 
 
     if (success) {

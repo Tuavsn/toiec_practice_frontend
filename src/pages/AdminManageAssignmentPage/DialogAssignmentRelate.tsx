@@ -82,7 +82,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
             const upsertQuestion = async () => {
                 let success = false;
                 if (formData.id) {
-                    success = await callPutQuestionUpdate(formData);
+                    success = await callPutQuestionUpdate(formData,[]);
                 } else {
                     success = await callPostAssignmentQuestion(formData);
                 }

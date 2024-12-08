@@ -126,7 +126,7 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateTestBodyProps> = React.mem
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end">
-                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => { handleSave({ row: formData, dispatch: props.dispatch, toast,setIsDisabled }) }} />
+                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => { handleSave({ row: formData, dispatch: props.dispatch, toast, setIsDisabled }) }} />
                 </div>
 
             </Fieldset>
@@ -170,7 +170,7 @@ const RenderDeleteTestBody: React.FC<DialogDeleteRowBodyProps<TestRow>> = React.
 
                 <h1 className='text-center'>Bạn có chắc muốn xóa <q>{props.currentSelectedRow.name}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button label="Xóa" icon="pi pi-save" onClick={() => handleDelete({ rowID: props.currentSelectedRow.id, dispatch: props.dispatch, toast })} />
+                    <Button label="Xóa" icon="pi pi-save" onClick={() => handleDelete({ row: props.currentSelectedRow, dispatch: props.dispatch, toast })} />
                 </div>
             </React.Fragment>
         )
@@ -185,7 +185,7 @@ const RenderDeleteTestBody: React.FC<DialogDeleteRowBodyProps<TestRow>> = React.
 
 // khi nhấn nút Xóa
 async function handleDelete(params: handeDeleteRowParams<TestRow>) {
-    const success = await callPostDeleteTestRow({ id: params.rowID } as TestRow);
+    const success = await callPostDeleteTestRow(params.row);
 
 
     if (success) {

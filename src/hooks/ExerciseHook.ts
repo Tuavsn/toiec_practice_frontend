@@ -31,13 +31,16 @@ const useExercisePage = () => {
         pageMapper,
         changePage,
         timeDoTest,
+        setIsSumit,
         startTest,
         isOnTest,
         navigate,
+        isSumit,
         start,
     } = useMultipleQuestion();
     // Hàm kết thúc bài thi và điều hướng đến trang xem lại
     const onEndTest = async () => {
+        setIsSumit(true);
         setIsOnTest(false);
         sendFinalResultToServer().then((resultId: ResultID) => navigate(`/test/${resultId}/review`));
     };
@@ -50,8 +53,8 @@ const useExercisePage = () => {
             totalSeconds: (Date.now() - timeDoTest.current) / 1000, // khép lại thời gian làm bài ( đơn vị giây)
             testId: "",
             parts: exerciseType.split("=")[1],
-            type: "practice",
-            userAnswer: prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current)
+            type: "exercise",
+            userAnswer: prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current).filter(ans => ans.userAnswer !== "")
         }
         console.dir(resultBodyObject);
         return (await callPostTestRecord(resultBodyObject)).data.resultId;
@@ -114,6 +117,7 @@ const useExercisePage = () => {
         onEndTest,
         startTest,
         isOnTest,
+        isSumit,
         start,
     };
 };

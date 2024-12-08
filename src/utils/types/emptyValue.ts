@@ -1,5 +1,5 @@
 import { TreeNode } from "primereact/treenode";
-import { CategoryRow, LectureHookState, LectureRow, RowHookState, TestDetailPageData, TestResultSummary, TestReviewHookState, TestRow, Topic, UserRow } from "./type";
+import { CategoryRow, LectureHookState, LectureRow, OverallStat, ProfileHookState, Role, RowHookState, TestDetailPageData, TestResultSummary, TestReviewHookState, TestRow, Topic, UserRow } from "./type";
 const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
@@ -163,3 +163,36 @@ export const emptyTestDetailPageData: TestDetailPageData = {
     resultsOverview: [],
     topicsOverview: []
 } as const
+
+
+export const emptyOverallStat: OverallStat = {
+    averageListeningScore: 0,
+    listeningScoreCount: 0,
+    averageReadingScore: 0,
+    readingScoreCount: 0,
+    averageTotalScore: 0,
+    totalScoreCount: 0,
+    averageTime: 0,
+    timeCount: 0,
+    highestScore: 0
+} as const;
+
+export const emptyRole: Role = {
+    createdAt: "",
+    updatedAt: "",
+    id: "",
+    name: "",
+    description: "",
+    permissions: [],
+    active: false
+} as const
+export const initProfile: ProfileHookState = {
+    id: "",
+    avatar: "",
+    role: emptyRole,
+    target: 0,
+    overallStat: emptyOverallStat,
+    topicStats: [],
+    skillStats: [],
+    results: []
+} as const;

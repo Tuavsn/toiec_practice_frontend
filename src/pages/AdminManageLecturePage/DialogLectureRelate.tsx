@@ -4,7 +4,7 @@ import { Fieldset } from "primereact/fieldset";
 import { InputText } from "primereact/inputtext";
 import { MultiSelect } from "primereact/multiselect";
 import React, { useRef, useState } from "react";
-import { callDeleteLecture, callPostLectureDetail, callPutLectureDetailUpdate } from "../../api/api";
+import { callPutLectureActive, callPostLectureDetail, callPutLectureDetailUpdate } from "../../api/api";
 import EditCourseRichTextBox from "../../components/Common/richTextBox/richTextBox";
 import { useToast } from "../../context/ToastProvider";
 import useTopicRef from "../../hooks/TopicRefHook";
@@ -194,7 +194,7 @@ const RenderDeleteLectureBody: React.FC<DialogDeleteLectureBodyProps> = React.me
 
 // khi nhấn nút Xóa
 async function handleDelete(params: handeDeleteLectureParams) {
-    const success = await callDeleteLecture(params.lecture);
+    const success = await callPutLectureActive(params.lecture);
 
 
     if (success) {

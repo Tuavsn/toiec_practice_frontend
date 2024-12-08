@@ -6,7 +6,7 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { InputNumber } from "primereact/inputnumber";
 import React, { memo, useEffect, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { callGetTestDetailPageData } from "../api/api";
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
 import { useCheckBox } from "../hooks/TestDetailPaperHook";
@@ -23,7 +23,7 @@ function TestDetailPage() {
     const { id = "" } = useParams<{ id: string }>(); // Access course ID from URL params
     const [testInfo, setTestInfo] = useState<TestDetailPageData>(emptyTestDetailPageData)
 
-    if(IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+
 
     useEffect(() => {
         callGetTestDetailPageData(id).then(newTestInfo => {
@@ -107,6 +107,7 @@ const PartChooser: React.FC = memo(
         const { parts, onPartSelectChange } = useCheckBox();
         const [timeLimit, setTimeLimit] = useState<number>(120);
         const navigate = useNavigate();
+        const isNotLogIn = IsNotLogIn();
         const checkboxes = Array.from({ length: 8 }, (_, index) => {
             const label = index === 0 ? "Thi thử" : "Phần " + index;
             return (
@@ -122,6 +123,7 @@ const PartChooser: React.FC = memo(
                 </div>
             );
         });
+
         return (
             <React.Fragment>
                 <section>
@@ -131,12 +133,19 @@ const PartChooser: React.FC = memo(
                     </span>
                 </section>
                 <div className="flex p-5 justify-content-center gap-2">
-                    <InputNumber disabled={parts[0]} inputStyle={{width:"6rem"}}  buttonLayout="horizontal" showButtons  value={parts[0] ?120 :timeLimit} min={10} max={150} onValueChange={(e) => setTimeLimit(e.value ?? 120)} suffix=" phút" />
-                    <Button onClick={() => {
+                    <InputNumber disabled={parts[0]} inputStyle={{ width: "6rem" }} buttonLayout="horizontal" showButtons value={parts[0] ? 120 : timeLimit} min={10} max={150} onValueChange={(e) => setTimeLimit(e.value ?? 120)} suffix=" phút" />
+                    <Button disabled={isNotLogIn} onClick={() => {
 
                         navigate(`dotest/${timeLimit}/${DecodeCheckBoxesToUrl(parts)}`)
                     }} label="Làm bài"></Button>
                 </div>
+                {isNotLogIn &&
+                    <div className="flex text-red-500 justify-content-center align-items-center column-gap-3">
+                        <i className="pi pi-exclamation-circle" style={{ fontSize: '2rem' }}></i>
+                        <p className="inline"> Bạn cần phải đăng nhập để có thể làm bài </p>
+                    </div>
+                }
+
             </React.Fragment>
         )
     }

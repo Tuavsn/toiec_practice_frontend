@@ -21,6 +21,8 @@ export function useMultipleQuestion() {
 
     // State để kiểm soát trạng thái bắt đầu bài thi
     const [start, setStart] = useState<boolean>(false);
+    // State để kiểm soát trạng thái nộp bài thi
+    const [isSumit, setIsSumit] = useState<boolean>(false);
     // Ref dùng để ghi lại thời gian
     const lastTimeStampRef = useRef<number>(0);
     // thời gian người dùng đã tốn 
@@ -112,11 +114,13 @@ export function useMultipleQuestion() {
         pageMapper,
         changePage,
         timeDoTest,
+        setIsSumit,
         startTest,
         isVisible,
         isOnTest,
         navigate,
         setFlags,
+        isSumit,
         flags,
         start,
     }

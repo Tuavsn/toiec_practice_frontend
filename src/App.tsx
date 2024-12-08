@@ -17,7 +17,6 @@ import { ToastProvider } from './context/ToastProvider';
 import SetWebPageTitle from './utils/setTitlePage';
 
 
-
 function App() {
   SetWebPageTitle("UTE TOEIC")
   return (
