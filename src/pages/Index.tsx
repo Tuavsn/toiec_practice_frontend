@@ -14,6 +14,7 @@ const DoTestPage = React.lazy(() => import("./DoTestPage"));
 const ExercisePage = React.lazy(() => import("./ExercisePage"))
 const DoExercisePage = React.lazy(() => import("./DoExercisePage"))
 const TestReviewPage = React.lazy(() => import("../pages/TestReviewPage"))
+const TestRoutes = React.lazy(() => import("../router/TestRoutes"));
 export {
     TestOverallResultPage,
     LectureDetailsPage,
@@ -24,6 +25,7 @@ export {
     NotFoundPage,
     ExercisePage,
     LecturePage,
+    TestRoutes,
     DoTestPage,
     LookUpPage,
     HomePage,

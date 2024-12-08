@@ -1,22 +1,22 @@
 import { Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { LoadingSpinner } from "../components/Common/Index";
 import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
+import { LoadingSpinner } from "../components/Common/Index";
 import {
-    TestOverallResultPage,
-    LectureDetailsPage,
-    UserProfilePage,
-    TestDetailPage,
     DoExercisePage,
-    TestReviewPage,
-    NotFoundPage,
     ExercisePage,
-    LecturePage,
-    DoTestPage,
-    LookUpPage,
     HomePage,
+    LectureDetailsPage,
+    LecturePage,
+    LookUpPage,
+    NotFoundPage,
+    TestOverallResultPage,
     TestPage,
+    TestReviewPage,
+    TestRoutes,
+    UserProfilePage
 } from "../pages/Index";
+
 
 
 
@@ -33,10 +33,12 @@ export default function UserRoutes() {
                 <Route path="/profile" element={<UserProfilePage />} />
                 {/* Test Page */}
                 <Route path="/test" element={<TestPage />} />
-                {/* Test Detail Page */}
-                <Route path="/test/:id" element={<TestDetailPage />} />
-                {/* Do Test  Page */}
-                <Route path="/dotest/:time/:id/:testType/:parts" element={<DoTestPage />} />
+                {/* Test Routes */}
+                <Route path="/test/*" element={<TestRoutes />} />
+                <Route path="/exercise" element={<ExercisePage />} />
+                {/* Do Exercise  Page */}
+                <Route path="/doexercise/:exerciseType" element={<DoExercisePage />} />
+
                 {/* Test Review Page */}
                 <Route path="/test/:id/review" element={<TestOverallResultPage />} />
                 <Route path="/test/:id/review/detail" element={<TestReviewPage />} />
@@ -44,9 +46,6 @@ export default function UserRoutes() {
                 <Route path="/lecture" element={<LecturePage />} />
                 <Route path="/lecture/:lecture_name_id" element={<LectureDetailsPage />} />F
                 {/* Exercise page */}
-                <Route path="/exercise" element={<ExercisePage />} />
-                {/* Do Exercise  Page */}
-                <Route path="/doexercise/:exerciseType" element={<DoExercisePage />} />
                 {/* Lookup  Page */}
                 <Route path="/lookup" element={<LookUpPage />} />
                 {/* NotFound Page */}

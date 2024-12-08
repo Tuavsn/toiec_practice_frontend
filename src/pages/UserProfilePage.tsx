@@ -7,7 +7,7 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Stepper, StepperRefAttributes } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Doughnut, Pie } from "react-chartjs-2";
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
 import useProfile, { GetFakeSuggestionData } from "../hooks/ProfileHook";
@@ -16,6 +16,7 @@ import formatDate from "../utils/formatDateToString";
 import { ActivityLogProps, SkillInsightsProps, SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from "../utils/types/type";
 import { Navigate } from 'react-router-dom';
 import { IsNotLogIn } from '../utils/AuthCheck';
+import { Steps } from 'primereact/steps';
 // Đăng ký các phần tử Chart.js cần thiết
 ChartJS.register(...registerables);
 // Đăng ký plugin DataLabels
@@ -27,16 +28,16 @@ export default function UserProfilePage() {
         state
     } = useProfile();
 
-    if(IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+    if (IsNotLogIn()) return <Navigate to={"/home?login=true"} />
 
     return (
         <main className="pt-8 flex gap-3 flex-column">
             <div key="area-1">
-                {/* <Card key="user-goal" className='shadow-7' title="1. Mục tiêu bản thân"><UserGoal /></Card> */}
+                <Card key="user-goal" className='shadow-7' title="1. Mục tiêu bản thân"><UserGoal target={state.target} /></Card>
                 {/* <Card key="current-course" className='shadow-7' title="2. Đang diễn ra"><CurrentCourse /></Card> */}
             </div>
             <div key="area-2" className="flex gap-3 flex-wrap">
-                <Card key="progress-overview" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="1. Tổng quan tiến độ ">{ProgressOverview(state.overallStat.averageListeningScore, state.overallStat.averageReadingScore)}</Card>
+                <Card key="progress-overview" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="1. Tổng quan tiến độ ">{ProgressOverview(state.overallStat!.averageListeningScore, state.overallStat!.averageReadingScore)}</Card>
                 <Card key="skill-insight" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="2. Thông tin chi tiết kỹ năng"><SkillInsights parts={state.topicStats} /></Card>
             </div>
             <Card key="activity-log" className='shadow-7' title="3. Nhật ký học tập"><ActivityLog userResultRows={state.results} /></Card>
@@ -51,17 +52,67 @@ export default function UserProfilePage() {
 }
 
 //==================================================helper HTML ELEMENT =============================================================================================
-
+const GoalLabel = [0, 10, 255, 405, 605, 785, 905, 990] as const;
 //---[1]-------------------------------------------------------------------------------------------------------------------------------------------
-// const UserGoal: React.FC = React.memo(
-//     () => {
+const UserGoal: React.FC<{ target: number }> = React.memo(
+    (props) => {
+        const [activeIndex, setActiveIndex] = useState(0);
 
-//         return (
-//             <main>
-//             </main>
-//         )
-//     }
-// )
+        const itemRenderer = (itemIndex: number) => {
+            const isActiveItem = activeIndex === itemIndex;
+            const backgroundColor = isActiveItem ? 'var(--primary-color)' : 'var(--surface-b)';
+            const textColor = isActiveItem ? 'var(--surface-b)' : 'var(--text-color-secondary)';
+            return (
+                <span
+                    className="inline-flex align-items-center justify-content-center align-items-center border-circle border-primary border-1 h-3rem w-3rem z-1 cursor-pointer"
+                    style={{ backgroundColor: backgroundColor, color: textColor, marginTop: '-25px' }}
+                    onClick={() => setActiveIndex(itemIndex)}
+                >
+
+                </span>
+            );
+        };
+        const items = [
+            {
+                icon: 'pi pi-user',
+                label: "user",
+                template: (item: any) => itemRenderer(0)
+            },
+            {
+                label: "user",
+                icon: 'pi pi-calendar',
+                template: (item: any) => itemRenderer(1)
+            },
+            {
+                label: "user",
+                icon: 'pi pi-check',
+                template: (item: any) => itemRenderer(2)
+            },
+            {
+                icon: 'pi pi-user',
+                label: "user",
+                template: (item: any) => itemRenderer(3)
+            },
+            {
+                label: "user",
+                icon: 'pi pi-calendar',
+                template: (item: any) => itemRenderer(4)
+            },
+            {
+                label: "user",
+                icon: 'pi pi-check',
+                template: (item: any) => itemRenderer(5)
+            }
+        ];
+        return (
+            <main>
+                <div className="card">
+                    <Steps model={items} activeIndex={activeIndex} readOnly={false} className="m-2 pt-4" />
+                </div>
+            </main>
+        )
+    }
+)
 
 //---[2]-------------------------------------------------------------------------------------------------------------------------------------------
 // const CurrentCourse: React.FC = React.memo(
@@ -151,8 +202,8 @@ const SkillInsights: React.FC<SkillInsightsProps> = React.memo(
             <div className="card">
 
                 <div className="shadow-7">
-                    <DataTable value={parts} paginator rows={5} totalRecords={parts.length}>
-                        <Column key="col-topic" field="topic.name" header="Phân loại câu hỏi" />
+                    <DataTable value={parts} paginator rows={5} totalRecords={parts.length} emptyMessage="Không có dữ liệu">
+                        <Column key="col-topic" field="topic.name" filter filterMatchMode="startsWith" header="Phân loại câu hỏi" />
                         <Column key="col-correctCount" field="totalCorrect" header="Số câu đúng" />
                         <Column key="col-wrongCount" field="totalIncorrect" header="Số câu sai" />
                         <Column key="col-correctPercent" field="correctPercent" header="Độ chính xác" body={correctPercentTemplate} />
@@ -172,7 +223,7 @@ const ActivityLog: React.FC<ActivityLogProps> = React.memo(
         return (
             <main>
                 <h1>Lịch sử hoạt động</h1>
-                <DataTable dataKey="resultId" loading={!userResultRows.length} showGridlines paginator totalRecords={userResultRows.length} rows={5} size="small" value={userResultRows} >
+                <DataTable dataKey="resultId" showGridlines paginator totalRecords={userResultRows.length} rows={5} size="small" value={userResultRows} emptyMessage="Không có lịch sử">
                     {/* // Cột ngày làm việc, hiển thị ngày từ trường createdAt và cho phép lọc, sắp xếp */}
                     <Column key="col-createdAt" alignHeader='center' field="createdAt" header="Ngày làm" body={(rowData: UserDetailResultRow) => formatDate(rowData.createdAt)} sortable filter />
 
@@ -341,7 +392,7 @@ function getCurrentTitle(score: number): string {
     } else if (score >= 10 && score <= 250) {
         return "Mới bắt đầu";
     } else {
-        return "Điểm ngoài phạm vi";
+        return "Không có cơ sở";
     }
 
 }

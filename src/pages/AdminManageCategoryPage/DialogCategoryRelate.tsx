@@ -1,7 +1,7 @@
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import React, { useRef, useState } from "react";
-import { callCreateCateogry, callPostDeleteCategoryRow, callPostUpdateCategoryRow } from "../../api/api";
+import { callCreateCategory, callPutCategoryRowActive, callPostUpdateCategoryRow } from "../../api/api";
 import { useToast } from "../../context/ToastProvider";
 import { DialogDeleteRowBodyProps, DialogRowProps, handeDeleteRowParams, RenderRowDialogParams, CategoryRow, DialogUpdateCategoryBodyProps, handeSaveRowParams } from "../../utils/types/type";
 import { Fieldset } from "primereact/fieldset";
@@ -129,7 +129,7 @@ async function handleSave(params: handeSaveRowParams<CategoryRow>) {
     if (params.row.id) {
         success = await callPostUpdateCategoryRow(params.row);
     } else {
-        success = await callCreateCateogry(params.row);
+        success = await callCreateCategory(params.row);
     }
     params.setIsDisabled(false);
     if (success) {
@@ -153,7 +153,7 @@ const RenderDeleteCategoryBody: React.FC<DialogDeleteRowBodyProps<CategoryRow>> 
 
                 <h1 className='text-center'>Bạn có chắc muốn {text} <q>{props.currentSelectedRow.format}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ rowID: props.currentSelectedRow.id, dispatch: props.dispatch, toast })} />
+                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ row: props.currentSelectedRow, dispatch: props.dispatch, toast })} />
                 </div>
             </React.Fragment>
         )
@@ -168,7 +168,7 @@ const RenderDeleteCategoryBody: React.FC<DialogDeleteRowBodyProps<CategoryRow>> 
 
 // khi nhấn nút Xóa
 async function handleDelete(params: handeDeleteRowParams<CategoryRow>) {
-    const success = await callPostDeleteCategoryRow({ id: params.rowID } as CategoryRow);
+    const success = await callPutCategoryRowActive(params.row);
 
 
     if (success) {

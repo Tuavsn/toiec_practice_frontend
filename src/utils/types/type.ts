@@ -20,6 +20,12 @@ export interface Lecture extends DataTableValue {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface Comment {
+  id: number;
+  text: string;
+  email: string;
+  userId: string;
+}
 
 export interface Topic {
   createdAt: Date,
@@ -468,6 +474,10 @@ export type DialogUpdateCategoryBodyProps = {
   currentSelectedRow: CategoryRow,
   dispatch: Dispatch<RowHookAction<CategoryRow>>,
 }
+export type DialogUpdateTopicBodyProps = {
+  currentSelectedRow: Topic,
+  dispatch: Dispatch<RowHookAction<Topic>>,
+}
 export type DialogUpdateTestBodyProps = {
   currentSelectedRow: TestRow,
   dispatch: Dispatch<RowHookAction<TestRow>>,
@@ -518,7 +528,7 @@ export type handeDeleteLectureParams = {
 }
 
 export type handeDeleteRowParams<RowModel> = {
-  rowID: string,
+  row: RowModel,
   toast: React.MutableRefObject<Toast | null>,
   dispatch: React.Dispatch<RowHookAction<RowModel>>,
 }
@@ -567,6 +577,7 @@ export interface DoTestPageProps {
   timeDoTest: React.MutableRefObject<number>,
   timeLimit: React.MutableRefObject<number>,
   isVisible: boolean,
+  isSumit: boolean,
   id: TestID,
   onEndTest: () => Promise<void>,
   startTest: () => void,
@@ -576,6 +587,23 @@ export interface DoTestPageProps {
   flags: boolean[],
   currentPageIndex: number,
   testType: TestType,
+  questionList: MultipleChoiceQuestion[],
+}
+
+export interface DoExercisePageProps {
+  setIsUserAnswerSheetVisible: React.Dispatch<React.SetStateAction<boolean>>,
+  isUserAnswerSheetVisible: boolean,
+  setTestAnswerSheet: (qNum: QuestionNumber, qID: QuestionID, answer: string) => void,
+  totalQuestions: number,
+  changePage: (offset: number) => void,
+  timeDoTest: React.MutableRefObject<number>,
+  isSumit: boolean,
+  onEndTest: () => Promise<void>,
+  startTest: () => void,
+  start: boolean,
+  userAnswerSheet: TestAnswerSheet,
+  createButtonListElement: () => JSX.Element[],
+  currentPageIndex: number,
   questionList: MultipleChoiceQuestion[],
 }
 
@@ -692,7 +720,7 @@ export type TopicID = string;
 export type ResponseUserResultList = ApiResponse<TableData<UserDetailResultRow>>;
 export type UserAnswerTimeCounter = Map<QuestionNumber, milisecond>
 export type ResourceType = 'paragraph' | 'image' | 'audio'
-export type TestType = 'fulltest' | 'practice' | 'survival';
+export type TestType = 'fulltest' | 'practice' | 'exercise' | 'thi thử' | 'làm 1 phần' | 'luyện tập';
 export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
 export type ExerciseType = "partNum=1" | "partNum=2" | "partNum=3" | "partNum=4" | "partNum=5" | "partNum=6" | "partNum=7" | "TOPIC=grammar" | "TOPIC=vocabulary";
 export type DialogLectureJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE' | 'PAGE_DESIGNER' | 'QUESTION_EDITOR';
@@ -720,7 +748,7 @@ export type ProfileHookState = {
   avatar: string,
   role: Role,
   target: number,
-  overallStat: OverallStat,
+  overallStat: OverallStat | null,
   topicStats: TopicStat[],
   skillStats: SkillStat[],
   results: UserDetailResultRow[],

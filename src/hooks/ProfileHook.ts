@@ -1,41 +1,12 @@
 import { useEffect, useReducer } from "react";
 import { callGetProfile } from "../api/api";
 import SetWebPageTitle from "../utils/setTitlePage";
-import { OverallStat, ProfileHookState, Role, SuggestionsForUser } from "../utils/types/type";
+import { initProfile } from "../utils/types/emptyValue";
+import { ProfileHookState, SuggestionsForUser } from "../utils/types/type";
 
 
 
-const emptyOverallStat: OverallStat = {
-    averageListeningScore: 0,
-    listeningScoreCount: 0,
-    averageReadingScore: 0,
-    readingScoreCount: 0,
-    averageTotalScore: 0,
-    totalScoreCount: 0,
-    averageTime: 0,
-    timeCount: 0,
-    highestScore: 0
-};
 
-const emptyRole: Role = {
-    createdAt: "",
-    updatedAt: "",
-    id: "",
-    name: "",
-    description: "",
-    permissions: [],
-    active: false
-}
-const initProfile: ProfileHookState = {
-    id: "",
-    avatar: "",
-    role: emptyRole,
-    target: 0,
-    overallStat: emptyOverallStat,
-    topicStats: [],
-    skillStats: [],
-    results: []
-}
 
 type ProfileHookAction =
     | { type: 'FETCH_SUCCESS', payload: ProfileHookState }

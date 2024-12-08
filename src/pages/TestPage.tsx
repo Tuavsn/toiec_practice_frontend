@@ -89,7 +89,7 @@ function RenderTestCards(testCards: TestCard[] | null, navigate: NavigateFunctio
     return (
         testCards.map((testCard, index) => (
 
-            <Card style={{ flex: '1 1 20%', minWidth: "300px", maxWidth: "20%", height: "100%" }} key={testCard.id + index} title={<p className="text-center">{testCard.name}</p>} className="flex align-items-left justify-content-center border-round m-2 shadow-2 min-h-full">
+            <Card style={{ flex: '1 1 20%', minWidth: "300px", maxWidth: "20%", height: "100%" }} key={testCard.id + index} title={<p className="text-center text-overflow-ellipsis white-space-nowrap">{testCard.name}</p>} className="flex align-items-left justify-content-center border-round m-2 shadow-2 min-h-full">
                 <div>
                     <p>
                         <strong>Chuyên mục:</strong> {testCard.format}

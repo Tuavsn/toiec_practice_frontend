@@ -1,3 +1,4 @@
+import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, PracticePaper, ProfileHookState, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
@@ -6,7 +7,7 @@ export const loginUrl = `${host}/oauth2/authorize/google`;
 
 
 
-export const callCreateCateogry = async (category: CategoryRow): Promise<boolean> => {
+export const callCreateCategory = async (category: CategoryRow): Promise<boolean> => {
     try {
         await axios.post<ApiResponse<CategoryRow>>(
             `${import.meta.env.VITE_API_URL}/categories`,
@@ -98,14 +99,18 @@ export const callPostAssignmentQuestion = async (formData: any): Promise<boolean
     }
 }
 
-export const callGetTopics = async (): Promise<ApiResponse<Topic[]>> => {
-    const response = await axios.get<ApiResponse<Topic[]>>(`${import.meta.env.VITE_API_URL}/topics`)
-    return response.data;
+export const callGetTopics = async (): Promise<Topic[] | null> => {
+    try {
+        const response = await axios.get<ApiResponse<Topic[]>>(`${import.meta.env.VITE_API_URL}/topics`);
+        return response.data.data;
+    } catch (e) {
+        return null;
+    }
 }
 
 export const callGetResult = async (id: ResultID): Promise<ApiResponse<TestResultSummary>> => {
     // nếu dùng pageNumber thì dùng Api
-    const response = await axios.get<ApiResponse<TestResultSummary>>(`${import.meta.env.VITE_API_URL}/results/${id}?current=1&pageSize=99`);
+    const response = await axios.get<ApiResponse<TestResultSummary>>(`${import.meta.env.VITE_API_URL}/results/${id}`);
     return response.data;
 }
 
@@ -191,9 +196,11 @@ export const callGetLectureDoctrine = async (lectureID: LectureID): Promise<stri
     }
 }
 
-export const callDeleteLecture = async (lecture: LectureRow): Promise<boolean> => {
+export const callPutLectureActive = async (lecture: LectureRow): Promise<boolean> => {
     try {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/lectures/${lecture.id}`);
+        await axios.put(`${import.meta.env.VITE_API_URL}/lectures/${lecture.id}/status`, {
+            active: !lecture.active
+        });
         return true;
     } catch (error) {
         return false;
@@ -288,6 +295,15 @@ export const callGetTestRow = async (categoryID: CategoryID, currentPageIndex: n
     }
 }
 
+export const callGetTopicRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<Topic> | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<Topic>>>(`${import.meta.env.VITE_API_URL}/topics?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        return response.data.data;
+    } catch (e) {
+        return null;
+    }
+}
+
 export const callPostUpdateCategoryRow = async (category: CategoryRow): Promise<boolean> => {
     try {
         await axios.post(`${import.meta.env.VITE_API_URL}/categories/${category.id}`, {
@@ -299,10 +315,20 @@ export const callPostUpdateCategoryRow = async (category: CategoryRow): Promise<
         return false;
     }
 }
-export const callPostDeleteCategoryRow = async (category: CategoryRow): Promise<boolean> => {
+export const callPutCategoryRowActive = async (category: CategoryRow): Promise<boolean> => {
     try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/categories/${category.id}`, {
-            isActive: false
+        await axios.put(`${import.meta.env.VITE_API_URL}/categories/${category.id}/status`, {
+            active: !category.active
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+export const callPutTopicRowActive = async (topic: Topic): Promise<boolean> => {
+    try {
+        await axios.post(`${import.meta.env.VITE_API_URL}/topics/${topic.id}/status`, {
+            active: !topic.active
         });
         return true;
     } catch (error) {
@@ -312,7 +338,7 @@ export const callPostDeleteCategoryRow = async (category: CategoryRow): Promise<
 export const callPostDeleteTestRow = async (test: TestRow): Promise<boolean> => {
     try {
         await axios.post(`${import.meta.env.VITE_API_URL}/tests/${test.id}`, {
-            isActive: false
+            active: false
         });
         return true;
     } catch (error) {
@@ -363,6 +389,32 @@ export const callPostUpdateTest = async (testRow: TestRow): Promise<boolean> => 
     }
 }
 
+export const callPostUpdateTopic = async (topicRow: Topic): Promise<boolean> => {
+    try {
+        axios.post<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
+            name: topicRow.name,
+            solution: topicRow.solution,
+            overallSkill: topicRow.solution,
+        });
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
+export const callPostTopic = async (topicRow: Topic): Promise<boolean> => {
+    try {
+        axios.post<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
+            name: topicRow.name,
+            solution: topicRow.solution,
+            overallSkill: topicRow.solution,
+        });
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
 export const callGetTestDetailPageData = async (testID: TestID): Promise<TestDetailPageData | null> => {
     try {
         const response = await axios.get<ApiResponse<TestDetailPageData>>(`${import.meta.env.VITE_API_URL}/tests/${testID}/info`);
@@ -375,6 +427,9 @@ export const callGetTestDetailPageData = async (testID: TestID): Promise<TestDet
 export const callGetProfile = async (): Promise<ProfileHookState | null> => {
     try {
         const response = await axios.get<ApiResponse<ProfileHookState>>(`${import.meta.env.VITE_API_URL}/auth/account`);
+        if (!response.data.data.overallStat) {
+            response.data.data.overallStat = emptyOverallStat;
+        }
         return response.data.data;
     } catch (error) {
         return null;

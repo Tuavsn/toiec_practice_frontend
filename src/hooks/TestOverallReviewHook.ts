@@ -19,6 +19,10 @@ export function useTestOverallResult() {
         const fetchResult = async () => {
             const response = await callGetResult(id);
             callGetReviewTestPaper(id).then(testReviewAnswerSheet => sessionStorage.setItem("review", JSON.stringify(testReviewAnswerSheet)));
+            if (response.data.type === "exercise") {
+                response.data.testName = "Ngân hàng câu hỏi"
+            }
+            ConvertEnglishToVietnamese(response.data);
             setOverallDetail(response.data);
         }
         fetchResult();
@@ -28,8 +32,8 @@ export function useTestOverallResult() {
         console.dir(userAnswerResult);
 
         setCurrentSelectedQuestion(
-         UserReviewSingleAnswerToHTML(userAnswerResult),
-         
+            UserReviewSingleAnswerToHTML(userAnswerResult),
+
         );
     }
     return {
@@ -41,4 +45,20 @@ export function useTestOverallResult() {
     }
 }
 
+
+function ConvertEnglishToVietnamese(data: TestResultSummary) {
+    switch (data.type) {
+        case "exercise":
+            data.type = "luyện tập";
+            return;
+        case "practice":
+            data.type = "làm 1 phần";
+            return;
+        case "fulltest":
+            data.type = "thi thử";
+            return;
+        default:
+            return;
+    }
+}
 

@@ -32,6 +32,7 @@ function DoTestPage() {
         onEndTest,
         startTest,
         testType,
+        isSumit,
         flags,
         start,
         id,
@@ -88,7 +89,7 @@ function DoTestPage() {
             <RenderMainPage changePage={changePage} isVisible={isVisible} onEndTest={onEndTest}
                 isUserAnswerSheetVisible={isUserAnswerSheetVisible} setVisiable={setVisiable}
                 setIsUserAnswerSheetVisible={setIsUserAnswerSheetVisible} startTest={startTest}
-                setTestAnswerSheet={setTestAnswerSheet} timeDoTest={timeDoTest} start={start}
+                setTestAnswerSheet={setTestAnswerSheet} timeDoTest={timeDoTest} start={start} isSumit={isSumit}
                 totalQuestions={totalQuestions} timeLimit={timeLimit} toggleFlag={toggleFlag} id={id}
                 createButtonListElement={createButtonListElement} userAnswerSheet={userAnswerSheet}
                 currentPageIndex={currentPageIndex} flags={flags} questionList={questionList} testType={testType}
@@ -168,13 +169,23 @@ const SimpleTimeCountDown: React.FC<SimpleTimeCountDownProps> = React.memo(
 
 
 const RenderMainPage: React.FC<DoTestPageProps> = (props) => {
+    if (props.isSumit) {
+        return (
+            <section>
+                <div className="fixed" style={{ left: "50%", top: "50vh", transform: "translate(-50%, -50%)" }}>
+                    <LoadingSpinner text="Xin vui lòng chờ...." />
+                </div>
+            </section>
+
+        )
+    }
     if (props.totalQuestions <= 0) {
         return (
             <section>
                 <Link to={`/test/${props.id}`}>
                     <Button className="fixed" label="Quay về" />
                 </Link>
-                <div className="fixed" style={{left:"50%",top:"50vh",transform: "translate(-50%, -50%)"}}>
+                <div className="fixed" style={{ left: "50%", top: "50vh", transform: "translate(-50%, -50%)" }}>
                     <LoadingSpinner text="Xin vui lòng chờ...." />
                 </div>
             </section>
@@ -188,7 +199,7 @@ const RenderMainPage: React.FC<DoTestPageProps> = (props) => {
                 <Link to={`/test/${props.id}`}>
                     <Button className="fixed" label="Quay về" />
                 </Link>
-                <div className="fixed" style={{left:"50%",top:"50vh",transform: "translate(-50%, -50%)"}}>
+                <div className="fixed" style={{ left: "50%", top: "50vh", transform: "translate(-50%, -50%)" }}>
                     <div className="text-center">
 
                         <Button label="Bắt đầu" onClick={() => {

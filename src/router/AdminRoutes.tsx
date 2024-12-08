@@ -8,6 +8,7 @@ const AdminManageLecturePage = lazy(() => import("../pages/AdminManageLecturePag
 const AdminManageCategoryPage = lazy(() => import("../pages/AdminManageCategoryPage/AdminManageCategory"))
 const AdminManageAccountPage = lazy(() => import("../pages/AdminManageUserPage/AdminManageUser"))
 const AdminManageTestPage = lazy(() => import("../pages/AdminManageTestPage/AdminManageTest"))
+const AdminManageTopic = lazy(() => import("../pages/AdminManageTopic/AdminManageTopic"));
 const AdminLayout = lazy(() => import('../components/Layout/AdminLayout'));
 const TempAdminPage = lazy(() => import("../pages/TempAdminPage"))
 
@@ -36,6 +37,7 @@ export default function AdminRoutes() {
 
           <Route path="account" element={<AdminManageAccountPage />} />
           <Route path="lecture" element={<AdminManageLecturePage />} />
+          <Route path="topic" element={<AdminManageTopic />} />
           <Route path="lecture/:lecture_id" element={<AdminManageAssignmentPage />} />
           <Route path="user-analyst" element={<TempAdminPage text="thống kê người dùng" />} />
           <Route path="notify" element={<TempAdminPage text="notify" />} />
