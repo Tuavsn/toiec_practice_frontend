@@ -134,6 +134,7 @@ export const callGetTestCard = async (format: string, year: number, pageIndex: n
 }
 
 export const callGetPracticePaper = async (lectureId: LectureID): Promise<ApiResponse<PracticePaper>> => {
+
     const response = await fetch(`https://dummyjson.com/c/e6c2-181c-4ceb-86b1?lecture=${lectureId}`);
     const apiResponse: ApiResponse<PracticePaper> = await response.json();
     return apiResponse

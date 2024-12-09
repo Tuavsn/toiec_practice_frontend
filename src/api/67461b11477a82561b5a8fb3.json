@@ -1,0 +1,90 @@
+{
+  "statusCode": 200,
+  "message": "Practice test loaded successfully.",
+  "data": {
+    "totalQuestions": 15,
+    "practiceQuestions": [
+      {
+        "id": "000000000000000000000001",
+        "type": "single",
+        "content": "What do plants do during photosynthesis?",
+        "resources": [
+          {
+            "type": "paragraph",
+            "content": "Photosynthesis is a process in plants that converts sunlight into energy."
+          }
+        ],
+        "transcript": "",
+        "explanation": "Tests knowledge on Present Simple Tense related to biology.",
+        "answers": [
+          "Plants produce food.",
+          "Plants release oxygen.",
+          "Plants absorb water.",
+          "Plants produce carbon dioxide."
+        ],
+        "correctAnswer": "Plants produce food."
+      },
+      {
+        "id": "000000000000000000000002",
+        "type": "single",
+        "content": "What does a bird usually look like in the forest?",
+        "resources": [],
+        "transcript": "",
+        "explanation": "Revised to focus on Present Simple Tense.",
+        "answers": [
+          "It has bright feathers.",
+          "It hides with camouflage.",
+          "It has a small beak.",
+          "It uses webbed feet."
+        ],
+        "correctAnswer": "It has bright feathers."
+      },
+      {
+        "id": "000000000000000000000003",
+        "type": "single",
+        "content": "What element do plants need for growth?",
+        "resources": [],
+        "transcript": "",
+        "explanation": "Tests understanding of Present Simple Tense in plant biology.",
+        "answers": [
+          "Plants use oxygen.",
+          "Plants use nitrogen.",
+          "Plants use carbon dioxide.",
+          "Plants use chlorophyll."
+        ],
+        "correctAnswer": "Plants use chlorophyll."
+      },
+      {
+        "id": "000000000000000000000004",
+        "type": "single",
+        "content": "What emotion does calm music usually create?",
+        "resources": [],
+        "transcript": "",
+        "explanation": "Tests Present Simple Tense in auditory comprehension.",
+        "answers": [
+          "It creates excitement.",
+          "It creates calm.",
+          "It creates fear.",
+          "It creates confusion."
+        ],
+        "correctAnswer": "It creates calm."
+      },
+      {
+        "id": "000000000000000000000005",
+        "type": "single",
+        "content": "What gas do humans exhale that plants use?",
+        "resources": [],
+        "transcript": "",
+        "explanation": "Focuses on Present Simple Tense in basic science.",
+        "answers": [
+          "Humans exhale oxygen.",
+          "Humans exhale carbon dioxide.",
+          "Humans exhale nitrogen.",
+          "Humans exhale helium."
+        ],
+        "correctAnswer": "Humans exhale carbon dioxide."
+      }
+    ]
+  },
+  "error": null
+}
