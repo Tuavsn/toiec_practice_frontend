@@ -1,5 +1,5 @@
 import { TreeNode } from "primereact/treenode";
-import { CategoryRow, LectureHookState, LectureRow, OverallStat, ProfileHookState, Role, RowHookState, TestDetailPageData, TestResultSummary, TestReviewHookState, TestRow, Topic, UserRow } from "./type";
+import { CategoryRow, LectureHookState, LectureRow, OverallStat, Permission, ProfileHookState, Role, RoleHookState, RowHookState, TestDetailPageData, TestResultSummary, TestReviewHookState, TestRow, Topic, UserHookState, UserRow } from "./type";
 const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
@@ -79,7 +79,16 @@ export const emptyTestRow: TestRow = {
     updatedAt: emptyDate
 } as const
 
-
+export const emptyPermissionRowValue: Permission = {
+    createdAt: emptyDate,
+    updatedAt: emptyDate,
+    id: "",
+    name: "",
+    apiPath: "",
+    method: "",
+    module: "",
+    active: false
+}
 export const initialLectureState: LectureHookState = {
     job: "",
     lectures: null,
@@ -94,7 +103,15 @@ export const initialTopicState: RowHookState<Topic> = {
     currentPageIndex: 0,
     job: "",
     currentSelectedRow: emptyTopicRowValue
-}
+} as const
+export const initialPermissionState: RowHookState<Permission> = {
+    rows: null,
+    isRefresh: false,
+    currentPageIndex: 0,
+    job: "",
+    currentSelectedRow: emptyPermissionRowValue
+} as const
+
 
 export const initialTestReviewState: TestReviewHookState = {
     isUserAnswerSheetVisible: false,
@@ -103,12 +120,13 @@ export const initialTestReviewState: TestReviewHookState = {
     pageMapper: []
 } as const
 
-export const initialUserState: RowHookState<UserRow> = {
+export const initialUserState: UserHookState = {
     rows: null,
     isRefresh: false,
     currentPageIndex: 0,
     job: "",
-    currentSelectedRow: emptyUserRow
+    currentSelectedRow: emptyUserRow,
+    roleList: [],
 } as const
 
 export const initialCategoryState: RowHookState<CategoryRow> = {
@@ -196,3 +214,12 @@ export const initProfile: ProfileHookState = {
     skillStats: [],
     results: []
 } as const;
+
+export const initialRoleState: RoleHookState = {
+    rows: null,
+    isRefresh: false,
+    currentPageIndex: 0,
+    job: "",
+    currentSelectedRow: emptyRole,
+    permissionList: [],
+}

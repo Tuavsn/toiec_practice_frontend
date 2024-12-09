@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { callGetExercisePaper, callPostTestRecord } from "../api/api";
 import { MappingPageWithQuestionNum } from "../utils/convertToHTML";
 import prepareForTest from "../utils/prepareForTest";
-import { ExerciseType, milisecond, QuestionNumber, QuestionRow, ResultID, TestRecord } from "../utils/types/type";
+import { AnswerRecord, ExerciseType, milisecond, QuestionNumber, QuestionRow, ResultID, TestRecord } from "../utils/types/type";
 import { useMultipleQuestion } from "./MultipleQuestionHook";
 import SetWebPageTitle from "../utils/setTitlePage";
 
@@ -42,11 +42,16 @@ const useExercisePage = () => {
     const onEndTest = async () => {
         setIsSumit(true);
         setIsOnTest(false);
-        sendFinalResultToServer().then((resultId: ResultID) => navigate(`/test/${resultId}/review`));
+        const userAnswerList = prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current).filter(ans => ans.userAnswer !== "");
+        if (userAnswerList.length === 0) {
+            navigate('/exercise');
+            return;
+        }
+        sendFinalResultToServer(userAnswerList).then((resultId: ResultID) => navigate(`/test/${resultId}/review`));
     };
 
     // hàm gửi dữ liệu bài  làm kết thúc của người dùng về server
-    const sendFinalResultToServer = async () => {
+    const sendFinalResultToServer = async (userAnswerList: AnswerRecord[]) => {
         // tính thời gian làm trang cuối cùng
         updateTimeSpentOnEachQuestionInCurrentPage();
         const resultBodyObject: TestRecord = {
@@ -54,7 +59,7 @@ const useExercisePage = () => {
             testId: "",
             parts: exerciseType.split("=")[1],
             type: "exercise",
-            userAnswer: prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current).filter(ans => ans.userAnswer !== "")
+            userAnswer: userAnswerList
         }
         console.dir(resultBodyObject);
         return (await callPostTestRecord(resultBodyObject)).data.resultId;

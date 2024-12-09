@@ -59,6 +59,12 @@ function changeName(name: string): string {
             return "Đề thi";
         case "questions":
             return "Câu hỏi";
+        case "account":
+            return "Tài khoản";
+        case "role":
+            return "Chức danh";
+        case "permission":
+            return "Quyền";
         default:
             return "Nhà";
     }

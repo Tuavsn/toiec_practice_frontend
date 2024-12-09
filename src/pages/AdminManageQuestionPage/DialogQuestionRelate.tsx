@@ -105,7 +105,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
 
                     {/* Content */}
                     <div className="field flex-1">
-                        <label className='block' htmlFor="content">Content</label>
+                        <label className='block' htmlFor="content">Nội dung câu hỏi</label>
                         <InputTextarea
                             style={{ width: '20vw', resize: 'none' }}
                             id="content"
@@ -118,7 +118,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
 
                     {/* Difficulty */}
                     <div className="field flex-1">
-                        <p className='m-0 mb-2'>Difficulty</p>
+                        <p className='m-0 mb-2'>Độ khó</p>
                         <InputNumber
                             name="difficulty"
                             value={formData.difficulty}
@@ -147,7 +147,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
 
                     {/* Explanation */}
                     <div className="field flex-1">
-                        <label className='block' htmlFor="explanation">Explanation</label>
+                        <label className='block' htmlFor="explanation">Giải thích</label>
                         <InputTextarea
                             className='' style={{ width: '30vw', resize: 'none' }}
                             id="explanation"
@@ -161,7 +161,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
 
                     {/* Answers */}
                     <div className="field flex-1">
-                        <p className='m-0 mb-2'>Answers</p>
+                        <p className='m-0 mb-2'>Đáp án</p>
                         <div >
 
                             {formData.answers.map((answer, index) => (
@@ -192,14 +192,14 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                                 className="p-button-text"
                                 onClick={() => setFormData({ ...formData, answers: [...formData.answers, ''] })}
                             >
-                                Add Answer
+                                Thêm đáp án
                             </Button>
                         </div>
 
 
                         {/* Correct Answer */}
                         <div className="field flex-1">
-                            <p className='block m-0 mb-2 text-right'><b>Correct Answer</b></p>
+                            <p className='block m-0 mb-2 text-right'><b>Đáp án đúng</b></p>
                             <Dropdown
                                 className='bg-green-200'
                                 name="correctAnswer"
@@ -212,14 +212,14 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                     </div>
                     {/* Topics */}
                     <div className="field flex-1">
-                        <p className='m-0 mb-2'>Topics</p>
+                        <p className='m-0 mb-2'>Chủ đề</p>
                         <MultiSelect
                             style={{ width: '100%', maxWidth: "70vw" }}
                             name="listTopicIds"
                             value={formData.listTopicIds}
                             options={topicList.current.map((topic) => ({ label: topic.name, value: topic.id }))}
                             onChange={(e) => setFormData((prev) => ({ ...prev, listTopicIds: e.value as string[] }))}
-                            placeholder="Select Topics"
+                            placeholder="Chọn chủ đề"
                             display='chip'
                         />
                     </div>

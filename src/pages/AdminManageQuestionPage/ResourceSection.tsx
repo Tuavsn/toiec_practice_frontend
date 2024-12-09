@@ -6,9 +6,9 @@ import { ResourceIndex, ResourceSectionProps, ResourceType } from "../../utils/t
 
 
 const types = [
-    { label: "Image", value: "image" },
-    { label: "Audio", value: "audio" },
-    { label: "Paragraph", value: "paragraph" },
+    { label: "Ảnh", value: "image" },
+    { label: "Âm thanh", value: "audio" },
+    { label: "Đoạn văn", value: "paragraph" },
 ];
 const ResourceSection: React.FC<ResourceSectionProps> = ({ resourseIndexes, setResourseIndexes }) => {
     const emptyRow: ResourceIndex = { index: resourseIndexes.length, type: "paragraph", content: "", file: null };
@@ -57,9 +57,9 @@ const ResourceSection: React.FC<ResourceSectionProps> = ({ resourseIndexes, setR
             <table className="w-full">
                 <thead>
                     <tr>
-                        <th className="w-2">Type</th>
-                        <th>Data</th>
-                        <th className="w-3">Action</th>
+                        <th className="w-2">Tệp</th>
+                        <th>Dữ liệu</th>
+                        <th className="w-3">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,7 +115,7 @@ const ResourceRow: React.FC<ResourceRowProps> = ({ rowIndex, rows, handleContent
                     <td>{
                         <textarea
                             className="w-full h-4rem"
-                            placeholder="Input here..."
+                            placeholder="Nhập đoạn văn..."
                             value={rows[rowIndex].content}
                             onChange={(e) => handleContentChange(e, rowIndex)}
                         />
@@ -133,14 +133,15 @@ const ResourceRow: React.FC<ResourceRowProps> = ({ rowIndex, rows, handleContent
                                 ref={fileUpload}
                                 className="w-full"
                                 mode="basic"
-                                chooseLabel={`Choose ${rows[rowIndex].type} file`}
+                                chooseLabel={`Chọn ${rows[rowIndex].type}`}
                                 accept={`${rows[rowIndex].type}/*`}
                                 onSelect={(e) => handleFileChange(e, rowIndex)}
+                                
                             />
                             <Button
                                 className="w-full my-2"
                                 severity="warning"
-                                label="Cancel"
+                                label="Hủy"
                                 onClick={() => { fileUpload.current?.clear(); handleFileCancel(rowIndex) }}
                             />
                         </span>
@@ -149,7 +150,7 @@ const ResourceRow: React.FC<ResourceRowProps> = ({ rowIndex, rows, handleContent
                 < Button
                     className="w-full"
                     severity="danger"
-                    label="Delete row"
+                    label="Xóa"
                     onClick={() => { deleteRow(rowIndex) }}
                 />
             </td >

@@ -1,5 +1,5 @@
 import { emptyOverallStat } from "../utils/types/emptyValue";
-import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, PracticePaper, ProfileHookState, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
+import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, Permission, PermissionID, PracticePaper, ProfileHookState, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -162,6 +162,14 @@ export const callGetLectureRow = async (pageNumber: number): Promise<TableData<L
         return (error as Error)
     }
 }
+export const callGetLectureCard = async (pageNumber: number): Promise<TableData<LectureRow> | Error> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<LectureRow>>>(`${import.meta.env.VITE_API_URL}/lectures?info=true&current=${pageNumber + 1}&pageSize=5&active=true`);
+        return response.data.data;
+    } catch (error) {
+        return (error as Error)
+    }
+}
 export const callPutLectureDetailUpdate = async (lectureID: LectureID, name: string, topicIds: TopicID[]): Promise<boolean> => {
     try {
         await axios.put(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}`, {
@@ -200,6 +208,26 @@ export const callPutLectureActive = async (lecture: LectureRow): Promise<boolean
     try {
         await axios.put(`${import.meta.env.VITE_API_URL}/lectures/${lecture.id}/status`, {
             active: !lecture.active
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+export const callPutRoleRowActive = async (role: Role): Promise<boolean> => {
+    try {
+        await axios.put(`${import.meta.env.VITE_API_URL}/roles/${role.id}/status`, {
+            active: !role.active
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+export const callPutPermissionRowActive = async (permission: Permission): Promise<boolean> => {
+    try {
+        await axios.put(`${import.meta.env.VITE_API_URL}/permissions/${permission.id}/status`, {
+            active: !permission.active
         });
         return true;
     } catch (error) {
@@ -277,7 +305,70 @@ export const callGetUserRow = async (currentPageIndex: number, pageSize: number 
     }
 
 }
+export const callGetRole = async (): Promise<TableData<Role> | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<Role>>>(`${import.meta.env.VITE_API_URL}/roles`);
+        return response.data.data;
 
+    } catch (error) {
+        return null;
+    }
+}
+
+export const callGetPermission = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<Permission> | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<Permission>>>(`${import.meta.env.VITE_API_URL}/permissions?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        return response.data.data;
+
+    } catch (error) {
+        return null;
+    }
+}
+
+export const callPostRole = async (role: Role, permissionIDList: PermissionID[]): Promise<boolean> => {
+    try {
+        await axios.post(`${import.meta.env.VITE_API_URL}/roles`, {
+            name: role.name,
+            description: role.description,
+            permissionIds: permissionIDList,
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+export const callPostPermission = async (permission: Permission): Promise<boolean> => {
+    try {
+        await axios.post(`${import.meta.env.VITE_API_URL}/permissions`, {
+            ...permission
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+export const callPutUpdateRole = async (role: Role, permissionIDList: PermissionID[]): Promise<boolean> => {
+    try {
+        await axios.post(`${import.meta.env.VITE_API_URL}/roles/${role.id}`, {
+            name: role.name,
+            description: role.description,
+            permissionIds: permissionIDList,
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+export const callPutUpdatePermission = async (permission: Permission,): Promise<boolean> => {
+    try {
+        await axios.post(`${import.meta.env.VITE_API_URL}/roles/${permission.id}`, {
+            ...permission
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
 export const callGetCategoryRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<CategoryRow> | null> => {
     try {
         const response = await axios.get<ApiResponse<TableData<CategoryRow>>>(`${import.meta.env.VITE_API_URL}/categories?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
@@ -297,7 +388,7 @@ export const callGetTestRow = async (categoryID: CategoryID, currentPageIndex: n
 
 export const callGetTopicRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<Topic> | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<Topic>>>(`${import.meta.env.VITE_API_URL}/topics?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        const response = await axios.get<ApiResponse<TableData<Topic>>>(`${import.meta.env.VITE_API_URL}/topics/pagination?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
         return response.data.data;
     } catch (e) {
         return null;
@@ -325,9 +416,19 @@ export const callPutCategoryRowActive = async (category: CategoryRow): Promise<b
         return false;
     }
 }
+export const callPutUpdateRoleForUser = async (role: Role, user: UserRow): Promise<boolean> => {
+    try {
+        await axios.put(`${import.meta.env.VITE_API_URL}/users/${user.id}/role`, {
+            roleId: role.id
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
 export const callPutTopicRowActive = async (topic: Topic): Promise<boolean> => {
     try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/topics/${topic.id}/status`, {
+        await axios.put(`${import.meta.env.VITE_API_URL}/topics/${topic.id}/status`, {
             active: !topic.active
         });
         return true;
@@ -389,9 +490,9 @@ export const callPostUpdateTest = async (testRow: TestRow): Promise<boolean> => 
     }
 }
 
-export const callPostUpdateTopic = async (topicRow: Topic): Promise<boolean> => {
+export const callPutUpdateTopic = async (topicRow: Topic): Promise<boolean> => {
     try {
-        axios.post<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
+        axios.put<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
             name: topicRow.name,
             solution: topicRow.solution,
             overallSkill: topicRow.solution,
@@ -436,3 +537,12 @@ export const callGetProfile = async (): Promise<ProfileHookState | null> => {
     }
 }
 
+export const callPutUserTarget = async (targetScore: number): Promise<void> => {
+    try {
+        await axios.put<any>(`${import.meta.env.VITE_API_URL}/auth/account/target`, { target: targetScore });
+        console.log("ok");
+
+    } catch (error) {
+        console.error(error);
+    }
+}

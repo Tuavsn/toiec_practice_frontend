@@ -6,9 +6,11 @@ const AdminManageAssignmentPage = lazy(() => import("../pages/AdminManageAssignm
 const AdminManageQuestionPage = lazy(() => import("../pages/AdminManageQuestionPage/AdminManageQuestionPage"))
 const AdminManageLecturePage = lazy(() => import("../pages/AdminManageLecturePage/AdminManageLecturePage"))
 const AdminManageCategoryPage = lazy(() => import("../pages/AdminManageCategoryPage/AdminManageCategory"))
+const AdminManagePermission =lazy(()=> import("../pages/AdminManagePermission/AdminManagePermission"))
 const AdminManageAccountPage = lazy(() => import("../pages/AdminManageUserPage/AdminManageUser"))
 const AdminManageTestPage = lazy(() => import("../pages/AdminManageTestPage/AdminManageTest"))
 const AdminManageTopic = lazy(() => import("../pages/AdminManageTopic/AdminManageTopic"));
+const AdminManageRole = lazy(() => import("../pages/AdminManageRole/AdminManageRole"))
 const AdminLayout = lazy(() => import('../components/Layout/AdminLayout'));
 const TempAdminPage = lazy(() => import("../pages/TempAdminPage"))
 
@@ -36,8 +38,10 @@ export default function AdminRoutes() {
           <Route path="categories" element={<AdminManageCategoryPage />} /> {/* Quản lý các danh mục */}
 
           <Route path="account" element={<AdminManageAccountPage />} />
+          <Route path="role" element={<AdminManageRole />} />
           <Route path="lecture" element={<AdminManageLecturePage />} />
           <Route path="topic" element={<AdminManageTopic />} />
+          <Route path="permission" element={<AdminManagePermission />} />
           <Route path="lecture/:lecture_id" element={<AdminManageAssignmentPage />} />
           <Route path="user-analyst" element={<TempAdminPage text="thống kê người dùng" />} />
           <Route path="notify" element={<TempAdminPage text="notify" />} />

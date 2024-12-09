@@ -1,18 +1,15 @@
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import { Dropdown } from "primereact/dropdown";
 import { Fieldset } from "primereact/fieldset";
 import { InputText } from "primereact/inputtext";
-import { InputTextarea } from "primereact/inputtextarea";
 import React, { useRef, useState } from "react";
-import { callPutTopicRowActive, callPostTopic, callPutUpdateTopic } from "../../api/api";
 import { useToast } from "../../context/ToastProvider";
-import { emptyTopicRowValue } from "../../utils/types/emptyValue";
-import { DialogDeleteRowBodyProps, DialogRowProps, DialogUpdateTopicBodyProps, handeDeleteRowParams, handeSaveRowParams, RenderRowDialogParams, Topic } from "../../utils/types/type";
+import { emptyPermissionRowValue } from "../../utils/types/emptyValue";
+import { DialogRowProps, Permission, RenderRowDialogParams, handeSaveRowParams, DialogDeleteRowBodyProps, handeDeleteRowParams, DialogUpdatePermissionBodyProps } from "../../utils/types/type";
+import { callPostPermission, callPutPermissionRowActive, callPutUpdatePermission } from "../../api/api";
 
-
-// Thành phần DialogTopicActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)
-export const DialogTopicActionButton: React.FC<DialogRowProps<Topic>> = React.memo(
+// Thành phần DialogPermissionActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)
+export const DialogPermissionActionButton: React.FC<DialogRowProps<Permission>> = React.memo(
     ({ currentSelectedRow, dispatch, job }) => {
 
         // Render nội dung của Dialog, bao gồm header và body, từ hàm RenderDialog
@@ -25,7 +22,7 @@ export const DialogTopicActionButton: React.FC<DialogRowProps<Topic>> = React.me
                 header={header}                                                         // Tiêu đề của Dialog lấy từ prop header
                 visible={header != ""}                                                  // Nếu header không trống, Dialog sẽ hiển thị
                 style={{ width: "80vw" }}                                               // Thiết lập chiều rộng của Dialog (80% của viewport)
-                maximizable                                                             // Cho phép chủ đề tối đa hóa Dialog
+                maximizable                                                             // Cho phép quyền tối đa hóa Dialog
 
             >
                 {body                                                                   /* Nội dung của Dialog */}
@@ -42,25 +39,25 @@ export const DialogTopicActionButton: React.FC<DialogRowProps<Topic>> = React.me
 
 
 // Hàm RenderDialog nhận đối số là params và trả về một mảng gồm một chuỗi tiêu đề và một phần tử JSX (nội dung của Dialog)
-function RenderDialog(params: RenderRowDialogParams<Topic>): [string, JSX.Element] {
+function RenderDialog(params: RenderRowDialogParams<Permission>): [string, JSX.Element] {
 
     // Dựa trên giá trị của params.job, hàm sẽ trả về tiêu đề và nội dung phù hợp
     switch (params.job) {
 
-        case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa chủ đề" cùng với tên của chủ đề hiện tại và một thông báo xác nhận xóa
+        case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa quyền" cùng với tên của quyền hiện tại và một thông báo xác nhận xóa
 
-            return [`Xóa chủ đề ${params.currentSelectedRow.name}`,
-            <RenderDeleteTopicBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
+            return [`Xóa quyền ${params.currentSelectedRow.name}`,
+            <RenderDeletePermissionBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
             ];
-        case "CREATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa chủ đề" cùng với tên của chủ đề hiện tại và một thông báo xác nhận xóa
+        case "CREATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa quyền" cùng với tên của quyền hiện tại và một thông báo xác nhận xóa
 
-            return [`Tạo chủ đề mới`,
-                <RenderUpsertTopicBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
+            return [`Tạo quyền mới`,
+                <RenderUpsertPermissionBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
             ];
-        case "UPDATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa chủ đề" cùng với tên của chủ đề hiện tại và một thông báo xác nhận xóa
+        case "UPDATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa quyền" cùng với tên của quyền hiện tại và một thông báo xác nhận xóa
 
-            return [`Cập nhật chủ đề ${params.currentSelectedRow.name}`,
-            <RenderUpsertTopicBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
+            return [`Cập nhật quyền ${params.currentSelectedRow.name}`,
+            <RenderUpsertPermissionBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
             ];
     }
 
@@ -71,55 +68,55 @@ function RenderDialog(params: RenderRowDialogParams<Topic>): [string, JSX.Elemen
 
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-type UpsertTopicForm = {
-    name: string,
-    solution: string,
-    overallSkill: "Từ vựng" | "Ngữ pháp"
+type UpsertPermissionForm = {
+    name: string;
+    apiPath: string;
+    method: string;
+    module: string;
 }
 
-const RenderUpsertTopicBody: React.FC<DialogUpdateTopicBodyProps> = React.memo(
+const RenderUpsertPermissionBody: React.FC<DialogUpdatePermissionBodyProps> = React.memo(
     (props) => {
-        const [formData, setFormData] = useState<UpsertTopicForm>({ ...emptyTopicRowValue })
+        const [formData, setFormData] = useState<UpsertPermissionForm>({ ...emptyPermissionRowValue })
         const { toast } = useToast();
         const [isDisabled, setIsDisabled] = useState(false);
-        const title = useRef<string>(props.currentSelectedRow.id ? "Sửa chủ đề" : "Thêm chủ đề");
+        const title = useRef<string>(props.currentSelectedRow.id ? "Sửa quyền" : "Thêm quyền");
         return (
             <Fieldset legend={title.current} >
                 <section className='flex flex-row flex-wrap gap-4 justify-content-space'>
                     {
-                        /* -----------------------------------------------------tên chủ đề ----------------------------------------------------------------------------------------------------------*/
+                        /* -----------------------------------------------------tên quyền ----------------------------------------------------------------------------------------------------------*/
                         <div className="field flex-1">
                             <label className='block' htmlFor="row">Tên</label>
                             <InputText id="row" name="row" value={formData.name} required autoComplete="additional-name" onChange={(e) => setFormData({ ...formData, name: e.target.value || "" })} />
                         </div>
                         /* -----------------------------------------------------================= ----------------------------------------------------------------------------------------------------------*/
-
-                    }
-
-                    {
-                        <div className="field flex-1">
-                            <label className='block' htmlFor="solution">Giải pháp</label>
-                            <InputTextarea
-                                style={{ width: '20vw', resize: 'none' }}
-                                id="solution"
-                                name="solution"
-                                value={formData.solution || ""}
-                                onChange={(e) => setFormData({ ...formData, solution: e.target.value || "" })}
-                                rows={10}
-                            />
-                        </div>
                     }
                     {
+                        /* -----------------------------------------------------đường dẫn quyền ----------------------------------------------------------------------------------------------------------*/
                         <div className="field flex-1">
-                            <Dropdown
-                                name="overall skill"
-                                value={formData.overallSkill}
-                                options={[{ label: "Từ vựng", value: "Từ vựng" }, { label: "Ngữ pháp", value: "Ngữ pháp" }]}
-                                onChange={(e) => setFormData({ ...formData, overallSkill: e.target.value || "" })}
-                                placeholder="Chọn loại"
-                            />
+                            <label className='block' htmlFor="path">Đường dẫn</label>
+                            <InputText id="path" name="path" value={formData.apiPath} required autoComplete="additional-name" onChange={(e) => setFormData({ ...formData, apiPath: e.target.value || "" })} />
                         </div>
+                        /* -----------------------------------------------------================= ----------------------------------------------------------------------------------------------------------*/
                     }
+                    {
+                        /* -----------------------------------------------------phương thức quyền ----------------------------------------------------------------------------------------------------------*/
+                        <div className="field flex-1">
+                            <label className='block' htmlFor="phương thức">Phương thức</label>
+                            <InputText id="phương thức" name="phương thức" value={formData.method} required autoComplete="additional-name" onChange={(e) => setFormData({ ...formData, method: e.target.value || "" })} />
+                        </div>
+                        /* -----------------------------------------------------================= ----------------------------------------------------------------------------------------------------------*/
+                    }
+                    {
+                        /* -----------------------------------------------------loại quyền ----------------------------------------------------------------------------------------------------------*/
+                        <div className="field flex-1">
+                            <label className='block' htmlFor="module">Loại</label>
+                            <InputText id="module" name="module" value={formData.module} required autoComplete="additional-name" onChange={(e) => setFormData({ ...formData, module: e.target.value || "" })} />
+                        </div>
+                        /* -----------------------------------------------------================= ----------------------------------------------------------------------------------------------------------*/
+                    }
+
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end mt-5">
@@ -134,17 +131,17 @@ const RenderUpsertTopicBody: React.FC<DialogUpdateTopicBodyProps> = React.memo(
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // khi nhấn nút Lưu
-async function handleSave(params: handeSaveRowParams<Topic>) {
-    if (!params.row.name.trim() || !params.row.solution) {
-        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "Tên chủ đề / giải pháp không được phép để trống" });
+async function handleSave(params: handeSaveRowParams<Permission>) {
+    if (!params.row.name.trim() || !params.row.apiPath.trim() || !params.row.method.trim() || !params.row.module.trim()) {
+        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "Tên quyền / đường dẫn / phương thức / loại không được phép để trống" });
         return;
     }
     params.setIsDisabled(true);
     let success = false;
     if (params.row.id) {
-        success = await callPutUpdateTopic(params.row);
+        success = await callPutUpdatePermission(params.row);
     } else {
-        success = await callPostTopic(params.row);
+        success = await callPostPermission(params.row);
     }
     params.setIsDisabled(false);
     if (success) {
@@ -159,7 +156,7 @@ async function handleSave(params: handeSaveRowParams<Topic>) {
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-const RenderDeleteTopicBody: React.FC<DialogDeleteRowBodyProps<Topic>> = React.memo(
+const RenderDeletePermissionBody: React.FC<DialogDeleteRowBodyProps<Permission>> = React.memo(
     (props) => {
         const { toast } = useToast();
         const [isDisabled, setIsDisabled] = useState<boolean>(false);
@@ -183,8 +180,8 @@ const RenderDeleteTopicBody: React.FC<DialogDeleteRowBodyProps<Topic>> = React.m
 
 
 // khi nhấn nút Xóa
-async function handleDelete(params: handeDeleteRowParams<Topic>) {
-    const success = await callPutTopicRowActive(params.row);
+async function handleDelete(params: handeDeleteRowParams<Permission>) {
+    const success = await callPutPermissionRowActive(params.row);
 
 
     if (success) {

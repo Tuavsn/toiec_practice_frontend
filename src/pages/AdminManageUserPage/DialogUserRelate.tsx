@@ -1,17 +1,19 @@
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import React from "react";
-import { callPutUpdateUserRow } from "../../api/api";
+import { Dropdown } from "primereact/dropdown";
+import { Fieldset } from "primereact/fieldset";
+import React, { useRef, useState } from "react";
+import { callPutUpdateRoleForUser, callPutUpdateUserRow } from "../../api/api";
 import { useToast } from "../../context/ToastProvider";
-import { DialogDeleteRowBodyProps, DialogRowProps, handeDeleteRowParams, RenderRowDialogParams, UserRow } from "../../utils/types/type";
+import { DialogDeleteRowBodyProps, DialogUpdateUserBodyProps, DialogUserRowProps, handeDeleteRowParams, handeSaveUserRowParams, RenderUserRowDialogParams, Role, UserRow } from "../../utils/types/type";
 
 
 // Thành phần DialogUserActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)
-export const DialogUserActionButton: React.FC<DialogRowProps<UserRow>> = React.memo(
-    ({ currentSelectedRow, dispatch, job }) => {
+export const DialogUserActionButton: React.FC<DialogUserRowProps> = React.memo(
+    ({ currentSelectedRow, dispatch, job, roleList }) => {
 
         // Render nội dung của Dialog, bao gồm header và body, từ hàm RenderDialog
-        const [header, body] = RenderDialog({ job, currentSelectedRow, dispatch });
+        const [header, body] = RenderDialog({ job, currentSelectedRow, dispatch, roleList });
 
         return (
             <Dialog
@@ -37,7 +39,7 @@ export const DialogUserActionButton: React.FC<DialogRowProps<UserRow>> = React.m
 
 
 // Hàm RenderDialog nhận đối số là params và trả về một mảng gồm một chuỗi tiêu đề và một phần tử JSX (nội dung của Dialog)
-function RenderDialog(params: RenderRowDialogParams<UserRow>): [string, JSX.Element] {
+function RenderDialog(params: RenderUserRowDialogParams): [string, JSX.Element] {
 
     // Dựa trên giá trị của params.job, hàm sẽ trả về tiêu đề và nội dung phù hợp
     switch (params.job) {
@@ -49,7 +51,11 @@ function RenderDialog(params: RenderRowDialogParams<UserRow>): [string, JSX.Elem
                 <RenderDeleteUserBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
                 ];
             }
+        case "UPDATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa chủ đề" cùng với tên của chủ đề hiện tại và một thông báo xác nhận xóa
 
+            return [`Cập nhật quyền ${params.currentSelectedRow.email}`,
+            <RenderUpdateUserBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} roleList={params.roleList} />
+            ];
     }
 
     // Trả về giá trị mặc định nếu không có case nào phù hợp (đây là trường hợp lỗi)
@@ -60,11 +66,58 @@ function RenderDialog(params: RenderRowDialogParams<UserRow>): [string, JSX.Elem
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+const RenderUpdateUserBody: React.FC<DialogUpdateUserBodyProps> = React.memo(
+    (props) => {
+        const [formData, setFormData] = useState<Role>(props.currentSelectedRow.role)
+        const { toast } = useToast();
+        const [isDisabled, setIsDisabled] = useState(false);
+        const title = useRef<string>(props.currentSelectedRow.id ? "Sửa tài khoản" : "Thêm tài khoản");
+        return (
+            <Fieldset legend={title.current} >
+                <section className='flex flex-row flex-wrap gap-4 justify-content-space'>
+                    {
+                        <div className="field flex-1">
+                            <label className='block' htmlFor="overall skill">Chức danh</label>
+                            <Dropdown
+                                name="overall skill"
+                                value={formData.id}
+                                options={props.roleList.map(r => { return { label: r.name, value: r.id } })}
+                                onChange={(e) => setFormData({ ...formData, id: e.target.value || "" })}
+                                placeholder="Chọn loại"
+                            />
+                        </div>
+                    }
+                </section>
+                {/* Save Button */}
+                <div className="field flex justify-content-end mt-5">
+                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => handleSave({ role: formData, user: props.currentSelectedRow, dispatch: props.dispatch, toast, setIsDisabled })} />
+                </div>
 
+            </Fieldset>
+        );
+    }
+)
 
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+async function handleSave(params: handeSaveUserRowParams) {
+    if (!params.role.id.trim()) {
+        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "Tên chức danh không được phép để trống" });
+        return;
+    }
+    params.setIsDisabled(true);
+    let success = false;
 
+    success = await callPutUpdateRoleForUser(params.role, params.user);
+
+    params.setIsDisabled(false);
+    if (success) {
+        params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
+        params.dispatch({ type: "REFRESH_DATA" });
+    } else {
+        params.toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Sửa thất bại" });
+    }
+};
 
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,13 +126,14 @@ function RenderDialog(params: RenderRowDialogParams<UserRow>): [string, JSX.Elem
 const RenderDeleteUserBody: React.FC<DialogDeleteRowBodyProps<UserRow>> = React.memo(
     (props) => {
         const { toast } = useToast();
+        const [isDisabled, setIsDisabled] = useState<boolean>(false);
         const text = props.currentSelectedRow.active ? "xóa" : "khôi phục";
         return (
             <React.Fragment>
 
                 <h1 className='text-center'>Bạn có chắc muốn {text} <q>{props.currentSelectedRow.email.split('@')[0]}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ rowID: props.currentSelectedRow.id, dispatch: props.dispatch, toast })} />
+                    <Button disabled={isDisabled} label="Xác nhận" icon="pi pi-save" onClick={() => { handleDelete({ row: props.currentSelectedRow, dispatch: props.dispatch, toast }); setIsDisabled(true) }} />
                 </div>
             </React.Fragment>
         )
@@ -94,7 +148,7 @@ const RenderDeleteUserBody: React.FC<DialogDeleteRowBodyProps<UserRow>> = React.
 
 // khi nhấn nút Xóa
 async function handleDelete(params: handeDeleteRowParams<UserRow>) {
-    const success = await callPutUpdateUserRow({ id: params.rowID } as UserRow);
+    const success = await callPutUpdateUserRow(params.row);
 
 
     if (success) {

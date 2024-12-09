@@ -47,7 +47,8 @@ export function getUserResultRowSeverity(row: { type: TestType }) {
     switch (row.type) {
         case "fulltest":
             return 'success';
-
+        case "exercise":
+            return 'info';
         case "practice":
             return 'warning';
         default:
@@ -66,6 +67,9 @@ export function typeUserResultRowBodyTemplate(rowData: { type: TestType, parts: 
         <div className="flex justify-content-around">
             {rowData.type === "fulltest" &&
                 <Tag value={"Thi thử"} severity={getUserResultRowSeverity(rowData)}></Tag>
+            }
+            {rowData.type === "exercise" &&
+                <Tag value={"Luyện tập"} severity={getUserResultRowSeverity(rowData)}></Tag>
             }
             {rowData.type === "practice" &&
                 TagElements

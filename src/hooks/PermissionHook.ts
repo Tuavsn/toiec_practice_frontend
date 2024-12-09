@@ -1,24 +1,17 @@
 import { PaginatorPageChangeEvent } from "primereact/paginator";
-import { useCallback, useEffect, useReducer, useRef } from "react";
-import { callGetRole, callGetUserRow } from "../api/api";
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
+import { callGetPermission } from "../api/api";
 import { useToast } from "../context/ToastProvider";
-import { initialUserState } from "../utils/types/emptyValue";
-import { UserHookAction, UserHookState } from "../utils/types/type";
+import SetWebPageTitle from "../utils/setTitlePage";
+import { RowHookAction, RowHookState, Permission } from "../utils/types/type";
+import { initialPermissionState } from "../utils/types/emptyValue";
 
-
-
-
-const reducer = (state: UserHookState, action: UserHookAction): UserHookState => {
+const reducer = (state: RowHookState<Permission>, action: RowHookAction<Permission>): RowHookState<Permission> => {
     switch (action.type) {
         case 'FETCH_ROWS_SUCCESS': {
-            const [newUsers, newPageIndex] = action.payload;
-            return { ...state, rows: newUsers, currentPageIndex: newPageIndex }
+            const [newCateogories, newPageIndex] = action.payload;
+            return { ...state, rows: newCateogories, currentPageIndex: newPageIndex }
         }
-        case 'FETCH_ROLES_SUCCESS': {
-            return { ...state, roleList: action.payload }
-        }
-        case 'RESET_ROWS':
-            return { ...state, rows: [] }
         case 'SET_PAGE':
             return { ...state, currentPageIndex: action.payload }
         case 'REFRESH_DATA':
@@ -36,33 +29,34 @@ const reducer = (state: UserHookState, action: UserHookAction): UserHookState =>
             return state;
     }
 };
-export default function useUser() {
 
-    const [state, dispatch] = useReducer(reducer, initialUserState);
+
+
+export default function usePermission() {
+
+    const [state, dispatch] = useReducer(reducer, initialPermissionState);
     const totalItems = useRef(0);
     const { toast } = useToast();
-    const fetchUsers = useCallback(async (pageNumber: number) => {
+    const fetchPermissions = useCallback(async (pageNumber: number) => {
 
-        const response = await callGetUserRow(pageNumber);
+        const response = await callGetPermission(pageNumber);
         if (!response) {
-            toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Không thể tải được danh sách người dùng" });
+            toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Không thể tải được danh sách chủ đề" });
             return;
         }
         dispatch({ type: "FETCH_ROWS_SUCCESS", payload: [response.result, pageNumber] });
         totalItems.current = response.meta.totalItems;
 
     }, [])
+    useLayoutEffect(() => SetWebPageTitle("Quản lý chủ đề"), []);
     useEffect(() => {
-        if (state.roleList.length === 0) {
-            callGetRole().then(data => { if (data) dispatch({ type: "FETCH_ROLES_SUCCESS", payload: data.result }) })
-        }
-        fetchUsers(state.currentPageIndex);
+
+        fetchPermissions(state.currentPageIndex);
 
     }, [state.isRefresh]);
 
     const onPageChange = (e: PaginatorPageChangeEvent) => {
-        dispatch({ type: "RESET_ROWS" });
-        fetchUsers(e.page)
+        fetchPermissions(e.page)
     }
 
     return {
@@ -72,5 +66,3 @@ export default function useUser() {
         onPageChange,
     }
 }
-
-
