@@ -162,6 +162,14 @@ export const callGetLectureRow = async (pageNumber: number): Promise<TableData<L
         return (error as Error)
     }
 }
+export const callGetLectureCard = async (pageNumber: number): Promise<TableData<LectureRow> | Error> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<LectureRow>>>(`${import.meta.env.VITE_API_URL}/lectures?info=true&current=${pageNumber + 1}&pageSize=5&active=true`);
+        return response.data.data;
+    } catch (error) {
+        return (error as Error)
+    }
+}
 export const callPutLectureDetailUpdate = async (lectureID: LectureID, name: string, topicIds: TopicID[]): Promise<boolean> => {
     try {
         await axios.put(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}`, {
@@ -297,7 +305,7 @@ export const callGetTestRow = async (categoryID: CategoryID, currentPageIndex: n
 
 export const callGetTopicRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<Topic> | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<Topic>>>(`${import.meta.env.VITE_API_URL}/topics?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        const response = await axios.get<ApiResponse<TableData<Topic>>>(`${import.meta.env.VITE_API_URL}/topics/pagination?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
         return response.data.data;
     } catch (e) {
         return null;
@@ -327,7 +335,7 @@ export const callPutCategoryRowActive = async (category: CategoryRow): Promise<b
 }
 export const callPutTopicRowActive = async (topic: Topic): Promise<boolean> => {
     try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/topics/${topic.id}/status`, {
+        await axios.put(`${import.meta.env.VITE_API_URL}/topics/${topic.id}/status`, {
             active: !topic.active
         });
         return true;
@@ -389,9 +397,9 @@ export const callPostUpdateTest = async (testRow: TestRow): Promise<boolean> => 
     }
 }
 
-export const callPostUpdateTopic = async (topicRow: Topic): Promise<boolean> => {
+export const callPutUpdateTopic = async (topicRow: Topic): Promise<boolean> => {
     try {
-        axios.post<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
+        axios.put<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
             name: topicRow.name,
             solution: topicRow.solution,
             overallSkill: topicRow.solution,
@@ -436,3 +444,12 @@ export const callGetProfile = async (): Promise<ProfileHookState | null> => {
     }
 }
 
+export const callPutUserTarget = async (targetScore: number): Promise<void> => {
+    try {
+        await axios.put<any>(`${import.meta.env.VITE_API_URL}/auth/account/target`, { target: targetScore });
+        console.log("ok");
+        
+    } catch (error) {
+        console.error(error);
+    }
+}

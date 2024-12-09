@@ -5,18 +5,21 @@ import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
+import { InputNumber } from 'primereact/inputnumber';
+import { MenuItem } from 'primereact/menuitem';
 import { Stepper, StepperRefAttributes } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
-import React, { useRef, useState } from "react";
+import { Steps } from 'primereact/steps';
+import React, { useEffect, useRef, useState } from "react";
 import { Doughnut, Pie } from "react-chartjs-2";
+import { Navigate } from 'react-router-dom';
+import { callPutUserTarget } from '../api/api';
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
 import useProfile, { GetFakeSuggestionData } from "../hooks/ProfileHook";
+import { IsNotLogIn } from '../utils/AuthCheck';
 import convertSecondsToString from "../utils/convertSecondsToString";
 import formatDate from "../utils/formatDateToString";
 import { ActivityLogProps, SkillInsightsProps, SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from "../utils/types/type";
-import { Navigate } from 'react-router-dom';
-import { IsNotLogIn } from '../utils/AuthCheck';
-import { Steps } from 'primereact/steps';
 // Đăng ký các phần tử Chart.js cần thiết
 ChartJS.register(...registerables);
 // Đăng ký plugin DataLabels
@@ -25,7 +28,8 @@ ChartJS.register(ChartDataLabels as Plugin<"pie">);
 export default function UserProfilePage() {
 
     const {
-        state
+        state,
+        targetRef,
     } = useProfile();
 
     if (IsNotLogIn()) return <Navigate to={"/home?login=true"} />
@@ -33,17 +37,17 @@ export default function UserProfilePage() {
     return (
         <main className="pt-8 flex gap-3 flex-column">
             <div key="area-1">
-                <Card key="user-goal" className='shadow-7' title="1. Mục tiêu bản thân"><UserGoal target={state.target} /></Card>
+                <Card key="user-goal" className='shadow-7' title="1. Mục tiêu bản thân"><UserGoal currentScore={state.overallStat!.averageListeningScore + state.overallStat!.averageReadingScore} targetRef={targetRef} /></Card>
                 {/* <Card key="current-course" className='shadow-7' title="2. Đang diễn ra"><CurrentCourse /></Card> */}
             </div>
             <div key="area-2" className="flex gap-3 flex-wrap">
-                <Card key="progress-overview" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="1. Tổng quan tiến độ ">{ProgressOverview(state.overallStat!.averageListeningScore, state.overallStat!.averageReadingScore)}</Card>
-                <Card key="skill-insight" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="2. Thông tin chi tiết kỹ năng"><SkillInsights parts={state.topicStats} /></Card>
+                <Card key="progress-overview" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="2. Tổng quan tiến độ ">{ProgressOverview(state.overallStat!.averageListeningScore, state.overallStat!.averageReadingScore)}</Card>
+                <Card key="skill-insight" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="3. Thông tin chi tiết kỹ năng"><SkillInsights parts={state.topicStats} /></Card>
             </div>
-            <Card key="activity-log" className='shadow-7' title="3. Nhật ký học tập"><ActivityLog userResultRows={state.results} /></Card>
+            <Card key="activity-log" className='shadow-7' title="4. Nhật ký học tập"><ActivityLog userResultRows={state.results} /></Card>
             <div key="area-3" className="flex gap-3 flex-wrap">
-                <Card key="time-spent" className="shadow-7 flex-1" style={{ minWidth: "590px" }} title="4. Thời gian học tập theo kỹ năng">{TimeSpent(state.skillStats)}</Card>
-                <Card key="suggestion" className='shadow-7 flex-1' title="5. Đề xuất cải thiện">{Suggestions(GetFakeSuggestionData())}</Card>
+                <Card key="time-spent" className="shadow-7 flex-1" style={{ minWidth: "590px" }} title="5. Thời gian học tập theo kỹ năng">{TimeSpent(state.skillStats)}</Card>
+                <Card key="suggestion" className='shadow-7 flex-1' title="6. Đề xuất cải thiện">{Suggestions(GetFakeSuggestionData())}</Card>
 
             </div>
             {/* <Card key="stat" className='shadow-7' title="7. Thống kê"></Card> */}
@@ -52,67 +56,43 @@ export default function UserProfilePage() {
 }
 
 //==================================================helper HTML ELEMENT =============================================================================================
-const GoalLabel = [0, 10, 255, 405, 605, 785, 905, 990] as const;
+
 //---[1]-------------------------------------------------------------------------------------------------------------------------------------------
-const UserGoal: React.FC<{ target: number }> = React.memo(
-    (props) => {
-        const [activeIndex, setActiveIndex] = useState(0);
-
-        const itemRenderer = (itemIndex: number) => {
-            const isActiveItem = activeIndex === itemIndex;
-            const backgroundColor = isActiveItem ? 'var(--primary-color)' : 'var(--surface-b)';
-            const textColor = isActiveItem ? 'var(--surface-b)' : 'var(--text-color-secondary)';
-            return (
-                <span
-                    className="inline-flex align-items-center justify-content-center align-items-center border-circle border-primary border-1 h-3rem w-3rem z-1 cursor-pointer"
-                    style={{ backgroundColor: backgroundColor, color: textColor, marginTop: '-25px' }}
-                    onClick={() => setActiveIndex(itemIndex)}
-                >
-
-                </span>
-            );
-        };
-        const items = [
-            {
-                icon: 'pi pi-user',
-                label: "user",
-                template: (item: any) => itemRenderer(0)
-            },
-            {
-                label: "user",
-                icon: 'pi pi-calendar',
-                template: (item: any) => itemRenderer(1)
-            },
-            {
-                label: "user",
-                icon: 'pi pi-check',
-                template: (item: any) => itemRenderer(2)
-            },
-            {
-                icon: 'pi pi-user',
-                label: "user",
-                template: (item: any) => itemRenderer(3)
-            },
-            {
-                label: "user",
-                icon: 'pi pi-calendar',
-                template: (item: any) => itemRenderer(4)
-            },
-            {
-                label: "user",
-                icon: 'pi pi-check',
-                template: (item: any) => itemRenderer(5)
-            }
-        ];
-        return (
-            <main>
-                <div className="card">
-                    <Steps model={items} activeIndex={activeIndex} readOnly={false} className="m-2 pt-4" />
-                </div>
-            </main>
-        )
+const UserGoal: React.FC<{ targetRef: React.MutableRefObject<number>; currentScore: number }> = React.memo(({ targetRef, currentScore }) => {
+    const [targetScore, setTargetScore] = useState<number>(-1);
+    if (targetRef.current !== -1 && targetScore === -1) {
+        setTargetScore(targetRef.current);
     }
-)
+    const GoalLabel = Array.from(new Set([0, 10, 255, 405, 605, 785, 905, 990, targetScore, currentScore])).sort((a, b) => a - b);
+    const currentScoreIndex = GoalLabel.indexOf(currentScore);
+    const [activeIndex, setActiveIndex] = useState(currentScoreIndex);
+    console.log(targetScore);
+
+    // Generate unique and sorted GoalLabel dynamically
+    const steps = GetSteps({ GoalLabel, activeIndex, currentScore, setActiveIndex, setTargetScore, targetScore, currentScoreIndex });
+    return (
+        <div className="card">
+            <h3>
+                Cần cố gắng <i className="text-red-500">{targetScore - currentScore}</i> điểm nữa để đạt được mục tiêu :{getCurrentTitle(targetScore)}
+            </h3>
+            <Steps model={steps} activeIndex={activeIndex} readOnly={false} className="m-2 pt-4" />
+            <section className="flex justify-content-center gap-5 mt-7">
+                <div className="p-inputgroup w-fit">
+                    <Button severity="success" label="Đặt mục tiêu mới" onClick={() => callPutUserTarget(targetScore)} />
+                    <InputNumber
+                        inputStyle={{ maxWidth: '7rem', backgroundColor: 'aliceblue' }}
+                        value={targetScore} suffix="  điểm" showButtons
+                        onChange={(e) => {
+                            setTargetScore(Number(e.value) || currentScore);
+                        }}
+                        max={990} min={10} step={10}
+
+                    />
+                </div>
+            </section>
+        </div>
+    );
+});
 
 //---[2]-------------------------------------------------------------------------------------------------------------------------------------------
 // const CurrentCourse: React.FC = React.memo(
@@ -395,4 +375,72 @@ function getCurrentTitle(score: number): string {
         return "Không có cơ sở";
     }
 
+}
+export type UserStepGoalParams = {
+    GoalLabel: number[],
+    currentScore: number,
+    targetScore: number,
+    activeIndex: number,
+    currentScoreIndex: number,
+    setTargetScore: React.Dispatch<React.SetStateAction<number>>,
+    setActiveIndex: React.Dispatch<React.SetStateAction<number>>,
+}
+function GetSteps(params: UserStepGoalParams): MenuItem[] {
+
+    // Find indexes for special icons
+
+    const targetIndex = params.GoalLabel.indexOf(params.targetScore);
+    const endIndex = params.GoalLabel.length - 1;
+
+    const getIcon = (itemIndex: number) => {
+        if (itemIndex === params.currentScoreIndex) return 'pi pi-user';
+        if (itemIndex === targetIndex) return 'pi pi-flag';
+        if (itemIndex === endIndex) return 'pi pi-crown';
+        return 'pi pi-star-fill'; // Default icon
+    };
+
+    const getColor = (itemIndex: number) => {
+        if (itemIndex === targetIndex) return 'var(--yellow-500)';
+        if (itemIndex === endIndex) return 'var(--green-500)';
+        if (itemIndex === params.currentScoreIndex) return 'var(--blue-500)';
+        return params.activeIndex === itemIndex ? 'var(--primary-color)' : 'var(--surface-b)';
+    };
+
+    const getTextColor = (itemIndex: number) => {
+        if (itemIndex === targetIndex || itemIndex === endIndex || itemIndex === params.currentScoreIndex) {
+            return 'var(--surface-b)';
+        }
+        return params.activeIndex === itemIndex ? 'var(--surface-b)' : 'var(--text-color-secondary)';
+    };
+
+    const getLabel = (itemIndex: number) => {
+        if (itemIndex === params.currentScoreIndex) return 'Current Score';
+        if (itemIndex === targetIndex) return 'Target';
+        if (itemIndex === endIndex) return 'End';
+        return `Step ${itemIndex + 1}`;
+    };
+
+    return params.GoalLabel.map((label, index) => ({
+        label: getLabel(index), // Add labels dynamically
+        template: () => (
+            <span
+                className="inline-flex align-items-center justify-content-center border-circle border-primary border-1 h-3rem w-3rem z-1 cursor-pointer"
+                style={{
+                    backgroundColor: getColor(index),
+                    color: getTextColor(index),
+                    marginTop: '-25px',
+                }}
+                onClick={() => {
+                    params.setActiveIndex(index);
+                    params.setTargetScore(params.GoalLabel[index]);
+                }}
+            >
+                <div>
+                    <div><i className={`${getIcon(index)} text-xl`} /></div>
+                    <p className='absolute text-gray-500' >{label}</p>
+                </div>
+
+            </span>
+        ),
+    }));
 }

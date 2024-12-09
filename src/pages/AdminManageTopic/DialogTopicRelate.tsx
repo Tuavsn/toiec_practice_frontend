@@ -5,7 +5,7 @@ import { Fieldset } from "primereact/fieldset";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import React, { useRef, useState } from "react";
-import { callPutTopicRowActive, callPostTopic, callPostUpdateTopic } from "../../api/api";
+import { callPutTopicRowActive, callPostTopic, callPutUpdateTopic } from "../../api/api";
 import { useToast } from "../../context/ToastProvider";
 import { emptyTopicRowValue } from "../../utils/types/emptyValue";
 import { DialogDeleteRowBodyProps, DialogRowProps, DialogUpdateTopicBodyProps, handeDeleteRowParams, handeSaveRowParams, RenderRowDialogParams, Topic } from "../../utils/types/type";
@@ -85,7 +85,7 @@ const RenderUpsertTopicBody: React.FC<DialogUpdateTopicBodyProps> = React.memo(
         const title = useRef<string>(props.currentSelectedRow.id ? "Sửa chủ đề" : "Thêm chủ đề");
         return (
             <Fieldset legend={title.current} >
-                <section className='flex flex-column gap-4 justify-content-space'>
+                <section className='flex flex-row flex-wrap gap-4 justify-content-space'>
                     {
                         /* -----------------------------------------------------tên chủ đề ----------------------------------------------------------------------------------------------------------*/
                         <div className="field flex-1">
@@ -111,14 +111,12 @@ const RenderUpsertTopicBody: React.FC<DialogUpdateTopicBodyProps> = React.memo(
                     }
                     {
                         <div className="field flex-1">
-                            <p className='block m-0 mb-2 text-right'><b>Correct Answer</b></p>
                             <Dropdown
-                                className='bg-green-200'
-                                name="correctAnswer"
+                                name="overall skill"
                                 value={formData.overallSkill}
                                 options={[{ label: "Từ vựng", value: "Từ vựng" }, { label: "Ngữ pháp", value: "Ngữ pháp" }]}
                                 onChange={(e) => setFormData({ ...formData, overallSkill: e.target.value || "" })}
-                                placeholder="Select Correct Answer"
+                                placeholder="Chọn loại"
                             />
                         </div>
                     }
@@ -144,7 +142,7 @@ async function handleSave(params: handeSaveRowParams<Topic>) {
     params.setIsDisabled(true);
     let success = false;
     if (params.row.id) {
-        success = await callPostUpdateTopic(params.row);
+        success = await callPutUpdateTopic(params.row);
     } else {
         success = await callPostTopic(params.row);
     }
@@ -164,13 +162,14 @@ async function handleSave(params: handeSaveRowParams<Topic>) {
 const RenderDeleteTopicBody: React.FC<DialogDeleteRowBodyProps<Topic>> = React.memo(
     (props) => {
         const { toast } = useToast();
+        const [isDisabled, setIsDisabled] = useState<boolean>(false);
         const text = props.currentSelectedRow.active ? "xóa" : "khôi phục";
         return (
             <React.Fragment>
 
                 <h1 className='text-center'>Bạn có chắc muốn {text} <q>{props.currentSelectedRow.name}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ row: props.currentSelectedRow, dispatch: props.dispatch, toast })} />
+                    <Button disabled={isDisabled} label="Xác nhận" icon="pi pi-save" onClick={() => { handleDelete({ row: props.currentSelectedRow, dispatch: props.dispatch, toast }); setIsDisabled(true) }} />
                 </div>
             </React.Fragment>
         )

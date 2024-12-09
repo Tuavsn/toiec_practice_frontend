@@ -3,6 +3,8 @@ import useUser from "../../hooks/UserHook";
 import React from "react";
 import AdminUserTable from "./AdminUserTable";
 import { DialogUserActionButton } from "./DialogUserRelate";
+import { Card } from "primereact/card";
+import { CustomBreadCrumb } from "../../components/Common/Index";
 
 
 function AdminManageUserPage() {
@@ -14,7 +16,7 @@ function AdminManageUserPage() {
     } = useUser();
 
     return (
-        <div className="card">                                          {/* Thẻ div được áp dụng class CSS "card" */}
+        <Card title={<CustomBreadCrumb />}>                                          {/* Thẻ div được áp dụng class CSS "card" */}
             {/* Thành phần DialogUserActionButton quản lý hành động liên quan đến bài giảng hiện tại */}
             <DialogUserActionButton
                 currentSelectedRow={state.currentSelectedRow}   // Bài giảng hiện được chọn
@@ -29,7 +31,7 @@ function AdminManageUserPage() {
             />
 
             <Paginator first={state.currentPageIndex * 5} rows={5} totalRecords={totalItems.current} onPageChange={onPageChange} />
-        </div>
+        </Card>
     );
 }
 

@@ -7,7 +7,7 @@ import { Paginator } from "primereact/paginator";
 import { Skeleton } from "primereact/skeleton";
 import React, { useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import { Link } from "react-router-dom";
-import { callGetLectureRow } from "../api/api";
+import { callGetLectureCard } from "../api/api";
 import SetWebPageTitle from "../utils/setTitlePage";
 import { LectureRow, Topic } from "../utils/types/type";
 
@@ -16,11 +16,11 @@ export default function LecturePage() {
     const [state, dispatch] = useReducer(reducer, initialState);
     const searchTermRef = useRef<HTMLInputElement | null>(null);
     const totalItemsRef = useRef<number>(-1);
-    useLayoutEffect(() => SetWebPageTitle("Làm bài thi"), [])
+    useLayoutEffect(() => SetWebPageTitle("Xem bài giảng"), [])
     useEffect(() => {
         const fetchLectures = async (pageIndex: number) => {
             dispatch({ type: "RESET_ROWS" });
-            const response = await callGetLectureRow(pageIndex);
+            const response = await callGetLectureCard(pageIndex);
             if (response instanceof Error) {
                 return;
             }

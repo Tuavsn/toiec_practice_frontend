@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import React from "react";
+import React, { useState } from "react";
 import { callPutUpdateUserRow } from "../../api/api";
 import { useToast } from "../../context/ToastProvider";
 import { DialogDeleteRowBodyProps, DialogRowProps, handeDeleteRowParams, RenderRowDialogParams, UserRow } from "../../utils/types/type";
@@ -73,13 +73,14 @@ function RenderDialog(params: RenderRowDialogParams<UserRow>): [string, JSX.Elem
 const RenderDeleteUserBody: React.FC<DialogDeleteRowBodyProps<UserRow>> = React.memo(
     (props) => {
         const { toast } = useToast();
+        const [isDisabled, setIsDisabled] = useState<boolean>(false);
         const text = props.currentSelectedRow.active ? "xóa" : "khôi phục";
         return (
             <React.Fragment>
 
                 <h1 className='text-center'>Bạn có chắc muốn {text} <q>{props.currentSelectedRow.email.split('@')[0]}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ rowID: props.currentSelectedRow.id, dispatch: props.dispatch, toast })} />
+                    <Button disabled={isDisabled} label="Xác nhận" icon="pi pi-save" onClick={() => { handleDelete({ row: props.currentSelectedRow, dispatch: props.dispatch, toast }); setIsDisabled(true) }} />
                 </div>
             </React.Fragment>
         )
@@ -94,7 +95,7 @@ const RenderDeleteUserBody: React.FC<DialogDeleteRowBodyProps<UserRow>> = React.
 
 // khi nhấn nút Xóa
 async function handleDelete(params: handeDeleteRowParams<UserRow>) {
-    const success = await callPutUpdateUserRow({ id: params.rowID } as UserRow);
+    const success = await callPutUpdateUserRow(params.row);
 
 
     if (success) {

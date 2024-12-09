@@ -147,13 +147,14 @@ async function handleSave(params: handeSaveRowParams<CategoryRow>) {
 const RenderDeleteCategoryBody: React.FC<DialogDeleteRowBodyProps<CategoryRow>> = React.memo(
     (props) => {
         const { toast } = useToast();
+        const [isDisabled, setIsDisabled] = useState<boolean>(false);
         const text = props.currentSelectedRow.active ? "xóa" : "khôi phục";
         return (
             <React.Fragment>
 
                 <h1 className='text-center'>Bạn có chắc muốn {text} <q>{props.currentSelectedRow.format}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ row: props.currentSelectedRow, dispatch: props.dispatch, toast })} />
+                    <Button disabled={isDisabled} label="Xác nhận" icon="pi pi-save" onClick={() => { handleDelete({ row: props.currentSelectedRow, dispatch: props.dispatch, toast }); setIsDisabled(true) }} />
                 </div>
             </React.Fragment>
         )

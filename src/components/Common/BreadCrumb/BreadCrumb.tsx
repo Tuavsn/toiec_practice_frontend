@@ -59,6 +59,8 @@ function changeName(name: string): string {
             return "Đề thi";
         case "questions":
             return "Câu hỏi";
+        case "upload":
+            return "Đăng đề từ excel";
         default:
             return "Nhà";
     }
