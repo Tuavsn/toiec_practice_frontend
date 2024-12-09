@@ -1,9 +1,9 @@
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
-import React, { Dispatch } from "react";
+import { Dispatch } from "react";
 import { statusBodyTemplate } from "../../components/Common/Table/CommonColumn";
 import { emptyPermissionRowValue } from "../../utils/types/emptyValue";
-import { RowActionButtonProps, RowHookAction, Permission } from "../../utils/types/type";
+import { Permission, RowHookAction } from "../../utils/types/type";
 
 export function RenderAdminPermissionColumns(dispatch: Dispatch<RowHookAction<Permission>>): JSX.Element[] {
     return [
