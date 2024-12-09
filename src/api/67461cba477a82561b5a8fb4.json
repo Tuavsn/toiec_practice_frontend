@@ -1,0 +1,90 @@
+{
+    "statusCode": 200,
+    "message": "Practice test loaded successfully.",
+    "data": {
+        "totalQuestions": 5,
+        "practiceQuestions": [
+            {
+                "id": "000000000000000000000001",
+                "type": "single",
+                "content": "1. He is coming to the party, isn't he?",
+                "resources": [
+                    {
+                        "type": "paragraph",
+                        "content": "Tag questions, or question tags, are short questions added to the end of statements to confirm information."
+                    }
+                ],
+                "transcript": "Choose the correct form of the question tag.",
+                "explanation": "This question tests your ability to form question tags in the present simple tense.",
+                "answers": [
+                    "isn't he",
+                    "he isn't",
+                    "is he",
+                    "he is"
+                ],
+                "correctAnswer": "isn't he"
+            },
+            {
+                "id": "000000000000000000000002",
+                "type": "single",
+                "content": "2. You haven’t finished your work, have you?",
+                "resources": [],
+                "transcript": "Choose the correct form of the question tag.",
+                "explanation": "This tests the correct formation of a question tag with negative sentences in the present perfect tense.",
+                "answers": [
+                    "have you",
+                    "haven't you",
+                    "did you",
+                    "don't you"
+                ],
+                "correctAnswer": "have you"
+            },
+            {
+                "id": "000000000000000000000003",
+                "type": "single",
+                "content": "3. She can speak Spanish, can’t she?",
+                "resources": [],
+                "transcript": "Choose the correct question tag for the sentence.",
+                "explanation": "This tests the use of question tags with modal verbs like 'can'.",
+                "answers": [
+                    "can't she",
+                    "can she",
+                    "isn't she",
+                    "doesn't she"
+                ],
+                "correctAnswer": "can't she"
+            },
+            {
+                "id": "000000000000000000000004",
+                "type": "single",
+                "content": "4. They will attend the meeting tomorrow, won't they?",
+                "resources": [],
+                "transcript": "Choose the correct question tag for future tense sentences.",
+                "explanation": "This tests the correct use of question tags with future simple tense.",
+                "answers": [
+                    "won't they",
+                    "will they",
+                    "don't they",
+                    "aren't they"
+                ],
+                "correctAnswer": "won't they"
+            },
+            {
+                "id": "000000000000000000000005",
+                "type": "single",
+                "content": "5. John doesn’t like coffee, does he?",
+                "resources": [],
+                "transcript": "Choose the correct question tag for a negative sentence in the present simple.",
+                "explanation": "This tests the use of question tags with negative statements in the present simple tense.",
+                "answers": [
+                    "does he",
+                    "doesn't he",
+                    "is he",
+                    "isn't he"
+                ],
+                "correctAnswer": "does he"
+            }
+        ]
+    },
+    "error": null
+}

@@ -1,0 +1,91 @@
+{
+    "statusCode": 200,
+    "message": "Practice test loaded successfully.",
+    "data": {
+      "totalQuestions": 5,
+      "practiceQuestions": [
+        {
+          "id": "000000000000000000000001",
+          "type": "single",
+          "content": "1. What type of art typically depicts people and objects in a realistic way?",
+          "resources": [
+            {
+              "type": "paragraph",
+              "content": "Art depicting people and objects is commonly categorized into genres like portraiture, still life, and realism."
+            }
+          ],
+          "transcript": "Select the type of art that is most associated with realistic portrayals of people and objects.",
+          "explanation": "Tests knowledge of art genres that focus on realism.",
+          "answers": [
+            "Portraiture",
+            "Impressionism",
+            "Abstract",
+            "Cubism"
+          ],
+          "correctAnswer": "Portraiture"
+        },
+        {
+          "id": "000000000000000000000002",
+          "type": "single",
+          "content": "2. In which genre of art would you most likely find paintings of everyday objects?",
+          "resources": [],
+          "transcript": "Choose the genre of art that focuses on painting everyday objects.",
+          "explanation": "This question tests knowledge of still life in visual arts.",
+          "answers": [
+            "Still life",
+            "Landscape",
+            "Surrealism",
+            "Expressionism"
+          ],
+          "correctAnswer": "Still life"
+        },
+        {
+          "id": "000000000000000000000003",
+          "type": "single",
+          "content": "3. Which of the following is an example of a realistic painting of a person?",
+          "resources": [],
+          "transcript": "Choose the example that represents realistic art depicting a person.",
+          "explanation": "This tests the recognition of portrait painting in realistic art.",
+          "answers": [
+            "Portrait of a woman",
+            "Abstract face",
+            "Cubist figure",
+            "Watercolor landscape"
+          ],
+          "correctAnswer": "Portrait of a woman"
+        },
+        {
+          "id": "000000000000000000000004",
+          "type": "single",
+          "content": "4. Which type of art is most associated with exaggerating the features of people and objects?",
+          "resources": [],
+          "transcript": "Identify the type of art known for exaggerating features.",
+          "explanation": "This tests knowledge of the expressionist style in visual arts.",
+          "answers": [
+            "Expressionism",
+            "Realism",
+            "Impressionism",
+            "Minimalism"
+          ],
+          "correctAnswer": "Expressionism"
+        },
+        {
+          "id": "000000000000000000000005",
+          "type": "single",
+          "content": "5. A painting that focuses on objects like fruits, flowers, or everyday items is called what?",
+          "resources": [],
+          "transcript": "Select the correct term for a painting of everyday objects.",
+          "explanation": "This question tests the understanding of still life paintings.",
+          "answers": [
+            "Still life",
+            "Landscapes",
+            "Portraiture",
+            "Abstract"
+          ],
+          "correctAnswer": "Still life"
+        }
+      ]
+    },
+    "error": null
+  }
+  

@@ -154,7 +154,6 @@ const PracticeSection: React.FC<{ lectureID: LectureID }> = React.memo(
         useEffect(() => {
             const fetchPraticeQuestion = async () => {
                 const response = await callGetPracticePaper(lectureID);
-                console.log(response);
                 totalQuestions.current = response.data.totalQuestions;
                 setQuestionPage(response.data.practiceQuestions);
             }
