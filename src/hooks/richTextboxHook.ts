@@ -54,5 +54,4 @@ function EditText(params: EditTextParams) {
         }
     }
     params.text.current = params.e.htmlValue ?? ""
-    console.log(params.text);
 } 
