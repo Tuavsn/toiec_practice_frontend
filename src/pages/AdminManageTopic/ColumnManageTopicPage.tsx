@@ -12,7 +12,7 @@ export function RenderAdminTopicColumns(dispatch: Dispatch<RowHookAction<Topic>>
         <Column key="col-name"/*  */ field="name"/*        */ header="Tên"/*      */ filter/* */ sortable/*   */ alignHeader="center"/>,
         <Column key="col-skill"/* */ field="overallSkill"/**/ header="Dạng"/*                 */ sortable />,
         <Column key="col-active"/**/ field="active"/*      */ header="Trạng thái"/*            */ /*    */ bodyClassName="text-center"/*                    */ body={statusBodyTemplate} alignHeader="center"/>,
-        <Column key="col-solution"/*                       */ header="Giải pháp"/*                            */ alignHeader="center"/>,
+        <Column key="col-solution"   field="solution"/*    */ header="Giải pháp"/*                      */ alignHeader="center" style={{maxWidth:"8rem"}}/>,
         <Column key="col-action"/*                         */ header={() => AddNew(dispatch)}/*         */ headerClassName='flex justify-content-center'/*   */ body={(data) => <ActionBodyTemplate dispatch={dispatch} currentSelectedRow={data} />}  />
     ];
 }

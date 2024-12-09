@@ -1,12 +1,11 @@
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
+import { Dropdown } from "primereact/dropdown";
+import { Fieldset } from "primereact/fieldset";
 import React, { useRef, useState } from "react";
 import { callPutUpdateRoleForUser, callPutUpdateUserRow } from "../../api/api";
 import { useToast } from "../../context/ToastProvider";
-import { DialogDeleteRowBodyProps, DialogRowProps, DialogUpdateUserBodyProps, DialogUserRowProps, handeDeleteRowParams, handeSaveUserRowParams, RenderRowDialogParams, RenderUserRowDialogParams, Role, UserRow } from "../../utils/types/type";
-import { Dropdown } from "primereact/dropdown";
-import { Fieldset } from "primereact/fieldset";
-import { emptyRole } from "../../utils/types/emptyValue";
+import { DialogDeleteRowBodyProps, DialogUpdateUserBodyProps, DialogUserRowProps, handeDeleteRowParams, handeSaveUserRowParams, RenderUserRowDialogParams, Role, UserRow } from "../../utils/types/type";
 
 
 // Thành phần DialogUserActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)
@@ -78,7 +77,7 @@ const RenderUpdateUserBody: React.FC<DialogUpdateUserBodyProps> = React.memo(
                 <section className='flex flex-row flex-wrap gap-4 justify-content-space'>
                     {
                         <div className="field flex-1">
-                            <label className='block' htmlFor="overall skill">Quyền</label>
+                            <label className='block' htmlFor="overall skill">Chức danh</label>
                             <Dropdown
                                 name="overall skill"
                                 value={formData.id}
@@ -103,7 +102,7 @@ const RenderUpdateUserBody: React.FC<DialogUpdateUserBodyProps> = React.memo(
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 async function handleSave(params: handeSaveUserRowParams) {
     if (!params.role.id.trim()) {
-        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "Tên quyền không được phép để trống" });
+        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "Tên chức danh không được phép để trống" });
         return;
     }
     params.setIsDisabled(true);

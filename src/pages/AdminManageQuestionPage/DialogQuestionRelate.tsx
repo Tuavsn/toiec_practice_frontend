@@ -219,7 +219,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                             value={formData.listTopicIds}
                             options={topicList.current.map((topic) => ({ label: topic.name, value: topic.id }))}
                             onChange={(e) => setFormData((prev) => ({ ...prev, listTopicIds: e.value as string[] }))}
-                            placeholder="Select Topics"
+                            placeholder="Chọn chủ đề"
                             display='chip'
                         />
                     </div>

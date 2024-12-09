@@ -10,7 +10,7 @@ import { MenuItem } from 'primereact/menuitem';
 import { Stepper, StepperRefAttributes } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
 import { Steps } from 'primereact/steps';
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Doughnut, Pie } from "react-chartjs-2";
 import { Navigate } from 'react-router-dom';
 import { callPutUserTarget } from '../api/api';
