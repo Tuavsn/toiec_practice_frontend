@@ -123,7 +123,7 @@ const RenderUpdateLectureBody: React.FC<DialogUpdateLectureBodyProps> = React.me
                         /* -----------------------------------------------------Chủ đề ---------------------------------------------------------------------------------------------------------------------*/
                         <div className="field flex-1">
                             <label className='block' htmlFor="topicIds">Chủ đề</label>
-                            <MultiSelect name="topicIds" display='chip' placeholder="Select Topics" style={{ width: '100%', maxWidth: "70vw" }} value={topicIds} onChange={(e) => setTopicIds([...e.value])} options={GetIDNameTopicPair(props.topicListRef.current)} />
+                            <MultiSelect name="topicIds" display='chip' placeholder="Chọn chủ đề" style={{ width: '100%', maxWidth: "70vw" }} value={topicIds} onChange={(e) => setTopicIds([...e.value])} options={GetIDNameTopicPair(props.topicListRef.current)} />
                         </div>
                         /* -----------------------------------------------------================= ----------------------------------------------------------------------------------------------------------*/
                     }
