@@ -15,7 +15,7 @@ import { Doughnut, Pie } from "react-chartjs-2";
 import { Navigate } from 'react-router-dom';
 import { callPutUserTarget } from '../api/api';
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
-import useProfile, { GetFakeSuggestionData } from "../hooks/ProfileHook";
+import useProfile from "../hooks/ProfileHook";
 import { IsNotLogIn } from '../utils/AuthCheck';
 import convertSecondsToString from "../utils/convertSecondsToString";
 import formatDate from "../utils/formatDateToString";
@@ -34,6 +34,8 @@ export default function UserProfilePage() {
 
     if (IsNotLogIn()) return <Navigate to={"/home?login=true"} />
 
+
+
     return (
         <main className="pt-8 flex gap-3 flex-column">
             <div key="area-1">
@@ -47,7 +49,7 @@ export default function UserProfilePage() {
             <Card key="activity-log" className='shadow-7' title="4. Nhật ký học tập"><ActivityLog userResultRows={state.results} /></Card>
             <div key="area-3" className="flex gap-3 flex-wrap">
                 <Card key="time-spent" className="shadow-7 flex-1" style={{ minWidth: "590px" }} title="5. Thời gian học tập theo kỹ năng">{TimeSpent(state.skillStats)}</Card>
-                <Card key="suggestion" className='shadow-7 flex-1' title="6. Đề xuất cải thiện">{Suggestions(GetFakeSuggestionData())}</Card>
+                <Card key="suggestion" className='shadow-7 flex-1' title="6. Đề xuất cải thiện">{Suggestions(ConvertTopicStatToSuggestion(state.topicStats))}</Card>
 
             </div>
             {/* <Card key="stat" className='shadow-7' title="7. Thống kê"></Card> */}
@@ -66,7 +68,9 @@ const UserGoal: React.FC<{ targetRef: React.MutableRefObject<number>; currentSco
     const GoalLabel = Array.from(new Set([0, 10, 255, 405, 605, 785, 905, 990, targetScore, currentScore])).sort((a, b) => a - b);
     const currentScoreIndex = GoalLabel.indexOf(currentScore);
     const [activeIndex, setActiveIndex] = useState(currentScoreIndex);
-    console.log(targetScore);
+    if (currentScoreIndex != activeIndex) {
+        setActiveIndex(currentScoreIndex);
+    }
 
     // Generate unique and sorted GoalLabel dynamically
     const steps = GetSteps({ GoalLabel, activeIndex, currentScore, setActiveIndex, setTargetScore, targetScore, currentScoreIndex });
@@ -339,6 +343,18 @@ function Suggestions(suggestionOnParts: SuggestionsForUser[]) {
             </Stepper>
         </main>
     )
+}
+function ConvertTopicStatToSuggestion(topicStats: TopicStat[]): SuggestionsForUser[] {
+    return topicStats.filter(t=>t.totalCorrect !== 0 || t.totalIncorrect !== 0).toSorted((a,b)=> 
+        Math.round(a.totalCorrect / ((a.totalCorrect + a.totalIncorrect) || 1) * 10000) / 100 
+    - Math.round(b.totalCorrect / ((b.totalCorrect + b.totalIncorrect) || 1) * 10000) / 100
+    ).map(ts=> {
+        return {
+            title: ts.topic.name,
+            content: ts.topic.solution
+        }
+    }).slice(0,5);
+
 }
 
 function correctPercentTemplate(rowData: TopicStat) {
