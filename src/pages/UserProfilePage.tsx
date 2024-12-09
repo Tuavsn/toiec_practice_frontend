@@ -67,19 +67,16 @@ const UserGoal: React.FC<{ targetRef: React.MutableRefObject<number>; currentSco
     }
     const GoalLabel = Array.from(new Set([0, 10, 255, 405, 605, 785, 905, 990, targetScore, currentScore])).sort((a, b) => a - b);
     const currentScoreIndex = GoalLabel.indexOf(currentScore);
-    const [activeIndex, setActiveIndex] = useState(currentScoreIndex);
-    if (currentScoreIndex != activeIndex) {
-        setActiveIndex(currentScoreIndex);
-    }
+
 
     // Generate unique and sorted GoalLabel dynamically
-    const steps = GetSteps({ GoalLabel, activeIndex, currentScore, setActiveIndex, setTargetScore, targetScore, currentScoreIndex });
+    const steps = GetSteps({ GoalLabel, currentScore, setTargetScore, targetScore, currentScoreIndex });
     return (
         <div className="card">
             <h3>
                 Cần cố gắng <i className="text-red-500">{targetScore - currentScore}</i> điểm nữa để đạt được mục tiêu :{getCurrentTitle(targetScore)}
             </h3>
-            <Steps model={steps} activeIndex={activeIndex} readOnly={false} className="m-2 pt-4" />
+            <Steps model={steps} activeIndex={currentScoreIndex} readOnly={false} className="m-2 pt-4" />
             <section className="flex justify-content-center gap-5 mt-7">
                 <div className="p-inputgroup w-fit">
                     <Button severity="success" label="Đặt mục tiêu mới" onClick={() => callPutUserTarget(targetScore)} />
@@ -396,10 +393,8 @@ export type UserStepGoalParams = {
     GoalLabel: number[],
     currentScore: number,
     targetScore: number,
-    activeIndex: number,
     currentScoreIndex: number,
     setTargetScore: React.Dispatch<React.SetStateAction<number>>,
-    setActiveIndex: React.Dispatch<React.SetStateAction<number>>,
 }
 function GetSteps(params: UserStepGoalParams): MenuItem[] {
 
@@ -419,14 +414,14 @@ function GetSteps(params: UserStepGoalParams): MenuItem[] {
         if (itemIndex === targetIndex) return 'var(--yellow-500)';
         if (itemIndex === endIndex) return 'var(--green-500)';
         if (itemIndex === params.currentScoreIndex) return 'var(--blue-500)';
-        return params.activeIndex === itemIndex ? 'var(--primary-color)' : 'var(--surface-b)';
+        return params.currentScoreIndex === itemIndex ? 'var(--primary-color)' : 'var(--surface-b)';
     };
 
     const getTextColor = (itemIndex: number) => {
         if (itemIndex === targetIndex || itemIndex === endIndex || itemIndex === params.currentScoreIndex) {
             return 'var(--surface-b)';
         }
-        return params.activeIndex === itemIndex ? 'var(--surface-b)' : 'var(--text-color-secondary)';
+        return params.currentScoreIndex === itemIndex ? 'var(--surface-b)' : 'var(--text-color-secondary)';
     };
 
     const getLabel = (itemIndex: number) => {
@@ -447,7 +442,6 @@ function GetSteps(params: UserStepGoalParams): MenuItem[] {
                     marginTop: '-25px',
                 }}
                 onClick={() => {
-                    params.setActiveIndex(index);
                     params.setTargetScore(params.GoalLabel[index]);
                 }}
             >

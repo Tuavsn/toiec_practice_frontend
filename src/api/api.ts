@@ -324,6 +324,15 @@ export const callGetPermission = async (currentPageIndex: number, pageSize: numb
         return null;
     }
 }
+export const callGetPermissionList = async (): Promise<TableData<Permission> | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<Permission>>>(`${import.meta.env.VITE_API_URL}/permissions?current=1&pageSize=999&active=true`);
+        return response.data.data;
+
+    } catch (error) {
+        return null;
+    }
+}
 
 export const callPostRole = async (role: Role, permissionIDList: PermissionID[]): Promise<boolean> => {
     try {

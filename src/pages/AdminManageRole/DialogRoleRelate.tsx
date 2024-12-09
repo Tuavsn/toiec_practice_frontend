@@ -124,7 +124,7 @@ const RenderUpsertRoleBody: React.FC<DialogUpdateRoleBodyProps> = React.memo(
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end mt-5">
-                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => handleSave({ row: { ...props.currentSelectedRow, } ,permissionIDList: formData.permissionIDs, dispatch: props.dispatch, toast, setIsDisabled })} />
+                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => handleSave({ row: { ...props.currentSelectedRow,...formData } ,permissionIDList: formData.permissionIDs, dispatch: props.dispatch, toast, setIsDisabled })} />
                 </div>
 
             </Fieldset>
