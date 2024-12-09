@@ -1,5 +1,5 @@
 import { emptyOverallStat } from "../utils/types/emptyValue";
-import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, PracticePaper, ProfileHookState, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
+import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, PracticePaper, ProfileHookState, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -285,6 +285,16 @@ export const callGetUserRow = async (currentPageIndex: number, pageSize: number 
     }
 
 }
+export const callGetRole = async (): Promise<TableData<Role> | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<Role>>>(`${import.meta.env.VITE_API_URL}/roles`);
+        return response.data.data;
+        
+    } catch (error) {
+        return null;
+    }
+
+}
 
 export const callGetCategoryRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<CategoryRow> | null> => {
     try {
@@ -327,6 +337,16 @@ export const callPutCategoryRowActive = async (category: CategoryRow): Promise<b
     try {
         await axios.put(`${import.meta.env.VITE_API_URL}/categories/${category.id}/status`, {
             active: !category.active
+        });
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+export const callPutUpdateRoleForUser = async (role: Role, user: UserRow): Promise<boolean> => {
+    try {
+        await axios.put(`${import.meta.env.VITE_API_URL}/users/${user.id}/role`, {
+            roleId: role.id
         });
         return true;
     } catch (error) {
@@ -448,7 +468,7 @@ export const callPutUserTarget = async (targetScore: number): Promise<void> => {
     try {
         await axios.put<any>(`${import.meta.env.VITE_API_URL}/auth/account/target`, { target: targetScore });
         console.log("ok");
-        
+
     } catch (error) {
         console.error(error);
     }

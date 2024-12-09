@@ -16,18 +16,19 @@ function AdminManageUserPage() {
     } = useUser();
 
     return (
-        <Card title={<CustomBreadCrumb />}>                                          {/* Thẻ div được áp dụng class CSS "card" */}
-            {/* Thành phần DialogUserActionButton quản lý hành động liên quan đến bài giảng hiện tại */}
+        <Card title={<CustomBreadCrumb />}>                                          
+            {/* Thành phần DialogUserActionButton quản lý hành động liên quan đến người dùng hiện tại */}
             <DialogUserActionButton
-                currentSelectedRow={state.currentSelectedRow}   // Bài giảng hiện được chọn
+                currentSelectedRow={state.currentSelectedRow}   // người dùng hiện được chọn
                 job={state.job}                                         // Công việc hiện tại (job)
+                roleList={state.roleList}
                 dispatch={dispatch}                                     // Hàm dispatch để cập nhật trạng thái
             />
 
-            {/* Thành phần AdminUserTable hiển thị danh sách các bài giảng */}
+            {/* Thành phần AdminUserTable hiển thị danh sách các người dùng */}
             <AdminUserTable
                 dispatch={dispatch}                                     // Hàm dispatch để quản lý các hành động trong bảng
-                rows={state.rows}                               // Dữ liệu các bài giảng để hiển thị
+                rows={state.rows}                               // Dữ liệu các người dùng để hiển thị
             />
 
             <Paginator first={state.currentPageIndex * 5} rows={5} totalRecords={totalItems.current} onPageChange={onPageChange} />

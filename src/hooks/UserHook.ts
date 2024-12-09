@@ -1,18 +1,21 @@
 import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useReducer, useRef } from "react";
-import { callGetUserRow } from "../api/api";
+import { callGetRole, callGetUserRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
 import { initialUserState } from "../utils/types/emptyValue";
-import { RowHookAction, RowHookState, UserRow } from "../utils/types/type";
+import { UserHookAction, UserHookState } from "../utils/types/type";
 
 
 
 
-const reducer = (state: RowHookState<UserRow>, action: RowHookAction<UserRow>): RowHookState<UserRow> => {
+const reducer = (state: UserHookState, action: UserHookAction): UserHookState => {
     switch (action.type) {
         case 'FETCH_ROWS_SUCCESS': {
             const [newUsers, newPageIndex] = action.payload;
             return { ...state, rows: newUsers, currentPageIndex: newPageIndex }
+        }
+        case 'FETCH_ROLES_SUCCESS': {
+            return { ...state, roleList: action.payload }
         }
         case 'RESET_ROWS':
             return { ...state, rows: [] }
@@ -50,13 +53,15 @@ export default function useUser() {
 
     }, [])
     useEffect(() => {
-
+        if (state.roleList.length === 0) {
+            callGetRole().then(data => { if (data) dispatch({ type: "FETCH_ROLES_SUCCESS", payload: data.result }) })
+        }
         fetchUsers(state.currentPageIndex);
 
     }, [state.isRefresh]);
 
     const onPageChange = (e: PaginatorPageChangeEvent) => {
-        dispatch({type:"RESET_ROWS"});
+        dispatch({ type: "RESET_ROWS" });
         fetchUsers(e.page)
     }
 

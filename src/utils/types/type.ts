@@ -469,6 +469,12 @@ export type DialogRowProps<RowModel> = {
   dispatch: Dispatch<RowHookAction<RowModel>>,
   job: DialogRowJobType,
 }
+export type DialogUserRowProps = {
+  currentSelectedRow: UserRow,
+  dispatch: Dispatch<UserHookAction>,
+  job: DialogRowJobType,
+  roleList: Role[]
+}
 
 export type DialogUpdateCategoryBodyProps = {
   currentSelectedRow: CategoryRow,
@@ -477,6 +483,11 @@ export type DialogUpdateCategoryBodyProps = {
 export type DialogUpdateTopicBodyProps = {
   currentSelectedRow: Topic,
   dispatch: Dispatch<RowHookAction<Topic>>,
+}
+export type DialogUpdateUserBodyProps = {
+  currentSelectedRow: UserRow,
+  dispatch: Dispatch<UserHookAction>,
+  roleList: Role[],
 }
 export type DialogUpdateTestBodyProps = {
   currentSelectedRow: TestRow,
@@ -499,6 +510,12 @@ export type RenderRowDialogParams<RowModel> = {
   job: DialogRowJobType,
   currentSelectedRow: RowModel,
   dispatch: Dispatch<RowHookAction<RowModel>>,
+}
+export type RenderUserRowDialogParams = {
+  job: DialogRowJobType,
+  currentSelectedRow: UserRow,
+  dispatch: Dispatch<UserHookAction>,
+  roleList: Role[],
 }
 
 export type SaveTextParams = {
@@ -551,6 +568,13 @@ export type handeSaveRowParams<RowModel> = {
   row: RowModel
   toast: React.MutableRefObject<Toast | null>,
   dispatch: React.Dispatch<RowHookAction<RowModel>>,
+  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>,
+}
+export type handeSaveUserRowParams = {
+  role: Role,
+  user: UserRow,
+  toast: React.MutableRefObject<Toast | null>,
+  dispatch: React.Dispatch<UserHookAction>,
   setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>,
 }
 export type RowActionButtonProps<RowModel> = {
@@ -767,6 +791,14 @@ export type RowHookState<RowModel> = {
   job: DialogRowJobType,
   currentSelectedRow: RowModel,
 }
+export type UserHookState = {
+  rows: UserRow[] | null,
+  isRefresh: boolean;
+  currentPageIndex: number,
+  job: DialogRowJobType,
+  currentSelectedRow: UserRow,
+  roleList: Role[],
+}
 
 type FetchLecture = {
   lectures: LectureRow[],
@@ -783,6 +815,17 @@ export type RowHookAction<RowModel> =
   | { type: 'OPEN_UPDATE_DIALOG'; payload: RowModel }
   | { type: 'OPEN_DELETE_DIALOG'; payload: RowModel }
   | { type: 'OPEN_CREATE_DIALOG'; payload: RowModel }
+export type UserHookAction =
+  | { type: 'FETCH_ROWS_SUCCESS'; payload: [UserRow[], number] }
+  | { type: 'FETCH_ROLES_SUCCESS'; payload: Role[] }
+  | { type: 'SET_PAGE'; payload: number }
+  | { type: 'REFRESH_DATA' }
+  | { type: 'RESET_ROWS' }
+  | { type: 'SET_CURRENT_ROW'; payload: UserRow }
+  | { type: 'TOGGLE_DIALOG'; payload: DialogRowJobType }
+  | { type: 'OPEN_UPDATE_DIALOG'; payload: UserRow }
+  | { type: 'OPEN_DELETE_DIALOG'; payload: UserRow }
+  | { type: 'OPEN_CREATE_DIALOG'; payload: UserRow }
 export type LectureHookAction =
   | { type: 'FETCH_LECTURE_SUCCESS'; payload: FetchLecture }
   | { type: 'FETCH_TOPIC_SUCCESS'; payload: Topic[] }

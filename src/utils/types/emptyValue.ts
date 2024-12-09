@@ -1,5 +1,5 @@
 import { TreeNode } from "primereact/treenode";
-import { CategoryRow, LectureHookState, LectureRow, OverallStat, ProfileHookState, Role, RowHookState, TestDetailPageData, TestResultSummary, TestReviewHookState, TestRow, Topic, UserRow } from "./type";
+import { CategoryRow, LectureHookState, LectureRow, OverallStat, ProfileHookState, Role, RowHookState, TestDetailPageData, TestResultSummary, TestReviewHookState, TestRow, Topic, UserHookState, UserRow } from "./type";
 const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
@@ -103,12 +103,13 @@ export const initialTestReviewState: TestReviewHookState = {
     pageMapper: []
 } as const
 
-export const initialUserState: RowHookState<UserRow> = {
+export const initialUserState: UserHookState = {
     rows: null,
     isRefresh: false,
     currentPageIndex: 0,
     job: "",
-    currentSelectedRow: emptyUserRow
+    currentSelectedRow: emptyUserRow,
+    roleList: [],
 } as const
 
 export const initialCategoryState: RowHookState<CategoryRow> = {
