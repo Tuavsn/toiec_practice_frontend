@@ -1,6 +1,6 @@
 import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
-import { callGetPermission, callGetRole } from "../api/api";
+import { callGetPermissionList, callGetRole } from "../api/api";
 import { useToast } from "../context/ToastProvider";
 import SetWebPageTitle from "../utils/setTitlePage";
 import { initialRoleState } from "../utils/types/emptyValue";
@@ -54,7 +54,7 @@ export default function useRole() {
     useLayoutEffect(() => SetWebPageTitle("Quản lý quyền"), []);
     useEffect(() => {
         if (state.permissionList.length === 0) {
-            callGetPermission(0,999).then(data => {
+            callGetPermissionList().then(data => {
                 if (data) dispatch({ type: "FETCH_PERMISSIONS_SUCCESS", payload: data.result })
             })
         }
