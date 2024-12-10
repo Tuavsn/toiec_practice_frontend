@@ -99,7 +99,7 @@ const RenderUpsertCateogoryBody: React.FC<DialogUpdateTestBodyProps> = React.mem
                     {
                         /* -----------------------------------------------------Định dạng bộ đề ----------------------------------------------------------------------------------------------------------*/
                         <div className="field flex-1">
-                            <label className='block' htmlFor="row">name</label>
+                            <label className='block' htmlFor="row">Tên đề</label>
                             <InputText id="row" name="row" value={formData.name} required autoComplete="additional-name" onChange={(e) => onInputTextChange(e, 'name')} />
                         </div>
                         /* -----------------------------------------------------================= ----------------------------------------------------------------------------------------------------------*/

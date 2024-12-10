@@ -1,11 +1,11 @@
 import { PaginatorPageChangeEvent } from "primereact/paginator";
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useEffect, useReducer, useRef } from "react";
+import { useParams } from "react-router-dom";
 import { callGetTestRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
-import { emptyTestRow, initialTestState } from "../utils/types/emptyValue";
-import { TestRow, RowHookAction, RowHookState, CategoryID, Name_ID } from "../utils/types/type";
-import { useParams } from "react-router-dom";
 import SplitNameIDFromURL from "../utils/splitNameIDFromURL";
+import { emptyTestRow, initialTestState } from "../utils/types/emptyValue";
+import { CategoryID, Name_ID, RowHookAction, RowHookState, TestRow } from "../utils/types/type";
 
 const reducer = (state: RowHookState<TestRow>, action: RowHookAction<TestRow>): RowHookState<TestRow> => {
     switch (action.type) {
@@ -38,7 +38,7 @@ export default function useTest() {
     const { category_name_id = "no idCategory found" } = useParams<{ category_name_id: Name_ID<CategoryID> }>();
     const [, category_id] = SplitNameIDFromURL(category_name_id);
     emptyTestRow.idCategory = category_id;
-    const fetchTests = useCallback(async (pageNumber: number) => {
+    const fetchTests = async (pageNumber: number) => {
 
         const response = await callGetTestRow(category_id, pageNumber);
         if (!response) {
@@ -47,7 +47,7 @@ export default function useTest() {
         }
         dispatch({ type: "FETCH_ROWS_SUCCESS", payload: [response.result, pageNumber] });
         totalItems.current = response.meta.totalItems;
-    }, [])
+    }
     useEffect(() => {
 
         fetchTests(state.currentPageIndex);

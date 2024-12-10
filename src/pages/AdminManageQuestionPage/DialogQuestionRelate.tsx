@@ -35,7 +35,7 @@ export const DialogForQuestionPage: React.FC<DialogQuestionPageProps> = React.me
 // Định nghĩa component DialogActionButton sử dụng React.FC với React.memo để tối ưu hiệu suất
 export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = React.memo(
     ({ setIsVisible, isVisible, title, topicList, currentSelectedQuestion }) => {
-        console.dir(currentSelectedQuestion.current);
+
         return (
             <Dialog
                 onHide={() => setIsVisible(false)}           // Đóng Dialog khi sự kiện onHide xảy ra

@@ -65,6 +65,8 @@ function changeName(name: string): string {
             return "Chức danh";
         case "permission":
             return "Quyền";
+        case "upload":
+            return "đăng tệp từ excel";
         default:
             return "Nhà";
     }
