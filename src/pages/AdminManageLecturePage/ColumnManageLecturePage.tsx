@@ -9,7 +9,7 @@ import { LectureActionButtonProps, LectureHookAction, LectureRow } from "../../u
 export function RenderAdminLectureColumns(dispatch: Dispatch<LectureHookAction>): JSX.Element[] {
     return [
 
-        <Column key="col-name"/*             */ field="name"/*         */ header="Bài giảng"/*   */ filter/*          */ sortable />,
+        <Column key="col-name"/*             */ field="name"/*         */ header="Bài học"/*   */ filter/*          */ sortable />,
 
         <Column key="col-topic"/*            */ field="topic"/*        */ header="Chủ đề"/*      */ filter/*          */ sortable/*                                                                                                                                 */ body={topicTemplate} />,
 
@@ -27,16 +27,16 @@ export const ActionBodyTemplate: React.FC<LectureActionButtonProps> = React.memo
             // Chia các nút hành động ra thành hàng, sử dụng flexbox để căn chỉnh
             <div className='flex justify-content-around'>
 
-                {/* Nút chỉnh sửa: Khi nhấn, dispatch hành động để mở hộp thoại cập nhật bài giảng */}
+                {/* Nút chỉnh sửa: Khi nhấn, dispatch hành động để mở hộp thoại cập nhật bài học */}
                 <Button icon="pi pi-pencil" rounded outlined style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_UPDATE_DIALOG", payload: currentSelectedLecture }); }} />
 
-                {/* Nút sửa thiết kế: Khi nhấn, dispatch hành động để mở hộp thoại sửa thiết kế trang bài giảng */}
+                {/* Nút sửa thiết kế: Khi nhấn, dispatch hành động để mở hộp thoại sửa thiết kế trang bài học */}
                 <Button icon="pi pi-code" rounded outlined severity="info" style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_PAGE_DESIGNER_DIALOG", payload: currentSelectedLecture }); }} />
 
-                {/* Nút sửa câu hỏi: Dẫn đến trang câu hỏi của bài giảng hiện tại */}
+                {/* Nút sửa câu hỏi: Dẫn đến trang câu hỏi của bài học hiện tại */}
                 {/* <Link to={currentSelectedLecture.id}><Button icon="pi pi-question-circle" rounded outlined severity="help" style={{ width: "50px", height: "50px" }} link /></Link> */}
 
-                {/* Nút xóa: Khi nhấn, dispatch hành động để mở hộp thoại xóa bài giảng */}
+                {/* Nút xóa: Khi nhấn, dispatch hành động để mở hộp thoại xóa bài học */}
                 <Button icon={`pi ${currentSelectedLecture.active ? "pi-trash" : "pi-sync"}`} rounded outlined severity="danger" style={{ width: "50px", height: "50px" }} onClick={() => { dispatch({ type: "OPEN_DELETE_DIALOG", payload: currentSelectedLecture }); }} />
 
             </div>
@@ -44,7 +44,7 @@ export const ActionBodyTemplate: React.FC<LectureActionButtonProps> = React.memo
     }
 );
 
-// Hàm topicTemplate hiển thị các chủ đề của bài giảng dưới dạng các Chip
+// Hàm topicTemplate hiển thị các chủ đề của bài học dưới dạng các Chip
 function topicTemplate(rowData: LectureRow): JSX.Element {
     return (
         <React.Fragment>

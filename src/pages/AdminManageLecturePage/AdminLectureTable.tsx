@@ -7,11 +7,11 @@ import { RenderAdminLectureColumns } from "./ColumnManageLecturePage";
 const AdminLectureTable: React.FC<AdminLectureTableProps> = (props) => {
 
     return (
-        // DataTable là một bảng dữ liệu, hiển thị danh sách bài giảng (lectures) từ props
+        // DataTable là một bảng dữ liệu, hiển thị danh sách bài học (lectures) từ props
         <DataTable 
             value={props.lectures ?? []} // Dữ liệu nguồn từ props.lectures
             size="small" // Kích thước của bảng được thiết lập là nhỏ
-            loading={props.lectures === null} // Hiển thị trạng thái "loading" nếu danh sách bài giảng rỗng
+            loading={props.lectures === null} // Hiển thị trạng thái "loading" nếu danh sách bài học rỗng
             dataKey="id" // Sử dụng thuộc tính "id" làm khóa chính cho các hàng trong bảng
         >
             {/* Gọi hàm RenderAdminLectureColumns để render các cột bảng, truyền dispatch qua props */}

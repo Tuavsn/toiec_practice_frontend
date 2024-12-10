@@ -15,7 +15,7 @@ export default function ExercisePage() {
                 <Button severity="help" className="shadow-5 m-2 w-full py-4 flex-1 bg-green-100 glassmorphism" style={{ minWidth: "100px" }} text raised onClick={() => navigate("/doexercise/partNum=1")} label="Nghe hình ảnh" />
                 <Button severity="help" className="shadow-5 m-2 w-full py-4 flex-1 bg-green-100 glassmorphism" style={{ minWidth: "100px" }} text raised onClick={() => navigate("/doexercise/partNum=2")} label="Nghe câu hỏi và trả lời" />
                 <Button severity="help" className="shadow-5 m-2 w-full py-4 flex-1 bg-green-100 glassmorphism" style={{ minWidth: "100px" }} text raised onClick={() => navigate("/doexercise/partNum=3")} label="Nghe hội thoại" />
-                <Button severity="help" className="shadow-5 m-2 w-full py-4 flex-1 bg-green-100 glassmorphism" style={{ minWidth: "100px" }} text raised onClick={() => navigate("/doexercise/partNum=4")} label="Nghe bài giảng" />
+                <Button severity="help" className="shadow-5 m-2 w-full py-4 flex-1 bg-green-100 glassmorphism" style={{ minWidth: "100px" }} text raised onClick={() => navigate("/doexercise/partNum=4")} label="Nghe bài học" />
             </section>
 
             <section className="flex-1 flex flex-column" style={{ minWidth: "400px" }}>

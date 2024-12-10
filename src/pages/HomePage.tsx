@@ -44,11 +44,11 @@ function Info() {
                         <Card className="p-4 h-full" header={(
                             <div className="flex align-items-center">
                                 <img src={slideico} className="max-w-4rem mr-4"/>
-                                <h3>Bài giảng chất lượng cao, phù hợp với mọi đối tượng</h3>
+                                <h3>Bài học chất lượng cao, phù hợp với mọi đối tượng</h3>
                             </div>
                         )}>
                             <p className="m-0">
-                            Hệ thống bài giảng phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOEIC.
+                            Hệ thống bài học phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOEIC.
                             </p>
                         </Card>
                     </div>
@@ -143,17 +143,17 @@ function News() {
     return (
         <>
             <div className="py-6">
-                <h2 className="text-center"><a href="/course" style={{color: "#004B8D"}}>Bài giảng mới</a></h2>
+                <h2 className="text-center"><a href="/course" style={{color: "#004B8D"}}>Bài học mới</a></h2>
                 <div className="grid">
                     <div className="col">
                         <Card className="p-4 h-full" header={(
                             <div className="flex align-items-center">
                                 <img src="https://prepedu.com/_ipx/_/imgs/home/slide.svg" className="max-w-4rem mr-4"/>
-                                <h3>Bài giảng chất lượng cao, phù hợp với mọi đối tượng</h3>
+                                <h3>Bài học chất lượng cao, phù hợp với mọi đối tượng</h3>
                             </div>
                         )}>
                             <p className="m-0">
-                            Hệ thống bài giảng phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOEIC.
+                            Hệ thống bài học phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOEIC.
                             </p>
                         </Card>
                     </div>
@@ -191,11 +191,11 @@ function News() {
                         <Card className="p-4 h-full" header={(
                             <div className="flex align-items-center">
                                 <img src="https://prepedu.com/_ipx/_/imgs/home/slide.svg" className="max-w-4rem mr-4"/>
-                                <h3>Bài giảng chất lượng cao, phù hợp với mọi đối tượng</h3>
+                                <h3>Bài học chất lượng cao, phù hợp với mọi đối tượng</h3>
                             </div>
                         )}>
                             <p className="m-0">
-                            Hệ thống bài giảng phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOEIC.
+                            Hệ thống bài học phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOEIC.
                             </p>
                         </Card>
                     </div>
