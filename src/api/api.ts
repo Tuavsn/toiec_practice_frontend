@@ -471,7 +471,7 @@ export const callPutUpdateUserRow = async (user: UserRow): Promise<boolean> => {
 
 export const callPostTest = async (testRow: TestRow): Promise<boolean> => {
     try {
-        axios.post<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests`, {
+        await axios.post<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests`, {
             name: testRow.name,
             categoryId: testRow.idCategory,
             totalUserAttempt: testRow.totalUserAttempt,
@@ -486,7 +486,7 @@ export const callPostTest = async (testRow: TestRow): Promise<boolean> => {
 }
 export const callPostUpdateTest = async (testRow: TestRow): Promise<boolean> => {
     try {
-        axios.post<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests/${testRow.id}`, {
+        await axios.post<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests/${testRow.id}`, {
             name: testRow.name,
             categoryId: testRow.idCategory,
             totalUserAttempt: testRow.totalUserAttempt,
@@ -502,7 +502,7 @@ export const callPostUpdateTest = async (testRow: TestRow): Promise<boolean> => 
 
 export const callPutUpdateTopic = async (topicRow: Topic): Promise<boolean> => {
     try {
-        axios.put<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
+        await axios.put<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
             name: topicRow.name,
             solution: topicRow.solution,
             overallSkill: topicRow.solution,
@@ -515,7 +515,7 @@ export const callPutUpdateTopic = async (topicRow: Topic): Promise<boolean> => {
 
 export const callPostTopic = async (topicRow: Topic): Promise<boolean> => {
     try {
-        axios.post<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
+        await axios.post<ApiResponse<Topic>>(`${import.meta.env.VITE_API_URL}/topics`, {
             name: topicRow.name,
             solution: topicRow.solution,
             overallSkill: topicRow.solution,

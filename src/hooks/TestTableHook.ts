@@ -38,7 +38,7 @@ export default function useTest() {
     const { category_name_id = "no idCategory found" } = useParams<{ category_name_id: Name_ID<CategoryID> }>();
     const [, category_id] = SplitNameIDFromURL(category_name_id);
     emptyTestRow.idCategory = category_id;
-    const fetchTests = useCallback(async (pageNumber: number) => {
+    const fetchTests = async (pageNumber: number) => {
 
         const response = await callGetTestRow(category_id, pageNumber);
         if (!response) {
@@ -47,7 +47,7 @@ export default function useTest() {
         }
         dispatch({ type: "FETCH_ROWS_SUCCESS", payload: [response.result, pageNumber] });
         totalItems.current = response.meta.totalItems;
-    }, [])
+    }
     useEffect(() => {
 
         fetchTests(state.currentPageIndex);
