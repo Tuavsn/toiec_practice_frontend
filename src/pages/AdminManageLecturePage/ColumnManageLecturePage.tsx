@@ -2,10 +2,9 @@ import { Button } from "primereact/button";
 import { Chip } from "primereact/chip";
 import { Column } from "primereact/column";
 import React, { Dispatch } from "react";
-import { Link } from "react-router-dom";
 import { statusBodyTemplate, timeStampBodyTemplate } from "../../components/Common/Table/CommonColumn";
-import { LectureActionButtonProps, LectureHookAction, LectureRow } from "../../utils/types/type";
 import { emptyLectureRowValue } from "../../utils/types/emptyValue";
+import { LectureActionButtonProps, LectureHookAction, LectureRow } from "../../utils/types/type";
 
 export function RenderAdminLectureColumns(dispatch: Dispatch<LectureHookAction>): JSX.Element[] {
     return [
