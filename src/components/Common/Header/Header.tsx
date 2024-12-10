@@ -25,7 +25,7 @@ export default function Header() {
 
     // Định nghĩa danh sách các mục trong header
     const HeaderItems = [
-        { label: 'Bài giảng', icon: 'pi pi-book', command: () => handleCommand('/lecture') },
+        { label: 'Bài học', icon: 'pi pi-book', command: () => handleCommand('/lecture') },
         { label: 'Đề thi', icon: 'pi pi-folder', command: () => handleCommand('/test') },
         { label: 'Luyện tập', icon: 'pi pi-book', command: () => handleCommand('/exercise') },
         { label: 'Tra cứu', icon: 'pi pi-search', command: () => handleCommand('/lookup') },

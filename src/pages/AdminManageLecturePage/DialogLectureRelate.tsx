@@ -51,24 +51,24 @@ function RenderDialog(params: RenderLectureDialogParams): [string, JSX.Element] 
 
     // Dựa trên giá trị của params.job, hàm sẽ trả về tiêu đề và nội dung phù hợp
     switch (params.job) {
-        case "CREATE"://------------------------------------ Khi job là CREATE, hiển thị tiêu đề "Tạo bài giảng mới" và nội dung RenderUpdateLectureBody với giá trị bài giảng rỗng
+        case "CREATE"://------------------------------------ Khi job là CREATE, hiển thị tiêu đề "Tạo bài học mới" và nội dung RenderUpdateLectureBody với giá trị bài học rỗng
 
-            return ["Tạo bài giảng mới",
+            return ["Tạo bài học mới",
                 <RenderUpdateLectureBody dispatch={params.dispatch} topicListRef={params.topicListRef} currentSelectedLecture={emptyLectureRowValue} />
             ];
-        case "UPDATE"://------------------------------------- Khi job là UPDATE, hiển thị tiêu đề "Sửa bài giảng" cùng với tên của bài giảng hiện tại và nội dung RenderUpdateLectureBody với bài giảng đã chọn
+        case "UPDATE"://------------------------------------- Khi job là UPDATE, hiển thị tiêu đề "Sửa bài học" cùng với tên của bài học hiện tại và nội dung RenderUpdateLectureBody với bài học đã chọn
 
-            return [`Sửa bài giảng ${params.currentSelectedLecture.name}`,
+            return [`Sửa bài học ${params.currentSelectedLecture.name}`,
             <RenderUpdateLectureBody dispatch={params.dispatch} topicListRef={params.topicListRef} currentSelectedLecture={params.currentSelectedLecture} />
             ];
-        case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa bài giảng" cùng với tên của bài giảng hiện tại và một thông báo xác nhận xóa
+        case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa bài học" cùng với tên của bài học hiện tại và một thông báo xác nhận xóa
 
-            return [`Xóa bài giảng ${params.currentSelectedLecture.name}`,
+            return [`Xóa bài học ${params.currentSelectedLecture.name}`,
             <RenderDeleteLectureBody currentSelectedLecture={params.currentSelectedLecture} dispatch={params.dispatch} />
             ];
-        case "PAGE_DESIGNER"://------------------------------- Khi job là PAGE_DESIGNER, hiển thị tiêu đề "Viết bài giảng" và nội dung là EditCourseRichTextBox
+        case "PAGE_DESIGNER"://------------------------------- Khi job là PAGE_DESIGNER, hiển thị tiêu đề "Viết bài học" và nội dung là EditCourseRichTextBox
 
-            return [`Viết bài giảng ${params.currentSelectedLecture.name}`,
+            return [`Viết bài học ${params.currentSelectedLecture.name}`,
             <EditCourseRichTextBox lectureID={params.currentSelectedLecture.id} />
             ];
     }
@@ -105,14 +105,14 @@ const RenderUpdateLectureBody: React.FC<DialogUpdateLectureBodyProps> = React.me
         const [topicIds, setTopicIds] = useState<TopicID[]>(props.currentSelectedLecture.topic.map(t => t.id));
         const { toast } = useToast();
         const [isDisabled, setIsDisabled] = useState(false);
-        const title = useRef<string>(props.currentSelectedLecture.id ? "Sửa bài giảng" : "Thêm bài giảng");
+        const title = useRef<string>(props.currentSelectedLecture.id ? "Sửa bài học" : "Thêm bài học");
         return (
             <Fieldset legend={title.current} >
                 <section className='flex flex-column gap-4 justify-content-space'>
                     {
-                        /* -----------------------------------------------------Tiêu đề bài giảng ----------------------------------------------------------------------------------------------------------*/
+                        /* -----------------------------------------------------Tiêu đề bài học ----------------------------------------------------------------------------------------------------------*/
                         <div className="field flex-1">
-                            <label className='block' htmlFor="lecture">Tiêu Đề Bài giảng</label>
+                            <label className='block' htmlFor="lecture">Tiêu Đề Bài học</label>
                             <InputText id="lecture" name="name" autoComplete="additional-name" ref={inputRef} defaultValue={props.currentSelectedLecture.name} />
                         </div>
                         /* -----------------------------------------------------================= ----------------------------------------------------------------------------------------------------------*/
@@ -148,7 +148,7 @@ const RenderUpdateLectureBody: React.FC<DialogUpdateLectureBodyProps> = React.me
 // khi nhấn nút Lưu
 async function handleSave(params: handeSaveLectureParams) {
     if (!params.title.trim() || !params.topicIds.length) {
-        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "Tên bài giảng cùng danh sách chủ đề không được phép để trống" });
+        params.toast.current?.show({ severity: 'error', summary: "Cảnh báo", detail: "Tên bài học cùng danh sách chủ đề không được phép để trống" });
         return;
     }
     let success = false;

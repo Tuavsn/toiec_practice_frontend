@@ -26,7 +26,7 @@ const LectureDetailsPage: React.FC = () => {
         <main className='pt-7'>
             {/* Hiển thị tiêu đề khóa học */}
             <section className="bg-gray-300 mb-5 shadow-5 glassmorphism">
-                <h2 className='text-center'>Bài giảng: <q>{lectureName}</q></h2>
+                <h2 className='text-center'>Bài học: <q>{lectureName}</q></h2>
             </section>
             <div className='flex-1 flex-column md:flex-row'>
                 {/* Nội dung chính của khóa học */}

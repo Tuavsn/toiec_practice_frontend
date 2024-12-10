@@ -16,7 +16,7 @@ export default function LecturePage() {
     const [state, dispatch] = useReducer(reducer, initialState);
     const searchTermRef = useRef<HTMLInputElement | null>(null);
     const totalItemsRef = useRef<number>(-1);
-    useLayoutEffect(() => SetWebPageTitle("Xem bài giảng"), [])
+    useLayoutEffect(() => SetWebPageTitle("Xem bài học"), [])
     useEffect(() => {
         const fetchLectures = async (pageIndex: number) => {
             dispatch({ type: "RESET_ROWS" });
@@ -33,7 +33,7 @@ export default function LecturePage() {
     return (
         <div className="p-4">
             <section className="mt-5 bg-gray-300 shadow-5 p-3 glassmorphism">
-                <h1 className="pl-4">Các bài giảng nên thử</h1>
+                <h1 className="pl-4">Các bài học nên thử</h1>
             </section>
             <div className="flex justify-content-end flex-wrap mt-4">
                 <div className="flex align-items-center justify-content-center m-2">
@@ -41,7 +41,7 @@ export default function LecturePage() {
                         <InputIcon className="pi pi-search"> </InputIcon>
                         <InputText
                             ref={searchTermRef}
-                            placeholder="Tìm bài giảng..."
+                            placeholder="Tìm bài học..."
                             className="p-mb-2"
                         />
                     </IconField>

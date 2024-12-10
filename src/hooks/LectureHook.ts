@@ -47,7 +47,7 @@ export default function useLecture() {
         totalItems.current = response.meta.totalItems;
 
     }, [])
-    useLayoutEffect(() => SetWebPageTitle("Quản lý bài giảng"), []);
+    useLayoutEffect(() => SetWebPageTitle("Quản lý bài học"), []);
     useEffect(() => {
 
         fetchLectures(state.currentPageIndex);
