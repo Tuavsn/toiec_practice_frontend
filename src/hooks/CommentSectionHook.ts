@@ -1,14 +1,13 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 import { callGetComments } from '../api/api';
 import { UserCommentAction, UserCommentState } from '../utils/types/type';
+import { PaginatorPageChangeEvent } from 'primereact/paginator';
 
 
 
 const initialState: UserCommentState = {
   comments: [],
-  page: 0,
-  totalRecords: 0,
-  newComment: '',
+  currentPageIndex: 0,
 };
 
 const reducer = (state: UserCommentState, action: UserCommentAction): UserCommentState => {
@@ -18,16 +17,12 @@ const reducer = (state: UserCommentState, action: UserCommentAction): UserCommen
         ...state, comments: action.payload
       };
     case 'FETCH_COMMENTS':
-      const [newComments,totalItem] = action.payload;
+      const [newComments, newPageNumber] = action.payload;
       return {
-        ...state, comments: newComments , 
+        ...state, comments: newComments, currentPageIndex: newPageNumber
       };
     case 'SET_PAGE':
-      return { ...state, page: action.payload };
-    case 'SET_NEW_COMMENT':
-      return { ...state, newComment: action.payload };
-    case 'RESET_NEW_COMMENT':
-      return { ...state, newComment: '' };
+      return { ...state, currentPageIndex: action.payload };
     default:
       return state;
   }
@@ -35,17 +30,32 @@ const reducer = (state: UserCommentState, action: UserCommentAction): UserCommen
 
 export default function useComments() {
   const [state, dispatch] = useReducer(reducer, initialState);
-
+  const totalItems = useRef<number>(0);
 
   useEffect(() => {
-    dispatch({ type: 'SET_COMMENTS', payload: null });
-    fetchComments(state.page);
-  }, [state.page]);
+    fetchComments(state.currentPageIndex);
+  }, [state.currentPageIndex]);
+
+  const onPageChange = (event: PaginatorPageChangeEvent) => {
+    dispatch({ type: 'SET_COMMENTS', payload: null })
+    dispatch({ type: 'SET_PAGE', payload: event.page })
+
+  }
 
   const fetchComments = (page: number) => {
-    callGetComments(page).then(result => { if (result) dispatch({ type: 'FETCH_COMMENTS', payload: [result.result, result.meta.totalItems] }) })
+    callGetComments(page).then(result => {
+      if (result) {
+        totalItems.current = result.meta.totalItems;
+        dispatch({ type: 'FETCH_COMMENTS', payload: [result.result, page] })
+      }
+    })
   };
 
 
-  return { state, dispatch };
+  return {
+    state,
+    dispatch,
+    totalItems,
+    onPageChange
+  };
 };

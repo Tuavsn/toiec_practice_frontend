@@ -7,7 +7,7 @@ import { useTestOverallResult } from "../hooks/TestOverallReviewHook";
 import convertSecondsToString from "../utils/convertSecondsToString";
 import { SelectedQuestionDialogTestOverallPage } from "../utils/types/type";
 import { Navigate } from "react-router-dom";
-import { IsNotLogIn } from "../utils/AuthCheck";
+import { AmINotLoggedIn } from "../utils/AuthCheck";
 
 export default function TestOverallResultPage() {
 
@@ -19,7 +19,7 @@ export default function TestOverallResultPage() {
         setCurrentSelectedQuestion,
     } = useTestOverallResult();
 
-    if(IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+    if(AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
 
     let part = 0;
     return (

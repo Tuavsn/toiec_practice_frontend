@@ -4,7 +4,7 @@ import { Paginator } from 'primereact/paginator';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { callGetLectureDoctrine, callGetPracticePaper } from '../api/api';
-import { IsNotLogIn } from '../utils/AuthCheck';
+import { AmINotLoggedIn } from '../utils/AuthCheck';
 import { ConvertThisPracticeQuestionToHTML } from '../utils/convertToHTML';
 import SplitNameIDFromURL from '../utils/splitNameIDFromURL';
 import { LectureID, Name_ID, PracticeAnswerSheet, PracticeQuestion, QuestionID } from '../utils/types/type';
@@ -14,7 +14,7 @@ import { LectureID, Name_ID, PracticeAnswerSheet, PracticeQuestion, QuestionID }
 const LectureDetailsPage: React.FC = () => {
     // Lấy ID của khóa học từ tham số URL
     const { lecture_name_id = "" } = useParams<{ lecture_name_id: Name_ID<LectureID> }>();
-    if(IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+    if(AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
     const [lectureName, lectureId] = SplitNameIDFromURL(lecture_name_id);
     // Hook useEffect chạy khi component mount
     useEffect(() => {

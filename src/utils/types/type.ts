@@ -810,9 +810,7 @@ export type ProfileHookState = {
 }
 export interface UserCommentState {
   comments: UserComment[] | null;
-  page: number;
-  totalRecords: number;
-  newComment: string;
+  currentPageIndex: number;
 }
 export interface TestReviewHookState {
   testReviewAnswerSheet: TestReviewAnswerSheet,
@@ -874,8 +872,7 @@ export type RoleHookAction =
   | { type: 'SET_COMMENTS'; payload: UserComment[] | null }
   | { type: 'FETCH_COMMENTS'; payload: [UserComment[], number] }
   | { type: 'SET_PAGE'; payload: number }
-  | { type: 'SET_NEW_COMMENT'; payload: string }
-  | { type: 'RESET_NEW_COMMENT' };
+  | { type: 'REFRESH_DATA' }
   export type UserHookAction =
   | { type: 'FETCH_ROWS_SUCCESS'; payload: [UserRow[], number] }
   | { type: 'FETCH_ROLES_SUCCESS'; payload: Role[] }

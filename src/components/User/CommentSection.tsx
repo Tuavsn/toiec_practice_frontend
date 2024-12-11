@@ -1,63 +1,82 @@
+import { Avatar } from 'primereact/avatar';
 import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { Paginator } from 'primereact/paginator';
+import { Skeleton } from 'primereact/skeleton';
 import React, { useRef } from 'react';
 import useComments from '../../hooks/CommentSectionHook';
-import { Avatar } from 'primereact/avatar';
-import { UserComment } from '../../utils/types/type';
-
-
-
-
-
-
-
-
-
-const userId = "64dbf3817a6c9b1a1d9b0f33"; // Simulated logged-in user ID
+import { GetMyIDUser } from '../../utils/AuthCheck';
+import { UserComment, UserCommentAction, UserID } from '../../utils/types/type';
 
 const CommentSection: React.FC = () => {
 
-  const { state, dispatch } = useComments();
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  if (state.comments === null) {
-    return <>không có</>
-  }
+  const {
+    state,
+    dispatch,
+    onPageChange,
+    totalItems
+  } = useComments();
+
+
   return (
-    <div className="p-m-4">
-      <h2>Bình luận</h2>
-
-      <section className="flex flex-column gap-3 w-8 pl-3">
-        {state.comments.map((comment) => (
-
-          <div key={comment.id} className='shadow-5 hover:shadow-8'>
-            <CommentHeader email={comment.email} id={comment.id} text={comment.text} userId={comment.userId} />
-            <p className='pl-3 white-space-normal family-font'>{comment.text}</p>
-
-          </div>
-
-        ))}
-      </section>
-
-      <div className="w-8 flex flex-column mt-3">
-        <InputTextarea ref={textareaRef}
-          className=' block pb-5'
-          rows={4} maxLength={1000}
-          placeholder="Write a comment..."
-          style={{resize: "none"}}
-        />
-        <Button
-          icon="pi pi-send"
-          className="mt-2 align-self-end"
-
-        />
-      </div>
+    <div className="p-4">
+      <h1>Bình luận</h1>
+      <CommentList comments={state.comments} dispatch={dispatch} />
+      <Paginator first={state.currentPageIndex * 5} rows={5} totalRecords={totalItems.current} onPageChange={onPageChange} />
+      <NewUserCommentTextArea dispatch={dispatch} />
     </div>
   );
 };
 
 export default CommentSection;
 
+
+const CommentList: React.FC<{
+  comments: UserComment[] | null, dispatch: React.Dispatch<UserCommentAction>
+}> = React.memo(
+  (props) => {
+    const myUserID = useRef<UserID>(GetMyIDUser());
+    //------------------------------------------------------------
+    if (props.comments === null) {
+      return (
+        <section className='flex flex-column gap-3 pl-3'>
+          <Skeleton width="75%" height="5rem"></Skeleton><Skeleton width="75%" height="5rem"></Skeleton><Skeleton width="75%" height="5rem"></Skeleton>
+        </section>
+      )
+    }
+    //------------------------------------------------------------
+    if (props.comments.length === 0) {
+      return <>không có bình luận nào</>
+    }
+    //------------------------------------------------------------
+    return (
+      <section className="flex flex-column gap-3  w-full md:w-8 pl-3">
+        {props.comments.map((comment) => (
+          <div key={comment.id} className='shadow-5 hover:shadow-8 border-solid border-blue-100'>
+            <CommentHeader email={comment.email} id={comment.id} text={comment.text} userId={comment.userId} />
+            <p className='pl-3 white-space-normal family-font'>{comment.text}</p>
+            <CommentFooter isMyComment={comment.userId === myUserID.current} dispatch={props.dispatch} />
+          </div>
+        ))}
+      </section>
+    )
+  }
+)
+
+const CommentFooter: React.FC<{
+  isMyComment: boolean, dispatch: React.Dispatch<UserCommentAction>
+}> = React.memo(
+  (props) => {
+    return (
+      <footer>
+        {
+          props.isMyComment &&
+          <Button severity='danger' className='ml-auto block py-0' text label='xóa' />
+        }
+      </footer>
+    )
+  }
+)
 
 const CommentHeader: React.FC<UserComment> = React.memo(
   (comment) => {
@@ -74,3 +93,32 @@ const CommentHeader: React.FC<UserComment> = React.memo(
     )
   }
 )
+
+const NewUserCommentTextArea: React.FC<{ dispatch: React.Dispatch<UserCommentAction> }> = React.memo((props) => {
+  //----------------------------------------
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  //----------------------------------------
+  return (
+    <div className="flex flex-column mt-3 w-full md:w-8">
+      <InputTextarea
+        ref={textareaRef}
+        className="block pb-5 w-full"
+        rows={4}
+        cols={10}
+        maxLength={1000}
+        placeholder="Để lại cảm nghĩ..."
+        style={{ resize: "none" }}
+      />
+      <Button
+        icon="pi pi-send"
+        className="mt-2 align-self-end"
+        onClick={() => {
+          props.dispatch({type: "REFRESH_DATA"})
+          console.log(textareaRef.current?.value);
+          textareaRef.current!.value = "";
+        }
+        }
+      />
+    </div>
+  );
+});

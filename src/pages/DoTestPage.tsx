@@ -7,7 +7,7 @@ import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/
 import useTestPage from "../hooks/TestHook";
 import { DoTestPageProps, MultipleChoiceQuestion, SimpleTimeCountDownProps, TestType } from "../utils/types/type";
 import { Link, Navigate } from "react-router-dom";
-import { IsNotLogIn } from "../utils/AuthCheck";
+import { AmINotLoggedIn } from "../utils/AuthCheck";
 
 function DoTestPage() {
 
@@ -38,7 +38,7 @@ function DoTestPage() {
         id,
     } = useTestPage();
 
-    if (IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+    if (AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
 
 
     // Tạo danh sách nút điều hướng dựa trên pageMapper
