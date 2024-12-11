@@ -1,9 +1,8 @@
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { InputTextarea } from 'primereact/inputtextarea';
-import React, { useEffect, useReducer } from 'react';
-import { callGetComments } from '../../api/api';
-import { UserCommentAction, UserCommentID, UserCommentState } from '../../utils/types/type';
+import React from 'react';
+import useComments from '../../hooks/CommentSectionHook';
 
 
 
@@ -11,53 +10,14 @@ import { UserCommentAction, UserCommentID, UserCommentState } from '../../utils/
 
 
 
-const initialState: UserCommentState = {
-  comments: [],
-  page: 0,
-  totalRecords: 0,
-  newComment: '',
-};
 
-const reducer = (state: UserCommentState, action: UserCommentAction): UserCommentState => {
-  switch (action.type) {
-    case 'SET_COMMENTS':
-      return {
-        ...state, comments: action.payload
-      };
-    case 'SET_PAGE':
-      return { ...state, page: action.payload };
-    case 'SET_NEW_COMMENT':
-      return { ...state, newComment: action.payload };
-    case 'RESET_NEW_COMMENT':
-      return { ...state, newComment: '' };
-    default:
-      return state;
-  }
-};
 
 const userId = "12345"; // Simulated logged-in user ID
 
 const CommentSection: React.FC = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
 
-
-  useEffect(() => {
-    dispatch({ type: 'SET_COMMENTS', payload: null });
-    fetchComments(state.page);
-  }, [state.page]);
-
-  const fetchComments = (page: number) => {
-    callGetComments(page).then(result => { if (result) dispatch({ type: 'FETCH_COMMENTS', payload: [result.result, result.meta.totalItems] }) })
-  };
-
-  const addComment = () => {
-   
-  };
-
-  const deleteComment = (commentId: UserCommentID) => {
-   
-  };
-  if(!state.comments){
+  const { state, dispatch } = useComments();
+  if (!state.comments) {
     return <>không có</>
   }
   return (
@@ -75,7 +35,7 @@ const CommentSection: React.FC = () => {
                     label="Delete"
                     icon="pi pi-trash"
                     className="p-button-danger"
-                    onClick={() => deleteComment(comment.id)}
+
                   />
                 ) : null
               }
@@ -97,7 +57,7 @@ const CommentSection: React.FC = () => {
           label="Submit"
           icon="pi pi-send"
           className="p-mt-2"
-          onClick={addComment}
+
         />
       </div>
     </div>

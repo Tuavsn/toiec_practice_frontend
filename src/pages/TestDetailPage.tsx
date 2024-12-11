@@ -15,6 +15,7 @@ import convertSecondsToString from "../utils/convertSecondsToString";
 import formatDate from "../utils/formatDateToString";
 import { emptyTestDetailPageData } from "../utils/types/emptyValue";
 import { TestDetailPageData } from "../utils/types/type";
+import CommentSection from "../components/User/CommentSection";
 
 
 
@@ -80,6 +81,7 @@ function TestDetailPage() {
                     {showDetailParts}
                 </section>
             </Card>
+            <CommentSection />
         </main >
     )
 }

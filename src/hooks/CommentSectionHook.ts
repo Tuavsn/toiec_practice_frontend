@@ -1,54 +1,46 @@
-import { useState, useEffect } from 'react';
-import { TableData, ApiResponse } from '../utils/types/type';
+import { useEffect, useReducer } from 'react';
+import { callGetComments } from '../api/api';
+import { UserCommentAction, UserCommentState } from '../utils/types/type';
 
 
 
+const initialState: UserCommentState = {
+  comments: [],
+  page: 0,
+  totalRecords: 0,
+  newComment: '',
+};
 
-interface UseCommentsResult {
-  comments: Comment[];
-  meta: TableData<Comment>['meta'];
-  loading: boolean;
-  error: string | null;
-  fetchComments: (page: number, pageSize: number) => void;
-}
+const reducer = (state: UserCommentState, action: UserCommentAction): UserCommentState => {
+  switch (action.type) {
+    case 'SET_COMMENTS':
+      return {
+        ...state, comments: action.payload
+      };
+    case 'SET_PAGE':
+      return { ...state, page: action.payload };
+    case 'SET_NEW_COMMENT':
+      return { ...state, newComment: action.payload };
+    case 'RESET_NEW_COMMENT':
+      return { ...state, newComment: '' };
+    default:
+      return state;
+  }
+};
 
-export const useComments = (): UseCommentsResult => {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [meta, setMeta] = useState<TableData<Comment>['meta']>({
-    current: 1,
-    pageSize: 5,
-    totalPages: 0,
-    totalItems: 0,
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default function useComments() {
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const fetchComments = async (page: number, pageSize: number) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `/api/comments?page=${page}&size=${pageSize}`
-      );
-      const data: ApiResponse<TableData<Comment>> = await response.json();
-
-      if (data.statusCode === 200) {
-        setComments(data.data.result);
-        setMeta(data.data.meta);
-      } else {
-        setError(data.message || 'Failed to fetch comments');
-      }
-    } catch (err) {
-      setError('An error occurred while fetching comments');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchComments(1, 5); // Fetch initial page
-  }, []);
+    dispatch({ type: 'SET_COMMENTS', payload: null });
+    fetchComments(state.page);
+  }, [state.page]);
 
-  return { comments, meta, loading, error, fetchComments };
+  const fetchComments = (page: number) => {
+    callGetComments(page).then(result => { if (result) dispatch({ type: 'FETCH_COMMENTS', payload: [result.result, result.meta.totalItems] }) })
+  };
+
+
+  return { state, dispatch };
 };
