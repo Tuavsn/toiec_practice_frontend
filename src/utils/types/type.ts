@@ -20,12 +20,7 @@ export interface Lecture extends DataTableValue {
   createdAt: Date;
   updatedAt: Date;
 }
-export interface Comment {
-  id: number;
-  text: string;
-  email: string;
-  userId: string;
-}
+
 
 export interface Topic {
   createdAt: Date,
@@ -37,6 +32,12 @@ export interface Topic {
   active: boolean
 }
 
+export interface UserComment {
+  id: UserCommentID;
+  text: string;
+  email: string;
+  userId: UserID;
+}
 
 
 export interface Assignment extends DataTableValue {
@@ -766,6 +767,7 @@ export type TestID = string;
 type RoleID = string;
 export type PermissionID = string;
 export type LectureID = string;
+export type UserCommentID = string;
 export type PracticeAnswerSheet = Map<QuestionID, string>;
 export type TestReviewAnswerSheet = UserAnswerRecord[];
 export type CategoryID = string;
@@ -806,7 +808,12 @@ export type ProfileHookState = {
   skillStats: SkillStat[],
   results: UserDetailResultRow[],
 }
-
+export interface UserCommentState {
+  comments: UserComment[] | null;
+  page: number;
+  totalRecords: number;
+  newComment: string;
+}
 export interface TestReviewHookState {
   testReviewAnswerSheet: TestReviewAnswerSheet,
   isUserAnswerSheetVisible: boolean,
@@ -863,7 +870,13 @@ export type RoleHookAction =
   | { type: 'OPEN_UPDATE_DIALOG'; payload: Role }
   | { type: 'OPEN_DELETE_DIALOG'; payload: Role }
   | { type: 'OPEN_CREATE_DIALOG'; payload: Role }
-export type UserHookAction =
+  export type UserCommentAction =
+  | { type: 'SET_COMMENTS'; payload: UserComment[] | null }
+  | { type: 'FETCH_COMMENTS'; payload: [UserComment[], number] }
+  | { type: 'SET_PAGE'; payload: number }
+  | { type: 'SET_NEW_COMMENT'; payload: string }
+  | { type: 'RESET_NEW_COMMENT' };
+  export type UserHookAction =
   | { type: 'FETCH_ROWS_SUCCESS'; payload: [UserRow[], number] }
   | { type: 'FETCH_ROLES_SUCCESS'; payload: Role[] }
   | { type: 'SET_PAGE'; payload: number }

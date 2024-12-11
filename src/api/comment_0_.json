@@ -1,0 +1,45 @@
+{
+    "statusCode": 200,
+    "message": "Success",
+    "data": {
+        "meta": {
+            "current": 1,
+            "pageSize": 5,
+            "totalPages": 2,
+            "totalItems": 10
+        },
+        "result": [
+            {
+                "id": "64dbf37e7a6c9b1a1d9b0f32",
+                "text": "This is a sample comment.",
+                "email": "user1@example.com",
+                "userId": "64dbf3817a6c9b1a1d9b0f33"
+            },
+            {
+                "id": "64dbf38a7a6c9b1a1d9b0f34",
+                "text": "Another comment goes here.",
+                "email": "user2@example.com",
+                "userId": "64dbf38e7a6c9b1a1d9b0f35"
+            },
+            {
+                "id": "64dbf3947a6c9b1a1d9b0f36",
+                "text": "Yet another comment.",
+                "email": "user3@example.com",
+                "userId": "64dbf39a7a6c9b1a1d9b0f37"
+            },
+            {
+                "id": "64dbf3a17a6c9b1a1d9b0f38",
+                "text": "This comment is amazing!",
+                "email": "user4@example.com",
+                "userId": "64dbf3a47a6c9b1a1d9b0f39"
+            },
+            {
+                "id": "64dbf3ae7a6c9b1a1d9b0f3a",
+                "text": "I totally agree with this.",
+                "email": "user5@example.com",
+                "userId": "64dbf3b37a6c9b1a1d9b0f3b"
+            }
+        ]
+    },
+    "error": ""
+}
