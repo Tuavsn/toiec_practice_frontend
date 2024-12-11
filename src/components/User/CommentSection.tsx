@@ -1,8 +1,10 @@
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { InputTextarea } from 'primereact/inputtextarea';
-import React from 'react';
+import React, { useRef } from 'react';
 import useComments from '../../hooks/CommentSectionHook';
+import { Avatar } from 'primereact/avatar';
+import { UserComment } from '../../utils/types/type';
 
 
 
@@ -12,51 +14,41 @@ import useComments from '../../hooks/CommentSectionHook';
 
 
 
-const userId = "12345"; // Simulated logged-in user ID
+const userId = "64dbf3817a6c9b1a1d9b0f33"; // Simulated logged-in user ID
 
 const CommentSection: React.FC = () => {
 
   const { state, dispatch } = useComments();
-  if (!state.comments) {
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  if (state.comments === null) {
     return <>không có</>
   }
   return (
     <div className="p-m-4">
-      <h2>Comments</h2>
+      <h2>Bình luận</h2>
 
-      <div className="p-grid p-mb-3">
+      <section className="flex flex-column gap-3 w-8 pl-3">
         {state.comments.map((comment) => (
-          <div key={comment.id} className="p-col-12 p-mb-2">
-            <Card
-              title={comment.email}
-              footer={
-                comment.userId === userId ? (
-                  <Button
-                    label="Delete"
-                    icon="pi pi-trash"
-                    className="p-button-danger"
 
-                  />
-                ) : null
-              }
-            >
-              <p>{comment.text}</p>
-            </Card>
+          <div key={comment.id} className='shadow-5 hover:shadow-8'>
+            <CommentHeader email={comment.email} id={comment.id} text={comment.text} userId={comment.userId} />
+            <p className='pl-3 white-space-normal family-font'>{comment.text}</p>
+
           </div>
-        ))}
-      </div>
 
-      <div className="p-d-flex p-flex-column p-mt-3">
-        <InputTextarea
-          value={""}
-          onChange={(e) => dispatch({ type: 'SET_NEW_COMMENT', payload: e.target.value })}
-          rows={4} maxLength={2000}
+        ))}
+      </section>
+
+      <div className="w-8 flex flex-column mt-3">
+        <InputTextarea ref={textareaRef}
+          className=' block pb-5'
+          rows={4} maxLength={1000}
           placeholder="Write a comment..."
+          style={{resize: "none"}}
         />
         <Button
-          label="Submit"
           icon="pi pi-send"
-          className="p-mt-2"
+          className="mt-2 align-self-end"
 
         />
       </div>
@@ -65,3 +57,20 @@ const CommentSection: React.FC = () => {
 };
 
 export default CommentSection;
+
+
+const CommentHeader: React.FC<UserComment> = React.memo(
+  (comment) => {
+    return (
+      <header className='p-2 flex flex-row column-gap-4'>
+        <div key={`avatar ${comment.id}`} className='align-self-center'>
+          <Avatar label="P" size="large" shape="circle" className=' bg-blue-500' />
+        </div>
+        <span>
+          <p className='family-font mb-1'><b>{comment.email}</b></p>
+          <p className='text-gray-400 family-font text-sm mt-0 pl-3'>{"12-02-2032"}</p>
+        </span>
+      </header>
+    )
+  }
+)

@@ -406,8 +406,9 @@ export const callGetTopicRow = async (currentPageIndex: number, pageSize: number
 }
 export const callGetComments = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<UserComment> | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<UserComment>>>(`https://raw.githubusercontent.com/Tuavsn/toiec_practice_frontend/refs/heads/comment/src/api/dummy/comment_${currentPageIndex+1}_${pageSize}.json`);
-        return response.data.data;
+        const response = await fetch(`https://raw.githubusercontent.com/Tuavsn/toiec_practice_frontend/refs/heads/comment/src/api/dummy/comment_${currentPageIndex}_${pageSize}.json`);
+        const responseData = await response.json() as ApiResponse<TableData<UserComment>>
+        return responseData.data;
     } catch (e) {
         return null;
     }

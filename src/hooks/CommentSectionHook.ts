@@ -17,6 +17,11 @@ const reducer = (state: UserCommentState, action: UserCommentAction): UserCommen
       return {
         ...state, comments: action.payload
       };
+    case 'FETCH_COMMENTS':
+      const [newComments,totalItem] = action.payload;
+      return {
+        ...state, comments: newComments , 
+      };
     case 'SET_PAGE':
       return { ...state, page: action.payload };
     case 'SET_NEW_COMMENT':
