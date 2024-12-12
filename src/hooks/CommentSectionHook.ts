@@ -1,54 +1,61 @@
-import { useState, useEffect } from 'react';
-import { TableData, ApiResponse } from '../utils/types/type';
+import { useEffect, useReducer, useRef } from 'react';
+import { callGetComments } from '../api/api';
+import { UserCommentAction, UserCommentState } from '../utils/types/type';
+import { PaginatorPageChangeEvent } from 'primereact/paginator';
 
 
 
+const initialState: UserCommentState = {
+  comments: [],
+  currentPageIndex: 0,
+};
 
-interface UseCommentsResult {
-  comments: Comment[];
-  meta: TableData<Comment>['meta'];
-  loading: boolean;
-  error: string | null;
-  fetchComments: (page: number, pageSize: number) => void;
-}
+const reducer = (state: UserCommentState, action: UserCommentAction): UserCommentState => {
+  switch (action.type) {
+    case 'SET_COMMENTS':
+      return {
+        ...state, comments: action.payload
+      };
+    case 'FETCH_COMMENTS':
+      const [newComments, newPageNumber] = action.payload;
+      return {
+        ...state, comments: newComments, currentPageIndex: newPageNumber
+      };
+    case 'SET_PAGE':
+      return { ...state, currentPageIndex: action.payload };
+    default:
+      return state;
+  }
+};
 
-export const useComments = (): UseCommentsResult => {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [meta, setMeta] = useState<TableData<Comment>['meta']>({
-    current: 1,
-    pageSize: 5,
-    totalPages: 0,
-    totalItems: 0,
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchComments = async (page: number, pageSize: number) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `/api/comments?page=${page}&size=${pageSize}`
-      );
-      const data: ApiResponse<TableData<Comment>> = await response.json();
-
-      if (data.statusCode === 200) {
-        setComments(data.data.result);
-        setMeta(data.data.meta);
-      } else {
-        setError(data.message || 'Failed to fetch comments');
-      }
-    } catch (err) {
-      setError('An error occurred while fetching comments');
-    } finally {
-      setLoading(false);
-    }
-  };
+export default function useComments() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const totalItems = useRef<number>(0);
 
   useEffect(() => {
-    fetchComments(1, 5); // Fetch initial page
-  }, []);
+    fetchComments(state.currentPageIndex);
+  }, [state.currentPageIndex]);
 
-  return { comments, meta, loading, error, fetchComments };
+  const onPageChange = (event: PaginatorPageChangeEvent) => {
+    dispatch({ type: 'SET_COMMENTS', payload: null })
+    dispatch({ type: 'SET_PAGE', payload: event.page })
+
+  }
+
+  const fetchComments = (page: number) => {
+    callGetComments(page).then(result => {
+      if (result) {
+        totalItems.current = result.meta.totalItems;
+        dispatch({ type: 'FETCH_COMMENTS', payload: [result.result, page] })
+      }
+    })
+  };
+
+
+  return {
+    state,
+    dispatch,
+    totalItems,
+    onPageChange
+  };
 };

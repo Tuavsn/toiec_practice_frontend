@@ -20,12 +20,7 @@ export interface Lecture extends DataTableValue {
   createdAt: Date;
   updatedAt: Date;
 }
-export interface Comment {
-  id: number;
-  text: string;
-  email: string;
-  userId: string;
-}
+
 
 export interface Topic {
   createdAt: Date,
@@ -37,6 +32,12 @@ export interface Topic {
   active: boolean
 }
 
+export interface UserComment {
+  id: UserCommentID;
+  text: string;
+  email: string;
+  userId: UserID;
+}
 
 
 export interface Assignment extends DataTableValue {
@@ -469,6 +470,12 @@ export type DialogRowProps<RowModel> = {
   dispatch: Dispatch<RowHookAction<RowModel>>,
   job: DialogRowJobType,
 }
+export type DialogTestRowProps = {
+  currentSelectedRow: TestRow,
+  dispatch: Dispatch<RowHookAction<TestRow>>,
+  job: DialogRowJobType,
+  categoryName: string,
+}
 export type DialogRoleRowProps = {
   currentSelectedRow: Role,
   dispatch: Dispatch<RoleHookAction>,
@@ -525,6 +532,12 @@ export type RenderRowDialogParams<RowModel> = {
   job: DialogRowJobType,
   currentSelectedRow: RowModel,
   dispatch: Dispatch<RowHookAction<RowModel>>,
+}
+export type RenderTestRowDialogParams = {
+  job: DialogRowJobType,
+  currentSelectedRow: TestRow,
+  dispatch: Dispatch<RowHookAction<TestRow>>,
+  categoryName: string,
 }
 export type RenderRoleRowDialogParams = {
   job: DialogRowJobType,
@@ -766,6 +779,7 @@ export type TestID = string;
 type RoleID = string;
 export type PermissionID = string;
 export type LectureID = string;
+export type UserCommentID = string;
 export type PracticeAnswerSheet = Map<QuestionID, string>;
 export type TestReviewAnswerSheet = UserAnswerRecord[];
 export type CategoryID = string;
@@ -806,7 +820,10 @@ export type ProfileHookState = {
   skillStats: SkillStat[],
   results: UserDetailResultRow[],
 }
-
+export interface UserCommentState {
+  comments: UserComment[] | null;
+  currentPageIndex: number;
+}
 export interface TestReviewHookState {
   testReviewAnswerSheet: TestReviewAnswerSheet,
   isUserAnswerSheetVisible: boolean,
@@ -863,7 +880,12 @@ export type RoleHookAction =
   | { type: 'OPEN_UPDATE_DIALOG'; payload: Role }
   | { type: 'OPEN_DELETE_DIALOG'; payload: Role }
   | { type: 'OPEN_CREATE_DIALOG'; payload: Role }
-export type UserHookAction =
+  export type UserCommentAction =
+  | { type: 'SET_COMMENTS'; payload: UserComment[] | null }
+  | { type: 'FETCH_COMMENTS'; payload: [UserComment[], number] }
+  | { type: 'SET_PAGE'; payload: number }
+  | { type: 'REFRESH_DATA' }
+  export type UserHookAction =
   | { type: 'FETCH_ROWS_SUCCESS'; payload: [UserRow[], number] }
   | { type: 'FETCH_ROLES_SUCCESS'; payload: Role[] }
   | { type: 'SET_PAGE'; payload: number }

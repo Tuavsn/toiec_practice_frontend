@@ -10,7 +10,7 @@ export const useCheckBox = () => {
 
         if (value === 0) {
             _parts.fill(false, 1);
-            _parts[0] = checked;
+            _parts[0] = true;
             setParts(_parts);
             return;
         }

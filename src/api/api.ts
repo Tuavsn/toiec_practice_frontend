@@ -1,5 +1,5 @@
 import { emptyOverallStat } from "../utils/types/emptyValue";
-import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, Permission, PermissionID, PracticePaper, ProfileHookState, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserRow } from "../utils/types/type";
+import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, Permission, PermissionID, PracticePaper, ProfileHookState, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -129,13 +129,13 @@ export const callGetCategoryLabel = async (): Promise<ApiResponse<CategoryLabel[
 }
 
 export const callGetTestCard = async (format: string, year: number, pageIndex: number): Promise<ApiResponse<TableData<TestCard>>> => {
-    const response = await axios.get<ApiResponse<TableData<TestCard>>>(`${import.meta.env.VITE_API_URL}/categories/tests?format=${format}&year=${year}&current=${pageIndex + 1}&pageSize=8`);
+    const response = await axios.get<ApiResponse<TableData<TestCard>>>(`${import.meta.env.VITE_API_URL}/categories/tests?format=${format}&year=${year}&current=${pageIndex + 1}&pageSize=6`);
     return response.data;
 }
 
 export const callGetPracticePaper = async (lectureId: LectureID): Promise<ApiResponse<PracticePaper>> => {
 
-    const response = await fetch(`https://raw.githubusercontent.com/Tuavsn/toiec_practice_frontend/refs/heads/role-update/src/api/${lectureId}.json`);
+    const response = await fetch(`https://raw.githubusercontent.com/Tuavsn/toiec_practice_frontend/refs/heads/role-update/src/api/dummy/${lectureId}.json`);
     const apiResponse: ApiResponse<PracticePaper> = await response.json();
     return apiResponse
 }
@@ -371,7 +371,7 @@ export const callPutUpdateRole = async (role: Role, permissionIDList: Permission
 }
 export const callPutUpdatePermission = async (permission: Permission,): Promise<boolean> => {
     try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/roles/${permission.id}`, {
+        await axios.put(`${import.meta.env.VITE_API_URL}/permissions/${permission.id}`, {
             ...permission
         });
         return true;
@@ -400,6 +400,15 @@ export const callGetTopicRow = async (currentPageIndex: number, pageSize: number
     try {
         const response = await axios.get<ApiResponse<TableData<Topic>>>(`${import.meta.env.VITE_API_URL}/topics/pagination?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
         return response.data.data;
+    } catch (e) {
+        return null;
+    }
+}
+export const callGetComments = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<UserComment> | null> => {
+    try {
+        const response = await fetch(`https://raw.githubusercontent.com/Tuavsn/toiec_practice_frontend/refs/heads/comment/src/api/dummy/comment_${currentPageIndex}_${pageSize}.json`);
+        const responseData = await response.json() as ApiResponse<TableData<UserComment>>
+        return responseData.data;
     } catch (e) {
         return null;
     }
@@ -446,10 +455,10 @@ export const callPutTopicRowActive = async (topic: Topic): Promise<boolean> => {
         return false;
     }
 }
-export const callPostDeleteTestRow = async (test: TestRow): Promise<boolean> => {
+export const callPutDeleteTestRow = async (test: TestRow): Promise<boolean> => {
     try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/tests/${test.id}`, {
-            active: false
+        await axios.put(`${import.meta.env.VITE_API_URL}/tests/${test.id}/status`, {
+            active: !test.active
         });
         return true;
     } catch (error) {

@@ -16,7 +16,7 @@ import { Navigate } from 'react-router-dom';
 import { callPutUserTarget } from '../api/api';
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
 import useProfile from "../hooks/ProfileHook";
-import { IsNotLogIn } from '../utils/AuthCheck';
+import { AmINotLoggedIn } from '../utils/AuthCheck';
 import convertSecondsToString from "../utils/convertSecondsToString";
 import formatDate from "../utils/formatDateToString";
 import { ActivityLogProps, SkillInsightsProps, SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from "../utils/types/type";
@@ -32,7 +32,7 @@ export default function UserProfilePage() {
         targetRef,
     } = useProfile();
 
-    if (IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+    if (AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
 
 
 

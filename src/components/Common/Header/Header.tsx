@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Logo from "../../../assets/Header-Logo.png";
 import { useTestState } from "../../../context/TestStateProvider";
 import LoginDialog from "../LoginDialog/LoginDialog";
-import { IsNotLogIn } from "../../../utils/AuthCheck";
+import { AmINotLoggedIn } from "../../../utils/AuthCheck";
 
 
 
@@ -44,7 +44,7 @@ export default function Header() {
     }
 
     // Định nghĩa nội dung hiển thị ở cuối header
-    const HeaderEnd = IsNotLogIn() ?
+    const HeaderEnd = AmINotLoggedIn() ?
         <LoginDialog /> :
         (
             <div className="card flex justify-content-center pr-3">

@@ -12,7 +12,8 @@ function AdminManageTestPage() {
         state,
         dispatch,
         totalItems,
-        onPageChange
+        onPageChange,
+        categoryName,
     } = useTest();
 
     return (
@@ -23,6 +24,7 @@ function AdminManageTestPage() {
                 currentSelectedRow={state.currentSelectedRow}   // đề thi hiện được chọn
                 job={state.job}                                         // Công việc hiện tại (job)
                 dispatch={dispatch}                                     // Hàm dispatch để cập nhật trạng thái
+                categoryName={categoryName }
             />
 
             {/* Thành phần AdminTestTable hiển thị danh sách các đề thi */}

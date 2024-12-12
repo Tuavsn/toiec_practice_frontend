@@ -45,10 +45,13 @@ function RenderDialog(params: RenderRowDialogParams<Permission>): [string, JSX.E
     switch (params.job) {
 
         case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa quyền" cùng với tên của quyền hiện tại và một thông báo xác nhận xóa
+            {
+                const text = params.currentSelectedRow.active ? "Xóa" : "Khôi phục";
 
-            return [`Xóa quyền ${params.currentSelectedRow.name}`,
-            <RenderDeletePermissionBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
-            ];
+                return [`${text} quyền ${params.currentSelectedRow.name}`,
+                <RenderDeletePermissionBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
+                ];
+            }
         case "CREATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa quyền" cùng với tên của quyền hiện tại và một thông báo xác nhận xóa
 
             return [`Tạo quyền mới`,
@@ -77,7 +80,7 @@ type UpsertPermissionForm = {
 
 const RenderUpsertPermissionBody: React.FC<DialogUpdatePermissionBodyProps> = React.memo(
     (props) => {
-        const [formData, setFormData] = useState<UpsertPermissionForm>({ ...emptyPermissionRowValue })
+        const [formData, setFormData] = useState<UpsertPermissionForm>({ ...props.currentSelectedRow})
         const { toast } = useToast();
         const [isDisabled, setIsDisabled] = useState(false);
         const title = useRef<string>(props.currentSelectedRow.id ? "Sửa quyền" : "Thêm quyền");

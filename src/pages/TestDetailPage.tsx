@@ -10,11 +10,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { callGetTestDetailPageData } from "../api/api";
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
 import { useCheckBox } from "../hooks/TestDetailPaperHook";
-import { IsNotLogIn } from "../utils/AuthCheck";
+import { AmINotLoggedIn } from "../utils/AuthCheck";
 import convertSecondsToString from "../utils/convertSecondsToString";
 import formatDate from "../utils/formatDateToString";
 import { emptyTestDetailPageData } from "../utils/types/emptyValue";
 import { TestDetailPageData } from "../utils/types/type";
+import CommentSection from "../components/User/CommentSection";
 
 
 
@@ -38,7 +39,7 @@ function TestDetailPage() {
         <Column key="col-createdAt" field="createdAt" header="Ngày làm" bodyClassName="text-center" body={(rowData: { createdAt: Date }) => formatDate(rowData.createdAt)} />,
         <Column key="col-answer_count" header="thống kê" body={CountAnswerTypeTemplate} sortable filter />,
         <Column key="col-time" field="totalTime" header="Thời gian làm bài" body={row => convertSecondsToString(row.totalTime)} sortable filter />,
-        <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} headerClassName="w-max" />,
+        <Column key="col-type" header="Loại" body={typeUserResultRowBodyTemplate} headerClassName="w-max" alignHeader="center" />,
         <Column key="col-detail" bodyClassName="text-center" body={row => detailUserResultRowBodyTemplate({ id: row.resultId })} />,
     ];
 
@@ -80,6 +81,7 @@ function TestDetailPage() {
                     {showDetailParts}
                 </section>
             </Card>
+            <CommentSection />
         </main >
     )
 }
@@ -107,7 +109,7 @@ const PartChooser: React.FC = memo(
         const { parts, onPartSelectChange } = useCheckBox();
         const [timeLimit, setTimeLimit] = useState<number>(120);
         const navigate = useNavigate();
-        const isNotLogIn = IsNotLogIn();
+        const isNotLogIn = AmINotLoggedIn();
         const checkboxes = Array.from({ length: 8 }, (_, index) => {
             const label = index === 0 ? "Thi thử" : "Phần " + index;
             return (
@@ -125,9 +127,10 @@ const PartChooser: React.FC = memo(
         });
 
         return (
-            <React.Fragment>
+            <main className="">
+                <hr />
                 <section>
-                    <h1>Chọn phần thi bạn muốn làm</h1>
+                    <h1 className="">Chọn phần thi bạn muốn làm</h1>
                     <span className="flex flex-wrap justify-content-center gap-3">
                         {checkboxes}
                     </span>
@@ -145,8 +148,8 @@ const PartChooser: React.FC = memo(
                         <p className="inline"> Bạn cần phải đăng nhập để có thể làm bài </p>
                     </div>
                 }
-
-            </React.Fragment>
+<hr />
+            </main>
         )
     }
 )

@@ -1,12 +1,13 @@
 
 import { Button } from "primereact/button";
-import { Card } from "primereact/card";
 import { Paginator } from "primereact/paginator";
-import { useTestCard } from "../hooks/TestCardHook";
+import { Rating } from "primereact/rating";
 import { Skeleton } from "primereact/skeleton";
+import { Tag } from "primereact/tag";
+import React, { ReactNode } from "react";
+import { Link } from "react-router-dom";
+import { useTestCard } from "../hooks/TestCardHook";
 import { CategoryLabel, TestCard } from "../utils/types/type";
-import { NavigateFunction } from "react-router-dom";
-import React from "react";
 
 export default function TestPage() {
 
@@ -20,7 +21,6 @@ export default function TestPage() {
         currentYear,
         testCards,
         pageIndex,
-        navigate,
     } = useTestCard();
 
 
@@ -45,7 +45,7 @@ export default function TestPage() {
                     )
                     :
                     <div className="flex flex-wrap flex-row gap-2">
-                        {Array.from({ length: 8 }, (_, index) => <Skeleton width="8rem" height="3rem" borderRadius="35px" key={index} />)}
+                        {Array.from({ length: 6 }, (_, index) => <Skeleton width="8rem" height="3rem" borderRadius="35px" key={index} />)}
 
                     </div>
                 }
@@ -58,12 +58,12 @@ export default function TestPage() {
             }
 
             <div className="flex flex-wrap row-gap-4 justify-content-center align-items-stretch mt-4" >
-                {RenderTestCards(testCards, navigate)}
+                {RenderTestCards(testCards)}
 
             </div>
             <Paginator
-                first={pageIndex * 8}
-                rows={8}
+                first={pageIndex * 6}
+                rows={6}
                 totalRecords={totalItemsRef.current}
                 onPageChange={onPageChange}
             />
@@ -71,11 +71,11 @@ export default function TestPage() {
     );
 }
 
-function RenderTestCards(testCards: TestCard[] | null, navigate: NavigateFunction): import("react").ReactNode {
+function RenderTestCards(testCards: TestCard[] | null): ReactNode {
     if (testCards === null) {
         return (
             <div className="flex flex-row justify-content-center flex-wrap gap-2">
-                {Array.from({ length: 8 }, (_, index) => <Skeleton width="328px" height="360px" key={index} />)}
+                {Array.from({ length: 6 }, (_, index) => <Skeleton width="25vw" height="360px" key={index} />)}
             </div>
         )
     }
@@ -86,29 +86,42 @@ function RenderTestCards(testCards: TestCard[] | null, navigate: NavigateFunctio
             </div>
         )
     }
+
+
     return (
-        testCards.map((testCard, index) => (
-
-            <Card style={{ flex: '1 1 20%', minWidth: "300px", maxWidth: "20%", height: "100%" }} key={testCard.id + index} title={<p className="text-center text-overflow-ellipsis white-space-nowrap">{testCard.name}</p>} className="flex align-items-left justify-content-center border-round m-2 shadow-2 min-h-full">
-                <div>
-                    <p>
-                        <strong>Chuyên mục:</strong> {testCard.format}
-                    </p>
-                    <p>
-                        <strong>Năm:</strong> {testCard.year}
-                    </p>
-                    <div className="flex justify-content-center">
-
-                        <Button label="Xem chi tiết" onClick={() => navigate(`/test/${testCard.id}`)} />
-                    </div>
-                </div>
-            </Card>
-
-        )
-        )
-    )
+        <div className="grid grid-nogutter">
+            {testCards.map((testCard, index) => (
+                <TestCardGridItem key={index} testCard={testCard} />
+            ))}
+        </div>
+    );
 }
+const TestCardGridItem: React.FC<{ testCard: TestCard }> = ({ testCard }) => {
+    const isDone = Boolean(Math.round(Math.random()));
+    const getSeverity = () => (isDone ? 'success' : 'warning');
 
+    return (
+        <div className="col-12 sm:col-12 md:col-9 lg:col-6 xl:col-4 p-2">
+            <div className="p-4 border-1 surface-border surface-card border-round">
+                <div className="flex flex-column align-items-center gap-3 py-5">
+                    <h3 className="text-2xl font-bold white-space-nowrap text-overflow-ellipsis">{testCard.name}</h3>
+                    <h5 className="font-semibold">{testCard.format}</h5>
+                    <Rating value={testCard.year % 5} readOnly cancel={false}></Rating>
+                    <Tag value={isDone ? 'Hoàn thành' : 'Chưa thử'} severity={getSeverity()}></Tag>
+                </div>
+                <div className="flex align-items-center justify-content-between">
+                    <h5 className="text-2xl font-semibold">{testCard.year}</h5>
+                    <Link to={`/test/${testCard.id}`}>
+                        <Button
+                            label="Xem chi tiết"
+                            className="p-button-rounded"
+                        />
+                    </Link>
+                </div>
+            </div>
+        </div>
+    );
+};
 function RenderCategoryLabels(categoryLabels: CategoryLabel[], currentFormatIndex: number, currentYear: number, setCurrentYear: (index: number) => void) {
     if (categoryLabels.length === 0) {
         return (
@@ -121,7 +134,8 @@ function RenderCategoryLabels(categoryLabels: CategoryLabel[], currentFormatInde
         <React.Fragment>
 
             <Button key={"year all"} className="m-1" label="Tất cả"
-                severity={(currentYear === 0 ? "info" : 'secondary')} text raised />
+                severity={(currentYear === 0 ? "info" : 'secondary')} text raised
+                onClick={() => { setCurrentYear(0); }} />
             {
                 categoryLabels[currentFormatIndex].year.map((year, index) =>
 

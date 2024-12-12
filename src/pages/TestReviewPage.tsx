@@ -9,14 +9,14 @@ import useTestReview from "../hooks/TestReviewHook";
 import { ConvertSolutionToHTML as ConvertSolutionToHTML, ConvertTopicToHTML, ConvertUserAnswerRecordToHTML } from "../utils/convertToHTML";
 import { TestReviewAreaProps, TestReviewHookAction, UserAnswerRecord, UserAnswerSheetReviewProps } from "../utils/types/type";
 import { Navigate } from "react-router-dom";
-import { IsNotLogIn } from "../utils/AuthCheck";
+import { AmINotLoggedIn } from "../utils/AuthCheck";
 
 //-------------- Main Component: TestReviewPage -------------- -------------- -------------- -------------- -------------- -------------- -------------- 
 
 function TestReviewPage() {
     const { state, dispatch } = useTestReview();
 
-    if(IsNotLogIn()) return <Navigate to={"/home?login=true"} />
+    if(AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
 
     const question = state.testReviewAnswerSheet[state.currentPageIndex];
 

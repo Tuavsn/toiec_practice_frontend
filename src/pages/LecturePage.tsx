@@ -5,7 +5,7 @@ import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Paginator } from "primereact/paginator";
 import { Skeleton } from "primereact/skeleton";
-import React, { useEffect, useLayoutEffect, useReducer, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { callGetLectureCard } from "../api/api";
 import SetWebPageTitle from "../utils/setTitlePage";
@@ -14,7 +14,7 @@ import { LectureRow, Topic } from "../utils/types/type";
 export default function LecturePage() {
 
     const [state, dispatch] = useReducer(reducer, initialState);
-    const searchTermRef = useRef<HTMLInputElement | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const totalItemsRef = useRef<number>(-1);
     useLayoutEffect(() => SetWebPageTitle("Xem bài học"), [])
     useEffect(() => {
@@ -29,7 +29,11 @@ export default function LecturePage() {
         }
         fetchLectures(state.currentPageIndex);
     }, [state.currentPageIndex])
-
+    let filterLectures = state.lectures;
+    if (searchTerm) {
+        const searchKeyword = searchTerm.toLowerCase();
+        filterLectures = state.lectures.filter(l => l.name.toLowerCase().includes(searchKeyword));
+    }
     return (
         <div className="p-4">
             <section className="mt-5 bg-gray-300 shadow-5 p-3 glassmorphism">
@@ -40,7 +44,7 @@ export default function LecturePage() {
                     <IconField iconPosition="left">
                         <InputIcon className="pi pi-search"> </InputIcon>
                         <InputText
-                            ref={searchTermRef}
+                            onChange={(e) => setSearchTerm(e.target.value || '')}
                             placeholder="Tìm bài học..."
                             className="p-mb-2"
                         />
@@ -48,7 +52,7 @@ export default function LecturePage() {
                 </div>
             </div>
             <div className="flex flex-column mt-4">
-                {RenderLecture(state.lectures)}
+                {RenderLecture(filterLectures)}
 
             </div>
             <Paginator
