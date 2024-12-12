@@ -470,6 +470,12 @@ export type DialogRowProps<RowModel> = {
   dispatch: Dispatch<RowHookAction<RowModel>>,
   job: DialogRowJobType,
 }
+export type DialogTestRowProps = {
+  currentSelectedRow: TestRow,
+  dispatch: Dispatch<RowHookAction<TestRow>>,
+  job: DialogRowJobType,
+  categoryName: string,
+}
 export type DialogRoleRowProps = {
   currentSelectedRow: Role,
   dispatch: Dispatch<RoleHookAction>,
@@ -526,6 +532,12 @@ export type RenderRowDialogParams<RowModel> = {
   job: DialogRowJobType,
   currentSelectedRow: RowModel,
   dispatch: Dispatch<RowHookAction<RowModel>>,
+}
+export type RenderTestRowDialogParams = {
+  job: DialogRowJobType,
+  currentSelectedRow: TestRow,
+  dispatch: Dispatch<RowHookAction<TestRow>>,
+  categoryName: string,
 }
 export type RenderRoleRowDialogParams = {
   job: DialogRowJobType,

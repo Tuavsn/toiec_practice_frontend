@@ -46,10 +46,12 @@ function RenderDialog(params: RenderRowDialogParams<CategoryRow>): [string, JSX.
     switch (params.job) {
 
         case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa bộ đề" cùng với tên của bộ đề hiện tại và một thông báo xác nhận xóa
-
-            return [`Xóa bộ đề ${params.currentSelectedRow.format}`,
-            <RenderDeleteCategoryBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
-            ];
+            {
+                const text = params.currentSelectedRow.active ? "Xóa" : "Khôi phục";
+                return [`${text} bộ đề ${params.currentSelectedRow.format}`,
+                <RenderDeleteCategoryBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
+                ];
+            }
         case "CREATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa bộ đề" cùng với tên của bộ đề hiện tại và một thông báo xác nhận xóa
 
             return [`Tạo bộ đề mới`,

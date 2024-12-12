@@ -134,7 +134,8 @@ function RenderCategoryLabels(categoryLabels: CategoryLabel[], currentFormatInde
         <React.Fragment>
 
             <Button key={"year all"} className="m-1" label="Tất cả"
-                severity={(currentYear === 0 ? "info" : 'secondary')} text raised />
+                severity={(currentYear === 0 ? "info" : 'secondary')} text raised
+                onClick={() => { setCurrentYear(0); }} />
             {
                 categoryLabels[currentFormatIndex].year.map((year, index) =>
 

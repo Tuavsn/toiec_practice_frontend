@@ -455,10 +455,10 @@ export const callPutTopicRowActive = async (topic: Topic): Promise<boolean> => {
         return false;
     }
 }
-export const callPostDeleteTestRow = async (test: TestRow): Promise<boolean> => {
+export const callPutDeleteTestRow = async (test: TestRow): Promise<boolean> => {
     try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/tests/${test.id}`, {
-            active: false
+        await axios.put(`${import.meta.env.VITE_API_URL}/tests/${test.id}/status`, {
+            active: !test.active
         });
         return true;
     } catch (error) {
