@@ -36,7 +36,7 @@ export default function useTest() {
     const totalItems = useRef(0);
     const { toast } = useToast();
     const { category_name_id = "no idCategory found" } = useParams<{ category_name_id: Name_ID<CategoryID> }>();
-    const [, category_id] = SplitNameIDFromURL(category_name_id);
+    const [categoryName, category_id] = SplitNameIDFromURL(category_name_id);
     emptyTestRow.idCategory = category_id;
     const fetchTests = async (pageNumber: number) => {
 
@@ -63,7 +63,7 @@ export default function useTest() {
         dispatch,
         totalItems,
         onPageChange,
-
+        categoryName,
     }
 }
 
