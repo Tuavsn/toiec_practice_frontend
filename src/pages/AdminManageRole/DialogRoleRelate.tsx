@@ -47,19 +47,22 @@ function RenderDialog(params: RenderRoleRowDialogParams): [string, JSX.Element] 
     switch (params.job) {
 
         case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa vai trò" cùng với tên của vai trò hiện tại và một thông báo xác nhận xóa
+            {
+                const text = params.currentSelectedRow.active ? "Xóa" : "Khôi phục";
 
-            return [`Xóa vai trò ${params.currentSelectedRow.name}`,
-            <RenderDeleteRoleBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
-            ];
+                return [`${text} vai trò ${params.currentSelectedRow.name}`,
+                <RenderDeleteRoleBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
+                ];
+            }
         case "CREATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa vai trò" cùng với tên của vai trò hiện tại và một thông báo xác nhận xóa
 
             return [`Tạo vai trò mới`,
-                <RenderUpsertRoleBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} permissionList={params.permissionList}/>
+                <RenderUpsertRoleBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} permissionList={params.permissionList} />
             ];
         case "UPDATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa vai trò" cùng với tên của vai trò hiện tại và một thông báo xác nhận xóa
 
             return [`Cập nhật vai trò ${params.currentSelectedRow.name}`,
-            <RenderUpsertRoleBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} permissionList={params.permissionList}/>
+            <RenderUpsertRoleBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} permissionList={params.permissionList} />
             ];
     }
 
@@ -124,7 +127,7 @@ const RenderUpsertRoleBody: React.FC<DialogUpdateRoleBodyProps> = React.memo(
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end mt-5">
-                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => handleSave({ row: { ...props.currentSelectedRow,...formData } ,permissionIDList: formData.permissionIDs, dispatch: props.dispatch, toast, setIsDisabled })} />
+                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => handleSave({ row: { ...props.currentSelectedRow, ...formData }, permissionIDList: formData.permissionIDs, dispatch: props.dispatch, toast, setIsDisabled })} />
                 </div>
 
             </Fieldset>
@@ -143,9 +146,9 @@ async function handleSave(params: handeSaveRoleParams) {
     params.setIsDisabled(true);
     let success = false;
     if (params.row.id) {
-        success = await callPutUpdateRole(params.row,params.permissionIDList);
+        success = await callPutUpdateRole(params.row, params.permissionIDList);
     } else {
-        success = await callPostRole(params.row,params.permissionIDList);
+        success = await callPostRole(params.row, params.permissionIDList);
     }
     params.setIsDisabled(false);
     if (success) {

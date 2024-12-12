@@ -102,7 +102,6 @@ const useTestPage = () => {
         };
         fetchData();
     }, []);
-
     const toggleFlag = (index: number) => {
         setFlags((prevFlags) =>
             prevFlags.map((item, i) => (i === index ? !item : item))
