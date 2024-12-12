@@ -45,7 +45,7 @@ export default function TestPage() {
                     )
                     :
                     <div className="flex flex-wrap flex-row gap-2">
-                        {Array.from({ length: 8 }, (_, index) => <Skeleton width="8rem" height="3rem" borderRadius="35px" key={index} />)}
+                        {Array.from({ length: 6 }, (_, index) => <Skeleton width="8rem" height="3rem" borderRadius="35px" key={index} />)}
 
                     </div>
                 }
@@ -62,8 +62,8 @@ export default function TestPage() {
 
             </div>
             <Paginator
-                first={pageIndex * 8}
-                rows={8}
+                first={pageIndex * 6}
+                rows={6}
                 totalRecords={totalItemsRef.current}
                 onPageChange={onPageChange}
             />
@@ -75,7 +75,7 @@ function RenderTestCards(testCards: TestCard[] | null): ReactNode {
     if (testCards === null) {
         return (
             <div className="flex flex-row justify-content-center flex-wrap gap-2">
-                {Array.from({ length: 8 }, (_, index) => <Skeleton width="328px" height="360px" key={index} />)}
+                {Array.from({ length: 6 }, (_, index) => <Skeleton width="25vw" height="360px" key={index} />)}
             </div>
         )
     }
@@ -101,10 +101,10 @@ const TestCardGridItem: React.FC<{ testCard: TestCard }> = ({ testCard }) => {
     const getSeverity = () => (isDone ? 'success' : 'warning');
 
     return (
-        <div className="col-12 sm:col-12 md:col-6 lg:col-6 p-2">
+        <div className="col-12 sm:col-12 md:col-9 lg:col-6 xl:col-4 p-2">
             <div className="p-4 border-1 surface-border surface-card border-round">
                 <div className="flex flex-column align-items-center gap-3 py-5">
-                    <h3 className="text-2xl font-bold white-space-nowrap">{testCard.name}</h3>
+                    <h3 className="text-2xl font-bold white-space-nowrap text-overflow-ellipsis">{testCard.name}</h3>
                     <h5 className="font-semibold">{testCard.format}</h5>
                     <Rating value={testCard.year % 5} readOnly cancel={false}></Rating>
                     <Tag value={isDone ? 'Hoàn thành' : 'Chưa thử'} severity={getSeverity()}></Tag>
