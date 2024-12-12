@@ -2,7 +2,8 @@ import { DataTableValue } from "primereact/datatable";
 import { EditorTextChangeEvent } from "primereact/editor";
 import { Toast } from "primereact/toast";
 import { TreeNode } from "primereact/treenode";
-import { Dispatch, MutableRefObject } from "react";
+import { Dispatch, MutableRefObject, SetStateAction } from "react";
+import { NavigateFunction } from "react-router-dom";
 
 
 export interface Category extends CategoryRow {
@@ -631,29 +632,23 @@ export interface SimpleTimeCountDownProps {
   timeLeftInSecond: number;
   onTimeUp: () => void;
 }
+interface DoTestFunction {
+  updateTimeSpentOnEachQuestionInCurrentPage: () => void;
+  setIsOnTest: Dispatch<SetStateAction<boolean>>;
+  changePage: (offset: number) => void;
+  startTest: () => void;
+  navigate: NavigateFunction;
+}
 
 export interface DoTestPageProps {
-  setIsUserAnswerSheetVisible: React.Dispatch<React.SetStateAction<boolean>>,
-  isUserAnswerSheetVisible: boolean,
-  setTestAnswerSheet: (qNum: QuestionNumber, qID: QuestionID, answer: string) => void,
-  totalQuestions: number,
-  setVisiable: React.Dispatch<React.SetStateAction<boolean>>,
-  changePage: (offset: number) => void,
-  toggleFlag: (index: number) => void,
-  timeDoTest: React.MutableRefObject<number>,
-  timeLimit: React.MutableRefObject<number>,
-  isVisible: boolean,
-  isSumit: boolean,
   id: TestID,
+  func: DoTestFunction,
+  state: MultiQuestionState,
   onEndTest: () => Promise<void>,
-  startTest: () => void,
-  start: boolean,
-  userAnswerSheet: TestAnswerSheet,
+  timeLimitRef: React.MutableRefObject<number>,
   createButtonListElement: () => JSX.Element[],
-  flags: boolean[],
-  currentPageIndex: number,
-  testType: TestType,
-  questionList: MultipleChoiceQuestion[],
+  dispatch: React.Dispatch<MultiQuestionAction>,
+  MultiRef: React.MutableRefObject<MultiQuestionRef>,
 }
 
 export interface DoExercisePageProps {
@@ -691,6 +686,11 @@ export interface UserAnswerSheetProps {
   setVisible: React.Dispatch<React.SetStateAction<boolean>>,
   ButtonListElement: JSX.Element[],
 }
+export interface UserAnswerSheetFullTestProps {
+  visible: boolean,
+  dispatch: React.Dispatch<MultiQuestionAction>
+  ButtonListElement: JSX.Element[],
+}
 
 export type UserAnswerSheetReviewProps = {
   dispatch: Dispatch<TestReviewHookAction>,
@@ -707,6 +707,12 @@ export interface TestAreaProps {
   question: MultipleChoiceQuestion,
   userAnswerSheet: TestAnswerSheet,
   setTestAnswerSheet: (questionNumber: number, questionID: string, answer: string) => void
+  changePage: (offset: number) => void
+}
+export interface FullTestAreaProps {
+  question: MultipleChoiceQuestion,
+  userAnswerSheet: TestAnswerSheet,
+  dispatch: Dispatch<MultiQuestionAction>
   changePage: (offset: number) => void
 }
 
@@ -795,6 +801,14 @@ export type DialogRowJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE';
 export type Name_ID<T extends string> = T;
 
 //-----------------------------reducer---------------------
+export interface MultiQuestionRef {
+  lastTimeStampRef: number,
+  timeDoTest: number,
+  timeSpentListRef: UserAnswerTimeCounter,
+  abortControllerRef: AbortController | null,
+  totalQuestions: number
+}
+
 export interface LectureHookState {
   isRefresh: boolean;
   lectures: LectureRow[] | null,
@@ -853,7 +867,17 @@ export type UserHookState = {
   currentSelectedRow: UserRow,
   roleList: Role[],
 }
-
+export interface MultiQuestionState {
+  questionList: MultipleChoiceQuestion[];
+  pageMapper: QuestionPage[];
+  currentPageIndex: number;
+  userAnswerSheet: TestAnswerSheet;
+  flags: boolean[];
+  isVisible: boolean;
+  isUserAnswerSheetVisible: boolean;
+  start: boolean;
+  isSumit: boolean;
+}
 type FetchLecture = {
   lectures: LectureRow[],
   pageIndex: number
@@ -880,12 +904,12 @@ export type RoleHookAction =
   | { type: 'OPEN_UPDATE_DIALOG'; payload: Role }
   | { type: 'OPEN_DELETE_DIALOG'; payload: Role }
   | { type: 'OPEN_CREATE_DIALOG'; payload: Role }
-  export type UserCommentAction =
+export type UserCommentAction =
   | { type: 'SET_COMMENTS'; payload: UserComment[] | null }
   | { type: 'FETCH_COMMENTS'; payload: [UserComment[], number] }
   | { type: 'SET_PAGE'; payload: number }
   | { type: 'REFRESH_DATA' }
-  export type UserHookAction =
+export type UserHookAction =
   | { type: 'FETCH_ROWS_SUCCESS'; payload: [UserRow[], number] }
   | { type: 'FETCH_ROLES_SUCCESS'; payload: Role[] }
   | { type: 'SET_PAGE'; payload: number }
@@ -909,7 +933,19 @@ export type LectureHookAction =
   | { type: 'OPEN_PAGE_DESIGNER_DIALOG'; payload: LectureRow }
   | { type: 'OPEN_QUESTION_EDITOR_DIALOG'; payload: LectureRow }
 
-
+export type MultiQuestionAction =
+  | { type: "SET_QUESTION_LIST", payload: MultipleChoiceQuestion[] }
+  | { type: "SET_PAGE_MAPPER", payload: QuestionPage[] }
+  | { type: "SET_CURRENT_PAGE_INDEX", payload: number }
+  | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber, qID: QuestionID, answer: string } }
+  | { type: "SET_FLAGS", payload: boolean[] }
+  | { type: "SET_USER_ANSWER_SHEET", payload: TestAnswerSheet }
+  | { type: "SET_VISIBLE", payload: boolean }
+  | { type: "SET_USER_ANSWER_SHEET_VISIBLE", payload: boolean }
+  | { type: "SET_START", payload: boolean }
+  | { type: "SET_IS_SUMIT", payload: boolean }
+  | { type: "TOGGLE_FLAGS", payload: number }
+  | { type: "SET_TEST_DATA", payload: [QuestionPage[], MultipleChoiceQuestion[], boolean[]] }
 export type TestReviewHookAction =
   | { type: 'FETCH_TEST_REVIEW_SUCCESS'; payload: [TestReviewAnswerSheet, QuestionPage[]] }
   | { type: 'SET_ANSWER_SHEET_VISIBLE'; payload: boolean }

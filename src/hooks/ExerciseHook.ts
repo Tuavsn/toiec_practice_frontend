@@ -78,7 +78,6 @@ const useExercisePage = () => {
         const fetchData = async () => {
             try {
                 setIsOnTest(true);
-                localStorage.removeItem('userAnswerSheet');
                 const responseData = await callGetExercisePaper(exerciseType);
                 responseData.data.result = ReCountQuestionNumber(responseData.data.result);
                 const newPageMapper = MappingPageWithQuestionNum(responseData.data.result);

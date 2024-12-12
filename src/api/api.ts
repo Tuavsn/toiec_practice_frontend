@@ -19,10 +19,20 @@ export const callCreateCategory = async (category: CategoryRow): Promise<boolean
     }
 }
 
-export const callGetTestPaper = async (testId: TestID, parts: string): Promise<ApiResponse<TestPaper>> => {
+export const callGetTestPaper = async (testId: TestID, parts: string): Promise<ApiResponse<TestPaper> | null> => {
     const postfix = parts === '0' ? 'full-test' : `practice?parts=${parts}`;
-    const response = await axios.get<ApiResponse<TestPaper>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}`);
-    return response.data;
+    try {
+        const response = await axios.get<ApiResponse<TestPaper>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}`);
+        return response.data;
+
+    } catch (error: any) {
+        if (error.name === "CanceledError") {
+            console.log("Yêu cầu đã bị hủy");
+        } else {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+        }
+        return null;
+    }
 }
 
 export const callPostTestRecord = async (testRecord: TestRecord): Promise<ApiResponse<{ resultId: ResultID }>> => {

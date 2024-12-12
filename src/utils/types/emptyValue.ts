@@ -1,5 +1,5 @@
 import { TreeNode } from "primereact/treenode";
-import { CategoryRow, LectureHookState, LectureRow, OverallStat, Permission, ProfileHookState, Role, RoleHookState, RowHookState, TestDetailPageData, TestResultSummary, TestReviewHookState, TestRow, Topic, UserHookState, UserRow } from "./type";
+import { AnswerPair, CategoryRow, LectureHookState, LectureRow, MultiQuestionState, OverallStat, Permission, ProfileHookState, QuestionNumber, Role, RoleHookState, RowHookState, TestDetailPageData, TestResultSummary, TestReviewHookState, TestRow, Topic, UserHookState, UserRow } from "./type";
 const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
@@ -223,3 +223,15 @@ export const initialRoleState: RoleHookState = {
     currentSelectedRow: emptyRole,
     permissionList: [],
 }
+
+export const initialState: MultiQuestionState = {
+    questionList: [],
+    pageMapper: [],
+    currentPageIndex: 0,
+    userAnswerSheet: new Map<QuestionNumber, AnswerPair>(),
+    flags: [],
+    isVisible: false,
+    isUserAnswerSheetVisible: false,
+    start: false,
+    isSumit: false,
+} as const;

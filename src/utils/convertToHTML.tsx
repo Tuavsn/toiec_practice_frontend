@@ -3,8 +3,8 @@ import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
 import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
-import React from "react";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "./types/type";
+import React, { Dispatch } from "react";
+import { MultipleChoiceQuestion, MultiQuestionAction, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "./types/type";
 import { Chip } from "primereact/chip";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
@@ -539,6 +539,60 @@ export function ConvertThisTestQuestionToHTML(
     userAnswerSheet: TestAnswerSheet,            // Phiếu trả lời của người dùng (Map câu hỏi - câu trả lời)
     setTestAnswerSheet: (questionNumber: QuestionNumber, questionId: QuestionID, answer: string) => void,  // Hàm cập nhật phiếu trả lời
     testType: TestType,                               // Phần của bài thi (vd: listening, reading)
+    changePage: (offset: number) => void         // Hàm thay đổi trang
+): [JSX.Element[], JSX.Element[]] {              // Trả về hai mảng phần tử JSX: tài nguyên và câu hỏi
+
+    // Mảng để chứa các tài nguyên của câu hỏi
+    const resoursesElement: JSX.Element[] = [];
+
+    // Mảng để chứa các phần tử HTML của câu hỏi
+    const questionsElement: JSX.Element[] = [];
+
+    // Nếu câu hỏi có tài nguyên đi kèm (hình ảnh, audio,...)
+    if (question.resources) {
+        resoursesElement.push(...TestResourcesToHTML(question.resources, question.questionNum, testType, changePage));
+    }
+
+    // Nếu câu hỏi có các câu hỏi con (subQuestions)
+    if (question.subQuestions.length) {
+        // Thêm tiêu đề câu hỏi nhóm
+        questionsElement.push(<h3 key={"group" + question.questionNum} > {question.content} </h3>);
+
+        // Duyệt qua từng câu hỏi con
+        for (const subq of question.subQuestions) {
+            // Thêm nội dung từng câu hỏi con
+            questionsElement.push(<h5 key={"h5" + subq.questionNum} > {subq.questionNum}.{subq.content} </h5>);
+
+            // Nếu câu hỏi con có tài nguyên, thêm chúng vào
+            resoursesElement.push(...TestResourcesToHTML(subq.resources, subq.questionNum, testType, changePage));
+
+            // Xây dựng phần tử HTML cho từng câu hỏi con
+            questionsElement.push(
+                BuildTestQuestionHTML(subq, userAnswerSheet.get(subq.questionNum)?.userAnswer ?? "", setTestAnswerSheet)
+            );
+        }
+    } else {
+        // Nếu là câu hỏi đơn lẻ, thêm nội dung câu hỏi
+        questionsElement.push(
+            <h5 key={"h5" + question.questionNum} > {question.questionNum}.{question.content} </h5>
+        );
+
+        // Xây dựng phần tử HTML cho câu hỏi
+        questionsElement.push(
+            BuildTestQuestionHTML(question, userAnswerSheet.get(question.questionNum)?.userAnswer ?? "", setTestAnswerSheet)
+        );
+    }
+
+    // Trả về hai mảng JSX: mảng tài nguyên và mảng câu hỏi
+    return [
+        resoursesElement,
+        questionsElement
+    ]
+}
+export function ConvertThisFullTestQuestionToHTML(
+    question: MultipleChoiceQuestion,            // Đối tượng câu hỏi trắc nghiệm
+    userAnswerSheet: TestAnswerSheet,            // Phiếu trả lời của người dùng (Map câu hỏi - câu trả lời)
+    dispatch: Dispatch<MultiQuestionAction>,
     changePage: (offset: number) => void         // Hàm thay đổi trang
 ): [JSX.Element[], JSX.Element[]] {              // Trả về hai mảng phần tử JSX: tài nguyên và câu hỏi
 

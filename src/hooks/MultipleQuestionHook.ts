@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTestState } from "../context/TestStateProvider";
-import { AnswerPair, milisecond, MultipleChoiceQuestion, QuestionID, QuestionNumber, QuestionPage, TestAnswerSheet, UserAnswerTimeCounter } from "../utils/types/type";
+import { initialState } from "../utils/types/emptyValue";
+import { AnswerPair, milisecond, MultipleChoiceQuestion, MultiQuestionAction, MultiQuestionRef, MultiQuestionState, QuestionID, QuestionNumber, QuestionPage, TestAnswerSheet, UserAnswerTimeCounter } from "../utils/types/type";
 
 export function useMultipleQuestion() {
     // ---------------- Khởi tạo State và Context ---------------- //
@@ -130,36 +131,10 @@ export function useMultipleQuestion() {
 
 //--------------------------------------------------------------------------
 
-interface MultiQuestionState {
-    questionList: MultipleChoiceQuestion[];
-    pageMapper: QuestionPage[];
-    totalQuestions: number;
-    currentPageIndex: number;
-    userAnswerSheet: TestAnswerSheet;
-    flags: boolean[];
-    isVisible: boolean;
-    isUserAnswerSheetVisible: boolean;
-    start: boolean;
-    isSumit: boolean;
-}
 
-interface MultiQuestionAction {
-    type: string;
-    payload?: any;
-}
 
-const initialState: MultiQuestionState = {
-    questionList: [],
-    pageMapper: [],
-    totalQuestions: 0,
-    currentPageIndex: 0,
-    userAnswerSheet: new Map<QuestionNumber, AnswerPair>(),
-    flags: [],
-    isVisible: false,
-    isUserAnswerSheetVisible: false,
-    start: false,
-    isSumit: false,
-};
+
+
 
 function reducer(state: MultiQuestionState, action: MultiQuestionAction): MultiQuestionState {
     switch (action.type) {
@@ -167,10 +142,14 @@ function reducer(state: MultiQuestionState, action: MultiQuestionAction): MultiQ
             return { ...state, questionList: action.payload };
         case "SET_PAGE_MAPPER":
             return { ...state, pageMapper: action.payload };
-        case "SET_TOTAL_QUESTIONS":
-            return { ...state, totalQuestions: action.payload };
         case "SET_CURRENT_PAGE_INDEX":
             return { ...state, currentPageIndex: action.payload };
+        case "SET_USER_CHOICE_ANSWER_SHEET": {
+            const newMap = new Map(state.userAnswerSheet);
+            const { qNum, qID, answer } = action.payload;
+            newMap.set(qNum, { questionId: qID, userAnswer: answer });
+            return { ...state, userAnswerSheet: newMap };
+        }
         case "SET_USER_ANSWER_SHEET":
             return { ...state, userAnswerSheet: action.payload };
         case "SET_FLAGS":
@@ -183,28 +162,34 @@ function reducer(state: MultiQuestionState, action: MultiQuestionAction): MultiQ
             return { ...state, start: action.payload };
         case "SET_IS_SUMIT":
             return { ...state, isSumit: action.payload };
+        case "TOGGLE_FLAGS":
+            {
+                const newFlags = state.flags.map((item, i) => (i === action.payload ? !item : item))
+                return { ...state, flags: newFlags }
+            }
+        case "SET_TEST_DATA":
+            {
+                const [newPageMapper, newQuestionList, newFlags] = action.payload;
+                return { ...state, pageMapper: newPageMapper, questionList: newQuestionList, flags: newFlags };
+            }
         default:
             return state;
     }
 }
 
-interface MultiQuestionRef {
-    lastTimeStampRef: number,
-    timeDoTest: number,
-    timeSpentListRef: UserAnswerTimeCounter,
-    abortControllerRef: AbortController | null,
-}
+
 
 export function useMultipleQuestionX() {
     const [state, dispatch] = useReducer(reducer, initialState);
-    const { isOnTest, setIsOnTest } = useTestState();
+    const { setIsOnTest } = useTestState();
     const navigate = useNavigate();
     const MultiRef = useRef<MultiQuestionRef>({
         abortControllerRef: null,
         lastTimeStampRef: 0,
         timeDoTest: 0,
         timeSpentListRef: new Map<QuestionNumber, milisecond>(),
-    })
+        totalQuestions: 0
+    });
     const changePage = useCallback(
         (offset: number) => {
             const newPageIndex = state.currentPageIndex + offset;
@@ -220,17 +205,6 @@ export function useMultipleQuestionX() {
         dispatch({ type: "SET_START", payload: true });
         setIsOnTest(true);
         MultiRef.current.timeDoTest = MultiRef.current.lastTimeStampRef = Date.now();
-    };
-
-    const setTestAnswerSheet = (qNum: QuestionNumber, qID: QuestionID, answer: string) => {
-        dispatch({
-            type: "SET_USER_ANSWER_SHEET",
-            payload: (prevMap: TestAnswerSheet) => {
-                const newMap = new Map(prevMap);
-                newMap.set(qNum, { questionId: qID, userAnswer: answer });
-                return newMap;
-            },
-        });
     };
 
     const updateTimeSpentOnEachQuestionInCurrentPage = () => {
@@ -265,10 +239,9 @@ export function useMultipleQuestionX() {
     return {
         state,
         dispatch,
-        isOnTest,
+        MultiRef,
         func: {
             updateTimeSpentOnEachQuestionInCurrentPage,
-            setTestAnswerSheet,
             setIsOnTest,
             changePage,
             startTest,
@@ -276,3 +249,4 @@ export function useMultipleQuestionX() {
         }
     };
 }
+
