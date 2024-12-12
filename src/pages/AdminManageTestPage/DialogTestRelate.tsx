@@ -4,17 +4,17 @@ import { Fieldset } from "primereact/fieldset";
 import { InputNumber, InputNumberValueChangeEvent } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import React, { useRef, useState } from "react";
-import { callPostDeleteTestRow, callPostTest, callPostUpdateTest } from "../../api/api";
+import { callPostTest, callPostUpdateTest, callPutDeleteTestRow } from "../../api/api";
 import { useToast } from "../../context/ToastProvider";
-import { DialogDeleteRowBodyProps, DialogRowProps, DialogUpdateTestBodyProps, handeDeleteRowParams, handeSaveRowParams, RenderRowDialogParams, TestRow } from "../../utils/types/type";
+import { DialogDeleteRowBodyProps, DialogTestRowProps, DialogUpdateTestBodyProps, handeDeleteRowParams, handeSaveRowParams, RenderTestRowDialogParams, TestRow } from "../../utils/types/type";
 
 
 // Thành phần DialogTestActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)
-export const DialogTestActionButton: React.FC<DialogRowProps<TestRow>> = React.memo(
-    ({ currentSelectedRow, dispatch, job }) => {
+export const DialogTestActionButton: React.FC<DialogTestRowProps> = React.memo(
+    ({ currentSelectedRow, dispatch, job, categoryName }) => {
 
         // Render nội dung của Dialog, bao gồm header và body, từ hàm RenderDialog
-        const [header, body] = RenderDialog({ job, currentSelectedRow, dispatch });
+        const [header, body] = RenderDialog({ job, currentSelectedRow, dispatch, categoryName });
 
         return (
             <Dialog
@@ -40,25 +40,27 @@ export const DialogTestActionButton: React.FC<DialogRowProps<TestRow>> = React.m
 
 
 // Hàm RenderDialog nhận đối số là params và trả về một mảng gồm một chuỗi tiêu đề và một phần tử JSX (nội dung của Dialog)
-function RenderDialog(params: RenderRowDialogParams<TestRow>): [string, JSX.Element] {
+function RenderDialog(params: RenderTestRowDialogParams): [string, JSX.Element] {
 
     // Dựa trên giá trị của params.job, hàm sẽ trả về tiêu đề và nội dung phù hợp
     switch (params.job) {
 
         case "DELETE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa bộ đề" cùng với tên của bộ đề hiện tại và một thông báo xác nhận xóa
-
-            return [`Xóa đề ${params.currentSelectedRow.name}`,
-            <RenderDeleteTestBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
-            ];
+            {
+                const text = params.currentSelectedRow.active ? "Xóa" : "Khôi phục";
+                return [`${text} đề ${params.currentSelectedRow.name} thuộc ${params.categoryName}`,
+                <RenderDeleteTestBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
+                ];
+            }
         case "CREATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa bộ đề" cùng với tên của bộ đề hiện tại và một thông báo xác nhận xóa
 
-            return [`Tạo đề mới`,
-                <RenderUpsertCateogoryBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
+            return [`Tạo đề mới thuộc ${params.categoryName}`,
+            <RenderUpsertTestBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
             ];
         case "UPDATE"://------------------------------------- Khi job là DELETE, hiển thị tiêu đề "Xóa bộ đề" cùng với tên của bộ đề hiện tại và một thông báo xác nhận xóa
 
-            return [`Cập nhật đề ${params.currentSelectedRow.name}`,
-            <RenderUpsertCateogoryBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
+            return [`Cập nhật đề ${params.currentSelectedRow.name} thuộc ${params.categoryName}`,
+            <RenderUpsertTestBody currentSelectedRow={params.currentSelectedRow} dispatch={params.dispatch} />
             ];
     }
 
@@ -71,11 +73,11 @@ function RenderDialog(params: RenderRowDialogParams<TestRow>): [string, JSX.Elem
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-const RenderUpsertCateogoryBody: React.FC<DialogUpdateTestBodyProps> = React.memo(
+const RenderUpsertTestBody: React.FC<DialogUpdateTestBodyProps> = React.memo(
     (props) => {
         const [formData, setFormData] = useState<TestRow>(props.currentSelectedRow);
         const { toast } = useToast();
-        const title = useRef<string>(props.currentSelectedRow.id ? "Sửa bộ đề" : "Thêm bộ đề");
+        const title = useRef<string>(props.currentSelectedRow.id ? "Sửa đề thi" : "Thêm đề thi");
         const [isDisabled, setIsDisabled] = useState(false);
         const onInputTextChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof TestRow) => {
             const value = e.target.value === null ? '' : e.target.value; // Handle text input
@@ -165,12 +167,13 @@ async function handleSave(params: handeSaveRowParams<TestRow>) {
 const RenderDeleteTestBody: React.FC<DialogDeleteRowBodyProps<TestRow>> = React.memo(
     (props) => {
         const { toast } = useToast();
+        const text = props.currentSelectedRow.active ? "xóa" : "khôi phục";
         return (
             <React.Fragment>
 
-                <h1 className='text-center'>Bạn có chắc muốn xóa <q>{props.currentSelectedRow.name}</q> ?</h1>
+                <h1 className='text-center'>Bạn có chắc muốn {text} <q>{props.currentSelectedRow.name}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button label="Xóa" icon="pi pi-save" onClick={() => handleDelete({ row: props.currentSelectedRow, dispatch: props.dispatch, toast })} />
+                    <Button label="Xác nhận" icon="pi pi-save" onClick={() => handleDelete({ row: props.currentSelectedRow, dispatch: props.dispatch, toast })} />
                 </div>
             </React.Fragment>
         )
@@ -185,7 +188,7 @@ const RenderDeleteTestBody: React.FC<DialogDeleteRowBodyProps<TestRow>> = React.
 
 // khi nhấn nút Xóa
 async function handleDelete(params: handeDeleteRowParams<TestRow>) {
-    const success = await callPostDeleteTestRow(params.row);
+    const success = await callPutDeleteTestRow(params.row);
 
 
     if (success) {
