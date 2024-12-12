@@ -371,7 +371,7 @@ export const callPutUpdateRole = async (role: Role, permissionIDList: Permission
 }
 export const callPutUpdatePermission = async (permission: Permission,): Promise<boolean> => {
     try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/roles/${permission.id}`, {
+        await axios.put(`${import.meta.env.VITE_API_URL}/permissions/${permission.id}`, {
             ...permission
         });
         return true;
