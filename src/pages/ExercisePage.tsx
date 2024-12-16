@@ -6,8 +6,8 @@ export default function ExercisePage() {
     return (
         <main className="flex flex-wrap flex-row gap-3 pt-7 min-h-screen">
             <section className="flex-1 flex flex-column" style={{ minWidth: "400px" }}>
-                <div className="shadow-5 m-2 w-full py-4 h-full bg-orange-700 glassmorphism text-center align-content-center" style={{ minWidth: "100px" }} onClick={() => navigate("/doexercise/topic=vocabulary")} ><h1 className="text-gray-100">Từ vựng</h1></div>
-                <div className="shadow-5 m-2 w-full py-4 h-full bg-yellow-700 glassmorphism text-center align-content-center" style={{ minWidth: "100px" }} onClick={() => navigate("/doexercise/topic=grammar")} ><h1 className="text-gray-100">Ngữ pháp</h1></div>
+                <div className="shadow-5 m-2 w-full py-4 h-full bg-orange-700 glassmorphism text-center align-content-center" style={{ minWidth: "100px" }} onClick={() => navigate("/doexercise/topic=Câu hỏi từ vựng")} ><h1 className="text-gray-100">Từ vựng</h1></div>
+                <div className="shadow-5 m-2 w-full py-4 h-full bg-yellow-700 glassmorphism text-center align-content-center" style={{ minWidth: "100px" }} onClick={() => navigate("/doexercise/topic=Câu hỏi ngữ pháp")} ><h1 className="text-gray-100">Ngữ pháp</h1></div>
             </section>
 
             <section className="flex-1 flex flex-column" style={{ minWidth: "400px" }}>

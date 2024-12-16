@@ -787,7 +787,7 @@ export type UserAnswerTimeCounter = Map<QuestionNumber, milisecond>
 export type ResourceType = 'paragraph' | 'image' | 'audio'
 export type TestType = 'fulltest' | 'practice' | 'exercise' | 'thi thử' | 'làm 1 phần' | 'luyện tập';
 export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
-export type ExerciseType = "partNum=1" | "partNum=2" | "partNum=3" | "partNum=4" | "partNum=5" | "partNum=6" | "partNum=7" | "TOPIC=grammar" | "TOPIC=vocabulary";
+export type ExerciseType = "partNum=1" | "partNum=2" | "partNum=3" | "partNum=4" | "partNum=5" | "partNum=6" | "partNum=7" | "topic=Câu hỏi ngữ pháp" | "topic=Câu hỏi từ vựng";
 export type DialogLectureJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE' | 'PAGE_DESIGNER' | 'QUESTION_EDITOR';
 export type DialogRowJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE';
 export type Name_ID<T extends string> = T;
