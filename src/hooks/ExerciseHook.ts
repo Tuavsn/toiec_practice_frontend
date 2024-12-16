@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { callGetExercisePaper, callPostTestRecord } from "../api/api";
-import { MappingPageWithQuestionNum } from "../utils/convertToHTML";
+import { MappingPageWithQuestionRowNum } from "../utils/convertToHTML";
 import prepareForTest from "../utils/prepareForTest";
+import SetWebPageTitle from "../utils/setTitlePage";
 import { AnswerRecord, ExerciseType, milisecond, QuestionNumber, QuestionRow, ResultID, TestRecord } from "../utils/types/type";
 import { useMultipleQuestion } from "./MultipleQuestionHook";
-import SetWebPageTitle from "../utils/setTitlePage";
 
 const useExercisePage = () => {
 
@@ -80,13 +80,13 @@ const useExercisePage = () => {
                 setIsOnTest(true);
                 localStorage.removeItem('userAnswerSheet');
                 const responseData = await callGetExercisePaper(exerciseType);
-                responseData.data.result = ReCountQuestionNumber(responseData.data.result);
-                const newPageMapper = MappingPageWithQuestionNum(responseData.data.result);
+                const newList = ReCountQuestionNumber(responseData.data.result);
+                const newPageMapper = MappingPageWithQuestionRowNum(newList);
                 setTotalQuestions(responseData.data.meta.totalItems);
                 timeSpentListRef.current = new Map<QuestionNumber, milisecond>();
-                prepareForTest.prepareAnswerSheet(responseData.data.result, setUserAnswerSheet, timeSpentListRef);
+                prepareForTest.prepareAnswerSheet(newList, setUserAnswerSheet, timeSpentListRef);
                 setPageMapper(newPageMapper);
-                setQuestionList(responseData.data.result);
+                setQuestionList(newList);
             } catch (error: any) {
                 // Kiểm tra nếu lỗi là do yêu cầu bị hủy
                 if (error.name === "CanceledError") {
@@ -129,10 +129,12 @@ const useExercisePage = () => {
 export default useExercisePage;
 
 function ReCountQuestionNumber(questions: QuestionRow[]): QuestionRow[] {
-    return questions.map((q, index) => {
+    let count = 0;
+    return questions.map((q) => {
+        const newSubQuestions = q.subQuestions.map((sq) => { count += 1; return { ...sq, questionNum: count } })
         return {
             ...q,
-            questionNum: index + 1
+            subQuestions: newSubQuestions
         }
     })
 }

@@ -4,9 +4,25 @@ import { Divider } from "primereact/divider";
 import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "./types/type";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, QuestionRow, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "./types/type";
 import { Chip } from "primereact/chip";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
+    let pageNum = 0;
+    const questionPages = [];
+    for (const q of questionList) {
+        if (q.subQuestions.length) {
+            for (const sq of q.subQuestions) {
+                questionPages.push({ questionNum: sq.questionNum, page: pageNum, part: sq.partNum } as QuestionPage)
+            }
+        }
+        else {
+            questionPages.push({ questionNum: q.questionNum, page: pageNum, part: q.partNum } as QuestionPage)
+        }
+        pageNum += 1;
+    }
+    return questionPages;
+}
+export function MappingPageWithQuestionRowNum(questionList: QuestionRow[]): QuestionPage[] {
     let pageNum = 0;
     const questionPages = [];
     for (const q of questionList) {
