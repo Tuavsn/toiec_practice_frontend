@@ -1,11 +1,11 @@
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Card } from "primereact/card";
+import { Chip } from "primereact/chip";
 import { Divider } from "primereact/divider";
 import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
-import React, { Dispatch } from "react";
-import { MultipleChoiceQuestion, MultiQuestionAction, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "./types/type";
-import { Chip } from "primereact/chip";
+import React from "react";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "./types/type";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
     const questionPages = [];
@@ -141,29 +141,37 @@ function ResourcesToHTML(resources: Resource[], qNum: number): JSX.Element[] {
 }
 
 
-export function ResourcesToReviewHTML(resources: Resource[]): JSX.Element[] {
+export function FullTestResourcesToHTML(resources: Resource[], questID: QuestionID, changePage: (offset: number) => void): JSX.Element[] {
     if (!resources) {
-        return [<h1 key={"res_"}>Cố lên</h1>]
+        return [<h1 key={"res_00"}>Cố lên</h1>]
     }
     const resourcesElement: JSX.Element[] = [];
     resources.forEach(
         (r, index) => {
+            const keyPrefix = r.type + questID + index;
             switch (r.type) {
                 case 'paragraph':
-                    resourcesElement.push(<Card key={"para" + index} style={{ borderStyle: 'dotted', borderColor: 'lavender' }} ><p >{r.content}</p></Card>)
+                    resourcesElement.push(<Card key={keyPrefix} style={{ borderStyle: 'dotted', borderColor: 'lavender' }} ><p >{r.content}</p></Card>)
                     break;
                 case 'image':
                     resourcesElement.push(
-                        <div key={"img" + index} className="p-3 text-center"> <Image src={r.content} width="100px" indicatorIcon={<i className="pi pi-search"></i>} alt="Image" preview loading='lazy' /> </div>
+                        // nếu audio chạy hết mà người dùng vẫn đang trong chế độ phóng to ảnh. web sẽ không cuộn được nữa
+                        <div key={keyPrefix} className="p-3 text-center"> <Image src={r.content} width="80%" height="auto" indicatorIcon={<i className="pi pi-search"></i>} alt="Image" preview loading='lazy' /> </div>
                     )
+
                     break;
                 case 'audio':
                     resourcesElement.unshift(
-                        <audio key={"audio" + index.toString()} className='w-full' controls>
-                            <source src={r.content} type="audio/mpeg" />
-                            Your browser does not support the audio element.
-                        </audio>
+                        <div key={"div" + keyPrefix}>
+                            <h5 className="text-center pt-1">Listen . . .🔊</h5>
+                            <audio key={keyPrefix} className='w-full' autoPlay={true} onPause={(e) => e.currentTarget.play()} onEnded={() => changePage(1)} hidden>
+                                <source src={r.content} type="audio/mpeg" />
+                                Your browser does not support the audio element.
+                            </audio>
+
+                        </div>
                     )
+
                     break;
                 default:
                     console.error("not have that: ", r.type);
@@ -592,7 +600,7 @@ export function ConvertThisTestQuestionToHTML(
 export function ConvertThisFullTestQuestionToHTML(
     question: MultipleChoiceQuestion,            // Đối tượng câu hỏi trắc nghiệm
     userAnswerSheet: TestAnswerSheet,            // Phiếu trả lời của người dùng (Map câu hỏi - câu trả lời)
-    dispatch: Dispatch<MultiQuestionAction>,
+    dispatch: (value: { type: "SET_USER_CHOICE_ANSWER_SHEET"; payload: { qNum: number; qID: string; answer: string; } }) => void,
     changePage: (offset: number) => void         // Hàm thay đổi trang
 ): [JSX.Element[], JSX.Element[]] {              // Trả về hai mảng phần tử JSX: tài nguyên và câu hỏi
 
@@ -604,7 +612,7 @@ export function ConvertThisFullTestQuestionToHTML(
 
     // Nếu câu hỏi có tài nguyên đi kèm (hình ảnh, audio,...)
     if (question.resources) {
-        resoursesElement.push(...TestResourcesToHTML(question.resources, question.questionNum, testType, changePage));
+        resoursesElement.push(...FullTestResourcesToHTML(question.resources, question.id, changePage));
     }
 
     // Nếu câu hỏi có các câu hỏi con (subQuestions)
@@ -618,11 +626,11 @@ export function ConvertThisFullTestQuestionToHTML(
             questionsElement.push(<h5 key={"h5" + subq.questionNum} > {subq.questionNum}.{subq.content} </h5>);
 
             // Nếu câu hỏi con có tài nguyên, thêm chúng vào
-            resoursesElement.push(...TestResourcesToHTML(subq.resources, subq.questionNum, testType, changePage));
+            resoursesElement.push(...FullTestResourcesToHTML(subq.resources, subq.id, changePage));
 
             // Xây dựng phần tử HTML cho từng câu hỏi con
             questionsElement.push(
-                BuildTestQuestionHTML(subq, userAnswerSheet.get(subq.questionNum)?.userAnswer ?? "", setTestAnswerSheet)
+                BuildFullTestQuestionHTML(subq, userAnswerSheet.get(subq.questionNum)?.userAnswer ?? "", dispatch)
             );
         }
     } else {
@@ -633,7 +641,7 @@ export function ConvertThisFullTestQuestionToHTML(
 
         // Xây dựng phần tử HTML cho câu hỏi
         questionsElement.push(
-            BuildTestQuestionHTML(question, userAnswerSheet.get(question.questionNum)?.userAnswer ?? "", setTestAnswerSheet)
+            BuildFullTestQuestionHTML(question, userAnswerSheet.get(question.questionNum)?.userAnswer ?? "", dispatch)
         );
     }
 
@@ -642,6 +650,49 @@ export function ConvertThisFullTestQuestionToHTML(
         resoursesElement,
         questionsElement
     ]
+}
+
+// Hàm xây dựng HTML cho câu hỏi trắc nghiệm
+function BuildFullTestQuestionHTML(
+    question: MultipleChoiceQuestion,             // Đối tượng câu hỏi trắc nghiệm
+    userAnswer: string,                           // Câu trả lời hiện tại của người dùng
+    dispatch: (value: { type: "SET_USER_CHOICE_ANSWER_SHEET"; payload: { qNum: number; qID: string; answer: string; } }) => void, // Hàm cập nhật phiếu trả lời
+): JSX.Element {
+
+    // Lấy số câu hỏi hiện tại
+    const currentQuestionNumber = question.questionNum;
+
+    // Xác định các đáp án hiển thị cho câu hỏi (tùy thuộc vào partNum)
+    const answerTexts: string[] = (question.partNum === 1 || question.partNum === 2) ? ['A', 'B', 'C', 'D'] : question.answers;
+
+    // Trả về phần tử HTML cho câu hỏi
+    return (
+        <div key={"answer" + currentQuestionNumber} className={"flex flex-column gap-3 my-3"}>
+            {question.answers.map((thisAnswer, index) => {
+
+                // Tạo radio button cho mỗi đáp án
+                return (
+                    <div key={"answerbox" + index} className={"flex align-items-center py-3 "}>
+                        <input
+                            key={index + "radio" + currentQuestionNumber}
+                            style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }} // Tùy chỉnh kiểu radio button
+                            type="radio"                          // Loại input là radio
+                            id={"id" + currentQuestionNumber + index} // ID duy nhất cho mỗi radio
+                            name={`answer-${currentQuestionNumber}`}   // Name chung cho các radio cùng câu hỏi
+                            value={answerTexts[index]}             // Giá trị của mỗi đáp án
+                            checked={userAnswer === thisAnswer}        // Kiểm tra đáp án nào đang được chọn
+                            onChange={() => {                     // Khi người dùng chọn, cập nhật phiếu trả lời
+                                dispatch({ type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { answer: thisAnswer, qID: question.id, qNum: currentQuestionNumber } });
+                            }}
+                        />
+                        <label key={index + "label" + currentQuestionNumber} htmlFor={"id" + currentQuestionNumber + index} style={{ marginLeft: '8px' }}>
+                            {answerTexts[index]}  {/* Hiển thị đáp án A, B, C, D hoặc đáp án text */}
+                        </label>
+                    </div>
+                );
+            })}
+        </div>
+    )
 }
 
 // Hàm xây dựng HTML cho câu hỏi trắc nghiệm

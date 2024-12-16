@@ -356,7 +356,29 @@ interface ResultOverview {
   type: TestType; // "practice" or "fulltest"
   parts: string; // "Practice parts"
 }
-
+export interface FullTestScreenProps {
+  questionList: MultipleChoiceQuestion[];
+  pageMapper: QuestionPage[];
+  currentPageIndex: number;
+  userAnswerSheet: TestAnswerSheet;
+  flags: boolean[];
+  isVisible: boolean;
+  isUserAnswerSheetVisible: boolean;
+  func: DoTestFunction,
+  dispatch: Dispatch<MultiQuestionAction>
+  answeredCount: number,
+  MultiRef: MutableRefObject<MultiQuestionRef>
+}
+export interface RennderTutorialProps {
+  partNeedToShow: number;
+  dispatchTutorialIsDone: React.Dispatch<FullTestScreenAction>
+}
+export interface RenderTestProps {
+  testPaperRef: React.MutableRefObject<TestPaper>
+  fullTestScreenDispatch: React.Dispatch<FullTestScreenAction>
+  thisQuestion: MultipleChoiceQuestion,
+  changePage: (offset: number) => void
+}
 interface TopicOverview {
   partNum: number;
   topicNames: string[];
@@ -629,10 +651,11 @@ export type DialogDeleteLectureBodyProps = LectureActionButtonProps;
 export type DialogDeleteRowBodyProps<RowModel> = RowActionButtonProps<RowModel>;
 
 export interface SimpleTimeCountDownProps {
+  isTutorial: boolean;
   timeLeftInSecond: number;
   onTimeUp: () => void;
 }
-interface DoTestFunction {
+export interface DoTestFunction {
   updateTimeSpentOnEachQuestionInCurrentPage: () => void;
   setIsOnTest: Dispatch<SetStateAction<boolean>>;
   changePage: (offset: number) => void;
@@ -646,7 +669,6 @@ export interface DoTestPageProps {
   state: MultiQuestionState,
   onEndTest: () => Promise<void>,
   timeLimitRef: React.MutableRefObject<number>,
-  createButtonListElement: () => JSX.Element[],
   dispatch: React.Dispatch<MultiQuestionAction>,
   MultiRef: React.MutableRefObject<MultiQuestionRef>,
 }
@@ -688,8 +710,12 @@ export interface UserAnswerSheetProps {
 }
 export interface UserAnswerSheetFullTestProps {
   visible: boolean,
-  dispatch: React.Dispatch<MultiQuestionAction>
-  ButtonListElement: JSX.Element[],
+  pageMapper: QuestionPage[],
+  userAnswerSheet: TestAnswerSheet,
+  currentPageIndex: number,
+  questionList: MultipleChoiceQuestion[],
+  flags: boolean[],
+  dispatch: Dispatch<MultiQuestionAction>,
 }
 
 export type UserAnswerSheetReviewProps = {
@@ -712,7 +738,7 @@ export interface TestAreaProps {
 export interface FullTestAreaProps {
   question: MultipleChoiceQuestion,
   userAnswerSheet: TestAnswerSheet,
-  dispatch: Dispatch<MultiQuestionAction>
+  dispatch: Dispatch<RenderTestActiion>
   changePage: (offset: number) => void
 }
 
@@ -734,6 +760,15 @@ export interface QuestionTableProps {
   setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
   setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
   setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
+}
+export type renderTestRefType = {
+  pageMapper: QuestionPage[]
+  timeSpentList: UserAnswerTimeCounter
+}
+export interface TestToolBarProps {
+  renderTestRef: React.MutableRefObject<renderTestRefType>;
+  renderTestState: RenderTestState;
+  renderTestDispatch: React.Dispatch<RenderTestActiion>
 }
 
 export interface QuestionActionButtonProps {
@@ -801,6 +836,12 @@ export type DialogRowJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE';
 export type Name_ID<T extends string> = T;
 
 //-----------------------------reducer---------------------
+export type FullTestScreenState = {
+  tutorials: boolean[];
+  currentPageIndex: number;
+};
+
+
 export interface MultiQuestionRef {
   lastTimeStampRef: number,
   timeDoTest: number,
@@ -878,11 +919,22 @@ export interface MultiQuestionState {
   start: boolean;
   isSumit: boolean;
 }
+export interface RenderTestState {
+  userAnswerSheet: TestAnswerSheet
+  flags: boolean[]
+}
 type FetchLecture = {
   lectures: LectureRow[],
   pageIndex: number
 }
+export type RenderTestActiion =
+  | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber; qID: QuestionID; answer: string; } }
+  | { type: "TOGGLE_FLAGS", payload: number }
 
+export type FullTestScreenAction =
+  | { type: "SET_TUTORIALS"; payload: boolean[] }
+  | { type: "SET_CURRENT_PAGE_INDEX"; payload: number }
+  | { type: "SET_CURRENT_PAGE_OFFSET"; payload: number }
 export type RowHookAction<RowModel> =
   | { type: 'FETCH_ROWS_SUCCESS'; payload: [RowModel[], number] }
   | { type: 'SET_PAGE'; payload: number }

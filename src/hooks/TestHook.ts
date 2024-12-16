@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { callGetTestPaper, callPostTestRecord } from '../api/api';
+import { useTestState } from '../context/TestStateProvider';
 import { MappingPageWithQuestionNum } from '../utils/convertToHTML';
+import hasSessionStorageItem from '../utils/hasItemInSessionStorage';
 import prepareForTest from '../utils/prepareForTest';
 import SetWebPageTitle from '../utils/setTitlePage';
-import { milisecond, QuestionNumber, ResultID, TestID, TestRecord, TestType } from '../utils/types/type';
+import { AnswerPair, FullTestScreenAction, FullTestScreenState, milisecond, QuestionNumber, QuestionPage, RenderTestActiion, renderTestRefType, RenderTestState, ResultID, TestID, TestPaper, TestRecord, TestType } from '../utils/types/type';
 import { useMultipleQuestionX } from './MultipleQuestionHook';
 
 //------------------ Custom Hook: useTestPage ------------------//
@@ -84,3 +86,146 @@ const useTestPage = () => {
 
 export default useTestPage;
 
+
+export type TestScreenState = "SUBMITING" | "DOING_TEST" | "OTHER"
+
+export function useTestScreen() {
+    const { id = "" } = useParams<{ id: TestID }>();
+    const { setIsOnTest } = useTestState();
+    const [testScreenState, setTestScreenState] = useState<TestScreenState>("DOING_TEST");
+    useEffect(() => {
+        if (!hasSessionStorageItem("testPapaer")) {
+            setTestScreenState("OTHER")
+            return;
+        }
+        setIsOnTest(true);
+    }, [])
+    return {
+        id,
+        testScreenState,
+    }
+}
+
+
+
+// Define types for state and action
+
+
+// Initial state
+const initFullTestScreenState: FullTestScreenState = {
+    tutorials: Array<boolean>(7).fill(false),
+    currentPageIndex: -9999999,
+};
+
+// Reducer function
+function fullTestScreenReducer(
+    state: FullTestScreenState,
+    action: FullTestScreenAction
+): FullTestScreenState {
+    switch (action.type) {
+        case "SET_TUTORIALS":
+            return { ...state, tutorials: action.payload };
+        case "SET_CURRENT_PAGE_INDEX":
+            return { ...state, currentPageIndex: action.payload };
+        case "SET_CURRENT_PAGE_OFFSET":
+            return { ...state, currentPageIndex: state.currentPageIndex + action.payload };
+        default:
+            return state;
+    }
+}
+
+export function useFullTestScreen() {
+    const [fullTestScreenState, fullTestScreenDispatch] = useReducer(fullTestScreenReducer, initFullTestScreenState);
+    const testPaperRef = useRef<TestPaper>(GetQuestionFromSessionStorage());
+    const changePage = (offset: number) => {
+        const newPageIndex = fullTestScreenState.currentPageIndex + offset;
+        if (newPageIndex >= 0 && newPageIndex < testPaperRef.current.listMultipleChoiceQuestions.length) {
+            fullTestScreenDispatch({ type: "SET_CURRENT_PAGE_INDEX", payload: newPageIndex });
+        }
+    }
+    return {
+        fullTestScreenDispatch,
+        fullTestScreenState,
+        testPaperRef,
+        changePage
+    }
+}
+
+function GetQuestionFromSessionStorage(): TestPaper {
+    const questionListStr = sessionStorage.getItem("questionList");
+    if (questionListStr) {
+        const questionList = JSON.parse(questionListStr) as TestPaper;
+        sessionStorage.removeItem("testPapaer");
+        sessionStorage.removeItem("testPapaer");
+        return questionList
+    }
+    return { listMultipleChoiceQuestions: [], totalQuestion: 0 };
+}
+
+
+
+
+
+function renderTestReducer(state: RenderTestState, action: RenderTestActiion): RenderTestState {
+    switch (action.type) {
+        case "SET_USER_CHOICE_ANSWER_SHEET": {
+            const newMap = new Map(state.userAnswerSheet);
+            const { qNum, qID, answer } = action.payload;
+            newMap.set(qNum, { questionId: qID, userAnswer: answer });
+            return { ...state, userAnswerSheet: newMap };
+        }
+        case "TOGGLE_FLAGS":
+            {
+                const newFlags = state.flags.map((item, i) => (i === action.payload ? !item : item))
+                return { ...state, flags: newFlags }
+            }
+        default:
+            return state;
+    }
+}
+
+
+
+export function useRenderTest(testPaper: TestPaper) {
+    const {
+        flags,
+        pageMapper,
+        timeSpentList,
+        userAnswerSheet,
+    } = useMemo(() => GetInitRenderTest(testPaper), [])
+
+    const renderTestRef = useRef<renderTestRefType>({ pageMapper, timeSpentList });
+    const [renderTestState, renderTestDispatch] = useReducer(renderTestReducer, { flags, userAnswerSheet });
+
+
+
+    return {
+        renderTestRef,
+        renderTestState,
+        renderTestDispatch,
+    }
+}
+
+function GetInitRenderTest(testPaper: TestPaper) {
+    const userAnswerSheet = new Map<QuestionNumber, AnswerPair>();
+    const pageMapper: QuestionPage[] = MappingPageWithQuestionNum(testPaper.listMultipleChoiceQuestions);
+    const timeSpentList = new Map<QuestionNumber, milisecond>();
+    for (const question of testPaper.listMultipleChoiceQuestions) {
+        if (question.subQuestions.length !== 0) {
+            for (const subQuestion of question.subQuestions) {
+                userAnswerSheet.set(subQuestion.questionNum, ({ questionId: subQuestion.id, userAnswer: "" }));
+                timeSpentList.set(subQuestion.questionNum, 0);
+            }
+        } else {
+            userAnswerSheet.set(question.questionNum, { questionId: question.id, userAnswer: "" });
+            timeSpentList.set(question.questionNum, 0);
+        }
+    }
+
+    return {
+        flags: Array<boolean>(testPaper.totalQuestion).fill(false),
+        pageMapper,
+        timeSpentList,
+        userAnswerSheet,
+    }
+}

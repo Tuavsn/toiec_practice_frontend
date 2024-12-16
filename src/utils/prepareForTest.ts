@@ -26,7 +26,7 @@ function prepareAnswerSheet(
 }
 function prepareAnswerSheetX(
     listMultipleChoiceQuestions: MultipleChoiceQuestion[],
-    dispatch: (value: MultiQuestionAction) => void,
+    dispatch: (value: { type: "SET_USER_ANSWER_SHEET", payload: TestAnswerSheet }) => void,
     MultiRef: MutableRefObject<MultiQuestionRef>
 ) {
     const testAnswerSheet: TestAnswerSheet = new Map<QuestionNumber, AnswerPair>();

@@ -58,7 +58,7 @@ instance.interceptors.response.use(
         // }
         if (error.status === 401) {
             localStorage.clear();
-            window.location.href = '/home'
+            window.location.href = '/home?login=true'
             return;
         }
         throw error;

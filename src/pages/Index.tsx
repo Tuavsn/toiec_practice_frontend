@@ -10,9 +10,9 @@ const LecturePage = React.lazy(() => import("./LecturePage"));
 const NotFoundPage = React.lazy(() => import("./NotFoundPage"));
 const LectureDetailsPage = React.lazy(() => import("./LectureDetailsPage"));
 const LookUpPage = React.lazy(() => import("./LookUpPage"));
-const DoTestPage = React.lazy(() => import("./DoTestPage"));
+const DoTestPage = React.lazy(() => import("./DoTestPage/DoTestPage"));
 const ExercisePage = React.lazy(() => import("./ExercisePage"))
-const DoExercisePage = React.lazy(() => import("./DoExercisePage"))
+const DoExercisePage = React.lazy(() => import("./DoTestPage/DoExercisePage"))
 const TestReviewPage = React.lazy(() => import("../pages/TestReviewPage"))
 const TestRoutes = React.lazy(() => import("../router/TestRoutes"));
 export {

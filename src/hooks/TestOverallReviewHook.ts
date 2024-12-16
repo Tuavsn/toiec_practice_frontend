@@ -29,7 +29,6 @@ export function useTestOverallResult() {
     }, [])
     const gotoReviewPage = () => navigate("detail")
     const onClickToView = (userAnswerResult: UserAnswerResult) => {
-        console.dir(userAnswerResult);
 
         setCurrentSelectedQuestion(
             UserReviewSingleAnswerToHTML(userAnswerResult),
