@@ -85,8 +85,7 @@ const useExercisePage = () => {
                 const responseData = await callGetExercisePaper(exerciseType);
                 const newList = ReCountQuestionNumber(responseData.data.result);
                 const newPageMapper = MappingPageWithQuestionRowNum(newList);
-                const totalQuestions = responseData.data.meta.totalItems <= responseData.data.meta.pageSize ? responseData.data.meta.totalItems : responseData.data.meta.pageSize;
-                setTotalQuestions(totalQuestions);
+                setTotalQuestions(newPageMapper.length);
                 timeSpentListRef.current = new Map<QuestionNumber, milisecond>();
                 prepareForTest.prepareAnswerSheet(newList, setUserAnswerSheet, timeSpentListRef);
                 setPageMapper(newPageMapper);
@@ -134,7 +133,15 @@ export default useExercisePage;
 
 function ReCountQuestionNumber(questions: QuestionRow[]): QuestionRow[] {
     let count = 0;
-    return questions.map((q, index) => {
+    const questionList = questions.map((q, index) => {
+        if (q.subQuestions.length === 0) {
+            count += 1;
+            return {
+                ...q,
+                questionNum: count
+            }
+        }
+
         const newSubQuestions = q.subQuestions.map((sq) => { count += 1; return { ...sq, questionNum: count } })
         return {
             ...q,
@@ -142,4 +149,5 @@ function ReCountQuestionNumber(questions: QuestionRow[]): QuestionRow[] {
             subQuestions: newSubQuestions
         }
     })
+    return questionList;
 }
