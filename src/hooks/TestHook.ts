@@ -92,17 +92,21 @@ export type TestScreenState = "SUBMITING" | "DOING_TEST" | "OTHER"
 export function useTestScreen() {
     const { id = "" } = useParams<{ id: TestID }>();
     const { setIsOnTest } = useTestState();
-    const [testScreenState, setTestScreenState] = useState<TestScreenState>("DOING_TEST");
-    useEffect(() => {
-        if (!hasSessionStorageItem("testPapaer")) {
-            setTestScreenState("OTHER")
-            return;
-        }
+    let currentState: TestScreenState = "DOING_TEST";
+
+    if (!hasSessionStorageItem("testPapaer")) {
+        currentState = "OTHER";
+    } else {
         setIsOnTest(true);
-    }, [])
+    }
+    const [testScreenState, setTestScreenState] = useState<TestScreenState>(currentState);
+
+
+
     return {
         id,
         testScreenState,
+        setTestScreenState,
     }
 }
 
