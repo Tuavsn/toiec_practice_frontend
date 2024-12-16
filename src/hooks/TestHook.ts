@@ -90,7 +90,7 @@ const useTestPage = () => {
                 prepareForTest.prepareAnswerSheet(responseData.data.listMultipleChoiceQuestions, setUserAnswerSheet, timeSpentListRef);
                 setPageMapper(newPageMapper);
                 setQuestionList(responseData.data.listMultipleChoiceQuestions);
-                setFlags(Array<boolean>(responseData.data.totalQuestion).fill(false));
+                setFlags(Array<boolean>(responseData.data.listMultipleChoiceQuestions.length).fill(false));
             } catch (error: any) {
                 // Kiểm tra nếu lỗi là do yêu cầu bị hủy
                 if (error.name === "CanceledError") {

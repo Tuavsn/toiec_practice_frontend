@@ -67,7 +67,7 @@ function DoTestPage() {
                         style={{ width: '60px', aspectRatio: '1/1' }}
                         className={"border-round-md border-solid text-center p-2"}
                         label={pq.questionNum.toString()}
-                        severity={getColorButtonOnAnswerSheet(text, isOnPage, flags[index])} // Cập nhật màu sắc nút theo câu trả lời
+                        severity={getColorButtonOnAnswerSheet(text, isOnPage, flags[pq.page])} // Cập nhật màu sắc nút theo câu trả lời
                         onClick={() => {
                             if (!isOnPage) {
                                 setCurrentPageIndex(pq.page);
