@@ -42,7 +42,10 @@ const useExercisePage = () => {
     const onEndTest = async () => {
         setIsSumit(true);
         setIsOnTest(false);
-        const userAnswerList = prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current).filter(ans => ans.userAnswer !== "");
+        updateTimeSpentOnEachQuestionInCurrentPage();
+        let userAnswerList = prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current)
+        userAnswerList = userAnswerList.filter(ans => ans.userAnswer !== "");
+
         if (userAnswerList.length === 0) {
             navigate('/exercise');
             return;
@@ -53,7 +56,8 @@ const useExercisePage = () => {
     // hàm gửi dữ liệu bài  làm kết thúc của người dùng về server
     const sendFinalResultToServer = async (userAnswerList: AnswerRecord[]) => {
         // tính thời gian làm trang cuối cùng
-        updateTimeSpentOnEachQuestionInCurrentPage();
+
+        console.dir(timeSpentListRef.current);
         const resultBodyObject: TestRecord = {
             totalSeconds: (Date.now() - timeDoTest.current) / 1000, // khép lại thời gian làm bài ( đơn vị giây)
             testId: "",
@@ -61,7 +65,6 @@ const useExercisePage = () => {
             type: "exercise",
             userAnswer: userAnswerList
         }
-        console.dir(resultBodyObject);
         return (await callPostTestRecord(resultBodyObject)).data.resultId;
     }
     // Gọi API để lấy dữ liệu bài thi khi component được mount
@@ -82,7 +85,8 @@ const useExercisePage = () => {
                 const responseData = await callGetExercisePaper(exerciseType);
                 const newList = ReCountQuestionNumber(responseData.data.result);
                 const newPageMapper = MappingPageWithQuestionRowNum(newList);
-                setTotalQuestions(responseData.data.meta.totalItems);
+                const totalQuestions = responseData.data.meta.totalItems <= responseData.data.meta.pageSize ? responseData.data.meta.totalItems : responseData.data.meta.pageSize;
+                setTotalQuestions(totalQuestions);
                 timeSpentListRef.current = new Map<QuestionNumber, milisecond>();
                 prepareForTest.prepareAnswerSheet(newList, setUserAnswerSheet, timeSpentListRef);
                 setPageMapper(newPageMapper);
@@ -130,10 +134,11 @@ export default useExercisePage;
 
 function ReCountQuestionNumber(questions: QuestionRow[]): QuestionRow[] {
     let count = 0;
-    return questions.map((q) => {
+    return questions.map((q, index) => {
         const newSubQuestions = q.subQuestions.map((sq) => { count += 1; return { ...sq, questionNum: count } })
         return {
             ...q,
+            questionNum: index + 1,
             subQuestions: newSubQuestions
         }
     })
