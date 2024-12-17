@@ -106,6 +106,7 @@ const PartChooser: React.FC<{ limitTime: number }> = memo(
     ({ limitTime }) => {
         const { parts, onPartSelectChange } = useCheckBox();
         const [timeLimit, setTimeLimit] = useState<number>(limitTime);
+        useEffect(() => setTimeLimit(limitTime), [limitTime])
         const navigate = useNavigate();
         const isNotLogIn = IsNotLogIn();
         const checkboxes = Array.from({ length: 8 }, (_, index) => {
