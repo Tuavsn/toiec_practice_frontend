@@ -22,6 +22,22 @@ export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[
     }
     return questionPages;
 }
+export function MappingPageWithQuestionRowNum(questionList: QuestionRow[]): QuestionPage[] {
+    let pageNum = 0;
+    const questionPages = [];
+    for (const q of questionList) {
+        if (q.subQuestions.length) {
+            for (const sq of q.subQuestions) {
+                questionPages.push({ questionNum: sq.questionNum, page: pageNum, part: sq.partNum } as QuestionPage)
+            }
+        }
+        else {
+            questionPages.push({ questionNum: q.questionNum, page: pageNum, part: q.partNum } as QuestionPage)
+        }
+        pageNum += 1;
+    }
+    return questionPages;
+}
 
 export function MappingPageWithQuestionNumReview(questionList: TestReviewAnswerSheet): QuestionPage[] {
     let pageNum = 0;

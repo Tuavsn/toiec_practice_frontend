@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { callGetExercisePaper, callPostTestRecord } from "../api/api";
-import { MappingPageWithQuestionNum } from "../utils/convertToHTML";
+import { MappingPageWithQuestionRowNum } from "../utils/convertToHTML";
 import prepareForTest from "../utils/prepareForTest";
+import SetWebPageTitle from "../utils/setTitlePage";
 import { AnswerRecord, ExerciseType, milisecond, QuestionNumber, QuestionRow, ResultID, TestRecord } from "../utils/types/type";
 import { useMultipleQuestion } from "./MultipleQuestionHook";
-import SetWebPageTitle from "../utils/setTitlePage";
 
 const useExercisePage = () => {
 
@@ -42,7 +42,10 @@ const useExercisePage = () => {
     const onEndTest = async () => {
         setIsSumit(true);
         setIsOnTest(false);
-        const userAnswerList = prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current).filter(ans => ans.userAnswer !== "");
+        updateTimeSpentOnEachQuestionInCurrentPage();
+        let userAnswerList = prepareForTest.GroupUserAnswerSheetAndTimeSpent(userAnswerSheet, timeSpentListRef.current)
+        userAnswerList = userAnswerList.filter(ans => ans.userAnswer !== "");
+
         if (userAnswerList.length === 0) {
             navigate('/exercise');
             return;
@@ -53,7 +56,8 @@ const useExercisePage = () => {
     // hàm gửi dữ liệu bài  làm kết thúc của người dùng về server
     const sendFinalResultToServer = async (userAnswerList: AnswerRecord[]) => {
         // tính thời gian làm trang cuối cùng
-        updateTimeSpentOnEachQuestionInCurrentPage();
+
+        console.dir(timeSpentListRef.current);
         const resultBodyObject: TestRecord = {
             totalSeconds: (Date.now() - timeDoTest.current) / 1000, // khép lại thời gian làm bài ( đơn vị giây)
             testId: "",
@@ -61,7 +65,6 @@ const useExercisePage = () => {
             type: "exercise",
             userAnswer: userAnswerList
         }
-        console.dir(resultBodyObject);
         return (await callPostTestRecord(resultBodyObject)).data.resultId;
     }
     // Gọi API để lấy dữ liệu bài thi khi component được mount
@@ -79,13 +82,13 @@ const useExercisePage = () => {
             try {
                 setIsOnTest(true);
                 const responseData = await callGetExercisePaper(exerciseType);
-                responseData.data.result = ReCountQuestionNumber(responseData.data.result);
-                const newPageMapper = MappingPageWithQuestionNum(responseData.data.result);
-                setTotalQuestions(responseData.data.meta.totalItems);
+                const newList = ReCountQuestionNumber(responseData.data.result);
+                const newPageMapper = MappingPageWithQuestionRowNum(newList);
+                setTotalQuestions(newPageMapper.length);
                 timeSpentListRef.current = new Map<QuestionNumber, milisecond>();
-                prepareForTest.prepareAnswerSheet(responseData.data.result, setUserAnswerSheet, timeSpentListRef);
+                prepareForTest.prepareAnswerSheet(newList, setUserAnswerSheet, timeSpentListRef);
                 setPageMapper(newPageMapper);
-                setQuestionList(responseData.data.result);
+                setQuestionList(newList);
             } catch (error: any) {
                 // Kiểm tra nếu lỗi là do yêu cầu bị hủy
                 if (error.name === "CanceledError") {
@@ -128,10 +131,22 @@ const useExercisePage = () => {
 export default useExercisePage;
 
 function ReCountQuestionNumber(questions: QuestionRow[]): QuestionRow[] {
-    return questions.map((q, index) => {
+    let count = 0;
+    const questionList = questions.map((q, index) => {
+        if (q.subQuestions.length === 0) {
+            count += 1;
+            return {
+                ...q,
+                questionNum: count
+            }
+        }
+
+        const newSubQuestions = q.subQuestions.map((sq) => { count += 1; return { ...sq, questionNum: count } })
         return {
             ...q,
-            questionNum: index + 1
+            questionNum: index + 1,
+            subQuestions: newSubQuestions
         }
     })
+    return questionList;
 }

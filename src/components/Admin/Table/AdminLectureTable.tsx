@@ -1,7 +1,7 @@
 import { DataTable } from "primereact/datatable";
 import React from "react";
-import { AdminLectureTableProps } from "../../utils/types/type";
-import { RenderAdminLectureColumns } from "./ColumnManageLecturePage";
+import { AdminLectureTableProps } from "../../../utils/types/type";
+import { RenderAdminLectureColumns } from "../AdminColumn/ColumnManageLecturePage";
 
 // Thành phần AdminLectureTable sử dụng React.FC với kiểu AdminLectureTableProps
 const AdminLectureTable: React.FC<AdminLectureTableProps> = (props) => {

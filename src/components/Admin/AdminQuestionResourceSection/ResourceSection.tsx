@@ -2,7 +2,7 @@ import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { FileUpload, FileUploadSelectEvent } from "primereact/fileupload";
 import React, { useRef } from "react";
-import { ResourceIndex, ResourceSectionProps, ResourceType } from "../../utils/types/type";
+import { ResourceIndex, ResourceSectionProps, ResourceType } from "../../../utils/types/type";
 
 
 const types = [

@@ -4,12 +4,11 @@ import { Paginator } from "primereact/paginator";
 import { TreeNode } from "primereact/treenode";
 import { TreeTable } from "primereact/treetable";
 import React from "react";
-import { LoadingSpinner } from "../../components/Common/Index";
-import { useQuestionTable } from "../../hooks/QuestionHook";
-import { QuestionTableProps } from "../../utils/types/type";
-import { RenderColumnsForTable } from "./ColumnsTreeTable";
-import { DialogQuestionActionButton } from "./DialogQuestionRelate";
-import { ToolbarQuestion } from "./ToolbarQuestion";
+import { useAssignmentTable } from "../../../hooks/AssignmentHook";
+import { QuestionTableProps } from "../../../utils/types/type";
+import { LoadingSpinner } from "../../Common/Index";
+import { RenderColumnsForTable } from "../AdminColumn/ColumnsQuestionAssignmentTreeTable";
+import { DialogQuestionActionButton } from "../AdminDialog/DialogAssignmentRelate";
 
 // Thành phần hiển thị bảng câu hỏi dạng cây, với các cột và hàng được thiết kế cụ thể
 const QuestionTreeTable: React.FC<QuestionTableProps> = React.memo(
@@ -30,7 +29,7 @@ const QuestionTreeTable: React.FC<QuestionTableProps> = React.memo(
             topics,
             nodes,
             title,
-        } = useQuestionTable();
+        } = useAssignmentTable();
         // tạo ra màn hình chờ 
         if (currentPageIndex === -1) {
             return <LoadingSpinner text='Dữ liệu đang tải' />
@@ -42,12 +41,10 @@ const QuestionTreeTable: React.FC<QuestionTableProps> = React.memo(
 
         return (
             <React.Fragment>
-               
-                <ToolbarQuestion />
                 {/* Dialog dùng để hiển thị nội dung xác nhận xóa hoặc cập nhật câu hỏi. */}
                 <DialogQuestionActionButton isVisible={isVisible} title={title} topicList={topics} setIsVisible={setIsVisible} currentSelectedQuestion={currentSelectedQuestion} />
 
-                <TreeTable emptyMessage="Không có câu hỏi" value={nodes} rows={5} scrollable rowClassName={rowClassName}>
+                <TreeTable value={nodes} rows={5} scrollable emptyMessage="Không có câu hỏi" rowClassName={rowClassName} >
 
                     {RenderColumnsForTable(setContextDialogBody, setResourceDialogBody, setTopicDialogBody, topics, setTitle, setIsVisible, currentSelectedQuestion)}
 

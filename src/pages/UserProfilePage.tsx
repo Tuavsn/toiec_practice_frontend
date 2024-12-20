@@ -14,7 +14,7 @@ import React, { useRef, useState } from "react";
 import { Doughnut, Pie } from "react-chartjs-2";
 import { Navigate } from 'react-router-dom';
 import { callPutUserTarget } from '../api/api';
-import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
+import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Column/CommonColumn";
 import useProfile from "../hooks/ProfileHook";
 import { AmINotLoggedIn } from '../utils/AuthCheck';
 import convertSecondsToString from "../utils/convertSecondsToString";

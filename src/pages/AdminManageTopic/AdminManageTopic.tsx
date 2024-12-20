@@ -1,10 +1,10 @@
+import { Card } from "primereact/card";
 import { Paginator } from "primereact/paginator";
 import React from "react";
-import AdminTopicTable from "./AdminTopicTable";
-import { DialogTopicActionButton } from "./DialogTopicRelate";
-import useTopic from "../../hooks/TopicHook";
+import { DialogTopicActionButton } from "../../components/Admin/AdminDialog/DialogTopicRelate";
+import AdminTopicTable from "../../components/Admin/Table/AdminTopicTable";
 import { CustomBreadCrumb } from "../../components/Common/Index";
-import { Card } from "primereact/card";
+import useTopic from "../../hooks/TopicHook";
 
 
 function AdminManageTopicPage() {

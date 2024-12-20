@@ -8,7 +8,7 @@ import { InputNumber } from "primereact/inputnumber";
 import React, { memo, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { callGetTestDetailPageData } from "../api/api";
-import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
+import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Column/CommonColumn";
 import { useCheckBox } from "../hooks/TestDetailPaperHook";
 import { AmINotLoggedIn } from "../utils/AuthCheck";
 import convertSecondsToString from "../utils/convertSecondsToString";
@@ -76,7 +76,7 @@ function TestDetailPage() {
                         {columns}
                     </DataTable>
                 </section>
-                <PartChooser />
+                <PartChooser limitTime={testInfo.limitTime} />
                 <section>
                     {showDetailParts}
                 </section>
@@ -104,10 +104,11 @@ function DecodeCheckBoxesToUrl(parts: boolean[]): string {
     return "practice/" + returnString;
 }
 
-const PartChooser: React.FC = memo(
-    () => {
+const PartChooser: React.FC<{ limitTime: number }> = memo(
+    ({ limitTime }) => {
         const { parts, onPartSelectChange } = useCheckBox();
-        const [timeLimit, setTimeLimit] = useState<number>(120);
+        const [timeLimit, setTimeLimit] = useState<number>(limitTime);
+        useEffect(() => setTimeLimit(limitTime), [limitTime])
         const navigate = useNavigate();
         const isNotLogIn = AmINotLoggedIn();
         const checkboxes = Array.from({ length: 8 }, (_, index) => {
@@ -136,7 +137,7 @@ const PartChooser: React.FC = memo(
                     </span>
                 </section>
                 <div className="flex p-5 justify-content-center gap-2">
-                    <InputNumber disabled={parts[0]} inputStyle={{ width: "6rem" }} buttonLayout="horizontal" showButtons value={parts[0] ? 120 : timeLimit} min={10} max={150} onValueChange={(e) => setTimeLimit(e.value ?? 120)} suffix=" phút" />
+                    <InputNumber disabled={parts[0]} inputStyle={{ width: "6rem" }} buttonLayout="horizontal" showButtons value={parts[0] ? limitTime : timeLimit} min={10} max={limitTime} onValueChange={(e) => setTimeLimit(e.value ?? limitTime)} suffix=" phút" />
                     <Button disabled={isNotLogIn} onClick={() => {
 
                         navigate(`dotest/${timeLimit}/${DecodeCheckBoxesToUrl(parts)}`)

@@ -1,10 +1,10 @@
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import React, { Dispatch } from "react";
-import { statusBodyTemplate } from "../../components/Common/Table/CommonColumn";
-import { RowActionButtonProps, RowHookAction, CategoryRow } from "../../utils/types/type";
 import { useNavigate } from "react-router-dom";
-import { emptyCategoryRow } from "../../utils/types/emptyValue";
+import { emptyCategoryRow } from "../../../utils/types/emptyValue";
+import { CategoryRow, RowActionButtonProps, RowHookAction } from "../../../utils/types/type";
+import { statusBodyTemplate } from "../../Common/Column/CommonColumn";
 
 export function RenderAdminCategoryColumns(dispatch: Dispatch<RowHookAction<CategoryRow>>): JSX.Element[] {
     return [

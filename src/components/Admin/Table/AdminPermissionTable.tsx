@@ -1,7 +1,7 @@
 import { DataTable } from "primereact/datatable";
 import React from "react";
-import { AdminRowTableProps, Permission } from "../../utils/types/type";
-import { RenderAdminPermissionColumns } from "./ColumnManagePermissionPage";
+import { AdminRowTableProps, Permission } from "../../../utils/types/type";
+import { RenderAdminPermissionColumns } from "../AdminColumn/ColumnManagePermissionPage";
 
 // Thành phần AdminPermissionTable sử dụng React.FC với kiểu AdminPermissionTableProps
 const AdminPermissionTable: React.FC<AdminRowTableProps<Permission>> = (props) => {
