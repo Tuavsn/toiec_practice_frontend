@@ -1,8 +1,8 @@
-import { memo } from "react";
-import useLecture from "../../hooks/LectureHook";
-import AdminLectureTable from "./AdminLectureTable";
-import { DialogLectureActionButton } from "./DialogLectureRelate";
 import { Paginator } from "primereact/paginator";
+import { memo } from "react";
+import { DialogLectureActionButton } from "../../components/Admin/AdminDialog/DialogLectureRelate";
+import AdminLectureTable from "../../components/Admin/Table/AdminLectureTable";
+import useLecture from "../../hooks/LectureHook";
 
 // Hàm AdminManageLecturePage là một thành phần React hiển thị giao diện quản lý bài học
 function AdminManageLecturePage() {

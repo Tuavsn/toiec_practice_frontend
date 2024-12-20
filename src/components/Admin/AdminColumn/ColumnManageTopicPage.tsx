@@ -1,9 +1,9 @@
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import React, { Dispatch } from "react";
-import { statusBodyTemplate } from "../../components/Common/Table/CommonColumn";
-import { emptyTopicRowValue } from "../../utils/types/emptyValue";
-import { RowActionButtonProps, RowHookAction, Topic } from "../../utils/types/type";
+import { emptyTopicRowValue } from "../../../utils/types/emptyValue";
+import { RowActionButtonProps, RowHookAction, Topic } from "../../../utils/types/type";
+import { statusBodyTemplate } from "../../Common/Column/CommonColumn";
 
 export function RenderAdminTopicColumns(dispatch: Dispatch<RowHookAction<Topic>>): JSX.Element[] {
     return [

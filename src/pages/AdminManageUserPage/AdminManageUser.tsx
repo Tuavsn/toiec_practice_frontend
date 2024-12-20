@@ -1,10 +1,10 @@
-import { Paginator } from "primereact/paginator";
-import useUser from "../../hooks/UserHook";
-import React from "react";
-import AdminUserTable from "./AdminUserTable";
-import { DialogUserActionButton } from "./DialogUserRelate";
 import { Card } from "primereact/card";
+import { Paginator } from "primereact/paginator";
+import React from "react";
+import { DialogUserActionButton } from "../../components/Admin/AdminDialog/DialogUserRelate";
+import AdminUserTable from "../../components/Admin/Table/AdminUserTable";
 import { CustomBreadCrumb } from "../../components/Common/Index";
+import useUser from "../../hooks/UserHook";
 
 
 function AdminManageUserPage() {

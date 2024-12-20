@@ -4,12 +4,12 @@ import { Fieldset } from "primereact/fieldset";
 import { InputText } from "primereact/inputtext";
 import { MultiSelect } from "primereact/multiselect";
 import React, { useRef, useState } from "react";
-import { callPutLectureActive, callPostLectureDetail, callPutLectureDetailUpdate } from "../../api/api";
-import EditCourseRichTextBox from "../../components/Common/richTextBox/richTextBox";
-import { useToast } from "../../context/ToastProvider";
-import useTopicRef from "../../hooks/TopicRefHook";
-import { emptyLectureRowValue } from "../../utils/types/emptyValue";
-import { DialogDeleteLectureBodyProps, DialogLectureProps, DialogUpdateLectureBodyProps, handeDeleteLectureParams, handeSaveLectureParams, RenderLectureDialogParams, Topic, TopicID } from "../../utils/types/type";
+import { callPostLectureDetail, callPutLectureActive, callPutLectureDetailUpdate } from "../../../api/api";
+import { useToast } from "../../../context/ToastProvider";
+import useTopicRef from "../../../hooks/TopicRefHook";
+import { emptyLectureRowValue } from "../../../utils/types/emptyValue";
+import { DialogDeleteLectureBodyProps, DialogLectureProps, DialogUpdateLectureBodyProps, handeDeleteLectureParams, handeSaveLectureParams, RenderLectureDialogParams, Topic, TopicID } from "../../../utils/types/type";
+import EditCourseRichTextBox from "../../Common/richTextBox/richTextBox";
 
 
 

@@ -1,7 +1,7 @@
 import { DataTable } from "primereact/datatable";
 import React from "react";
-import { AdminRowTableProps, UserRow } from "../../utils/types/type";
-import { RenderAdminUserColumns } from "./ColumnManageUserPage";
+import { AdminRowTableProps, UserRow } from "../../../utils/types/type";
+import { RenderAdminUserColumns } from "../AdminColumn/ColumnManageUserPage";
 
 // Thành phần AdminUserTable sử dụng React.FC với kiểu AdminUserTableProps
 const AdminUserTable: React.FC<AdminRowTableProps<UserRow>> = (props) => {

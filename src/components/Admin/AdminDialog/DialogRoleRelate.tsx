@@ -5,9 +5,9 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { MultiSelect } from "primereact/multiselect";
 import React, { useRef, useState } from "react";
-import { callPostRole, callPutRoleRowActive, callPutUpdateRole } from "../../api/api";
-import { useToast } from "../../context/ToastProvider";
-import { DialogDeleteRowBodyProps, DialogRoleRowProps, DialogUpdateRoleBodyProps, handeDeleteRowParams, handeSaveRoleParams, PermissionID, RenderRoleRowDialogParams, Role } from "../../utils/types/type";
+import { callPostRole, callPutRoleRowActive, callPutUpdateRole } from "../../../api/api";
+import { useToast } from "../../../context/ToastProvider";
+import { DialogDeleteRowBodyProps, DialogRoleRowProps, DialogUpdateRoleBodyProps, handeDeleteRowParams, handeSaveRoleParams, PermissionID, RenderRoleRowDialogParams, Role } from "../../../utils/types/type";
 
 
 // Thành phần DialogRoleActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)

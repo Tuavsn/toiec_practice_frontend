@@ -2,9 +2,9 @@ import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import React, { Dispatch } from "react";
 import { useNavigate } from "react-router-dom";
-import { statusBodyTemplate } from "../../components/Common/Table/CommonColumn";
-import { emptyTestRow } from "../../utils/types/emptyValue";
-import { RowActionButtonProps, RowHookAction, TestRow } from "../../utils/types/type";
+import { emptyTestRow } from "../../../utils/types/emptyValue";
+import { RowActionButtonProps, RowHookAction, TestRow } from "../../../utils/types/type";
+import { statusBodyTemplate } from "../../Common/Column/CommonColumn";
 
 export function RenderAdminTestColumns(dispatch: Dispatch<RowHookAction<TestRow>>): JSX.Element[] {
     return [

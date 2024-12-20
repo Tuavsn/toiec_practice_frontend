@@ -8,7 +8,7 @@ import { InputNumber } from "primereact/inputnumber";
 import React, { memo, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { callGetTestDetailPageData } from "../api/api";
-import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Table/CommonColumn";
+import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Column/CommonColumn";
 import { useCheckBox } from "../hooks/TestDetailPaperHook";
 import { IsNotLogIn } from "../utils/AuthCheck";
 import convertSecondsToString from "../utils/convertSecondsToString";

@@ -7,9 +7,10 @@ import { InputText } from "primereact/inputtext"
 import { InputTextarea } from "primereact/inputtextarea"
 import { MultiSelect } from "primereact/multiselect"
 import React, { useState } from "react"
-import { callPostAssignmentQuestion, callPutQuestionUpdate } from "../../api/api"
-import { DialogQuestionActionProps, DialogQuestionPageProps, Topic, UpdateQuestionDialogProps, UpdateQuestionForm } from "../../utils/types/type"
-import { useToast } from "../../context/ToastProvider"
+import { callPutQuestionUpdate } from "../../../api/api"
+import { useToast } from "../../../context/ToastProvider"
+import { DialogQuestionActionProps, DialogQuestionPageProps, Resource, ResourceIndex, Topic, UpdateQuestionDialogProps, UpdateQuestionForm } from "../../../utils/types/type"
+import ResourceSection from "../AdminQuestionResourceSection/ResourceSection"
 
 // Định nghĩa component DialogForQuestionPage sử dụng React.FC với React.memo để tối ưu hiệu suất
 export const DialogForQuestionPage: React.FC<DialogQuestionPageProps> = React.memo(
@@ -43,7 +44,7 @@ export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = R
                 style={{ width: "80vw" }}                    // Thiết lập chiều rộng của Dialog
             >
                 {title === "Xóa" ?                          // Kiểm tra nếu tiêu đề là "Xóa"
-                    <h1 className='text-center'>Bạn có chắc muốn xóa</h1> // Hiển thị nội dung xác nhận xóa
+                    <h1 className='text-center'>Bạn có chắc muốn xóa câu <q>{currentSelectedQuestion.current.data ? currentSelectedQuestion.current.data.questionNum : 0}</q></h1> // Hiển thị nội dung xác nhận xóa
                     :
                     <RenderUpdateQuestionBody               // Hiển thị nội dung cập nhật câu hỏi
                         topicList={topicList}               // Truyền danh sách chủ đề vào RenderUpdateQuestionBody
@@ -60,6 +61,8 @@ export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = R
 const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo(
     ({ currentSelectedQuestion, topicList, }) => {
         const { toast } = useToast();
+        const [isDisabled, setIsDisabled] = useState(false);
+        const [resources, setResourses] = useState<ResourceIndex[]>((currentSelectedQuestion.current.data.resources as Resource[]).map((res, index) => ({ ...res, index, file: null })))
         const [formData, setFormData] = useState<UpdateQuestionForm>({
             listTopicIds: (currentSelectedQuestion.current.data.topic as Topic[]).map((t) => t.id),
             correctAnswer: currentSelectedQuestion.current.data.correctChoice as string,
@@ -73,37 +76,36 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
             id: currentSelectedQuestion.current.key as string,
         });
 
-        const handleChange = (e: { target: { name: any; value: any; }; }) => {
+        const handleChange = (e: { target: { name: any; value: any } }) => {
             const { name, value } = e.target;
             setFormData({ ...formData, [name]: value });
         };
         // khi nhấn nút Lưu
         const handleSave = () => {
-            const upsertQuestion = async () => {
-                let success = false;
-                if (formData.id) {
-                    success = await callPutQuestionUpdate(formData,[]);
-                } else {
-                    success = await callPostAssignmentQuestion(formData);
-                }
+            setIsDisabled(true);
+            const updateQuestion = async () => {
+                const success: boolean = await callPutQuestionUpdate(formData, resources);
                 if (success) {
-                    toast.current?.show({ severity: 'success', content: "Thao tác thành công" });
-                } else {
-                    toast.current?.show({ severity: 'error', content: "Thao tác thất bại" });
+                    if (success) {
+                        toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
 
+                    } else {
+                        toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Có lỗi khi lưu" });
+                    }
                 }
+                setIsDisabled(false);
             }
-            upsertQuestion();
+            updateQuestion();
         };
 
         return (
-            <Fieldset legend={formData.id ? "Sửa câu hỏi" : "Tạo câu hỏi"} >
+            <Fieldset legend="Sửa câu hỏi" >
                 <section className='flex flex-wrap gap-4 justify-content-space'>
 
 
                     {/* Content */}
                     <div className="field flex-1">
-                        <label className='block' htmlFor="content">Content</label>
+                        <label className='block' htmlFor="content">Nội dung câu hỏi</label>
                         <InputTextarea
                             style={{ width: '20vw', resize: 'none' }}
                             id="content"
@@ -116,7 +118,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
 
                     {/* Difficulty */}
                     <div className="field flex-1">
-                        <p className='m-0 mb-2'>Difficulty</p>
+                        <p className='m-0 mb-2'>Độ khó</p>
                         <InputNumber
                             name="difficulty"
                             value={formData.difficulty}
@@ -145,7 +147,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
 
                     {/* Explanation */}
                     <div className="field flex-1">
-                        <label className='block' htmlFor="explanation">Explanation</label>
+                        <label className='block' htmlFor="explanation">Giải thích</label>
                         <InputTextarea
                             className='' style={{ width: '30vw', resize: 'none' }}
                             id="explanation"
@@ -159,7 +161,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
 
                     {/* Answers */}
                     <div className="field flex-1">
-                        <p className='m-0 mb-2'>Answers</p>
+                        <p className='m-0 mb-2'>Đáp án</p>
                         <div >
 
                             {formData.answers.map((answer, index) => (
@@ -190,14 +192,14 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                                 className="p-button-text"
                                 onClick={() => setFormData({ ...formData, answers: [...formData.answers, ''] })}
                             >
-                                Add Answer
+                                Thêm đáp án
                             </Button>
                         </div>
 
 
                         {/* Correct Answer */}
                         <div className="field flex-1">
-                            <p className='block m-0 mb-2 text-right'><b>Correct Answer</b></p>
+                            <p className='block m-0 mb-2 text-right'><b>Đáp án đúng</b></p>
                             <Dropdown
                                 className='bg-green-200'
                                 name="correctAnswer"
@@ -210,21 +212,22 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                     </div>
                     {/* Topics */}
                     <div className="field flex-1">
-                        <p className='m-0 mb-2'>Topics</p>
+                        <p className='m-0 mb-2'>Chủ đề</p>
                         <MultiSelect
                             style={{ width: '100%', maxWidth: "70vw" }}
                             name="listTopicIds"
                             value={formData.listTopicIds}
                             options={topicList.current.map((topic) => ({ label: topic.name, value: topic.id }))}
                             onChange={(e) => setFormData((prev) => ({ ...prev, listTopicIds: e.value as string[] }))}
-                            placeholder="Select Topics"
+                            placeholder="Chọn chủ đề"
                             display='chip'
                         />
                     </div>
                 </section>
+                <ResourceSection resourseIndexes={resources} setResourseIndexes={setResourses} />
                 {/* Save Button */}
-                <div className="field flex justify-content-end">
-                    <Button label="Lưu" icon="pi pi-save" onClick={handleSave} />
+                <div className="field flex justify-content-end mt-7">
+                    <Button className="p-5" label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={handleSave} />
                 </div>
 
             </Fieldset>

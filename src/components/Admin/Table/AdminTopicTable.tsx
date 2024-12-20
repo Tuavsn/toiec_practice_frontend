@@ -1,7 +1,7 @@
 import { DataTable } from "primereact/datatable";
 import React from "react";
-import { AdminRowTableProps, Topic } from "../../utils/types/type";
-import { RenderAdminTopicColumns } from "./ColumnManageTopicPage";
+import { AdminRowTableProps, Topic } from "../../../utils/types/type";
+import { RenderAdminTopicColumns } from "../AdminColumn/ColumnManageTopicPage";
 
 // Thành phần AdminTopicTable sử dụng React.FC với kiểu AdminTopicTableProps
 const AdminTopicTable: React.FC<AdminRowTableProps<Topic>> = (props) => {
