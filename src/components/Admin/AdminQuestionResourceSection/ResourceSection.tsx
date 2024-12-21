@@ -2,7 +2,8 @@ import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { FileUpload, FileUploadSelectEvent } from "primereact/fileupload";
 import React, { useRef } from "react";
-import { ResourceIndex, ResourceSectionProps, ResourceType } from "../../../utils/types/type";
+import { ResourceSectionProps } from "../../../utils/types/props";
+import { ResourceIndex, ResourceType } from "../../../utils/types/type";
 
 
 const types = [
@@ -25,28 +26,28 @@ const ResourceSection: React.FC<ResourceSectionProps> = ({ resourseIndexes, setR
         setResourseIndexes(newRes);
     };
     const handleTypeChange = (e: { value: ResourceType }, idx: number) => {
-        const updateRes = resourseIndexes.map((res) =>
+        const updateRes = resourseIndexes.map((res: ResourceIndex) =>
             res.index === idx ? { ...res, type: e.value } : res
         )
         setResourseIndexes(updateRes);;
     };
 
     const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>, idx: number) => {
-        const updateRes = resourseIndexes.map((res) =>
+        const updateRes = resourseIndexes.map((res: ResourceIndex) =>
             res.index === idx ? { ...res, content: e.target.value } : res
         )
         setResourseIndexes(updateRes);;
     };
 
     const handleFileChange = (event: FileUploadSelectEvent, idx: number) => {
-        const updateRes = resourseIndexes.map((res) =>
+        const updateRes = resourseIndexes.map((res: ResourceIndex) =>
             res.index === idx ? { ...res, file: event.files[0] } : res
         )
         setResourseIndexes(updateRes);;
     }
 
     const handleFileCancel = (idx: number) => {
-        const updateRes = resourseIndexes.map((res) =>
+        const updateRes = resourseIndexes.map((res: ResourceIndex) =>
             res.index === idx ? { ...res, file: null } : res
         )
         setResourseIndexes(updateRes);;
@@ -136,7 +137,7 @@ const ResourceRow: React.FC<ResourceRowProps> = ({ rowIndex, rows, handleContent
                                 chooseLabel={`Chọn ${rows[rowIndex].type}`}
                                 accept={`${rows[rowIndex].type}/*`}
                                 onSelect={(e) => handleFileChange(e, rowIndex)}
-                                
+
                             />
                             <Button
                                 className="w-full my-2"

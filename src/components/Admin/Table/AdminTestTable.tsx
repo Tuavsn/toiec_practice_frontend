@@ -1,6 +1,7 @@
 import { DataTable } from "primereact/datatable";
 import React from "react";
-import { AdminRowTableProps, TestRow } from "../../../utils/types/type";
+import { AdminRowTableProps } from "../../../utils/types/props";
+import { TestRow } from "../../../utils/types/type";
 import { RenderAdminTestColumns } from "../AdminColumn/ColumnManageTestPage";
 
 // Thành phần AdminTestTable sử dụng React.FC với kiểu AdminTestTableProps

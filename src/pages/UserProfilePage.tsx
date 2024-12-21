@@ -19,7 +19,8 @@ import useProfile from "../hooks/ProfileHook";
 import { AmINotLoggedIn } from '../utils/AuthCheck';
 import convertSecondsToString from "../utils/convertSecondsToString";
 import formatDate from "../utils/formatDateToString";
-import { ActivityLogProps, SkillInsightsProps, SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from "../utils/types/type";
+import { ActivityLogProps, SkillInsightsProps } from '../utils/types/props';
+import { SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from "../utils/types/type";
 // Đăng ký các phần tử Chart.js cần thiết
 ChartJS.register(...registerables);
 // Đăng ký plugin DataLabels

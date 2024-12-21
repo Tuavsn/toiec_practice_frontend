@@ -7,7 +7,9 @@ import { MultiSelect } from "primereact/multiselect";
 import React, { useRef, useState } from "react";
 import { callPostRole, callPutRoleRowActive, callPutUpdateRole } from "../../../api/api";
 import { useToast } from "../../../context/ToastProvider";
-import { DialogDeleteRowBodyProps, DialogRoleRowProps, DialogUpdateRoleBodyProps, handeDeleteRowParams, handeSaveRoleParams, PermissionID, RenderRoleRowDialogParams, Role } from "../../../utils/types/type";
+import { RenderRoleRowDialogParams, handeDeleteRowParams, handeSaveRoleParams } from "../../../utils/types/prams";
+import { DialogDeleteRowBodyProps, DialogRoleRowProps, DialogUpdateRoleBodyProps } from "../../../utils/types/props";
+import { Permission, PermissionID, Role } from "../../../utils/types/type";
 
 
 // Thành phần DialogRoleActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)
@@ -81,7 +83,7 @@ type UpsertRoleForm = {
 
 const RenderUpsertRoleBody: React.FC<DialogUpdateRoleBodyProps> = React.memo(
     (props) => {
-        const [formData, setFormData] = useState<UpsertRoleForm>({ ...props.currentSelectedRow, permissionIDs: props.currentSelectedRow.permissions.map(p => p.id) })
+        const [formData, setFormData] = useState<UpsertRoleForm>({ ...props.currentSelectedRow, permissionIDs: props.currentSelectedRow.permissions.map((p:Permission) => p.id) })
         const { toast } = useToast();
         const [isDisabled, setIsDisabled] = useState(false);
         const title = useRef<string>(props.currentSelectedRow.id ? "Sửa vai trò" : "Thêm vai trò");
@@ -118,7 +120,7 @@ const RenderUpsertRoleBody: React.FC<DialogUpdateRoleBodyProps> = React.memo(
                             style={{ width: '100%', maxWidth: "70vw" }}
                             name="listTopicIds"
                             value={formData.permissionIDs}
-                            options={props.permissionList.map((p) => ({ label: p.name, value: p.id }))}
+                            options={props.permissionList.map((p: Permission) => ({ label: p.name, value: p.id }))}
                             onChange={(e) => setFormData((prev) => ({ ...prev, permissionIDs: e.value as PermissionID[] }))}
                             placeholder="Chọn các thao tác"
                             display='chip'

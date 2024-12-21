@@ -1,7 +1,7 @@
 // ---------------- Hàm Chuẩn Bị Phiếu Trả Lời Rỗng ---------------- //
 
-import { Dispatch, SetStateAction, MutableRefObject } from "react";
-import { MultipleChoiceQuestion, TestAnswerSheet, UserAnswerTimeCounter, QuestionNumber, AnswerPair, AnswerRecord, MultiQuestionAction, MultiQuestionRef } from "./types/type";
+import { Dispatch, MutableRefObject, SetStateAction } from "react";
+import { AnswerPair, AnswerRecord, MultipleChoiceQuestion, MultiQuestionRef, QuestionNumber, TestAnswerSheet, UserAnswerTimeCounter } from "./types/type";
 
 function prepareAnswerSheet(
     listMultipleChoiceQuestions: MultipleChoiceQuestion[],

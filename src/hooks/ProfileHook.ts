@@ -1,16 +1,16 @@
 import { useEffect, useReducer, useRef } from "react";
 import { callGetProfile } from "../api/api";
 import SetWebPageTitle from "../utils/setTitlePage";
+import { ProfileHookAction } from "../utils/types/action";
 import { initProfile } from "../utils/types/emptyValue";
-import { ProfileHookState, SuggestionsForUser } from "../utils/types/type";
+import { ProfileHookState } from "../utils/types/state";
+import { SuggestionsForUser } from "../utils/types/type";
 
 
 
 
 
-type ProfileHookAction =
-    | { type: 'FETCH_SUCCESS', payload: ProfileHookState }
-    | { type: 'SET_PAGE', payload: number }
+
 
 const reducer = (state: ProfileHookState, action: ProfileHookAction): ProfileHookState => {
     switch (action.type) {

@@ -2,12 +2,14 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Toolbar } from "primereact/toolbar";
 import React, { memo, useEffect, useState } from "react";
-import '../App.css';
-import { LoadingSpinner, TestArea, UserAnswerSheet } from "../components/Common/Index";
-import useTestPage from "../hooks/TestHook";
-import { DoTestPageProps, MultipleChoiceQuestion, SimpleTimeCountDownProps, TestType } from "../utils/types/type";
 import { Link, Navigate } from "react-router-dom";
-import { AmINotLoggedIn } from "../utils/AuthCheck";
+import { LoadingSpinner, TestArea, UserAnswerSheet } from "../../components/Common/Index";
+import useTestPage from "../../hooks/TestHook";
+import { AmINotLoggedIn } from "../../utils/AuthCheck";
+import { DoTestPageProps, SimpleTimeCountDownProps } from "../../utils/types/props";
+import { MultipleChoiceQuestion, TestType } from "../../utils/types/type";
+import '../App.css';
+;
 
 function DoTestPage() {
 

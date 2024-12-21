@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTestState } from "../context/TestStateProvider";
+import { MultiQuestionAction } from "../utils/types/action";
 import { initialState } from "../utils/types/emptyValue";
-import { AnswerPair, milisecond, MultipleChoiceQuestion, MultiQuestionAction, MultiQuestionRef, MultiQuestionState, QuestionID, QuestionNumber, QuestionPage, TestAnswerSheet, UserAnswerTimeCounter } from "../utils/types/type";
+import { MultiQuestionState } from "../utils/types/state";
+import { AnswerPair, milisecond, MultipleChoiceQuestion, MultiQuestionRef, QuestionID, QuestionNumber, QuestionPage, TestAnswerSheet, UserAnswerTimeCounter } from "../utils/types/type";
 
 export function useMultipleQuestion() {
     // ---------------- Khởi tạo State và Context ---------------- //
@@ -164,7 +166,7 @@ function reducer(state: MultiQuestionState, action: MultiQuestionAction): MultiQ
             return { ...state, isSumit: action.payload };
         case "TOGGLE_FLAGS":
             {
-                const newFlags = state.flags.map((item, i) => (i === action.payload ? !item : item))
+                const newFlags = state.flags.map((item:boolean, i:number) => (i === action.payload ? !item : item))
                 return { ...state, flags: newFlags }
             }
         case "SET_TEST_DATA":
@@ -209,8 +211,8 @@ export function useMultipleQuestionX() {
 
     const updateTimeSpentOnEachQuestionInCurrentPage = () => {
         const allQuestionsInCurrentPage: QuestionNumber[] = state.pageMapper
-            .filter((page) => page.page === state.currentPageIndex)
-            .map((page) => page.questionNum);
+            .filter((page:QuestionPage) => page.page === state.currentPageIndex)
+            .map((page:QuestionPage) => page.questionNum);
 
         const newTimeStamp = Date.now();
         const timeDiff: number = (newTimeStamp - MultiRef.current.lastTimeStampRef) / allQuestionsInCurrentPage.length;

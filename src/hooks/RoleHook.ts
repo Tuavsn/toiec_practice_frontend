@@ -3,8 +3,9 @@ import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "rea
 import { callGetPermissionList, callGetRole } from "../api/api";
 import { useToast } from "../context/ToastProvider";
 import SetWebPageTitle from "../utils/setTitlePage";
+import { RoleHookAction } from "../utils/types/action";
 import { initialRoleState } from "../utils/types/emptyValue";
-import { RoleHookAction, RoleHookState } from "../utils/types/type";
+import { RoleHookState } from "../utils/types/state";
 
 const reducer = (state: RoleHookState, action: RoleHookAction): RoleHookState => {
     switch (action.type) {

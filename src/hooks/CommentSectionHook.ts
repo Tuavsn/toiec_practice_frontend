@@ -1,7 +1,8 @@
+import { PaginatorPageChangeEvent } from 'primereact/paginator';
 import { useEffect, useReducer, useRef } from 'react';
 import { callGetComments } from '../api/api';
-import { UserCommentAction, UserCommentState } from '../utils/types/type';
-import { PaginatorPageChangeEvent } from 'primereact/paginator';
+import { UserCommentAction } from '../utils/types/action';
+import { UserCommentState } from '../utils/types/state';
 
 
 

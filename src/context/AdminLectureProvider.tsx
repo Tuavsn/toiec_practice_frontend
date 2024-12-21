@@ -1,6 +1,6 @@
 import { createContext } from "react";
-import { LectureReduceProps } from "../utils/types/type";
 import useLecture from "../hooks/LectureHook";
+import { LectureReduceProps } from "../utils/types/props";
 
 const AdminLectureContext = createContext<LectureReduceProps | undefined>(undefined);
 

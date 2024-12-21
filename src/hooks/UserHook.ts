@@ -2,8 +2,10 @@ import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useReducer, useRef } from "react";
 import { callGetRole, callGetUserRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
+import { UserHookAction } from "../utils/types/action";
 import { initialUserState } from "../utils/types/emptyValue";
-import { UserHookAction, UserHookState } from "../utils/types/type";
+import { UserHookState } from "../utils/types/state";
+
 
 
 

@@ -6,7 +6,9 @@ import { InputText } from "primereact/inputtext";
 import React, { useRef, useState } from "react";
 import { callPostTest, callPostUpdateTest, callPutDeleteTestRow } from "../../../api/api";
 import { useToast } from "../../../context/ToastProvider";
-import { DialogDeleteRowBodyProps, DialogTestRowProps, DialogUpdateTestBodyProps, handeDeleteRowParams, handeSaveRowParams, RenderTestRowDialogParams, TestRow } from "../../../utils/types/type";
+import { RenderTestRowDialogParams, handeDeleteRowParams, handeSaveRowParams } from "../../../utils/types/prams";
+import { DialogDeleteRowBodyProps, DialogTestRowProps, DialogUpdateTestBodyProps } from "../../../utils/types/props";
+import { TestRow } from "../../../utils/types/type";
 
 
 // Thành phần DialogTestActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)

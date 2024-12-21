@@ -4,8 +4,10 @@ import { useParams } from "react-router-dom";
 import { callGetTestRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
 import SplitNameIDFromURL from "../utils/splitNameIDFromURL";
+import { RowHookAction } from "../utils/types/action";
 import { emptyTestRow, initialTestState } from "../utils/types/emptyValue";
-import { CategoryID, Name_ID, RowHookAction, RowHookState, TestRow } from "../utils/types/type";
+import { RowHookState } from "../utils/types/state";
+import { CategoryID, Name_ID, TestRow } from "../utils/types/type";
 
 const reducer = (state: RowHookState<TestRow>, action: RowHookAction<TestRow>): RowHookState<TestRow> => {
     switch (action.type) {

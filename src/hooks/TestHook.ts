@@ -6,7 +6,9 @@ import { MappingPageWithQuestionNum } from '../utils/convertToHTML';
 import hasSessionStorageItem from '../utils/hasItemInSessionStorage';
 import prepareForTest from '../utils/prepareForTest';
 import SetWebPageTitle from '../utils/setTitlePage';
-import { AnswerPair, FullTestScreenAction, FullTestScreenState, milisecond, QuestionNumber, QuestionPage, RenderTestActiion, renderTestRefType, RenderTestState, ResultID, TestID, TestPaper, TestRecord, TestType } from '../utils/types/type';
+import { FullTestScreenAction, RenderTestActiion } from '../utils/types/action';
+import { FullTestScreenState, RenderTestState } from '../utils/types/state';
+import { AnswerPair, QuestionNumber, QuestionPage, ResultID, TestID, TestPaper, TestRecord, TestType, milisecond, renderTestRefType } from '../utils/types/type';
 import { useMultipleQuestionX } from './MultipleQuestionHook';
 
 //------------------ Custom Hook: useTestPage ------------------//
@@ -180,7 +182,7 @@ function renderTestReducer(state: RenderTestState, action: RenderTestActiion): R
         }
         case "TOGGLE_FLAGS":
             {
-                const newFlags = state.flags.map((item, i) => (i === action.payload ? !item : item))
+                const newFlags = state.flags.map((item:boolean, i:number) => (i === action.payload ? !item : item))
                 return { ...state, flags: newFlags }
             }
         default:

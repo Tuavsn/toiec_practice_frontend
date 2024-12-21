@@ -4,12 +4,14 @@ import { ScrollPanel } from "primereact/scrollpanel";
 import { Sidebar } from "primereact/sidebar";
 import { Toolbar } from "primereact/toolbar";
 import React, { Dispatch, memo, useCallback, useMemo } from "react";
+import { Navigate } from "react-router-dom";
 import { LoadingSpinner } from "../components/Common/Index";
 import useTestReview from "../hooks/TestReviewHook";
-import { ConvertSolutionToHTML as ConvertSolutionToHTML, ConvertTopicToHTML, ConvertUserAnswerRecordToHTML } from "../utils/convertToHTML";
-import { TestReviewAreaProps, TestReviewHookAction, UserAnswerRecord, UserAnswerSheetReviewProps } from "../utils/types/type";
-import { Navigate } from "react-router-dom";
 import { AmINotLoggedIn } from "../utils/AuthCheck";
+import { ConvertSolutionToHTML, ConvertTopicToHTML, ConvertUserAnswerRecordToHTML } from "../utils/convertToHTML";
+import { TestReviewHookAction } from "../utils/types/action";
+import { TestReviewAreaProps, UserAnswerSheetReviewProps } from "../utils/types/props";
+import { QuestionPage, UserAnswerRecord, } from "../utils/types/type";
 
 //-------------- Main Component: TestReviewPage -------------- -------------- -------------- -------------- -------------- -------------- -------------- 
 
@@ -151,7 +153,7 @@ const UserAnswerSheet: React.FC<UserAnswerSheetReviewProps> = React.memo(({ stat
             return [<h1 key="error-button-list">Lỗi rồi</h1>];
         }
         let part = 0;
-        return state.pageMapper.map((pq, index) => {
+        return state.pageMapper.map((pq:QuestionPage, index:number) => {
             const isOnPage = state.currentPageIndex === pq.page;
             let newPart = false;
             if (part != pq.part) {

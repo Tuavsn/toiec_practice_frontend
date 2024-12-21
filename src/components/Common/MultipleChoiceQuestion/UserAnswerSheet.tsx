@@ -1,7 +1,7 @@
 import { Sidebar } from "primereact/sidebar";
 import React from "react";
 import { UserAnswerSheetFullTestProps, UserAnswerSheetProps } from "../../../utils/types/type";
-import SubComponents from "../../../pages/DoTestPage/SubComponents";
+import SubComponents from "../../User/TestComponent/LoadingGetQuestions";
 
 export const UserAnswerSheet: React.FC<UserAnswerSheetProps> = React.memo(
     ({ visible, setVisible, ButtonListElement }) => {

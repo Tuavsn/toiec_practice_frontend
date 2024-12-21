@@ -1,8 +1,5 @@
 import { DataTableValue } from "primereact/datatable";
-import { EditorTextChangeEvent } from "primereact/editor";
-import { Toast } from "primereact/toast";
-import { TreeNode } from "primereact/treenode";
-import { Dispatch, MutableRefObject, SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { NavigateFunction } from "react-router-dom";
 
 
@@ -164,16 +161,11 @@ export interface LearningProgress extends DataTableValue {
 //-------------------------------------------------REQUEST RESPONE OBJECT----------------------------------------------------------------
 
 export interface TableData<T> {
-  meta: {
-    current: number;
-    pageSize: number;
-    totalPages: number;
-    totalItems: number;
-  };
+  meta: Meta;
   result: T[];
 }
 
-export interface Meta {
+interface Meta {
   current: number;
   pageSize: number;
   totalPages: number;
@@ -356,29 +348,7 @@ interface ResultOverview {
   type: TestType; // "practice" or "fulltest"
   parts: string; // "Practice parts"
 }
-export interface FullTestScreenProps {
-  questionList: MultipleChoiceQuestion[];
-  pageMapper: QuestionPage[];
-  currentPageIndex: number;
-  userAnswerSheet: TestAnswerSheet;
-  flags: boolean[];
-  isVisible: boolean;
-  isUserAnswerSheetVisible: boolean;
-  func: DoTestFunction,
-  dispatch: Dispatch<MultiQuestionAction>
-  answeredCount: number,
-  MultiRef: MutableRefObject<MultiQuestionRef>
-}
-export interface RennderTutorialProps {
-  partNeedToShow: number;
-  dispatchTutorialIsDone: React.Dispatch<FullTestScreenAction>
-}
-export interface RenderTestProps {
-  testPaperRef: React.MutableRefObject<TestPaper>
-  fullTestScreenDispatch: React.Dispatch<FullTestScreenAction>
-  thisQuestion: MultipleChoiceQuestion,
-  changePage: (offset: number) => void
-}
+
 interface TopicOverview {
   partNum: number;
   topicNames: string[];
@@ -473,188 +443,6 @@ export interface UpdateLectureForm {
 }
 
 
-
-
-// ------------------------- tham số truyền
-export type RichEditorProps = {
-  button: React.MutableRefObject<HTMLButtonElement>,
-  text: React.MutableRefObject<string>,
-  saveText(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, text: React.MutableRefObject<string>): void
-
-}
-export type DialogLectureProps = {
-  currentSelectedLecture: LectureRow,
-  dispatch: Dispatch<LectureHookAction>,
-  job: DialogLectureJobType,
-}
-
-export type DialogRowProps<RowModel> = {
-  currentSelectedRow: RowModel,
-  dispatch: Dispatch<RowHookAction<RowModel>>,
-  job: DialogRowJobType,
-}
-export type DialogTestRowProps = {
-  currentSelectedRow: TestRow,
-  dispatch: Dispatch<RowHookAction<TestRow>>,
-  job: DialogRowJobType,
-  categoryName: string,
-}
-export type DialogRoleRowProps = {
-  currentSelectedRow: Role,
-  dispatch: Dispatch<RoleHookAction>,
-  job: DialogRowJobType,
-  permissionList: Permission[]
-}
-export type DialogUserRowProps = {
-  currentSelectedRow: UserRow,
-  dispatch: Dispatch<UserHookAction>,
-  job: DialogRowJobType,
-  roleList: Role[]
-}
-
-export type DialogUpdateCategoryBodyProps = {
-  currentSelectedRow: CategoryRow,
-  dispatch: Dispatch<RowHookAction<CategoryRow>>,
-}
-export type DialogUpdateTopicBodyProps = {
-  currentSelectedRow: Topic,
-  dispatch: Dispatch<RowHookAction<Topic>>,
-}
-export type DialogUpdatePermissionBodyProps = {
-  currentSelectedRow: Permission,
-  dispatch: Dispatch<RowHookAction<Permission>>,
-}
-export type DialogUpdateRoleBodyProps = {
-  currentSelectedRow: Role,
-  dispatch: Dispatch<RoleHookAction>,
-  permissionList: Permission[],
-}
-export type DialogUpdateUserBodyProps = {
-  currentSelectedRow: UserRow,
-  dispatch: Dispatch<UserHookAction>,
-  roleList: Role[],
-}
-export type DialogUpdateTestBodyProps = {
-  currentSelectedRow: TestRow,
-  dispatch: Dispatch<RowHookAction<TestRow>>,
-}
-export type DialogUpdateLectureBodyProps = {
-  currentSelectedLecture: LectureRow,
-  dispatch: Dispatch<LectureHookAction>,
-  topicListRef: React.MutableRefObject<Topic[]>,
-}
-
-export type RenderLectureDialogParams = {
-  job: DialogLectureJobType,
-  currentSelectedLecture: LectureRow,
-  dispatch: Dispatch<LectureHookAction>,
-  topicListRef: React.MutableRefObject<Topic[]>
-}
-
-export type RenderRowDialogParams<RowModel> = {
-  job: DialogRowJobType,
-  currentSelectedRow: RowModel,
-  dispatch: Dispatch<RowHookAction<RowModel>>,
-}
-export type RenderTestRowDialogParams = {
-  job: DialogRowJobType,
-  currentSelectedRow: TestRow,
-  dispatch: Dispatch<RowHookAction<TestRow>>,
-  categoryName: string,
-}
-export type RenderRoleRowDialogParams = {
-  job: DialogRowJobType,
-  currentSelectedRow: Role,
-  dispatch: Dispatch<RoleHookAction>,
-  permissionList: Permission[],
-}
-export type RenderUserRowDialogParams = {
-  job: DialogRowJobType,
-  currentSelectedRow: UserRow,
-  dispatch: Dispatch<UserHookAction>,
-  roleList: Role[],
-}
-
-export type SaveTextParams = {
-  e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  toast: MutableRefObject<Toast | null>
-  text: React.MutableRefObject<string>,
-  lectureID: LectureID,
-}
-export type EditTextParams = {
-  e: EditorTextChangeEvent,
-  button: React.MutableRefObject<HTMLButtonElement>,
-  text: React.MutableRefObject<string>
-}
-export type handeSaveLectureParams = {
-  title: string,
-  topicIds: TopicID[],
-  lectureID: LectureID,
-  toast: React.MutableRefObject<Toast | null>,
-  dispatch: React.Dispatch<LectureHookAction>,
-  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>,
-}
-
-export type handeDeleteLectureParams = {
-  lecture: LectureRow,
-  toast: React.MutableRefObject<Toast | null>,
-  dispatch: React.Dispatch<LectureHookAction>,
-}
-
-export type handeDeleteRowParams<RowModel> = {
-  row: RowModel,
-  toast: React.MutableRefObject<Toast | null>,
-  dispatch: React.Dispatch<RowHookAction<RowModel>>,
-}
-
-export type AdminLectureTableProps = {
-  lectures: LectureRow[] | null,
-  dispatch: Dispatch<LectureHookAction>,
-}
-
-export type AdminRowTableProps<RowModel> = {
-  rows: RowModel[] | null,
-  dispatch: Dispatch<RowHookAction<RowModel>>,
-}
-
-export type LectureActionButtonProps = {
-  currentSelectedLecture: LectureRow,
-  dispatch: Dispatch<LectureHookAction>,
-}
-export type handeSaveRowParams<RowModel> = {
-  row: RowModel
-  toast: React.MutableRefObject<Toast | null>,
-  dispatch: React.Dispatch<RowHookAction<RowModel>>,
-
-  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>,
-}
-export type handeSaveRoleParams = {
-  row: Role
-  toast: React.MutableRefObject<Toast | null>,
-  dispatch: React.Dispatch<RoleHookAction>,
-  permissionIDList: PermissionID[],
-  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>,
-}
-export type handeSaveUserRowParams = {
-  role: Role,
-  user: UserRow,
-  toast: React.MutableRefObject<Toast | null>,
-  dispatch: React.Dispatch<UserHookAction>,
-  setIsDisabled: React.Dispatch<React.SetStateAction<boolean>>,
-}
-export type RowActionButtonProps<RowModel> = {
-  currentSelectedRow: RowModel,
-  dispatch: Dispatch<RowHookAction<RowModel>>,
-}
-export type DialogDeleteLectureBodyProps = LectureActionButtonProps;
-
-export type DialogDeleteRowBodyProps<RowModel> = RowActionButtonProps<RowModel>;
-
-export interface SimpleTimeCountDownProps {
-  isTutorial: boolean;
-  timeLeftInSecond: number;
-  onTimeUp: () => void;
-}
 export interface DoTestFunction {
   updateTimeSpentOnEachQuestionInCurrentPage: () => void;
   setIsOnTest: Dispatch<SetStateAction<boolean>>;
@@ -663,84 +451,7 @@ export interface DoTestFunction {
   navigate: NavigateFunction;
 }
 
-export interface DoTestPageProps {
-  id: TestID,
-  func: DoTestFunction,
-  state: MultiQuestionState,
-  onEndTest: () => Promise<void>,
-  timeLimitRef: React.MutableRefObject<number>,
-  dispatch: React.Dispatch<MultiQuestionAction>,
-  MultiRef: React.MutableRefObject<MultiQuestionRef>,
-}
 
-export interface DoExercisePageProps {
-  setIsUserAnswerSheetVisible: React.Dispatch<React.SetStateAction<boolean>>,
-  isUserAnswerSheetVisible: boolean,
-  setTestAnswerSheet: (qNum: QuestionNumber, qID: QuestionID, answer: string) => void,
-  totalQuestions: number,
-  changePage: (offset: number) => void,
-  timeDoTest: React.MutableRefObject<number>,
-  isSumit: boolean,
-  onEndTest: () => Promise<void>,
-  startTest: () => void,
-  start: boolean,
-  userAnswerSheet: TestAnswerSheet,
-  createButtonListElement: () => JSX.Element[],
-  currentPageIndex: number,
-  questionList: MultipleChoiceQuestion[],
-}
-
-export interface DialogQuestionActionProps {
-  isVisible: boolean,
-  title: string,
-  topicList: React.MutableRefObject<Topic[]>,
-  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
-  currentSelectedQuestion: React.MutableRefObject<TreeNode>,
-}
-
-export type LectureReduceProps = {
-  state: LectureHookState;
-  dispatch: Dispatch<LectureHookAction>;
-}
-
-export interface UserAnswerSheetProps {
-  visible: boolean,
-  setVisible: React.Dispatch<React.SetStateAction<boolean>>,
-  ButtonListElement: JSX.Element[],
-}
-export interface UserAnswerSheetFullTestProps {
-  visible: boolean,
-  pageMapper: QuestionPage[],
-  userAnswerSheet: TestAnswerSheet,
-  currentPageIndex: number,
-  questionList: MultipleChoiceQuestion[],
-  flags: boolean[],
-  dispatch: Dispatch<MultiQuestionAction>,
-}
-
-export type UserAnswerSheetReviewProps = {
-  dispatch: Dispatch<TestReviewHookAction>,
-  state: TestReviewHookState
-}
-
-export type TestReviewAreaProps = {
-  question: UserAnswerRecord,
-  dispatch: Dispatch<TestReviewHookAction>,
-}
-
-export interface TestAreaProps {
-  testType: TestType,
-  question: MultipleChoiceQuestion,
-  userAnswerSheet: TestAnswerSheet,
-  setTestAnswerSheet: (questionNumber: number, questionID: string, answer: string) => void
-  changePage: (offset: number) => void
-}
-export interface FullTestAreaProps {
-  question: MultipleChoiceQuestion,
-  userAnswerSheet: TestAnswerSheet,
-  dispatch: Dispatch<RenderTestActiion>
-  changePage: (offset: number) => void
-}
 
 export interface TopicRecord extends DataTableValue {
   topic: string,
@@ -749,40 +460,17 @@ export interface TopicRecord extends DataTableValue {
   correctPercent: number,
 }
 
-export interface SkillInsightsProps {
-  parts: TopicStat[]
-}
+
 export type AnswerRecord = AnswerPair & {
   timeSpent: milisecond;
 }
 
-export interface QuestionTableProps {
-  setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
-  setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
-  setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
-}
+
 export type renderTestRefType = {
   pageMapper: QuestionPage[]
   timeSpentList: UserAnswerTimeCounter
 }
-export interface TestToolBarProps {
-  renderTestRef: React.MutableRefObject<renderTestRefType>;
-  renderTestState: RenderTestState;
-  renderTestDispatch: React.Dispatch<RenderTestActiion>
-}
 
-export interface QuestionActionButtonProps {
-  questionNode: TreeNode,
-  topicList: React.MutableRefObject<Topic[]>,
-  setTitle: React.Dispatch<React.SetStateAction<string>>,
-  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
-  currentSelectedQuestion: React.MutableRefObject<TreeNode>,
-}
-
-export interface UpdateQuestionDialogProps {
-  currentSelectedQuestion: React.MutableRefObject<TreeNode>,
-  topicList: React.MutableRefObject<Topic[]>,
-}
 
 export interface QuestionContext {
   ask?: string
@@ -795,20 +483,7 @@ export type ResourceIndex = Resource & {
   index: number,
   file: File | null,
 }
-export interface ResourceSectionProps {
-  resourseIndexes: ResourceIndex[],
-  setResourseIndexes: React.Dispatch<React.SetStateAction<ResourceIndex[]>>,
 
-}
-export interface DialogQuestionPageProps {
-  setIsDialogVisible: React.Dispatch<React.SetStateAction<JSX.Element | null>>
-  dialogBodyVisible: JSX.Element | null,
-  title: string
-}
-
-export interface ActivityLogProps {
-  userResultRows: UserDetailResultRow[]
-}
 //---------------------------- tên gọi khác
 export type TestAnswerSheet = Map<QuestionNumber, AnswerPair>;
 export type ResultID = string;
@@ -836,10 +511,7 @@ export type DialogRowJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE';
 export type Name_ID<T extends string> = T;
 
 //-----------------------------reducer---------------------
-export type FullTestScreenState = {
-  tutorials: boolean[];
-  currentPageIndex: number;
-};
+
 
 
 export interface MultiQuestionRef {
@@ -850,157 +522,6 @@ export interface MultiQuestionRef {
   totalQuestions: number
 }
 
-export interface LectureHookState {
-  isRefresh: boolean;
-  lectures: LectureRow[] | null,
-  currentPageIndex: number,
-  job: DialogLectureJobType,
-  currentSelectedLecture: LectureRow
-}
-export interface CategoryHookState {
-  isRefresh: boolean;
-  lectures: CategoryRow[],
-  currentPageIndex: number,
-  job: DialogRowJobType,
-  currentSelectedCategory: CategoryRow
-}
 
-export type ProfileHookState = {
-  id: UserID,
-  avatar: string,
-  role: Role,
-  target: number,
-  overallStat: OverallStat | null,
-  topicStats: TopicStat[],
-  skillStats: SkillStat[],
-  results: UserDetailResultRow[],
-}
-export interface UserCommentState {
-  comments: UserComment[] | null;
-  currentPageIndex: number;
-}
-export interface TestReviewHookState {
-  testReviewAnswerSheet: TestReviewAnswerSheet,
-  isUserAnswerSheetVisible: boolean,
-  currentPageIndex: number,
-  pageMapper: QuestionPage[],
-}
-export type RowHookState<RowModel> = {
-  rows: RowModel[] | null,
-  isRefresh: boolean;
-  currentPageIndex: number,
-  job: DialogRowJobType,
-  currentSelectedRow: RowModel,
-}
-export type RoleHookState = {
-  rows: Role[] | null,
-  isRefresh: boolean;
-  currentPageIndex: number,
-  job: DialogRowJobType,
-  currentSelectedRow: Role,
-  permissionList: Permission[],
-}
-export type UserHookState = {
-  rows: UserRow[] | null,
-  isRefresh: boolean;
-  currentPageIndex: number,
-  job: DialogRowJobType,
-  currentSelectedRow: UserRow,
-  roleList: Role[],
-}
-export interface MultiQuestionState {
-  questionList: MultipleChoiceQuestion[];
-  pageMapper: QuestionPage[];
-  currentPageIndex: number;
-  userAnswerSheet: TestAnswerSheet;
-  flags: boolean[];
-  isVisible: boolean;
-  isUserAnswerSheetVisible: boolean;
-  start: boolean;
-  isSumit: boolean;
-}
-export interface RenderTestState {
-  userAnswerSheet: TestAnswerSheet
-  flags: boolean[]
-}
-type FetchLecture = {
-  lectures: LectureRow[],
-  pageIndex: number
-}
-export type RenderTestActiion =
-  | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber; qID: QuestionID; answer: string; } }
-  | { type: "TOGGLE_FLAGS", payload: number }
 
-export type FullTestScreenAction =
-  | { type: "SET_TUTORIALS"; payload: boolean[] }
-  | { type: "SET_CURRENT_PAGE_INDEX"; payload: number }
-  | { type: "SET_CURRENT_PAGE_OFFSET"; payload: number }
-export type RowHookAction<RowModel> =
-  | { type: 'FETCH_ROWS_SUCCESS'; payload: [RowModel[], number] }
-  | { type: 'SET_PAGE'; payload: number }
-  | { type: 'REFRESH_DATA' }
-  | { type: 'RESET_ROWS' }
-  | { type: 'SET_CURRENT_ROW'; payload: RowModel }
-  | { type: 'TOGGLE_DIALOG'; payload: DialogRowJobType }
-  | { type: 'OPEN_UPDATE_DIALOG'; payload: RowModel }
-  | { type: 'OPEN_DELETE_DIALOG'; payload: RowModel }
-  | { type: 'OPEN_CREATE_DIALOG'; payload: RowModel }
-export type RoleHookAction =
-  | { type: 'FETCH_ROWS_SUCCESS'; payload: [Role[], number] }
-  | { type: 'FETCH_PERMISSIONS_SUCCESS'; payload: Permission[] }
-  | { type: 'SET_PAGE'; payload: number }
-  | { type: 'REFRESH_DATA' }
-  | { type: 'RESET_ROWS' }
-  | { type: 'SET_CURRENT_ROW'; payload: Role }
-  | { type: 'TOGGLE_DIALOG'; payload: DialogRowJobType }
-  | { type: 'OPEN_UPDATE_DIALOG'; payload: Role }
-  | { type: 'OPEN_DELETE_DIALOG'; payload: Role }
-  | { type: 'OPEN_CREATE_DIALOG'; payload: Role }
-export type UserCommentAction =
-  | { type: 'SET_COMMENTS'; payload: UserComment[] | null }
-  | { type: 'FETCH_COMMENTS'; payload: [UserComment[], number] }
-  | { type: 'SET_PAGE'; payload: number }
-  | { type: 'REFRESH_DATA' }
-export type UserHookAction =
-  | { type: 'FETCH_ROWS_SUCCESS'; payload: [UserRow[], number] }
-  | { type: 'FETCH_ROLES_SUCCESS'; payload: Role[] }
-  | { type: 'SET_PAGE'; payload: number }
-  | { type: 'REFRESH_DATA' }
-  | { type: 'RESET_ROWS' }
-  | { type: 'SET_CURRENT_ROW'; payload: UserRow }
-  | { type: 'TOGGLE_DIALOG'; payload: DialogRowJobType }
-  | { type: 'OPEN_UPDATE_DIALOG'; payload: UserRow }
-  | { type: 'OPEN_DELETE_DIALOG'; payload: UserRow }
-  | { type: 'OPEN_CREATE_DIALOG'; payload: UserRow }
-export type LectureHookAction =
-  | { type: 'FETCH_LECTURE_SUCCESS'; payload: FetchLecture }
-  | { type: 'FETCH_TOPIC_SUCCESS'; payload: Topic[] }
-  | { type: 'SET_PAGE'; payload: number }
-  | { type: 'REFRESH_DATA' }
-  | { type: 'SET_CURRENT_LECTURE'; payload: LectureRow }
-  | { type: 'TOGGLE_DIALOG'; payload: DialogLectureJobType }
-  | { type: 'OPEN_UPDATE_DIALOG'; payload: LectureRow }
-  | { type: 'OPEN_DELETE_DIALOG'; payload: LectureRow }
-  | { type: 'OPEN_CREATE_DIALOG'; payload: LectureRow }
-  | { type: 'OPEN_PAGE_DESIGNER_DIALOG'; payload: LectureRow }
-  | { type: 'OPEN_QUESTION_EDITOR_DIALOG'; payload: LectureRow }
 
-export type MultiQuestionAction =
-  | { type: "SET_QUESTION_LIST", payload: MultipleChoiceQuestion[] }
-  | { type: "SET_PAGE_MAPPER", payload: QuestionPage[] }
-  | { type: "SET_CURRENT_PAGE_INDEX", payload: number }
-  | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber, qID: QuestionID, answer: string } }
-  | { type: "SET_FLAGS", payload: boolean[] }
-  | { type: "SET_USER_ANSWER_SHEET", payload: TestAnswerSheet }
-  | { type: "SET_VISIBLE", payload: boolean }
-  | { type: "SET_USER_ANSWER_SHEET_VISIBLE", payload: boolean }
-  | { type: "SET_START", payload: boolean }
-  | { type: "SET_IS_SUMIT", payload: boolean }
-  | { type: "TOGGLE_FLAGS", payload: number }
-  | { type: "SET_TEST_DATA", payload: [QuestionPage[], MultipleChoiceQuestion[], boolean[]] }
-export type TestReviewHookAction =
-  | { type: 'FETCH_TEST_REVIEW_SUCCESS'; payload: [TestReviewAnswerSheet, QuestionPage[]] }
-  | { type: 'SET_ANSWER_SHEET_VISIBLE'; payload: boolean }
-  | { type: 'SET_PAGE'; payload: number }
-  | { type: 'MOVE_PAGE'; payload: number }
-// | { type: 'FETCH_TEST_REVIEW_SUCCESS'; payload: TestReviewAnswerSheet }

@@ -1,11 +1,12 @@
 import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
 import { memo, useCallback } from "react";
+import { Link, Navigate } from "react-router-dom";
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../../components/Common/Index";
 import useExercisePage from "../../hooks/ExerciseHook";
-import { DoExercisePageProps, TestAnswerSheet } from "../../utils/types/type";
-import { Link, Navigate } from "react-router-dom";
 import { AmINotLoggedIn } from "../../utils/AuthCheck";
+import { DoExercisePageProps } from "../../utils/types/props";
+import { TestAnswerSheet } from "../../utils/types/type";
 
 function DoExercisePage() {
     // Gọi hook tùy chỉnh để lấy danh sách câu hỏi, ánh xạ trang, tổng số câu hỏi và các hàm điều khiển trạng thái

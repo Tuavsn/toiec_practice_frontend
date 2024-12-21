@@ -1,7 +1,8 @@
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import React, { Dispatch } from "react";
-import { RowActionButtonProps, RowHookAction, UserRow } from "../../../utils/types/type";
+import { RowHookAction } from "../../../utils/types/action";
+import { UserRow } from "../../../utils/types/type";
 import { statusBodyTemplate } from "../../Common/Column/CommonColumn";
 
 export function RenderAdminUserColumns(dispatch: Dispatch<RowHookAction<UserRow>>): JSX.Element[] {

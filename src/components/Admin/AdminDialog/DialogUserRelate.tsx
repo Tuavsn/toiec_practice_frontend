@@ -5,7 +5,9 @@ import { Fieldset } from "primereact/fieldset";
 import React, { useRef, useState } from "react";
 import { callPutUpdateRoleForUser, callPutUpdateUserRow } from "../../../api/api";
 import { useToast } from "../../../context/ToastProvider";
-import { DialogDeleteRowBodyProps, DialogUpdateUserBodyProps, DialogUserRowProps, handeDeleteRowParams, handeSaveUserRowParams, RenderUserRowDialogParams, Role, UserRow } from "../../../utils/types/type";
+import { RenderUserRowDialogParams, handeDeleteRowParams, handeSaveUserRowParams } from "../../../utils/types/prams";
+import { DialogDeleteRowBodyProps, DialogUpdateUserBodyProps, DialogUserRowProps } from "../../../utils/types/props";
+import { Role, UserRow } from "../../../utils/types/type";
 
 
 // Thành phần DialogUserActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)
@@ -81,7 +83,7 @@ const RenderUpdateUserBody: React.FC<DialogUpdateUserBodyProps> = React.memo(
                             <Dropdown
                                 name="overall skill"
                                 value={formData.id}
-                                options={props.roleList.map(r => { return { label: r.name, value: r.id } })}
+                                options={props.roleList.map((r:Role) => { return { label: r.name, value: r.id } })}
                                 onChange={(e) => setFormData({ ...formData, id: e.target.value || "" })}
                                 placeholder="Chọn loại"
                             />

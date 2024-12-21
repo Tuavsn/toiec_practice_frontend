@@ -8,7 +8,9 @@ import React, { useRef, useState } from "react";
 import { callPostTopic, callPutTopicRowActive, callPutUpdateTopic } from "../../../api/api";
 import { useToast } from "../../../context/ToastProvider";
 import { emptyTopicRowValue } from "../../../utils/types/emptyValue";
-import { DialogDeleteRowBodyProps, DialogRowProps, DialogUpdateTopicBodyProps, handeDeleteRowParams, handeSaveRowParams, RenderRowDialogParams, Topic } from "../../../utils/types/type";
+import { RenderRowDialogParams, handeDeleteRowParams, handeSaveRowParams } from "../../../utils/types/prams";
+import { DialogDeleteRowBodyProps, DialogRowProps, DialogUpdateTopicBodyProps } from "../../../utils/types/props";
+import { Topic } from "../../../utils/types/type";
 
 
 // Thành phần DialogTopicActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)

@@ -1,10 +1,12 @@
 import React, { memo } from "react";
 import { Navigate } from "react-router-dom";
 import { FullTestArea } from "../../components/Common/MultipleChoiceQuestion/FullTestArea";
+import SubmitLoading from "../../components/User/TestComponent/SubmitLoading";
+import TestToolbar from "../../components/User/TestComponent/TestToolBar";
 import { useFullTestScreen, useRenderTest, useTestScreen } from "../../hooks/TestHook";
 import { AmINotLoggedIn } from "../../utils/AuthCheck";
-import { MultipleChoiceQuestion, RenderTestProps, RennderTutorialProps } from "../../utils/types/type";
-import SubComponents from "./SubComponents";
+import { RenderTestProps, RennderTutorialProps } from "../../utils/types/props";
+import { MultipleChoiceQuestion } from "../../utils/types/type";
 //--------------------------------------------------------------------------
 // Hàm chính `DoTestPage` để hiển thị giao diện trang làm bài thi
 function DoTestPage() {
@@ -34,7 +36,7 @@ const RenderMainPage: React.FC = () => {
         case "DOING_TEST":
             return <FullTestScreen />;
         case "SUBMITING":
-            return <SubComponents.SubmitLoading />;
+            return <SubmitLoading />;
         default:
             return <Navigate to={`/test/${id}`}></Navigate>
     }
@@ -94,7 +96,7 @@ const RenderTest: React.FC<RenderTestProps> = React.memo(
                 <section className="flex flex-column justify-content-center">
 
                     {/* Thanh công cụ khi làm bài thi */}
-                    <SubComponents.TestToolbar
+                    <TestToolbar
                         renderTestRef={renderTestRef}
                         renderTestState={renderTestState}
                         renderTestDispatch={renderTestDispatch}
