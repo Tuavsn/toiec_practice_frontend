@@ -5,7 +5,7 @@ import { Paginator } from 'primereact/paginator';
 import { Skeleton } from 'primereact/skeleton';
 import React, { useRef } from 'react';
 import useComments from '../../hooks/CommentSectionHook';
-import { GetMyIDUser } from '../../utils/AuthCheck';
+import { GetMyIDUser } from '../../utils/helperFunction/AuthCheck';
 import { UserComment, UserCommentAction, UserID } from '../../utils/types/type';
 
 const CommentSection: React.FC = () => {

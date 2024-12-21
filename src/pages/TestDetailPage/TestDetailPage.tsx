@@ -9,13 +9,13 @@ import React, { memo, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { callGetTestDetailPageData } from "../api/api";
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Column/CommonColumn";
+import CommentSection from "../components/User/CommentSection";
 import { useCheckBox } from "../hooks/TestDetailPaperHook";
-import { AmINotLoggedIn } from "../utils/AuthCheck";
-import convertSecondsToString from "../utils/convertSecondsToString";
-import formatDate from "../utils/formatDateToString";
+import { AmINotLoggedIn } from "../utils/helperFunction/AuthCheck";
+import convertSecondsToString from "../utils/helperFunction/convertSecondsToString";
+import formatDate from "../utils/helperFunction/formatDateToString";
 import { emptyTestDetailPageData } from "../utils/types/emptyValue";
 import { TestDetailPageData } from "../utils/types/type";
-import CommentSection from "../components/User/CommentSection";
 
 
 

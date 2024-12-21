@@ -3,10 +3,10 @@ import { TreeNode } from "primereact/treenode";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { callGetQuestionRows } from "../api/api";
-import SplitNameIDFromURL from "../utils/splitNameIDFromURL";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
+import SplitNameIDFromURL from "../utils/helperFunction/splitNameIDFromURL";
 import { Name_ID, QuestionID, QuestionRow, TestID } from "../utils/types/type";
 import useTopicRef from "./TopicRefHook";
-import SetWebPageTitle from "../utils/setTitlePage";
 
 export function useQuestion() {
 

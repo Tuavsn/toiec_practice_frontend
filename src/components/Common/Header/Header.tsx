@@ -5,8 +5,8 @@ import { MouseEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../../assets/Header-Logo.png";
 import { useTestState } from "../../../context/TestStateProvider";
+import { AmINotLoggedIn } from "../../../utils/helperFunction/AuthCheck";
 import LoginDialog from "../LoginDialog/LoginDialog";
-import { AmINotLoggedIn } from "../../../utils/AuthCheck";
 
 
 

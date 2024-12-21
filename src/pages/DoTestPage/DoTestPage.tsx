@@ -4,7 +4,7 @@ import { FullTestArea } from "../../components/Common/MultipleChoiceQuestion/Ful
 import SubmitLoading from "../../components/User/TestComponent/SubmitLoading";
 import TestToolbar from "../../components/User/TestComponent/TestToolBar";
 import { useFullTestScreen, useRenderTest, useTestScreen } from "../../hooks/TestHook";
-import { AmINotLoggedIn } from "../../utils/AuthCheck";
+import { AmINotLoggedIn } from "../../utils/helperFunction/AuthCheck";
 import { RenderTestProps, RennderTutorialProps } from "../../utils/types/props";
 import { MultipleChoiceQuestion } from "../../utils/types/type";
 //--------------------------------------------------------------------------

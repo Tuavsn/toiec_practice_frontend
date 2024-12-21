@@ -1,6 +1,6 @@
 import { Tag } from "primereact/tag";
 import { Link } from "react-router-dom";
-import formatDate from "../../../utils/formatDateToString";
+import formatDate from "../../../utils/helperFunction/formatDateToString";
 import { TestType } from "../../../utils/types/type";
 
 export function timeStampBodyTemplate<Model extends { createdAt: Date, updatedAt: Date }>(rowData: Model) {

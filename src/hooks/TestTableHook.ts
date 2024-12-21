@@ -3,7 +3,7 @@ import { useEffect, useReducer, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { callGetTestRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
-import SplitNameIDFromURL from "../utils/splitNameIDFromURL";
+import SplitNameIDFromURL from "../utils/helperFunction/splitNameIDFromURL";
 import { RowHookAction } from "../utils/types/action";
 import { emptyTestRow, initialTestState } from "../utils/types/emptyValue";
 import { RowHookState } from "../utils/types/state";

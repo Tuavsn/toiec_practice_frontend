@@ -74,10 +74,27 @@ interface RenderTestState {
   flags: boolean[]
 }
 type FullTestScreenState = {
-    tutorials: boolean[];
-    currentPageIndex: number;
-  };
-
-  export type {
-    CategoryHookState, FullTestScreenState, LectureHookState, MultiQuestionState, ProfileHookState, RenderTestState, RoleHookState, RowHookState, TestReviewHookState, UserCommentState, UserHookState
+  tutorials: boolean[];
+  currentPageIndex: number;
 };
+interface LectureCardState {
+  lectures: LectureRow[],
+  keyword: string,
+  currentPageIndex: number,
+
+}
+export type {
+  CategoryHookState,
+  FullTestScreenState,
+  LectureCardState,
+  LectureHookState,
+  MultiQuestionState,
+  ProfileHookState,
+  RenderTestState,
+  RoleHookState,
+  RowHookState,
+  TestReviewHookState,
+  UserCommentState,
+  UserHookState
+};
+

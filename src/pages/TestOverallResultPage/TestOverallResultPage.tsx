@@ -3,11 +3,11 @@ import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Dialog } from "primereact/dialog";
 import React, { Dispatch, SetStateAction } from "react";
-import { useTestOverallResult } from "../hooks/TestOverallReviewHook";
-import convertSecondsToString from "../utils/convertSecondsToString";
-import { SelectedQuestionDialogTestOverallPage } from "../utils/types/type";
 import { Navigate } from "react-router-dom";
-import { AmINotLoggedIn } from "../utils/AuthCheck";
+import { useTestOverallResult } from "../hooks/TestOverallReviewHook";
+import { AmINotLoggedIn } from "../utils/helperFunction/AuthCheck";
+import convertSecondsToString from "../utils/helperFunction/convertSecondsToString";
+import { SelectedQuestionDialogTestOverallPage } from "../utils/types/type";
 
 export default function TestOverallResultPage() {
 

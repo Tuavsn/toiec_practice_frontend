@@ -1,7 +1,7 @@
 import { Button } from "primereact/button"
 import { ScrollPanel } from "primereact/scrollpanel"
 import React from "react"
-import { ConvertThisFullTestQuestionToHTML } from "../../../utils/convertToHTML"
+import { ConvertThisFullTestQuestionToHTML } from "../../../utils/helperFunction/convertToHTML"
 import { FullTestAreaProps } from "../../../utils/types/props"
 
 export const FullTestArea: React.FC<FullTestAreaProps> =

@@ -16,9 +16,9 @@ import { Navigate } from 'react-router-dom';
 import { callPutUserTarget } from '../api/api';
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Column/CommonColumn";
 import useProfile from "../hooks/ProfileHook";
-import { AmINotLoggedIn } from '../utils/AuthCheck';
-import convertSecondsToString from "../utils/convertSecondsToString";
-import formatDate from "../utils/formatDateToString";
+import { AmINotLoggedIn } from '../utils/helperFunction/AuthCheck';
+import convertSecondsToString from "../utils/helperFunction/convertSecondsToString";
+import formatDate from "../utils/helperFunction/formatDateToString";
 import { ActivityLogProps, SkillInsightsProps } from '../utils/types/props';
 import { SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from "../utils/types/type";
 // Đăng ký các phần tử Chart.js cần thiết

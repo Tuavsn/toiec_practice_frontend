@@ -4,7 +4,7 @@ import { memo, useCallback } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../../components/Common/Index";
 import useExercisePage from "../../hooks/ExerciseHook";
-import { AmINotLoggedIn } from "../../utils/AuthCheck";
+import { AmINotLoggedIn } from "../../utils/helperFunction/AuthCheck";
 import { DoExercisePageProps } from "../../utils/types/props";
 import { TestAnswerSheet } from "../../utils/types/type";
 

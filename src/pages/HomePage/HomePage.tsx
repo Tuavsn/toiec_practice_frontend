@@ -13,7 +13,7 @@ import website from "../assets/website_flatform.jpg";
 import {
     Banner
 } from "../components/User/index";
-import SetWebPageTitle from "../utils/setTitlePage";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
 
 export default function HomePage() {
     useLayoutEffect(()=> SetWebPageTitle("Trang chủ"),[])

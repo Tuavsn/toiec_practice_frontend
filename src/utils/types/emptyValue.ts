@@ -1,5 +1,6 @@
 import { TreeNode } from "primereact/treenode";
-import { AnswerPair, CategoryRow, LectureHookState, LectureRow, MultiQuestionState, OverallStat, Permission, ProfileHookState, QuestionNumber, Role, RoleHookState, RowHookState, TestDetailPageData, TestResultSummary, TestReviewHookState, TestRow, Topic, UserHookState, UserRow } from "./type";
+import { LectureCardState, LectureHookState, MultiQuestionState, ProfileHookState, RoleHookState, RowHookState, TestReviewHookState, UserHookState } from "./state";
+import { AnswerPair, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, Topic, UserRow } from "./type";
 const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
@@ -64,7 +65,11 @@ export const emptyCategoryRow: CategoryRow = {
     active: true
 } as const;
 
-
+export const initialLectureCardState: LectureCardState = {
+    lectures: [],
+    keyword: "",
+    currentPageIndex: 0
+} as const
 export const emptyTestRow: TestRow = {
     id: '',
     name: '',

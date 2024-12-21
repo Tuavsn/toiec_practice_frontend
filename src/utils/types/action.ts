@@ -85,8 +85,17 @@ type TestReviewHookAction =
 type ProfileHookAction =
     | { type: 'FETCH_SUCCESS', payload: ProfileHookState }
     | { type: 'SET_PAGE', payload: number }
+
+type LectureCardAction =
+    | { type: 'FETCH_SUCCESS'; payload: LectureRow[] }
+    | { type: 'SET_PAGE'; payload: number }
+    | { type: 'SET_KEYWORD'; payload: string }
+    | { type: 'RESET_ROWS' }
+
+
 export type {
     FullTestScreenAction,
+    LectureCardAction,
     LectureHookAction,
     MultiQuestionAction,
     ProfileHookAction,

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { callGetResult, callGetReviewTestPaper } from "../api/api";
-import { UserReviewSingleAnswerToHTML } from "../utils/convertToHTML";
+import { UserReviewSingleAnswerToHTML } from "../utils/helperFunction/convertToHTML";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
 import { emptyTestResultSummaryValue } from "../utils/types/emptyValue";
 import { ResultID, SelectedQuestionDialogTestOverallPage, TestResultSummary, UserAnswerResult } from "../utils/types/type";
-import SetWebPageTitle from "../utils/setTitlePage";
 
 
 export function useTestOverallResult() {

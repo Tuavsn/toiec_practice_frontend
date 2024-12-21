@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useRef } from "react";
 import { callGetProfile } from "../api/api";
-import SetWebPageTitle from "../utils/setTitlePage";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
 import { ProfileHookAction } from "../utils/types/action";
 import { initProfile } from "../utils/types/emptyValue";
 import { ProfileHookState } from "../utils/types/state";

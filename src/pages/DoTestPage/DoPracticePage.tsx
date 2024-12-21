@@ -5,7 +5,7 @@ import React, { memo, useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { LoadingSpinner, TestArea, UserAnswerSheet } from "../../components/Common/Index";
 import useTestPage from "../../hooks/TestHook";
-import { AmINotLoggedIn } from "../../utils/AuthCheck";
+import { AmINotLoggedIn } from "../../utils/helperFunction/AuthCheck";
 import { DoTestPageProps, SimpleTimeCountDownProps } from "../../utils/types/props";
 import { MultipleChoiceQuestion, TestType } from "../../utils/types/type";
 import '../App.css';

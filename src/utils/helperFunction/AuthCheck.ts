@@ -1,4 +1,4 @@
-import { UserID } from "./types/type";
+import { UserID } from "../types/type";
 
 export function AmINotLoggedIn(): boolean {
     return localStorage.getItem("access_token") === null

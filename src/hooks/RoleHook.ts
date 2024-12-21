@@ -2,7 +2,7 @@ import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import { callGetPermissionList, callGetRole } from "../api/api";
 import { useToast } from "../context/ToastProvider";
-import SetWebPageTitle from "../utils/setTitlePage";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
 import { RoleHookAction } from "../utils/types/action";
 import { initialRoleState } from "../utils/types/emptyValue";
 import { RoleHookState } from "../utils/types/state";

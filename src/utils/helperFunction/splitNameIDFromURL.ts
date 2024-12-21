@@ -1,4 +1,4 @@
-import { Name_ID } from "./types/type";
+import { Name_ID } from "../types/type";
 
 export default function SplitNameIDFromURL<T extends string>(nameIDPair: Name_ID<T>) {
 

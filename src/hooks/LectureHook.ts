@@ -2,9 +2,10 @@ import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import { callGetLectureRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
+import { LectureHookAction } from "../utils/types/action";
 import { initialLectureState } from "../utils/types/emptyValue";
-import { LectureHookAction, LectureHookState } from "../utils/types/type";
-import SetWebPageTitle from "../utils/setTitlePage";
+import { LectureHookState } from "../utils/types/state";
 
 
 const reducer = (state: LectureHookState, action: LectureHookAction): LectureHookState => {

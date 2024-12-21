@@ -12,7 +12,10 @@
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "esModuleInterop": true,
+    "types": ["@testing-library/jest-dom"],
     "target": "ESNext", 
+    "jsx": "react-jsx",
     "module": "ESNext", 
     "lib": ["DOM", "ESNext", "ES2023"], 
   }

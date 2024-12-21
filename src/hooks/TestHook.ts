@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import { useParams } from 'react-router-dom';
 import { callGetTestPaper, callPostTestRecord } from '../api/api';
 import { useTestState } from '../context/TestStateProvider';
-import { MappingPageWithQuestionNum } from '../utils/convertToHTML';
-import hasSessionStorageItem from '../utils/hasItemInSessionStorage';
-import prepareForTest from '../utils/prepareForTest';
-import SetWebPageTitle from '../utils/setTitlePage';
+import { MappingPageWithQuestionNum } from '../utils/helperFunction/convertToHTML';
+import hasSessionStorageItem from '../utils/helperFunction/hasItemInSessionStorage';
+import prepareForTest from '../utils/helperFunction/prepareForTest';
+import SetWebPageTitle from '../utils/helperFunction/setTitlePage';
 import { FullTestScreenAction, RenderTestActiion } from '../utils/types/action';
 import { FullTestScreenState, RenderTestState } from '../utils/types/state';
 import { AnswerPair, QuestionNumber, QuestionPage, ResultID, TestID, TestPaper, TestRecord, TestType, milisecond, renderTestRefType } from '../utils/types/type';

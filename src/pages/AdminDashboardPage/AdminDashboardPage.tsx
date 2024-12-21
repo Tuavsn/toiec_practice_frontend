@@ -1,6 +1,7 @@
 import { Card } from "primereact/card";
 import React from "react";
-import { CustomBreadCrumb } from "../components/Common/Index";
+import CustomBreadCrumb from "../../components/Common/BreadCrumb/BreadCrumb";
+
 
 export default function AdminDashboardPage() {
 

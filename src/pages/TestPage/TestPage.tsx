@@ -6,8 +6,8 @@ import { Skeleton } from "primereact/skeleton";
 import { Tag } from "primereact/tag";
 import React, { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { useTestCard } from "../hooks/TestCardHook";
-import { CategoryLabel, TestCard } from "../utils/types/type";
+import { useTestCard } from "../../hooks/TestCardHook";
+import { CategoryLabel, TestCard } from "../../utils/types/type";
 
 export default function TestPage() {
 

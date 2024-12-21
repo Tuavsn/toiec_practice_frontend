@@ -4,9 +4,9 @@ import { Paginator } from 'primereact/paginator';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { callGetLectureDoctrine, callGetPracticePaper } from '../api/api';
-import { AmINotLoggedIn } from '../utils/AuthCheck';
-import { ConvertThisPracticeQuestionToHTML } from '../utils/convertToHTML';
-import SplitNameIDFromURL from '../utils/splitNameIDFromURL';
+import { AmINotLoggedIn } from '../utils/helperFunction/AuthCheck';
+import { ConvertThisPracticeQuestionToHTML } from '../utils/helperFunction/convertToHTML';
+import SplitNameIDFromURL from '../utils/helperFunction/splitNameIDFromURL';
 import { LectureID, Name_ID, PracticeAnswerSheet, PracticeQuestion, QuestionID } from '../utils/types/type';
 
 

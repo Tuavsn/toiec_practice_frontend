@@ -5,7 +5,7 @@ import { Divider } from "primereact/divider";
 import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "./types/type";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "../types/type";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
     const questionPages = [];
