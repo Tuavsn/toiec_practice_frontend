@@ -165,7 +165,7 @@ export interface TableData<T> {
   result: T[];
 }
 
-interface Meta {
+export interface Meta {
   current: number;
   pageSize: number;
   totalPages: number;

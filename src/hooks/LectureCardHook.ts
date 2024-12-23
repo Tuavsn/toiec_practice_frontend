@@ -27,7 +27,7 @@ export default function useLectureCard() {
         const fetchLectures = async (pageIndex: number) => {
             dispatch({ type: "RESET_ROWS" });
             const response = await callGetLectureCard(pageIndex);
-            if (response instanceof Error) {
+            if (response === null) {
                 return;
             }
             totalItemsRef.current = response.meta.totalItems;

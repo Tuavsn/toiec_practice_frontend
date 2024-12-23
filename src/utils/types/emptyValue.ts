@@ -1,7 +1,7 @@
 import { TreeNode } from "primereact/treenode";
 import { LectureCardState, LectureHookState, MultiQuestionState, ProfileHookState, RoleHookState, RowHookState, TestReviewHookState, UserHookState } from "./state";
 import { AnswerPair, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, Topic, UserRow } from "./type";
-const emptyDate = new Date(0, 0, 0);
+export const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
     id: "",
@@ -40,7 +40,6 @@ export const emptyTopicRowValue: Topic = {
 export const emptyUserRow: UserRow = {
     id: "",
     email: "",
-    avatar: "",
     role: {
         createdAt: "",
         updatedAt: "",
@@ -75,7 +74,6 @@ export const emptyTestRow: TestRow = {
     name: '',
     active: true,
     idCategory: "",
-    totalTestAttempt: 0,
     totalQuestion: 200,
     totalScore: 990,
     limitTime: 90,

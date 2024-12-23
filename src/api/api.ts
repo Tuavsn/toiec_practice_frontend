@@ -1,5 +1,6 @@
 import { emptyOverallStat } from "../utils/types/emptyValue";
-import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, Permission, PermissionID, PracticePaper, ProfileHookState, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
+import { ProfileHookState } from "../utils/types/state";
+import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, Permission, PermissionID, PracticePaper, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -173,12 +174,12 @@ export const callGetLectureRow = async (pageNumber: number): Promise<TableData<L
         return (error as Error)
     }
 }
-export const callGetLectureCard = async (pageNumber: number): Promise<TableData<LectureRow> | Error> => {
+export const callGetLectureCard = async (pageNumber: number): Promise<TableData<LectureRow> | null> => {
     try {
         const response = await axios.get<ApiResponse<TableData<LectureRow>>>(`${import.meta.env.VITE_API_URL}/lectures?info=true&current=${pageNumber + 1}&pageSize=5&active=true`);
         return response.data.data;
     } catch (error) {
-        return (error as Error)
+        return null
     }
 }
 export const callPutLectureDetailUpdate = async (lectureID: LectureID, name: string, topicIds: TopicID[]): Promise<boolean> => {

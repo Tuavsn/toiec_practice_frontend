@@ -10,13 +10,27 @@
   ],
   "compilerOptions": {
     "strict": true,
+    "skipLibCheck": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "esModuleInterop": true,
-    "types": ["@testing-library/jest-dom"],
-    "target": "ESNext", 
+    "types": [
+      "@testing-library/jest-dom",
+      "node",
+      "jest",
+      "primereact"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/primereact"
+    ],
+    "target": "ESNext",
     "jsx": "react-jsx",
-    "module": "ESNext", 
-    "lib": ["DOM", "ESNext", "ES2023"], 
+    "module": "ESNext",
+    "lib": [
+      "DOM",
+      "ESNext",
+      "ES2023"
+    ],
   }
 }
