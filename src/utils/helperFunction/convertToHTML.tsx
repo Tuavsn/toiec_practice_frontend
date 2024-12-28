@@ -1,11 +1,12 @@
 import { Accordion, AccordionTab } from "primereact/accordion";
+import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Chip } from "primereact/chip";
 import { Divider } from "primereact/divider";
 import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, QuestionRow, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "../types/type";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, QuestionRow, Resource, SelectedQuestionDialogTestOverallPage, SingleUserAnswerOverview, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord } from "../types/type";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
     const questionPages = [];
@@ -274,7 +275,7 @@ export function ConvertTopicToHTML(question: UserAnswerRecord): JSX.Element {
     return <>{topicElement}</>
 }
 
-export function ConvertReviewTopicToHTML(question: UserAnswerResult): JSX.Element {
+export function ConvertReviewTopicToHTML(question: SingleUserAnswerOverview): JSX.Element {
     return <>
         {
             question.listTopics.map((topic, index) => {
@@ -290,7 +291,7 @@ export function ConvertReviewTopicToHTML(question: UserAnswerResult): JSX.Elemen
 
 }
 
-function ConvertToTopicTag(question: UserAnswerResult): JSX.Element {
+function ConvertToTopicTag(question: SingleUserAnswerOverview): JSX.Element {
     return <>
         {
             question.listTopics.map((topic, index) => {
@@ -303,7 +304,7 @@ function ConvertToTopicTag(question: UserAnswerResult): JSX.Element {
         }
     </>
 }
-export function ConvertReviewSolutionToHTML(question: UserAnswerResult): JSX.Element {
+export function ConvertReviewSolutionToHTML(question: SingleUserAnswerOverview): JSX.Element {
     return <>
         {question.solution && question.solution.trim() && <li>{question.solution}</li>}
     </>
@@ -367,7 +368,7 @@ export function UserAnswerToHTML(question: UserAnswerRecord): JSX.Element {
 }
 
 
-export function UserReviewSingleAnswerToHTML(question: UserAnswerResult): SelectedQuestionDialogTestOverallPage {
+export function UserReviewSingleAnswerToHTML(question: SingleUserAnswerOverview): SelectedQuestionDialogTestOverallPage {
     const title: JSX.Element = <h5>Phần {question.partNum} - Câu {question.questionNum}</h5>
     const body: JSX.Element =
         <section>
@@ -614,61 +615,79 @@ export function ConvertThisTestQuestionToHTML(
     ]
 }
 export function ConvertThisFullTestQuestionToHTML(
-    question: QuestionAnswerRecord,            // Đối tượng câu hỏi trắc nghiệm
-    changePage: (offset: number) => void         // Hàm thay đổi trang
-): [JSX.Element[], JSX.Element[]] {              // Trả về hai mảng phần tử JSX: tài nguyên và câu hỏi
+    question: QuestionAnswerRecord,
+    changePage: (offset: number) => void,
+    setAnsweredCount: React.Dispatch<React.SetStateAction<number>>
+): [JSX.Element[], JSX.Element[]] {
+    const { resources, subQuestions, content, questionId, questionNum } = question;
 
-    // Mảng để chứa các tài nguyên của câu hỏi
-    const resoursesElement: JSX.Element[] = [];
+    // Hàm phụ để xây dựng phần tử tài nguyên
+    const buildResources = (resources: Resource[], questionId: string) =>
+        resources?.length
+            ? FullTestResourcesToHTML(resources, questionId, changePage)
+            : [];
 
-    // Mảng để chứa các phần tử HTML của câu hỏi
+
+
+
+    // Mảng chứa các tài nguyên (hình ảnh, âm thanh, ...)
+    const resoursesElement: JSX.Element[] = buildResources(resources, questionId);
+    // Mảng chứa các phần tử HTML của câu hỏi
     const questionsElement: JSX.Element[] = [];
 
-    // Nếu câu hỏi có tài nguyên đi kèm (hình ảnh, audio,...)
-    if (question.resources) {
-        resoursesElement.push(...FullTestResourcesToHTML(question.resources, question.id, changePage));
-    }
-
-    // Nếu câu hỏi có các câu hỏi con (subQuestions)
-    if (question.subQuestions.length) {
-        // Thêm tiêu đề câu hỏi nhóm
-        questionsElement.push(<h3 key={"group" + question.questionNum} > {question.content} </h3>);
+    // Nếu câu hỏi có danh sách các câu hỏi con
+    if (subQuestions.length > 0) {
+        // Thêm nội dung tiêu đề cho nhóm câu hỏi
+        questionsElement.push(<h3 key={`group-${questionNum}`}>{content}</h3>);
 
         // Duyệt qua từng câu hỏi con
-        for (const subq of question.subQuestions) {
-            // Thêm nội dung từng câu hỏi con
-            questionsElement.push(<h5 key={"h5" + subq.questionNum} > {subq.questionNum}.{subq.content} </h5>);
+        subQuestions.forEach(subq => {
+            const { questionNum, resources, questionId } = subq;
 
-            // Nếu câu hỏi con có tài nguyên, thêm chúng vào
-            resoursesElement.push(...FullTestResourcesToHTML(subq.resources, subq.id, changePage));
+            // Thêm số thứ tự và nội dung câu hỏi con
+            questionsElement.push(<QuestionHeader key={`h5-${questionNum}`} question={subq} setAnsweredCount={setAnsweredCount} />);
 
-            // Xây dựng phần tử HTML cho từng câu hỏi con
-            questionsElement.push(
-                BuildFullTestQuestionHTML(subq)
-            );
-        }
+            // Thêm tài nguyên đi kèm của câu hỏi con
+            resoursesElement.push(...buildResources(resources, questionId));
+
+            // Thêm phần tử HTML của câu hỏi con
+            questionsElement.push(BuildFullTestQuestionHTML(subq, setAnsweredCount));
+        });
     } else {
-        // Nếu là câu hỏi đơn lẻ, thêm nội dung câu hỏi
-        questionsElement.push(
-            <h5 key={"h5" + question.questionNum} > {question.questionNum}.{question.content} </h5>
-        );
-
-        // Xây dựng phần tử HTML cho câu hỏi
-        questionsElement.push(
-            BuildFullTestQuestionHTML(question)
-        );
+        // Nếu không có câu hỏi con, thêm câu hỏi chính
+        questionsElement.push(<QuestionHeader key={`h5-${questionNum}`} question={question} setAnsweredCount={setAnsweredCount} />);
+        // Thêm phần tử HTML của câu hỏi chính
+        questionsElement.push(BuildFullTestQuestionHTML(question, setAnsweredCount));
     }
 
-    // Trả về hai mảng JSX: mảng tài nguyên và mảng câu hỏi
-    return [
-        resoursesElement,
-        questionsElement
-    ]
+    // Trả về hai mảng JSX: tài nguyên và câu hỏi
+    return [resoursesElement, questionsElement];
+}
+// Hàm phụ để xây dựng phần tử câu hỏi
+const QuestionHeader: React.FC<{ question: QuestionAnswerRecord, setAnsweredCount: React.Dispatch<React.SetStateAction<number>> }> = ({ question, setAnsweredCount }) => {
+    const { questionNum, content, flag, } = question;
+    const [, setReload] = React.useState(false);
+    function updateFlagByUsingTrick() {
+        setAnsweredCount(pre => {
+            const integer = ~~pre;
+            if (integer + 0.06 >= pre)
+                return pre + 0.1;
+            return integer;
+        })
+    }
+    return (
+        <div>
+            <h5 key={`h5-${questionNum}`}>{questionNum}. {content}</h5>
+            <Button className={`p-0 m-0 ml-1 ${flag ? "text-red-500" : "text-gray-500"}`} icon="pi pi-flag-fill" text
+                onClick={() => { question.flag = !flag; setReload(pre => pre = !pre); updateFlagByUsingTrick() }} />
+        </div>
+    )
 }
 
 // Hàm xây dựng HTML cho câu hỏi trắc nghiệm
 function BuildFullTestQuestionHTML(
     question: QuestionAnswerRecord,             // Đối tượng câu hỏi trắc nghiệm
+    setAnsweredCount: React.Dispatch<React.SetStateAction<number>>
 ): JSX.Element {
 
     // Lấy số câu hỏi hiện tại
@@ -680,13 +699,13 @@ function BuildFullTestQuestionHTML(
     // Trả về phần tử HTML cho câu hỏi
     return (
         <div key={"answer" + currentQuestionNumber} className={"flex flex-column gap-3 my-3"}>
-            <RadioButtonGroup currentQuestionNumber={currentQuestionNumber} question={question} answerTexts={answerTexts} />
+            <RadioButtonGroup currentQuestionNumber={currentQuestionNumber} question={question} answerTexts={answerTexts} setAnsweredCount={setAnsweredCount} />
         </div>
     )
 }
 
-const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: QuestionAnswerRecord, answerTexts: string[] }> =
-    ({ currentQuestionNumber, answerTexts, question }) => {
+const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: QuestionAnswerRecord, answerTexts: string[], setAnsweredCount: React.Dispatch<React.SetStateAction<number>> }> =
+    ({ currentQuestionNumber, answerTexts, question, setAnsweredCount }) => {
         const [, setReload] = React.useState(false);
         return (
             <>
@@ -705,8 +724,10 @@ const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: Ques
                                 onChange={() => {                     // Khi người dùng chọn, cập nhật phiếu trả lời
 
                                     setReload(pre => pre = !pre);
+                                    if (question.userAnswer === "") {
+                                        setAnsweredCount(pre => pre = pre + 1);
+                                    }
                                     question.userAnswer = thisAnswer;
-                                    console.dir(question);
                                 }}
                             />
                             <label key={index + "label" + currentQuestionNumber} htmlFor={"id" + currentQuestionNumber + index} style={{ marginLeft: '8px' }}>

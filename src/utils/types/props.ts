@@ -213,6 +213,7 @@ interface TestAreaProps {
     changePage: (offset: number) => void
 }
 interface FullTestAreaProps {
+    setAnsweredCount: React.Dispatch<React.SetStateAction<number>>
     question: QuestionAnswerRecord,
     changePage: (offset: number) => void
 }
@@ -226,6 +227,7 @@ interface QuestionTableProps {
     setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
 }
 interface TestToolBarProps {
+    answeredCount: number,
     currentPageIndex: number,
     doTestDataRef: React.MutableRefObject<TestSheet>
     fullTestScreenDispatch: React.Dispatch<FullTestScreenAction>
@@ -237,13 +239,14 @@ interface ResourceSectionProps {
 
 }
 interface ToolBarFrameProps {
-    currentPageIndex: number,
+    buttonElementList: JSX.Element
     answeredCount: number,
     doTestDataRef: React.MutableRefObject<TestSheet>
 }
 interface UserAnswerSideBarProps {
     isShowed: boolean,
     setIsShowed: React.Dispatch<React.SetStateAction<boolean>>
+    buttonElementList: JSX.Element
 }
 
 interface DialogQuestionPageProps {
@@ -283,6 +286,7 @@ interface ResultTableProps {
 
 interface UserAnswerSideTabProps {
     answeredCount: number,
+    buttonElementList: JSX.Element
     dotestDataRef: React.MutableRefObject<TestSheet>
 }
 

@@ -45,27 +45,21 @@ export interface Assignment extends DataTableValue {
 }
 
 // Question Collection
-export interface QuestionRow extends DataTableValue {
+export type QuestionRow = QuestionCore & DataTableValue & {
   id: QuestionID;
   parentId: QuestionID;
   testId: TestID;
   practiceId: string | null;
-  questionNum: number;
-  partNum: number;
-  type: QuestionType;
-  subQuestions: QuestionRow[];  // List of subquestions
-  content: string;
   difficulty: number;
-  topic: Topic[];  // Array of topics
-  resources: Resource[];
+  topic: Topic[];
   transcript?: string;
   explanation?: string;
-  answers: string[];  // Array of answers
   correctAnswer: string;
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
-}
+  subQuestions: QuestionRow[]; // Specific subQuestions type
+};
 
 export interface Resource extends DataTableValue {
   type: ResourceType;  // Resource type
@@ -85,25 +79,29 @@ export interface Result extends DataTableValue {
   totalSkipAnswer: number;
   type: 'practice' | 'fulltest';
   parts: number[];  // Practice parts
-  userAnswers: UserAnswerResult[];
+  userAnswers: SingleUserAnswerOverview[];
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
-
-export interface UserAnswerResult extends DataTableValue {
-  questionId: string;
-  answer: string;
-  solution: string;
-  questionNum: QuestionNumber;
+export type QuestionCore = {
+  type: string;
   partNum: number;
   content: string;
+  answers: string[];
   resources: Resource[];
+  questionNum: QuestionNumber;
+};
+export type SingleUserAnswerOverview = QuestionCore & {
+  answer: string;
+  solution: string;
+  timeSpent: number;
   transcript: string;
   explanation: string;
-  answers: string[];
   correctAnswer: string;
-}
+  questionId: QuestionID;
+  listTopics: Topic[];
+};
 
 // Role Collection
 export interface Role extends DataTableValue {
@@ -271,18 +269,20 @@ export interface TestPaper {
   listMultipleChoiceQuestions: MultipleChoiceQuestion[]
 }
 
-export interface QuestionAnswerRecord {
-  id: string;
-  questionNum: number;
-  type: string;
-  partNum: number;
-  subQuestions: QuestionAnswerRecord[];
-  content: string;
-  resources: Resource[];
-  answers: string[];
+export type QuestionAnswerRecord = QuestionCore & {
+  flag: boolean;
   pageIndex: number;
   userAnswer: string;
-}
+  timeSpent: milisecond;
+  questionId: QuestionID;
+  subQuestions: QuestionAnswerRecord[];
+};
+
+export type Question_PageIndex = QuestionCore & {
+  pageIndex: number;
+  questionId: QuestionID;
+  subQuestions: Question_PageIndex[];
+};
 
 export interface TestPaperRecord {
   totalQuestion: number,
@@ -302,20 +302,6 @@ export interface QuestionPage {
   page: number,
 }
 
-export interface UserAnswerResult {
-  questionId: QuestionID;
-  answer: string;
-  solution: string;
-  timeSpent: number;
-  correct: boolean;
-  partNum: number;
-  resources: Resource[];
-  transcript: string;
-  explanation: string;
-  answers: string[];
-  listTopics: Topic[];
-  correctAnswer: string;
-}
 
 export interface AnswerData {
   questionId: QuestionID,
@@ -394,7 +380,7 @@ export type TestResultSummary = {
   totalSkipAnswer: number;
   type: TestType;
   parts: string;
-  userAnswers: UserAnswerResult[];
+  userAnswers: SingleUserAnswerOverview[];
 }
 
 export interface PracticePaper {
@@ -435,16 +421,10 @@ export interface UserAnswerRecord {
   subUserAnswer: UserAnswerRecord[];
 }
 
-export interface MultipleChoiceQuestion {
-  id: QuestionID;
-  questionNum: number;
-  type: string;
-  partNum: number
+export type MultipleChoiceQuestion = QuestionCore & {
   subQuestions: MultipleChoiceQuestion[];
-  content: string;
-  resources: Resource[];
-  answers: string[];
-}
+  id: QuestionID;
+};
 
 export interface SuggestionsForUser {
   title: string;
@@ -494,10 +474,6 @@ export type AnswerRecord = AnswerData & {
 }
 
 
-export type RenderTestRefType = {
-  pageMapper: QuestionPage[]
-  timeSpentList: UserAnswerTimeCounter
-}
 
 
 export interface QuestionContext {
@@ -513,6 +489,12 @@ export type ResourceIndex = Resource & {
 }
 
 export interface QuestionListByPart {
+  questionList: Question_PageIndex[],
+  totalQuestions: number,
+}
+
+export interface TestSheet {
+
   questionList: QuestionAnswerRecord[],
   totalQuestions: number,
 }
@@ -543,7 +525,6 @@ export type DialogRowJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE';
 export type ColorString = "success" | "info" | "warning" | "danger" | 'secondary' | 'help';
 export type Name_ID<T extends string> = T;
 export type TestDocument = QuestionListByPart[]
-export type TestSheet = QuestionListByPart
 //-----------------------------reducer---------------------
 
 

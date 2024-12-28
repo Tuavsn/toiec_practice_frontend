@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { FullTestArea } from "../../components/Common/MultipleChoiceQuestion/FullTestArea";
 import RennderTutorial from "../../components/Common/MultipleChoiceQuestion/TutorialSection";
@@ -7,7 +7,7 @@ import TestToolbar from "../../components/User/TestComponent/TestToolBar";
 import { TestScreenState, useTestFrame, useTestScreen } from "../../hooks/TestHook";
 import { AmINotLoggedIn } from "../../utils/helperFunction/AuthCheck";
 import { RenderTestProps } from "../../utils/types/props";
-import { MultipleChoiceQuestion } from "../../utils/types/type";
+import { QuestionAnswerRecord } from "../../utils/types/type";
 //--------------------------------------------------------------------------
 // Hàm chính `DoTestPage` để hiển thị giao diện trang làm bài thi
 function DoTestPage() {
@@ -59,19 +59,17 @@ const TestFrame: React.FC<{ setTestScreenState: React.Dispatch<React.SetStateAct
             fullTestScreenState,
             doTestDataRef,
             thisQuestion,
-            doneLoading,
+            isLoading,
             changePage,
         } = useTestFrame();
-
+        if (isLoading) return <SubmitLoading />
         // Nếu chưa hiển thị phần hướng dẫn của bài thi hiện tại, hiển thị hướng dẫn
         if (NotShowThisPartTutorialYet(thisQuestion, fullTestScreenState.tutorials)) {
             return <RennderTutorial partNeedToShow={thisQuestion.partNum} dispatchTutorialIsDone={fullTestScreenDispatch} />
         }
-
         // Khi đã tải xong, hiển thị giao diện làm bài thi
-        return doneLoading && (
-            <RenderTest
-                fullTestScreenDispatch={fullTestScreenDispatch}
+        return (
+            <RenderTest fullTestScreenDispatch={fullTestScreenDispatch}
                 currentPageIndex={fullTestScreenState.currentPageIndex}
                 doTestDataRef={doTestDataRef}
                 thisQuestion={thisQuestion}
@@ -85,6 +83,7 @@ const TestFrame: React.FC<{ setTestScreenState: React.Dispatch<React.SetStateAct
 // Component `RenderTest` hiển thị giao diện chính khi làm bài thi
 const RenderTest: React.FC<RenderTestProps> = React.memo(
     ({ changePage, fullTestScreenDispatch, currentPageIndex, doTestDataRef, thisQuestion }) => {
+        const [answeredCount, setAnsweredCount] = useState<number>(0); // bị mất khi render tutorial
         return (
 
             < section className="flex flex-column justify-content-center" >
@@ -93,11 +92,13 @@ const RenderTest: React.FC<RenderTestProps> = React.memo(
                     fullTestScreenDispatch={fullTestScreenDispatch}
                     currentPageIndex={currentPageIndex}
                     doTestDataRef={doTestDataRef}
+                    answeredCount={answeredCount}
                 />
 
                 {/* Khu vực chính hiển thị câu hỏi và các nút điều hướng */}
                 < div id="test-area-container" className="max-w-screen p-0" >
                     <FullTestArea
+                        setAnsweredCount={setAnsweredCount}
                         changePage={changePage}
                         question={thisQuestion}
                     />
@@ -109,6 +110,6 @@ const RenderTest: React.FC<RenderTestProps> = React.memo(
 
 //--------------------------------------------------------------------------
 // Hàm kiểm tra nếu phần hướng dẫn cho câu hỏi hiện tại chưa được hiển thị
-function NotShowThisPartTutorialYet(question: MultipleChoiceQuestion, tutorials: boolean[]): boolean {
+function NotShowThisPartTutorialYet(question: QuestionAnswerRecord, tutorials: boolean[]): boolean {
     return question && !tutorials[question.partNum - 1]
 }

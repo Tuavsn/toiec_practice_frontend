@@ -8,7 +8,7 @@ import prepareForTest from '../utils/helperFunction/prepareForTest';
 import SetWebPageTitle from '../utils/helperFunction/setTitlePage';
 import { FullTestScreenAction } from '../utils/types/action';
 import { FullTestScreenState } from '../utils/types/state';
-import { milisecond, QuestionAnswerRecord, QuestionNumber, ResultID, TestID, TestRecord, TestSheet, TestType } from '../utils/types/type';
+import { milisecond, Question_PageIndex, QuestionAnswerRecord, QuestionNumber, ResultID, TestID, TestRecord, TestSheet, TestType } from '../utils/types/type';
 import { useMultipleQuestionX } from './MultipleQuestionHook';
 
 //------------------ Custom Hook: useTestPage ------------------//
@@ -143,19 +143,18 @@ export function useTestFrame() {
 
     const doTestDataRef = useRef<TestSheet>({ questionList: [], totalQuestions: 0 });
     const { parts = "0" } = useParams<{ id: TestID, parts: string }>();
-    const [doneLoading, setDoneLoading] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const changePage = (offset: number) => {
         const newPageIndex = fullTestScreenState.currentPageIndex + offset;
         if (newPageIndex >= 0 && newPageIndex < doTestDataRef.current.questionList.length) {
             fullTestScreenDispatch({ type: "SET_CURRENT_PAGE_INDEX", payload: newPageIndex });
-            console.dir(doTestDataRef.current.questionList);
         }
     }
     useEffect(() => {
         GetQuestionFromIndexDB(parts).then((QnAList) => {
             doTestDataRef.current = QnAList;
 
-            setDoneLoading(false);
+            setIsLoading(false);
         });
 
     }, [])
@@ -164,7 +163,7 @@ export function useTestFrame() {
         fullTestScreenState,
         doTestDataRef,
         changePage,
-        doneLoading,
+        isLoading,
         thisQuestion: doTestDataRef.current.questionList[fullTestScreenState.currentPageIndex]
     }
 }
@@ -174,12 +173,30 @@ async function GetQuestionFromIndexDB(parts: string): Promise<TestSheet> {
     const questionFinalList: QuestionAnswerRecord[] = [];
     let finalTotalQuestions: number = 0;
     for (const p of parts) {
-        const partNumIndex = Number(p) - 1;
-        const { questionList, totalQuestions } = await queryByPartIndex(partNumIndex);
-        questionFinalList.push(...questionList);
+        const { questionList, totalQuestions } = await queryByPartIndex(Number(p) - 1);
+        questionFinalList.push(...questionList.map((q: Question_PageIndex) => ConvertQuestionMetaToQuestionAnswerRecord(q)));
         finalTotalQuestions += totalQuestions;
     }
 
     return { questionList: questionFinalList, totalQuestions: finalTotalQuestions };
 
 }
+function ConvertQuestionMetaToQuestionAnswerRecord({ answers, content, questionId, pageIndex, partNum, questionNum, resources, subQuestions, type }: Question_PageIndex): QuestionAnswerRecord {
+
+    return {
+        questionId: questionId,
+        questionNum: questionNum,
+        type: type,
+        partNum: partNum,
+        subQuestions: subQuestions.length > 0 ? subQuestions.map((sq: Question_PageIndex) => ConvertQuestionMetaToQuestionAnswerRecord(sq)) : [],
+        content: content,
+        resources: resources,
+        answers: answers,
+        pageIndex: pageIndex,
+        userAnswer: "",
+        flag: false,
+        timeSpent: 0,
+    };
+}
+
+

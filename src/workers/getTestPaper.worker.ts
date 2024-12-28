@@ -1,5 +1,5 @@
 import axios from "../api/axios-customize";
-import { ApiResponse, MultipleChoiceQuestion, QuestionAnswerRecord, TestDocument, TestID, TestPaper, WorkerResponse } from "../utils/types/type";
+import { ApiResponse, MultipleChoiceQuestion, Question_PageIndex, TestDocument, TestID, TestPaper, WorkerResponse } from "../utils/types/type";
 interface TestPaperWorkerRequest {
     testId: TestID;
     parts: string;
@@ -44,12 +44,13 @@ function ConvertTestPaperToTestDocument(testPaper: TestPaper): TestDocument {
 
 }
 
-function ConvertMultipleChoiceQuestionToQuestionAnswerRecord(question: MultipleChoiceQuestion, pageIndex: number): QuestionAnswerRecord {
-    const questionAnswerRecord = { ...question, pageIndex, userAnswer: "" };
+function ConvertMultipleChoiceQuestionToQuestionAnswerRecord(question: MultipleChoiceQuestion, pageIndex: number): Question_PageIndex {
+    const subQuestionAnswers: Question_PageIndex[] = [];
     if (question.subQuestions.length > 0) {
-        questionAnswerRecord.subQuestions = question.subQuestions.map((subQuestion: MultipleChoiceQuestion) => {
+        subQuestionAnswers.push(...question.subQuestions.map((subQuestion: MultipleChoiceQuestion) => {
             return ConvertMultipleChoiceQuestionToQuestionAnswerRecord(subQuestion, pageIndex);
-        });
+        }))
     }
+    const questionAnswerRecord: Question_PageIndex = { questionId: question.id, ...question, subQuestions: subQuestionAnswers, pageIndex };
     return questionAnswerRecord;
 }

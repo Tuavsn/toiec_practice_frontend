@@ -4,10 +4,10 @@ import React from "react"
 import { ConvertThisFullTestQuestionToHTML } from "../../../utils/helperFunction/convertToHTML"
 import { FullTestAreaProps } from "../../../utils/types/props"
 
-export const FullTestArea: React.FC<FullTestAreaProps> =
-    ({ changePage, question }) => {
+export const FullTestArea: React.FC<FullTestAreaProps> = React.memo(
+    ({ changePage, question, setAnsweredCount }) => {
 
-        const [resourcesElement, questionsElement] = ConvertThisFullTestQuestionToHTML(question, changePage);
+        const [resourcesElement, questionsElement] = ConvertThisFullTestQuestionToHTML(question, changePage, setAnsweredCount);
         return (
             <div className="flex xl:flex-row lg:flex-row flex-wrap md:flex-column sm:flex-column justify-content-between gap-1 custom-scrollpanel px-0 py-0 align-items-center"
             >
@@ -38,6 +38,4 @@ export const FullTestArea: React.FC<FullTestAreaProps> =
             </div>
         );
     }
-
-
-
+)
