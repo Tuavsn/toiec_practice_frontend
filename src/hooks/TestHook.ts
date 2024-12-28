@@ -1,14 +1,14 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { callGetTestPaper, callPostTestRecord } from '../api/api';
 import { useTestState } from '../context/TestStateProvider';
+import { queryByPartIndex } from '../database/indexdb';
 import { MappingPageWithQuestionNum } from '../utils/helperFunction/convertToHTML';
-import hasSessionStorageItem from '../utils/helperFunction/hasItemInSessionStorage';
 import prepareForTest from '../utils/helperFunction/prepareForTest';
 import SetWebPageTitle from '../utils/helperFunction/setTitlePage';
-import { FullTestScreenAction, RenderTestActiion } from '../utils/types/action';
-import { FullTestScreenState, RenderTestState } from '../utils/types/state';
-import { AnswerPair, QuestionNumber, QuestionPage, ResultID, TestID, TestPaper, TestRecord, TestType, milisecond, renderTestRefType } from '../utils/types/type';
+import { FullTestScreenAction } from '../utils/types/action';
+import { FullTestScreenState } from '../utils/types/state';
+import { milisecond, QuestionAnswerRecord, QuestionNumber, ResultID, TestID, TestRecord, TestSheet, TestType } from '../utils/types/type';
 import { useMultipleQuestionX } from './MultipleQuestionHook';
 
 //------------------ Custom Hook: useTestPage ------------------//
@@ -88,39 +88,31 @@ const useTestPage = () => {
 
 export default useTestPage;
 
-
 export type TestScreenState = "SUBMITING" | "DOING_TEST" | "OTHER"
 
 export function useTestScreen() {
-    const { id = "" } = useParams<{ id: TestID }>();
     const { setIsOnTest } = useTestState();
     let currentState: TestScreenState = "DOING_TEST";
 
-    if (!hasSessionStorageItem("testPapaer")) {
-        currentState = "OTHER";
-    } else {
+    useLayoutEffect(() => {
+
         setIsOnTest(true);
-    }
+        return () => {
+            setIsOnTest(false);
+        }
+    }, [])
     const [testScreenState, setTestScreenState] = useState<TestScreenState>(currentState);
 
-
-
     return {
-        id,
         testScreenState,
         setTestScreenState,
     }
 }
 
-
-
-// Define types for state and action
-
-
 // Initial state
 const initFullTestScreenState: FullTestScreenState = {
     tutorials: Array<boolean>(7).fill(false),
-    currentPageIndex: -9999999,
+    currentPageIndex: 0,
 };
 
 // Reducer function
@@ -131,6 +123,9 @@ function fullTestScreenReducer(
     switch (action.type) {
         case "SET_TUTORIALS":
             return { ...state, tutorials: action.payload };
+        case "SET_TUTORIALS_DONE":
+            const index = action.payload - 1;
+            return { ...state, tutorials: state.tutorials.map((item, i) => (i === index ? true : item)) };
         case "SET_CURRENT_PAGE_INDEX":
             return { ...state, currentPageIndex: action.payload };
         case "SET_CURRENT_PAGE_OFFSET":
@@ -140,98 +135,51 @@ function fullTestScreenReducer(
     }
 }
 
-export function useFullTestScreen() {
+
+
+export function useTestFrame() {
+
     const [fullTestScreenState, fullTestScreenDispatch] = useReducer(fullTestScreenReducer, initFullTestScreenState);
-    const testPaperRef = useRef<TestPaper>(GetQuestionFromSessionStorage());
+
+    const doTestDataRef = useRef<TestSheet>({ questionList: [], totalQuestions: 0 });
+    const { parts = "0" } = useParams<{ id: TestID, parts: string }>();
+    const [doneLoading, setDoneLoading] = useState<boolean>(true);
     const changePage = (offset: number) => {
         const newPageIndex = fullTestScreenState.currentPageIndex + offset;
-        if (newPageIndex >= 0 && newPageIndex < testPaperRef.current.listMultipleChoiceQuestions.length) {
+        if (newPageIndex >= 0 && newPageIndex < doTestDataRef.current.questionList.length) {
             fullTestScreenDispatch({ type: "SET_CURRENT_PAGE_INDEX", payload: newPageIndex });
+            console.dir(doTestDataRef.current.questionList);
         }
     }
+    useEffect(() => {
+        GetQuestionFromIndexDB(parts).then((QnAList) => {
+            doTestDataRef.current = QnAList;
+
+            setDoneLoading(false);
+        });
+
+    }, [])
     return {
         fullTestScreenDispatch,
         fullTestScreenState,
-        testPaperRef,
-        changePage
+        doTestDataRef,
+        changePage,
+        doneLoading,
+        thisQuestion: doTestDataRef.current.questionList[fullTestScreenState.currentPageIndex]
     }
 }
 
-function GetQuestionFromSessionStorage(): TestPaper {
-    const questionListStr = sessionStorage.getItem("questionList");
-    if (questionListStr) {
-        const questionList = JSON.parse(questionListStr) as TestPaper;
-        sessionStorage.removeItem("testPapaer");
-        sessionStorage.removeItem("testPapaer");
-        return questionList
-    }
-    return { listMultipleChoiceQuestions: [], totalQuestion: 0 };
-}
-
-
-
-
-
-function renderTestReducer(state: RenderTestState, action: RenderTestActiion): RenderTestState {
-    switch (action.type) {
-        case "SET_USER_CHOICE_ANSWER_SHEET": {
-            const newMap = new Map(state.userAnswerSheet);
-            const { qNum, qID, answer } = action.payload;
-            newMap.set(qNum, { questionId: qID, userAnswer: answer });
-            return { ...state, userAnswerSheet: newMap };
-        }
-        case "TOGGLE_FLAGS":
-            {
-                const newFlags = state.flags.map((item:boolean, i:number) => (i === action.payload ? !item : item))
-                return { ...state, flags: newFlags }
-            }
-        default:
-            return state;
-    }
-}
-
-
-
-export function useRenderTest(testPaper: TestPaper) {
-    const {
-        flags,
-        pageMapper,
-        timeSpentList,
-        userAnswerSheet,
-    } = useMemo(() => GetInitRenderTest(testPaper), [])
-
-    const renderTestRef = useRef<renderTestRefType>({ pageMapper, timeSpentList });
-    const [renderTestState, renderTestDispatch] = useReducer(renderTestReducer, { flags, userAnswerSheet });
-
-
-
-    return {
-        renderTestRef,
-        renderTestState,
-        renderTestDispatch,
-    }
-}
-
-function GetInitRenderTest(testPaper: TestPaper) {
-    const userAnswerSheet = new Map<QuestionNumber, AnswerPair>();
-    const pageMapper: QuestionPage[] = MappingPageWithQuestionNum(testPaper.listMultipleChoiceQuestions);
-    const timeSpentList = new Map<QuestionNumber, milisecond>();
-    for (const question of testPaper.listMultipleChoiceQuestions) {
-        if (question.subQuestions.length !== 0) {
-            for (const subQuestion of question.subQuestions) {
-                userAnswerSheet.set(subQuestion.questionNum, ({ questionId: subQuestion.id, userAnswer: "" }));
-                timeSpentList.set(subQuestion.questionNum, 0);
-            }
-        } else {
-            userAnswerSheet.set(question.questionNum, { questionId: question.id, userAnswer: "" });
-            timeSpentList.set(question.questionNum, 0);
-        }
+async function GetQuestionFromIndexDB(parts: string): Promise<TestSheet> {
+    if (parts === "0") parts = "1234567";
+    const questionFinalList: QuestionAnswerRecord[] = [];
+    let finalTotalQuestions: number = 0;
+    for (const p of parts) {
+        const partNumIndex = Number(p) - 1;
+        const { questionList, totalQuestions } = await queryByPartIndex(partNumIndex);
+        questionFinalList.push(...questionList);
+        finalTotalQuestions += totalQuestions;
     }
 
-    return {
-        flags: Array<boolean>(testPaper.totalQuestion).fill(false),
-        pageMapper,
-        timeSpentList,
-        userAnswerSheet,
-    }
+    return { questionList: questionFinalList, totalQuestions: finalTotalQuestions };
+
 }

@@ -71,7 +71,6 @@ interface MultiQuestionState {
 }
 interface RenderTestState {
   userAnswerSheet: TestAnswerSheet
-  flags: boolean[]
 }
 type FullTestScreenState = {
   tutorials: boolean[];

@@ -4,7 +4,7 @@ import { useTestState } from "../context/TestStateProvider";
 import { MultiQuestionAction } from "../utils/types/action";
 import { initialState } from "../utils/types/emptyValue";
 import { MultiQuestionState } from "../utils/types/state";
-import { AnswerPair, milisecond, MultipleChoiceQuestion, MultiQuestionRef, QuestionID, QuestionNumber, QuestionPage, TestAnswerSheet, UserAnswerTimeCounter } from "../utils/types/type";
+import { AnswerData, milisecond, MultipleChoiceQuestion, MultiQuestionRef, QuestionID, QuestionNumber, QuestionPage, TestAnswerSheet, UserAnswerTimeCounter } from "../utils/types/type";
 
 export function useMultipleQuestion() {
     // ---------------- Khởi tạo State và Context ---------------- //
@@ -12,7 +12,7 @@ export function useMultipleQuestion() {
     const [pageMapper, setPageMapper] = useState<QuestionPage[]>([]);
     const [totalQuestions, setTotalQuestions] = useState<number>(0);
     const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
-    const [userAnswerSheet, setUserAnswerSheet] = useState<TestAnswerSheet>(new Map<QuestionNumber, AnswerPair>());
+    const [userAnswerSheet, setUserAnswerSheet] = useState<TestAnswerSheet>(new Map<QuestionNumber, AnswerData>());
     const { isOnTest, setIsOnTest } = useTestState();
     const [flags, setFlags] = useState<boolean[]>([]);
     const [isVisible, setVisiable] = useState<boolean>(false);

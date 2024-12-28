@@ -1,11 +1,12 @@
 import React, { memo } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { FullTestArea } from "../../components/Common/MultipleChoiceQuestion/FullTestArea";
+import RennderTutorial from "../../components/Common/MultipleChoiceQuestion/TutorialSection";
 import SubmitLoading from "../../components/User/TestComponent/SubmitLoading";
 import TestToolbar from "../../components/User/TestComponent/TestToolBar";
-import { useFullTestScreen, useRenderTest, useTestScreen } from "../../hooks/TestHook";
+import { TestScreenState, useTestFrame, useTestScreen } from "../../hooks/TestHook";
 import { AmINotLoggedIn } from "../../utils/helperFunction/AuthCheck";
-import { RenderTestProps, RennderTutorialProps } from "../../utils/types/props";
+import { RenderTestProps } from "../../utils/types/props";
 import { MultipleChoiceQuestion } from "../../utils/types/type";
 //--------------------------------------------------------------------------
 // Hàm chính `DoTestPage` để hiển thị giao diện trang làm bài thi
@@ -30,94 +31,84 @@ export default memo(DoTestPage);
 //--------------------------------------------------------------------------
 // Component `RenderMainPage` dùng để hiển thị nội dung cụ thể của trang
 const RenderMainPage: React.FC = () => {
-    const { id, testScreenState } = useTestScreen()
+    const { testScreenState, setTestScreenState } = useTestScreen()
+    const navigate = useNavigate();
 
+    // Kiểm tra trạng thái màn hình thi để quyết định nội dung cần hiển thị
     switch (testScreenState) {
-        case "DOING_TEST":
-            return <FullTestScreen />;
-        case "SUBMITING":
+        case "DOING_TEST": // Khi đang làm bài thi
+            return <TestFrame setTestScreenState={setTestScreenState} />;
+        case "SUBMITING": // Khi đang gửi bài
             return <SubmitLoading />;
-        default:
-            return <Navigate to={`/test/${id}`}></Navigate>
+        default: // Nếu trạng thái không xác định, điều hướng lại
+            if (window.history.length > 1) {
+                navigate(-1);
+            } else {
+                navigate("/test")
+            }
+            return <></>;
     }
-
-    //--------------------------------------------------------------------------
-    // Tính số lượng câu hỏi đã được trả lời (memoized để tối ưu hiệu năng)
-    // const answeredCount = React.useMemo(() => {
-    //     return Array.from(props.state.userAnswerSheet.values())
-    //         .filter((answerPair) => answerPair.userAnswer !== "").length;
-    // }, [props.state.userAnswerSheet]);
-
-    //--------------------------------------------------------------------------
-    // Render giao diện chính của phần làm bài thi
-
-
 }
 
-
-
-
-const FullTestScreen: React.FC = React.memo(
+//--------------------------------------------------------------------------
+// Component `TestFrame` dùng để quản lý và hiển thị giao diện làm bài thi chính
+const TestFrame: React.FC<{ setTestScreenState: React.Dispatch<React.SetStateAction<TestScreenState>> }> = React.memo(
     () => {
-        const { fullTestScreenDispatch, fullTestScreenState, testPaperRef, changePage } = useFullTestScreen();
-        const thisQuestion = testPaperRef.current.listMultipleChoiceQuestions[fullTestScreenState.currentPageIndex];
+        const {
+            fullTestScreenDispatch,
+            fullTestScreenState,
+            doTestDataRef,
+            thisQuestion,
+            doneLoading,
+            changePage,
+        } = useTestFrame();
+
+        // Nếu chưa hiển thị phần hướng dẫn của bài thi hiện tại, hiển thị hướng dẫn
         if (NotShowThisPartTutorialYet(thisQuestion, fullTestScreenState.tutorials)) {
-            return (
-                <RennderTutorial partNeedToShow={thisQuestion.partNum} dispatchTutorialIsDone={fullTestScreenDispatch} />
-            )
+            return <RennderTutorial partNeedToShow={thisQuestion.partNum} dispatchTutorialIsDone={fullTestScreenDispatch} />
         }
 
-        return (
-            <RenderTest changePage={changePage}
-                testPaperRef={testPaperRef}
-                thisQuestion={thisQuestion}
+        // Khi đã tải xong, hiển thị giao diện làm bài thi
+        return doneLoading && (
+            <RenderTest
                 fullTestScreenDispatch={fullTestScreenDispatch}
+                currentPageIndex={fullTestScreenState.currentPageIndex}
+                doTestDataRef={doTestDataRef}
+                thisQuestion={thisQuestion}
+                changePage={changePage}
             />
         )
     }
 )
 
-const RennderTutorial: React.FC<RennderTutorialProps> = React.memo(
-    (props) => {
-        return (
-            <h1>tutorials {props.partNeedToShow}</h1>
-        )
-    }
-)
-
+//--------------------------------------------------------------------------
+// Component `RenderTest` hiển thị giao diện chính khi làm bài thi
 const RenderTest: React.FC<RenderTestProps> = React.memo(
-    (props) => {
-        const { renderTestRef,
-            renderTestState,
-            renderTestDispatch, } = useRenderTest(props.testPaperRef.current);
+    ({ changePage, fullTestScreenDispatch, currentPageIndex, doTestDataRef, thisQuestion }) => {
         return (
-            <section>
-                {/* Giao diện làm bài thi */}
-                <section className="flex flex-column justify-content-center">
 
-                    {/* Thanh công cụ khi làm bài thi */}
-                    <TestToolbar
-                        renderTestRef={renderTestRef}
-                        renderTestState={renderTestState}
-                        renderTestDispatch={renderTestDispatch}
+            < section className="flex flex-column justify-content-center" >
+                {/* Thanh công cụ khi làm bài thi */}
+                < TestToolbar
+                    fullTestScreenDispatch={fullTestScreenDispatch}
+                    currentPageIndex={currentPageIndex}
+                    doTestDataRef={doTestDataRef}
+                />
+
+                {/* Khu vực chính hiển thị câu hỏi và các nút điều hướng */}
+                < div id="test-area-container" className="max-w-screen p-0" >
+                    <FullTestArea
+                        changePage={changePage}
+                        question={thisQuestion}
                     />
-
-                    {/* Khu vực chính hiển thị câu hỏi và các nút điều hướng */}
-                    <div id="test-area-container" className="max-w-screen p-0">
-                        <FullTestArea
-                            dispatch={renderTestDispatch}
-                            changePage={props.changePage}
-                            userAnswerSheet={renderTestState.userAnswerSheet}
-                            question={props.thisQuestion}
-                        />
-                    </div>
-                </section>
-            </section>
+                </div >
+            </section >
         )
     }
 )
 
+//--------------------------------------------------------------------------
+// Hàm kiểm tra nếu phần hướng dẫn cho câu hỏi hiện tại chưa được hiển thị
 function NotShowThisPartTutorialYet(question: MultipleChoiceQuestion, tutorials: boolean[]): boolean {
-    return !tutorials[question.partNum - 1]
-
+    return question && !tutorials[question.partNum - 1]
 }

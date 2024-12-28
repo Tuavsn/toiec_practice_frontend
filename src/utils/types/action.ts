@@ -9,6 +9,8 @@ type FullTestScreenAction =
     | { type: "SET_TUTORIALS"; payload: boolean[] }
     | { type: "SET_CURRENT_PAGE_INDEX"; payload: number }
     | { type: "SET_CURRENT_PAGE_OFFSET"; payload: number }
+    | { type: "SET_TUTORIALS_DONE"; payload: number }
+
 type RowHookAction<RowModel> =
     | { type: 'FETCH_ROWS_SUCCESS'; payload: [RowModel[], number] }
     | { type: 'SET_PAGE'; payload: number }

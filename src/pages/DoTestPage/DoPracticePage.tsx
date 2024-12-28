@@ -7,7 +7,7 @@ import { LoadingSpinner, TestArea, UserAnswerSheet } from "../../components/Comm
 import useTestPage from "../../hooks/TestHook";
 import { AmINotLoggedIn } from "../../utils/helperFunction/AuthCheck";
 import { DoTestPageProps, SimpleTimeCountDownProps } from "../../utils/types/props";
-import { MultipleChoiceQuestion, TestType } from "../../utils/types/type";
+import { ColorString, MultipleChoiceQuestion, TestType } from "../../utils/types/type";
 import '../App.css';
 ;
 
@@ -100,7 +100,7 @@ function checkIsAllowToChangePage(testType: TestType, questionList: MultipleChoi
         (questionList[currentPageIndex].partNum <= 4 || questionList[page].partNum <= 4);
 }
 
-type ColorString = 'info' | 'secondary' | 'warning' | 'help';
+
 function getColorButtonOnAnswerSheet(answer: string, isOnPage: boolean, isFlag: boolean): ColorString {
     let returnString: ColorString = 'secondary';
     if (answer) {

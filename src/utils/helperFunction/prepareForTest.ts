@@ -1,14 +1,14 @@
 // ---------------- Hàm Chuẩn Bị Phiếu Trả Lời Rỗng ---------------- //
 
 import { Dispatch, MutableRefObject, SetStateAction } from "react";
-import { AnswerPair, AnswerRecord, MultipleChoiceQuestion, MultiQuestionRef, QuestionNumber, TestAnswerSheet, UserAnswerTimeCounter } from "../types/type";
+import { AnswerData, AnswerRecord, MultipleChoiceQuestion, MultiQuestionRef, QuestionNumber, TestAnswerSheet, UserAnswerTimeCounter } from "../types/type";
 
 function prepareAnswerSheet(
     listMultipleChoiceQuestions: MultipleChoiceQuestion[],
     setUserAnswerSheet: Dispatch<SetStateAction<TestAnswerSheet>>,
     timeSpentListRef: MutableRefObject<UserAnswerTimeCounter>
 ) {
-    const testAnswerSheet: TestAnswerSheet = new Map<QuestionNumber, AnswerPair>();
+    const testAnswerSheet: TestAnswerSheet = new Map<QuestionNumber, AnswerData>();
 
     for (const question of listMultipleChoiceQuestions) {
         if (question.subQuestions.length !== 0) {
@@ -29,7 +29,7 @@ function prepareAnswerSheetX(
     dispatch: (value: { type: "SET_USER_ANSWER_SHEET", payload: TestAnswerSheet }) => void,
     MultiRef: MutableRefObject<MultiQuestionRef>
 ) {
-    const testAnswerSheet: TestAnswerSheet = new Map<QuestionNumber, AnswerPair>();
+    const testAnswerSheet: TestAnswerSheet = new Map<QuestionNumber, AnswerData>();
 
     for (const question of listMultipleChoiceQuestions) {
         if (question.subQuestions.length !== 0) {

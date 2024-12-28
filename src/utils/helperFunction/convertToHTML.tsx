@@ -5,7 +5,7 @@ import { Divider } from "primereact/divider";
 import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionID, QuestionNumber, QuestionPage, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "../types/type";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, QuestionRow, Resource, SelectedQuestionDialogTestOverallPage, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord, UserAnswerResult } from "../types/type";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
     const questionPages = [];
@@ -614,9 +614,7 @@ export function ConvertThisTestQuestionToHTML(
     ]
 }
 export function ConvertThisFullTestQuestionToHTML(
-    question: MultipleChoiceQuestion,            // Đối tượng câu hỏi trắc nghiệm
-    userAnswerSheet: TestAnswerSheet,            // Phiếu trả lời của người dùng (Map câu hỏi - câu trả lời)
-    dispatch: (value: { type: "SET_USER_CHOICE_ANSWER_SHEET"; payload: { qNum: number; qID: string; answer: string; } }) => void,
+    question: QuestionAnswerRecord,            // Đối tượng câu hỏi trắc nghiệm
     changePage: (offset: number) => void         // Hàm thay đổi trang
 ): [JSX.Element[], JSX.Element[]] {              // Trả về hai mảng phần tử JSX: tài nguyên và câu hỏi
 
@@ -646,7 +644,7 @@ export function ConvertThisFullTestQuestionToHTML(
 
             // Xây dựng phần tử HTML cho từng câu hỏi con
             questionsElement.push(
-                BuildFullTestQuestionHTML(subq, userAnswerSheet.get(subq.questionNum)?.userAnswer ?? "", dispatch)
+                BuildFullTestQuestionHTML(subq)
             );
         }
     } else {
@@ -657,7 +655,7 @@ export function ConvertThisFullTestQuestionToHTML(
 
         // Xây dựng phần tử HTML cho câu hỏi
         questionsElement.push(
-            BuildFullTestQuestionHTML(question, userAnswerSheet.get(question.questionNum)?.userAnswer ?? "", dispatch)
+            BuildFullTestQuestionHTML(question)
         );
     }
 
@@ -670,9 +668,7 @@ export function ConvertThisFullTestQuestionToHTML(
 
 // Hàm xây dựng HTML cho câu hỏi trắc nghiệm
 function BuildFullTestQuestionHTML(
-    question: MultipleChoiceQuestion,             // Đối tượng câu hỏi trắc nghiệm
-    userAnswer: string,                           // Câu trả lời hiện tại của người dùng
-    dispatch: (value: { type: "SET_USER_CHOICE_ANSWER_SHEET"; payload: { qNum: number; qID: string; answer: string; } }) => void, // Hàm cập nhật phiếu trả lời
+    question: QuestionAnswerRecord,             // Đối tượng câu hỏi trắc nghiệm
 ): JSX.Element {
 
     // Lấy số câu hỏi hiện tại
@@ -684,32 +680,45 @@ function BuildFullTestQuestionHTML(
     // Trả về phần tử HTML cho câu hỏi
     return (
         <div key={"answer" + currentQuestionNumber} className={"flex flex-column gap-3 my-3"}>
-            {question.answers.map((thisAnswer, index) => {
-
-                // Tạo radio button cho mỗi đáp án
-                return (
-                    <div key={"answerbox" + index} className={"flex align-items-center py-3 "}>
-                        <input
-                            key={index + "radio" + currentQuestionNumber}
-                            style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }} // Tùy chỉnh kiểu radio button
-                            type="radio"                          // Loại input là radio
-                            id={"id" + currentQuestionNumber + index} // ID duy nhất cho mỗi radio
-                            name={`answer-${currentQuestionNumber}`}   // Name chung cho các radio cùng câu hỏi
-                            value={answerTexts[index]}             // Giá trị của mỗi đáp án
-                            checked={userAnswer === thisAnswer}        // Kiểm tra đáp án nào đang được chọn
-                            onChange={() => {                     // Khi người dùng chọn, cập nhật phiếu trả lời
-                                dispatch({ type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { answer: thisAnswer, qID: question.id, qNum: currentQuestionNumber } });
-                            }}
-                        />
-                        <label key={index + "label" + currentQuestionNumber} htmlFor={"id" + currentQuestionNumber + index} style={{ marginLeft: '8px' }}>
-                            {answerTexts[index]}  {/* Hiển thị đáp án A, B, C, D hoặc đáp án text */}
-                        </label>
-                    </div>
-                );
-            })}
+            <RadioButtonGroup currentQuestionNumber={currentQuestionNumber} question={question} answerTexts={answerTexts} />
         </div>
     )
 }
+
+const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: QuestionAnswerRecord, answerTexts: string[] }> =
+    ({ currentQuestionNumber, answerTexts, question }) => {
+        const [, setReload] = React.useState(false);
+        return (
+            <>
+                {question.answers.map((thisAnswer, index) => {
+                    return (
+                        // Tạo radio button cho mỗi đáp án
+                        <div key={"answerbox" + index} className={"flex align-items-center py-3 "}>
+                            <input
+                                key={index + "radio" + currentQuestionNumber}
+                                style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }} // Tùy chỉnh kiểu radio button
+                                type="radio"                          // Loại input là radio
+                                id={"id" + currentQuestionNumber + index} // ID duy nhất cho mỗi radio
+                                name={`answer-${currentQuestionNumber}`}   // Name chung cho các radio cùng câu hỏi
+                                value={answerTexts[index]}             // Giá trị của mỗi đáp án
+                                checked={question.userAnswer === thisAnswer}// Kiểm tra đáp án nào đang được chọn
+                                onChange={() => {                     // Khi người dùng chọn, cập nhật phiếu trả lời
+
+                                    setReload(pre => pre = !pre);
+                                    question.userAnswer = thisAnswer;
+                                    console.dir(question);
+                                }}
+                            />
+                            <label key={index + "label" + currentQuestionNumber} htmlFor={"id" + currentQuestionNumber + index} style={{ marginLeft: '8px' }}>
+                                {answerTexts[index]}  {/* Hiển thị đáp án A, B, C, D hoặc đáp án text */}
+                            </label>
+                        </div>
+                    )
+
+                })}
+            </>
+        )
+    }
 
 // Hàm xây dựng HTML cho câu hỏi trắc nghiệm
 function BuildTestQuestionHTML(

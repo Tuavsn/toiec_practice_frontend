@@ -172,6 +172,12 @@ export interface Meta {
   totalItems: number;
 }
 
+export interface WorkerResponse<T> {
+  status: 'success' | 'error';
+  data: T;
+  message: string;
+}
+
 export interface ApiResponse<T> {
   statusCode: number,
   message: string,
@@ -264,6 +270,28 @@ export interface TestPaper {
   totalQuestion: number,
   listMultipleChoiceQuestions: MultipleChoiceQuestion[]
 }
+
+export interface QuestionAnswerRecord {
+  id: string;
+  questionNum: number;
+  type: string;
+  partNum: number;
+  subQuestions: QuestionAnswerRecord[];
+  content: string;
+  resources: Resource[];
+  answers: string[];
+  pageIndex: number;
+  userAnswer: string;
+}
+
+export interface TestPaperRecord {
+  totalQuestion: number,
+  listMultipleChoiceQuestions: QuestionAnswerRecord[]
+}
+
+
+
+
 export interface SelectedQuestionDialogTestOverallPage {
   body: JSX.Element | null;
   title: JSX.Element | null;
@@ -289,7 +317,7 @@ export interface UserAnswerResult {
   correctAnswer: string;
 }
 
-export interface AnswerPair {
+export interface AnswerData {
   questionId: QuestionID,
   userAnswer: string,
 }
@@ -336,7 +364,7 @@ export type SkillStat = {
   totalIncorrect: number;
   totalTime: number;
 };
-interface ResultOverview {
+export interface ResultOverview {
   createdAt: Date; // Use ISO string for Instant in Java
   result: ResultID; // e.g., "x/200", "x/30"
   totalTime: number;
@@ -345,11 +373,11 @@ interface ResultOverview {
   totalCorrectAnswer: number;
   totalIncorrectAnswer: number;
   totalSkipAnswer: number;
-  type: TestType; // "practice" or "fulltest"
+  type: TestType;
   parts: string; // "Practice parts"
 }
 
-interface TopicOverview {
+export interface TopicOverview {
   partNum: number;
   topicNames: string[];
 }
@@ -364,7 +392,7 @@ export type TestResultSummary = {
   totalCorrectAnswer: number;
   totalIncorrectAnswer: number;
   totalSkipAnswer: number;
-  type: TestType;  // if "type" has specific possible values, you can use union types
+  type: TestType;
   parts: string;
   userAnswers: UserAnswerResult[];
 }
@@ -461,12 +489,12 @@ export interface TopicRecord extends DataTableValue {
 }
 
 
-export type AnswerRecord = AnswerPair & {
+export type AnswerRecord = AnswerData & {
   timeSpent: milisecond;
 }
 
 
-export type renderTestRefType = {
+export type RenderTestRefType = {
   pageMapper: QuestionPage[]
   timeSpentList: UserAnswerTimeCounter
 }
@@ -484,8 +512,12 @@ export type ResourceIndex = Resource & {
   file: File | null,
 }
 
+export interface QuestionListByPart {
+  questionList: QuestionAnswerRecord[],
+  totalQuestions: number,
+}
 //---------------------------- tên gọi khác
-export type TestAnswerSheet = Map<QuestionNumber, AnswerPair>;
+export type TestAnswerSheet = Map<QuestionNumber, AnswerData>;
 export type ResultID = string;
 export type QuestionID = string;
 export type UserID = string;
@@ -508,8 +540,10 @@ export type QuestionType = 'single' | 'group' | 'subquestion' | 'ABCD';
 export type ExerciseType = "partNum=1" | "partNum=2" | "partNum=3" | "partNum=4" | "partNum=5" | "partNum=6" | "partNum=7" | "topic=Câu hỏi ngữ pháp" | "topic=Câu hỏi từ vựng";
 export type DialogLectureJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE' | 'PAGE_DESIGNER' | 'QUESTION_EDITOR';
 export type DialogRowJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE';
+export type ColorString = "success" | "info" | "warning" | "danger" | 'secondary' | 'help';
 export type Name_ID<T extends string> = T;
-
+export type TestDocument = QuestionListByPart[]
+export type TestSheet = QuestionListByPart
 //-----------------------------reducer---------------------
 
 

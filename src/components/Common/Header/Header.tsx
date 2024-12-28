@@ -1,5 +1,6 @@
 import { Button } from "primereact/button";
 import { Menubar } from "primereact/menubar";
+import { MenuItem } from "primereact/menuitem";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { MouseEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +25,7 @@ export default function Header() {
     const HeaderStart = <a href="#"><img src={Logo} height={70} alt="Logo" onClick={() => handleCommand('/home')} /></a>;
 
     // Định nghĩa danh sách các mục trong header
-    const HeaderItems = [
+    const HeaderItems: MenuItem[] = [
         { label: 'Bài học', icon: 'pi pi-book', command: () => handleCommand('/lecture') },
         { label: 'Đề thi', icon: 'pi pi-folder', command: () => handleCommand('/test') },
         { label: 'Luyện tập', icon: 'pi pi-book', command: () => handleCommand('/exercise') },

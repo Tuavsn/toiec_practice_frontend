@@ -1,8 +1,8 @@
 import { TreeNode } from "primereact/treenode";
 import { Dispatch, MutableRefObject } from "react";
-import { FullTestScreenAction, LectureHookAction, MultiQuestionAction, RenderTestActiion, RoleHookAction, RowHookAction, TestReviewHookAction, UserHookAction } from "./action";
-import { LectureHookState, MultiQuestionState, RenderTestState, TestReviewHookState } from "./state";
-import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Permission, QuestionID, QuestionNumber, QuestionPage, renderTestRefType, ResourceIndex, Role, TestAnswerSheet, TestID, TestPaper, TestRow, TestType, Topic, TopicStat, UserAnswerRecord, UserDetailResultRow, UserRow } from "./type";
+import { FullTestScreenAction, LectureHookAction, MultiQuestionAction, RoleHookAction, RowHookAction, TestReviewHookAction, UserHookAction } from "./action";
+import { LectureHookState, MultiQuestionState, TestReviewHookState } from "./state";
+import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Permission, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, Topic, TopicOverview, TopicStat, UserAnswerRecord, UserDetailResultRow, UserRow } from "./type";
 
 interface ButtonListProps {
     pageMapper: QuestionPage[],
@@ -37,9 +37,10 @@ interface RennderTutorialProps {
     dispatchTutorialIsDone: React.Dispatch<FullTestScreenAction>
 }
 interface RenderTestProps {
-    testPaperRef: React.MutableRefObject<TestPaper>
+    currentPageIndex: number,
+    doTestDataRef: React.MutableRefObject<TestSheet>
     fullTestScreenDispatch: React.Dispatch<FullTestScreenAction>
-    thisQuestion: MultipleChoiceQuestion,
+    thisQuestion: QuestionAnswerRecord,
     changePage: (offset: number) => void
 }
 
@@ -212,9 +213,7 @@ interface TestAreaProps {
     changePage: (offset: number) => void
 }
 interface FullTestAreaProps {
-    question: MultipleChoiceQuestion,
-    userAnswerSheet: TestAnswerSheet,
-    dispatch: Dispatch<RenderTestActiion>
+    question: QuestionAnswerRecord,
     changePage: (offset: number) => void
 }
 interface SkillInsightsProps {
@@ -227,15 +226,26 @@ interface QuestionTableProps {
     setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
 }
 interface TestToolBarProps {
-    renderTestRef: React.MutableRefObject<renderTestRefType>;
-    renderTestState: RenderTestState;
-    renderTestDispatch: React.Dispatch<RenderTestActiion>
+    currentPageIndex: number,
+    doTestDataRef: React.MutableRefObject<TestSheet>
+    fullTestScreenDispatch: React.Dispatch<FullTestScreenAction>
+
 }
 interface ResourceSectionProps {
     resourseIndexes: ResourceIndex[],
     setResourseIndexes: React.Dispatch<React.SetStateAction<ResourceIndex[]>>,
 
 }
+interface ToolBarFrameProps {
+    currentPageIndex: number,
+    answeredCount: number,
+    doTestDataRef: React.MutableRefObject<TestSheet>
+}
+interface UserAnswerSideBarProps {
+    isShowed: boolean,
+    setIsShowed: React.Dispatch<React.SetStateAction<boolean>>
+}
+
 interface DialogQuestionPageProps {
     setIsDialogVisible: React.Dispatch<React.SetStateAction<JSX.Element | null>>
     dialogBodyVisible: JSX.Element | null,
@@ -261,6 +271,19 @@ interface UpdateQuestionDialogProps {
 interface RenderPressStartButtonProps {
     id: TestID,
     startTestFunc: () => void
+}
+interface PartDetailSectionProps {
+    topicsOverview: TopicOverview[]
+}
+
+interface ResultTableProps {
+    resultsOverview: ResultOverview[],
+    id: TestID
+}
+
+interface UserAnswerSideTabProps {
+    answeredCount: number,
+    dotestDataRef: React.MutableRefObject<TestSheet>
 }
 
 export type {
@@ -291,22 +314,23 @@ export type {
     FullTestScreenProps,
     LectureActionButtonProps,
     LectureReduceProps,
+    PartDetailSectionProps,
     QuestionActionButtonProps,
     QuestionTableProps,
     RenderPressStartButtonProps,
     RenderTestProps,
     RennderTutorialProps,
     ResourceSectionProps,
+    ResultTableProps,
     RichEditorProps,
     RowActionButtonProps,
     SimpleTimeCountDownProps,
     SkillInsightsProps,
     TestAreaProps,
     TestReviewAreaProps,
-    TestToolBarProps,
-    UpdateQuestionDialogProps,
+    TestToolBarProps, ToolBarFrameProps, UpdateQuestionDialogProps,
     UserAnswerSheetFullTestProps,
     UserAnswerSheetProps,
-    UserAnswerSheetReviewProps
+    UserAnswerSheetReviewProps, UserAnswerSideBarProps, UserAnswerSideTabProps
 };
 

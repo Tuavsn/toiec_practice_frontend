@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { SimpleTimeCountDownProps } from "../../../utils/types/props";
 
 const SimpleTimeCountDown: React.FC<SimpleTimeCountDownProps> = React.memo(
-    ({ timeLeftInSecond, onTimeUp, isTutorial }) => {
-        const [secondsLeft, setSecondsLeft] = useState(timeLeftInSecond);
+    ({onTimeUp, isTutorial }) => {
+        const {time="10"} = useParams<{time: string}>();
+        const [secondsLeft, setSecondsLeft] = useState(Number(time) * 3600);
 
         useEffect(() => {
             if (secondsLeft <= 0) { onTimeUp(); return; }

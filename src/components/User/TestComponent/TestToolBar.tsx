@@ -1,24 +1,69 @@
-import { TestToolBarProps } from "../../../utils/types/props";
+import { Button } from "primereact/button";
+import { Sidebar } from "primereact/sidebar";
+import { Toolbar } from "primereact/toolbar";
+import React, { useEffect, useState } from "react";
+import CountNotEmptyAnswers from "../../../utils/helperFunction/CountAnswered";
+import { TestToolBarProps, ToolBarFrameProps, UserAnswerSideBarProps, UserAnswerSideTabProps } from "../../../utils/types/props";
 
-const TestToolbar: React.FC<TestToolBarProps> = () => {
-    {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */ }
-    return (
-        <h1>toolbar</h1>
-        // < Toolbar className="py-1"
-        //     start={currentStatusBodyTemplate(answeredCount, props.MultiRef.current.totalQuestions, props.dispatch)}
-        //     center={< SimpleTimeCountDown onTimeUp={() => props.onEndTest()} timeLeftInSecond={props.timeLimitRef.current} isTutorial={false} />}
-        //     end={<RightSideToolbar dispatch={props.dispatch} flags={props.state.flags} pageIndex={props.state.currentPageIndex} />}
-        // />
+const TestToolbar: React.FC<TestToolBarProps> =
+    ({ doTestDataRef, currentPageIndex }) => {
+        {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */ }
 
-    )
-}
+        // Tính số lượng câu hỏi đã được trả lời (memoized để tối ưu hiệu năng)
 
-// function currentStatusBodyTemplate(answeredCount: number, totalQuestions: number, dispatch: React.Dispatch<MultiQuestionAction>) {
+        const answeredCount = CountNotEmptyAnswers(doTestDataRef);
 
-//     return (
-//         <Button severity="help" label={`Số câu đã trả lời: ${answeredCount} / ${totalQuestions}`} icon="pi pi-arrow-right" onClick={() => dispatch({ type: "SET_USER_ANSWER_SHEET_VISIBLE", payload: true })} />
-//     )
-// }
+
+        return (
+            <ToolbarFrame answeredCount={answeredCount}
+                currentPageIndex={currentPageIndex}
+                doTestDataRef={doTestDataRef}
+
+            />
+
+        )
+    }
+
+const ToolbarFrame: React.FC<ToolBarFrameProps> =
+    ({ answeredCount, doTestDataRef: dotestDataRef }) => {
+        const [, setReload] = useState(false);
+        useEffect(() => {
+            setReload(pre => !pre);
+        }, [answeredCount]);
+        return (
+            < Toolbar className="py-1"
+                start={<UserAnswerSideTab answeredCount={answeredCount} dotestDataRef={dotestDataRef} />}
+            // center={< SimpleTimeCountDown onTimeUp={() => props.onEndTest()} isTutorial={false} />}
+            // end={<RightSideToolbar dispatch={props.dispatch} flags={props.state.flags} pageIndex={props.state.currentPageIndex} />}
+            />
+
+        )
+    }
+
+
+const UserAnswerSideTab: React.FC<UserAnswerSideTabProps> = React.memo(
+    ({ answeredCount, dotestDataRef }) => {
+        const [isShowed, setIsShowed] = useState(false);
+        return (
+            <>
+                <UserAnswerSideBar isShowed={isShowed} setIsShowed={setIsShowed} />
+                <Button severity="help" label={`Số câu đã trả lời: ${answeredCount} / ${dotestDataRef.current.totalQuestions}`} icon="pi pi-arrow-right" onClick={() => setIsShowed(true)} />
+            </>
+        )
+    }
+)
+
+const UserAnswerSideBar: React.FC<UserAnswerSideBarProps> = React.memo(
+    ({ isShowed, setIsShowed }) => {
+        return (
+            <Sidebar header={< h2 className="text-center" > Câu trả lời</h2>} visible={isShowed} onHide={() => setIsShowed(false)}>
+                <div className="flex flex-wrap gap-2 justify-content-left">
+                    hé lô
+                </div>
+            </Sidebar >
+        );
+    }
+)
 
 // const RightSideToolbar: React.FC<{ flags: boolean[], pageIndex: number, dispatch: Dispatch<MultiQuestionAction> }> = React.memo(
 //     ({ flags, pageIndex, dispatch }) => {

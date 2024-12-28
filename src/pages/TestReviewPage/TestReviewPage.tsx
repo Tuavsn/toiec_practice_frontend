@@ -5,6 +5,7 @@ import { Sidebar } from "primereact/sidebar";
 import { Toolbar } from "primereact/toolbar";
 import React, { Dispatch, memo, useCallback, useMemo } from "react";
 import { Navigate } from "react-router-dom";
+import { ColorString } from "../../utils/types/type";
 import { LoadingSpinner } from "../components/Common/Index";
 import useTestReview from "../hooks/TestReviewHook";
 import { AmINotLoggedIn } from "../utils/helperFunction/AuthCheck";
@@ -60,14 +61,14 @@ export default memo(TestReviewPage);
 
 //-------------- Helper Functions -------------- -------------- -------------- -------------- -------------- -------------- -------------- 
 
-type ButtonColor = "success" | "danger" | "secondary" | "info";
+
 
 // Hàm xác định màu sắc nút dựa vào câu trả lời
 function getColorButtonOnAnswerSheet(
     questionDetailRecord: UserAnswerRecord,
     isOnPage: boolean
-): ButtonColor {
-    let returnString: ButtonColor = "secondary";
+): ColorString {
+    let returnString: ColorString = "secondary";
     if (questionDetailRecord.userAnswer) {
         returnString = questionDetailRecord.correct ? "success" : "danger";
     }

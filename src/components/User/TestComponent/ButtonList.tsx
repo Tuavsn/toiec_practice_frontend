@@ -1,7 +1,7 @@
 import { Button } from "primereact/button";
 import React, { memo } from "react";
 import { ButtonListProps } from "../../../utils/types/props";
-import { MultipleChoiceQuestion } from "../../../utils/types/type";
+import { ColorString, MultipleChoiceQuestion } from "../../../utils/types/type";
 
 
 
@@ -62,7 +62,7 @@ function checkIsAllowToChangePage(questionList: MultipleChoiceQuestion[], page: 
     return (questionList[currentPageIndex].partNum <= 4 || questionList[page].partNum <= 4);
 }
 
-type ColorString = 'info' | 'secondary' | 'warning' | 'help';
+
 function getColorButtonOnAnswerSheet(answer: string, isOnPage: boolean, isFlag: boolean): ColorString {
     let returnString: ColorString = 'secondary';
     if (answer) {
