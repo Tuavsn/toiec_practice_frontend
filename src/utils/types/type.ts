@@ -494,7 +494,7 @@ export interface QuestionListByPart {
 }
 
 export interface TestSheet {
-
+  answeredCount: number,
   questionList: QuestionAnswerRecord[],
   totalQuestions: number,
 }

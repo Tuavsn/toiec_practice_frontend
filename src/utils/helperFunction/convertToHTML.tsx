@@ -617,7 +617,7 @@ export function ConvertThisTestQuestionToHTML(
 export function ConvertThisFullTestQuestionToHTML(
     question: QuestionAnswerRecord,
     changePage: (offset: number) => void,
-    setAnsweredCount: React.Dispatch<React.SetStateAction<number>>
+    setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>
 ): [JSX.Element[], JSX.Element[]] {
     const { resources, subQuestions, content, questionId, questionNum } = question;
 
@@ -645,41 +645,34 @@ export function ConvertThisFullTestQuestionToHTML(
             const { questionNum, resources, questionId } = subq;
 
             // Thêm số thứ tự và nội dung câu hỏi con
-            questionsElement.push(<QuestionHeader key={`h5-${questionNum}`} question={subq} setAnsweredCount={setAnsweredCount} />);
+            questionsElement.push(<QuestionHeader key={`h5-${questionNum}`} question={subq} setReloadToolbar={setReloadToolbar} />);
 
             // Thêm tài nguyên đi kèm của câu hỏi con
             resoursesElement.push(...buildResources(resources, questionId));
 
             // Thêm phần tử HTML của câu hỏi con
-            questionsElement.push(BuildFullTestQuestionHTML(subq, setAnsweredCount));
+            questionsElement.push(BuildFullTestQuestionHTML(subq, setReloadToolbar));
         });
     } else {
         // Nếu không có câu hỏi con, thêm câu hỏi chính
-        questionsElement.push(<QuestionHeader key={`h5-${questionNum}`} question={question} setAnsweredCount={setAnsweredCount} />);
+        questionsElement.push(<QuestionHeader key={`h5-${questionNum}`} question={question} setReloadToolbar={setReloadToolbar} />);
         // Thêm phần tử HTML của câu hỏi chính
-        questionsElement.push(BuildFullTestQuestionHTML(question, setAnsweredCount));
+        questionsElement.push(BuildFullTestQuestionHTML(question, setReloadToolbar));
     }
 
     // Trả về hai mảng JSX: tài nguyên và câu hỏi
     return [resoursesElement, questionsElement];
 }
 // Hàm phụ để xây dựng phần tử câu hỏi
-const QuestionHeader: React.FC<{ question: QuestionAnswerRecord, setAnsweredCount: React.Dispatch<React.SetStateAction<number>> }> = ({ question, setAnsweredCount }) => {
+const QuestionHeader: React.FC<{ question: QuestionAnswerRecord, setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>> }> = ({ question, setReloadToolbar }) => {
     const { questionNum, content, flag, } = question;
     const [, setReload] = React.useState(false);
-    function updateFlagByUsingTrick() {
-        setAnsweredCount(pre => {
-            const integer = ~~pre;
-            if (integer + 0.06 >= pre)
-                return pre + 0.1;
-            return integer;
-        })
-    }
+   
     return (
         <div>
             <h5 key={`h5-${questionNum}`}>{questionNum}. {content}</h5>
             <Button className={`p-0 m-0 ml-1 ${flag ? "text-red-500" : "text-gray-500"}`} icon="pi pi-flag-fill" text
-                onClick={() => { question.flag = !flag; setReload(pre => pre = !pre); updateFlagByUsingTrick() }} />
+                onClick={() => { question.flag = !flag; setReload(pre => pre = !pre);  }} />
         </div>
     )
 }
@@ -687,7 +680,7 @@ const QuestionHeader: React.FC<{ question: QuestionAnswerRecord, setAnsweredCoun
 // Hàm xây dựng HTML cho câu hỏi trắc nghiệm
 function BuildFullTestQuestionHTML(
     question: QuestionAnswerRecord,             // Đối tượng câu hỏi trắc nghiệm
-    setAnsweredCount: React.Dispatch<React.SetStateAction<number>>
+    setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>
 ): JSX.Element {
 
     // Lấy số câu hỏi hiện tại
@@ -699,13 +692,13 @@ function BuildFullTestQuestionHTML(
     // Trả về phần tử HTML cho câu hỏi
     return (
         <div key={"answer" + currentQuestionNumber} className={"flex flex-column gap-3 my-3"}>
-            <RadioButtonGroup currentQuestionNumber={currentQuestionNumber} question={question} answerTexts={answerTexts} setAnsweredCount={setAnsweredCount} />
+            <RadioButtonGroup currentQuestionNumber={currentQuestionNumber} question={question} answerTexts={answerTexts} setReloadToolbar={setReloadToolbar} />
         </div>
     )
 }
 
-const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: QuestionAnswerRecord, answerTexts: string[], setAnsweredCount: React.Dispatch<React.SetStateAction<number>> }> =
-    ({ currentQuestionNumber, answerTexts, question, setAnsweredCount }) => {
+const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: QuestionAnswerRecord, answerTexts: string[], setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>> }> =
+    ({ currentQuestionNumber, answerTexts, question, setReloadToolbar }) => {
         const [, setReload] = React.useState(false);
         return (
             <>
@@ -724,9 +717,9 @@ const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: Ques
                                 onChange={() => {                     // Khi người dùng chọn, cập nhật phiếu trả lời
 
                                     setReload(pre => pre = !pre);
-                                    if (question.userAnswer === "") {
-                                        setAnsweredCount(pre => pre = pre + 1);
-                                    }
+                                    // if (question.userAnswer === "") {
+                                    //     setReloadToolbar(pre => pre = !pre);
+                                    // }
                                     question.userAnswer = thisAnswer;
                                 }}
                             />

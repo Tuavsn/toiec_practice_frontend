@@ -83,7 +83,7 @@ const TestFrame: React.FC<{ setTestScreenState: React.Dispatch<React.SetStateAct
 // Component `RenderTest` hiển thị giao diện chính khi làm bài thi
 const RenderTest: React.FC<RenderTestProps> = React.memo(
     ({ changePage, fullTestScreenDispatch, currentPageIndex, doTestDataRef, thisQuestion }) => {
-        const [answeredCount, setAnsweredCount] = useState<number>(0); // bị mất khi render tutorial
+        const [reloadToolbar, setReloadToolbar] = useState<boolean>(false);// bị mất khi render tutorial
         return (
 
             < section className="flex flex-column justify-content-center" >
@@ -92,13 +92,13 @@ const RenderTest: React.FC<RenderTestProps> = React.memo(
                     fullTestScreenDispatch={fullTestScreenDispatch}
                     currentPageIndex={currentPageIndex}
                     doTestDataRef={doTestDataRef}
-                    answeredCount={answeredCount}
+                    thisQuestion={thisQuestion}
                 />
 
                 {/* Khu vực chính hiển thị câu hỏi và các nút điều hướng */}
                 < div id="test-area-container" className="max-w-screen p-0" >
                     <FullTestArea
-                        setAnsweredCount={setAnsweredCount}
+                        setReloadToolbar={setReloadToolbar}
                         changePage={changePage}
                         question={thisQuestion}
                     />

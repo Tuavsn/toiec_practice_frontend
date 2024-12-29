@@ -141,7 +141,7 @@ export function useTestFrame() {
 
     const [fullTestScreenState, fullTestScreenDispatch] = useReducer(fullTestScreenReducer, initFullTestScreenState);
 
-    const doTestDataRef = useRef<TestSheet>({ questionList: [], totalQuestions: 0 });
+    const doTestDataRef = useRef<TestSheet>({ questionList: [], totalQuestions: 0, answeredCount: 0 });
     const { parts = "0" } = useParams<{ id: TestID, parts: string }>();
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const changePage = (offset: number) => {
@@ -178,7 +178,7 @@ async function GetQuestionFromIndexDB(parts: string): Promise<TestSheet> {
         finalTotalQuestions += totalQuestions;
     }
 
-    return { questionList: questionFinalList, totalQuestions: finalTotalQuestions };
+    return { questionList: questionFinalList, totalQuestions: finalTotalQuestions, answeredCount: 0 };
 
 }
 function ConvertQuestionMetaToQuestionAnswerRecord({ answers, content, questionId, pageIndex, partNum, questionNum, resources, subQuestions, type }: Question_PageIndex): QuestionAnswerRecord {

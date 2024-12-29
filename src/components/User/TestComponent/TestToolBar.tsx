@@ -6,15 +6,16 @@ import { TestToolBarProps, ToolBarFrameProps, UserAnswerSideBarProps, UserAnswer
 import { ColorString, QuestionAnswerRecord, QuestionID, TestSheet } from "../../../utils/types/type";
 
 const TestToolbar: React.FC<TestToolBarProps> =
-    ({ doTestDataRef, currentPageIndex, answeredCount }) => {
+    ({ doTestDataRef, currentPageIndex, thisQuestion }) => {
         {/* Thanh công cụ chứa bộ đếm thời gian và nút nộp bài */ }
 
         const buttonElementList = CreateButtonList(currentPageIndex, doTestDataRef.current);
 
         return (
-            <ToolbarFrame answeredCount={answeredCount}
+            <ToolbarFrame
                 buttonElementList={buttonElementList}
                 doTestDataRef={doTestDataRef}
+                thisQuestion={thisQuestion}
 
             />
 
@@ -22,14 +23,14 @@ const TestToolbar: React.FC<TestToolBarProps> =
     }
 
 const ToolbarFrame: React.FC<ToolBarFrameProps> =
-    ({ answeredCount, buttonElementList, doTestDataRef }) => {
+    ({ buttonElementList, doTestDataRef, thisQuestion }) => {
         const [, setReload] = useState(false);
         useEffect(() => {
             setReload(pre => pre = !pre);
-        }, [answeredCount]);
+        }, [thisQuestion.userAnswer, thisQuestion.flag]);
         return (
             < Toolbar className="py-1"
-                start={<UserAnswerSideTab answeredCount={answeredCount} buttonElementList={buttonElementList} dotestDataRef={doTestDataRef} />}
+                start={<UserAnswerSideTab buttonElementList={buttonElementList} dotestDataRef={doTestDataRef} />}
             // center={< SimpleTimeCountDown onTimeUp={() => props.onEndTest()} isTutorial={false} />}
             // end={<RightSideToolbar dispatch={props.dispatch} flags={props.state.flags} pageIndex={props.state.currentPageIndex} />}
             />
@@ -39,12 +40,13 @@ const ToolbarFrame: React.FC<ToolBarFrameProps> =
 
 
 const UserAnswerSideTab: React.FC<UserAnswerSideTabProps> = React.memo(
-    ({ answeredCount, dotestDataRef, buttonElementList }) => {
+    ({ dotestDataRef, buttonElementList }) => {
         const [isShowed, setIsShowed] = useState(false);
+        const { answeredCount, totalQuestions } = dotestDataRef.current;
         return (
             <>
                 <UserAnswerSideBar isShowed={isShowed} setIsShowed={setIsShowed} buttonElementList={buttonElementList} />
-                <Button severity="help" label={`Số câu đã trả lời: ${~~answeredCount} / ${dotestDataRef.current.totalQuestions}`} icon="pi pi-arrow-right" onClick={() => setIsShowed(true)} />
+                <Button severity="help" label={`Số câu đã trả lời: ${answeredCount} / ${totalQuestions}`} icon="pi pi-arrow-right" onClick={() => setIsShowed(true)} />
             </>
         )
     }
