@@ -1,19 +1,14 @@
-import { CategoryRow, DialogLectureJobType, DialogRowJobType, LectureRow, MultipleChoiceQuestion, OverallStat, Permission, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow } from "./type";
+import { CategoryRow, DialogLectureJobType, DialogRowJobType, LectureRow, MultipleChoiceQuestion, OverallStat, Permission, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow } from "./type";
 
 interface LectureHookState {
   isRefresh: boolean;
   lectures: LectureRow[] | null,
   currentPageIndex: number,
   job: DialogLectureJobType,
-  currentSelectedLecture: LectureRow
+  currentSelectedLecture: LectureRow,
+  searchText: string,
 }
-interface CategoryHookState {
-  isRefresh: boolean;
-  lectures: CategoryRow[],
-  currentPageIndex: number,
-  job: DialogRowJobType,
-  currentSelectedCategory: CategoryRow
-}
+
 
 type ProfileHookState = {
   id: UserID,
@@ -42,8 +37,24 @@ type RowHookState<RowModel> = {
   job: DialogRowJobType,
   currentSelectedRow: RowModel,
 }
+type TopicHookState = RowHookState<Topic> & {
+  searchText: string,
+}
+type PermissionHookState = RowHookState<Permission> & {
+  searchText: string,
+}
+type CategoryHookState = RowHookState<CategoryRow> & {
+  searchText: string,
+}
+type TestHookState = RowHookState<TestRow> & {
+  searchText: string,
+}
+
+
+
 type RoleHookState = {
   rows: Role[] | null,
+  searchText: string,
   isRefresh: boolean;
   currentPageIndex: number,
   job: DialogRowJobType,
@@ -51,6 +62,7 @@ type RoleHookState = {
   permissionList: Permission[],
 }
 type UserHookState = {
+  searchText: string,
   rows: UserRow[] | null,
   isRefresh: boolean;
   currentPageIndex: number,
@@ -88,13 +100,10 @@ export type {
   FullTestScreenState,
   LectureCardState,
   LectureHookState,
-  MultiQuestionState,
-  ProfileHookState,
+  MultiQuestionState, PermissionHookState, ProfileHookState,
   RenderTestState,
   RoleHookState,
-  RowHookState,
-  TestReviewHookState,
-  UserCommentState,
+  RowHookState, TestHookState, TestReviewHookState, TopicHookState, UserCommentState,
   UserHookState
 };
 

@@ -158,7 +158,7 @@ function ResourcesToHTML(resources: Resource[], qNum: number): JSX.Element[] {
 }
 
 
-export function FullTestResourcesToHTML(resources: Resource[], questID: QuestionID, changePage: (offset: number) => void): JSX.Element[] {
+export function FullTestResourcesToHTML(testType: TestType, resources: Resource[], questID: QuestionID, changePage: (offset: number) => void): JSX.Element[] {
     if (!resources) {
         return [<h1 key={"res_00"}>Cố lên</h1>]
     }
@@ -178,16 +178,7 @@ export function FullTestResourcesToHTML(resources: Resource[], questID: Question
 
                     break;
                 case 'audio':
-                    resourcesElement.unshift(
-                        <div key={"div" + keyPrefix}>
-                            <h5 className="text-center pt-1">Listen . . .🔊</h5>
-                            <audio key={keyPrefix} className='w-full' autoPlay={true} onPause={(e) => e.currentTarget.play()} onEnded={() => changePage(1)} hidden>
-                                <source src={r.content} type="audio/mpeg" />
-                                Your browser does not support the audio element.
-                            </audio>
-
-                        </div>
-                    )
+                    resourcesElement.unshift(RenderAudioHTML(testType, r.content, keyPrefix, changePage))
 
                     break;
                 default:
@@ -198,6 +189,28 @@ export function FullTestResourcesToHTML(resources: Resource[], questID: Question
     )
 
     return resourcesElement;
+}
+
+
+function RenderAudioHTML(testType: TestType, audioSource: string, keyPrefix: string, changePage: (offset: number) => void): JSX.Element {
+    if (testType === 'fulltest') {
+        return (
+            <div key={"div" + keyPrefix}>
+                <h5 className="text-center pt-1">Listen . . .🔊</h5>
+                <audio key={keyPrefix} className='w-full' autoPlay={true} onPause={(e) => e.currentTarget.play()} onEnded={() => changePage(1)} hidden>
+                    <source src={audioSource} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                </audio>
+
+            </div>
+        )
+    }
+    return (
+        <audio key={keyPrefix} className='w-full' controls autoPlay={true} >
+            <source src={audioSource} type="audio/mpeg" />
+            Your browser does not support the audio element.
+        </audio>
+    )
 }
 
 function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, testType: TestType, changePage: (offset: number) => void): JSX.Element[] {
@@ -625,7 +638,7 @@ export function ConvertThisFullTestQuestionToHTML(
     // Hàm phụ để xây dựng phần tử tài nguyên
     const buildResources = (resources: Resource[], questionId: string) =>
         resources?.length
-            ? FullTestResourcesToHTML(resources, questionId, changePage)
+            ? FullTestResourcesToHTML(doTestDataRef.current.testType,resources, questionId, changePage)
             : [];
 
 

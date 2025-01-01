@@ -2,6 +2,7 @@ import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import { callGetPermissionList, callGetRole } from "../api/api";
 import { useToast } from "../context/ToastProvider";
+import GetAbortController from "../utils/helperFunction/GetAbortController";
 import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
 import { RoleHookAction } from "../utils/types/action";
 import { initialRoleState } from "../utils/types/emptyValue";
@@ -16,6 +17,8 @@ const reducer = (state: RoleHookState, action: RoleHookAction): RoleHookState =>
         case 'FETCH_PERMISSIONS_SUCCESS': {
             return { ...state, permissionList: action.payload }
         }
+        case 'SET_SEARCH':
+            return { ...state, searchText: action.payload }
         case 'SET_PAGE':
             return { ...state, currentPageIndex: action.payload }
         case 'REFRESH_DATA':
@@ -41,9 +44,11 @@ export default function useRole() {
     const [state, dispatch] = useReducer(reducer, initialRoleState);
     const totalItems = useRef(0);
     const { toast } = useToast();
-    const fetchRoles = useCallback(async (pageNumber: number) => {
-
-        const response = await callGetRole();
+    const abortControllerRef = useRef<AbortController | null>(null);
+    const fetchRoles = useCallback(async (pageNumber: number, searchText: string) => {
+        const controller = GetAbortController(abortControllerRef);
+        const response = await callGetRole(controller.signal, searchText);
+        if (response === "abort") return;
         if (!response) {
             toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Không thể tải được danh sách quyền" });
             return;
@@ -59,12 +64,12 @@ export default function useRole() {
                 if (data) dispatch({ type: "FETCH_PERMISSIONS_SUCCESS", payload: data.result })
             })
         }
-        fetchRoles(state.currentPageIndex);
-
-    }, [state.isRefresh]);
+        fetchRoles(state.currentPageIndex, state.searchText);
+        return () => abortControllerRef.current?.abort();
+    }, [state.isRefresh, state.searchText]);
 
     const onPageChange = (e: PaginatorPageChangeEvent) => {
-        fetchRoles(e.page)
+        fetchRoles(e.page, state.searchText)
     }
 
     return {

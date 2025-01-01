@@ -1,5 +1,5 @@
 import { TreeNode } from "primereact/treenode";
-import { LectureCardState, LectureHookState, MultiQuestionState, ProfileHookState, RoleHookState, RowHookState, TestReviewHookState, UserHookState } from "./state";
+import { CategoryHookState, LectureCardState, LectureHookState, MultiQuestionState, PermissionHookState, ProfileHookState, RoleHookState, TestHookState, TestReviewHookState, TopicHookState, UserHookState } from "./state";
 import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, TestSheet, Topic, UserRow } from "./type";
 export const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
@@ -97,22 +97,25 @@ export const initialLectureState: LectureHookState = {
     lectures: null,
     isRefresh: true,
     currentPageIndex: 0,
-    currentSelectedLecture: emptyLectureRowValue
+    currentSelectedLecture: emptyLectureRowValue,
+    searchText: "",
 } as const
 
-export const initialTopicState: RowHookState<Topic> = {
+export const initialTopicState: TopicHookState = {
     rows: null,
     isRefresh: false,
     currentPageIndex: 0,
     job: "",
-    currentSelectedRow: emptyTopicRowValue
+    currentSelectedRow: emptyTopicRowValue,
+    searchText: "",
 } as const
-export const initialPermissionState: RowHookState<Permission> = {
+export const initialPermissionState: PermissionHookState = {
     rows: null,
     isRefresh: false,
     currentPageIndex: 0,
     job: "",
-    currentSelectedRow: emptyPermissionRowValue
+    currentSelectedRow: emptyPermissionRowValue,
+    searchText: "",
 } as const
 
 
@@ -130,22 +133,25 @@ export const initialUserState: UserHookState = {
     job: "",
     currentSelectedRow: emptyUserRow,
     roleList: [],
+    searchText: "",
 } as const
 
-export const initialCategoryState: RowHookState<CategoryRow> = {
+export const initialCategoryState: CategoryHookState = {
     rows: null,
     isRefresh: false,
     currentPageIndex: 0,
     job: "",
-    currentSelectedRow: emptyCategoryRow
+    currentSelectedRow: emptyCategoryRow,
+    searchText: "",
 } as const
 
-export const initialTestState: RowHookState<TestRow> = {
+export const initialTestState: TestHookState = {
     rows: null,
     isRefresh: false,
     currentPageIndex: 0,
     job: "",
-    currentSelectedRow: emptyTestRow
+    currentSelectedRow: emptyTestRow,
+    searchText: "",
 }
 
 export const emptyQuestionTreeNode: TreeNode = {
@@ -190,7 +196,8 @@ export const emptyDoTestData: TestSheet = {
     totalQuestions: 0,
     answeredCount: 0,
     secondsLeft: 0,
-    timeCountStart: 0
+    timeCountStart: 0,
+    testType: "fulltest",
 } as const;
 
 
@@ -233,6 +240,7 @@ export const initialRoleState: RoleHookState = {
     job: "",
     currentSelectedRow: emptyRole,
     permissionList: [],
+    searchText: "",
 }
 
 export const initialState: MultiQuestionState = {

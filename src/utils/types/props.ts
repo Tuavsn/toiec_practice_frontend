@@ -1,6 +1,6 @@
 import { TreeNode } from "primereact/treenode";
 import { Dispatch, MutableRefObject } from "react";
-import { FullTestScreenAction, LectureHookAction, MultiQuestionAction, RoleHookAction, RowHookAction, TestReviewHookAction, UserHookAction } from "./action";
+import { CategoryHookAction, FullTestScreenAction, LectureHookAction, MultiQuestionAction, PermissionHookAction, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, TopicHookAction, UserHookAction } from "./action";
 import { LectureHookState, MultiQuestionState, TestReviewHookState } from "./state";
 import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Permission, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, Topic, TopicOverview, TopicStat, UserAnswerRecord, UserDetailResultRow, UserRow } from "./type";
 
@@ -120,6 +120,23 @@ type AdminLectureTableProps = {
 type AdminRowTableProps<RowModel> = {
     rows: RowModel[] | null,
     dispatch: Dispatch<RowHookAction<RowModel>>,
+}
+
+type AdminGenericTableProps<RowModel, Action> = {
+    rows: RowModel[] | null,
+    dispatch: Dispatch<Action>,
+}
+
+type AdminTopicTableProps = AdminGenericTableProps<Topic, TopicHookAction>;
+type AdminRoleTableProps = AdminGenericTableProps<Role, RoleHookAction>;
+type AdminTestTableProps = AdminGenericTableProps<TestRow, TestHookAction>;
+type AdminCategoryTableProps = AdminGenericTableProps<CategoryRow, CategoryHookAction>;
+
+
+type AdminPermissionTableProps = AdminGenericTableProps<Permission, PermissionHookAction>;
+type AdminUserTableProps = {
+    rows: UserRow[] | null,
+    dispatch: Dispatch<UserHookAction>,
 }
 
 type LectureActionButtonProps = {
@@ -296,10 +313,7 @@ interface UserAnswerSideTabProps {
 }
 
 export type {
-    ActivityLogProps,
-    AdminLectureTableProps,
-    AdminRowTableProps,
-    ButtonListProps,
+    ActivityLogProps, AdminCategoryTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, ButtonListProps,
     ConfirmSubmitDialogProps,
     DialogDeleteLectureBodyProps,
     DialogDeleteRowBodyProps,

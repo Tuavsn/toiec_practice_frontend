@@ -2,13 +2,13 @@ import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import { callGetPermission } from "../api/api";
 import { useToast } from "../context/ToastProvider";
+import GetAbortController from "../utils/helperFunction/GetAbortController";
 import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
-import { RowHookAction } from "../utils/types/action";
+import { PermissionHookAction } from "../utils/types/action";
 import { initialPermissionState } from "../utils/types/emptyValue";
-import { RowHookState } from "../utils/types/state";
-import { Permission } from "../utils/types/type";
+import { PermissionHookState } from "../utils/types/state";
 
-const reducer = (state: RowHookState<Permission>, action: RowHookAction<Permission>): RowHookState<Permission> => {
+const reducer = (state: PermissionHookState, action: PermissionHookAction): PermissionHookState => {
     switch (action.type) {
         case 'FETCH_ROWS_SUCCESS': {
             const [newCateogories, newPageIndex] = action.payload;
@@ -16,6 +16,8 @@ const reducer = (state: RowHookState<Permission>, action: RowHookAction<Permissi
         }
         case 'SET_PAGE':
             return { ...state, currentPageIndex: action.payload }
+        case 'SET_SEARCH':
+            return { ...state, searchText: action.payload }
         case 'REFRESH_DATA':
             return { ...state, isRefresh: !state.isRefresh }
         case 'TOGGLE_DIALOG':
@@ -36,35 +38,60 @@ const reducer = (state: RowHookState<Permission>, action: RowHookAction<Permissi
 
 export default function usePermission() {
 
+    // Sử dụng useReducer để quản lý state và dispatch cho quản lý chủ đề
     const [state, dispatch] = useReducer(reducer, initialPermissionState);
+    // Biến tham chiếu lưu tổng số lượng mục
     const totalItems = useRef(0);
+    // Hook toast dùng để hiển thị thông báo
     const { toast } = useToast();
-    const fetchPermissions = useCallback(async (pageNumber: number) => {
+    // Biến tham chiếu lưu AbortController
+    const abortControllerRef = useRef<AbortController | null>(null);
 
-        const response = await callGetPermission(pageNumber);
+    // Hàm lấy danh sách chủ đề
+    const fetchPermissions = useCallback(async (pageNumber: number, searchText: string) => {
+        // Lấy hoặc tạo AbortController mới
+        const controller = GetAbortController(abortControllerRef);
+
+        // Gọi API lấy dữ liệu chủ đề
+        const response = await callGetPermission(controller.signal, pageNumber, searchText);
+
+        // Kiểm tra nếu request bị hủy, kết thúc hàm
+        if (response === "abort") return;
+
+        // Hiển thị thông báo lỗi nếu không lấy được dữ liệu
         if (!response) {
             toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Không thể tải được danh sách chủ đề" });
             return;
         }
+
+        // Cập nhật state với dữ liệu nhận được
         dispatch({ type: "FETCH_ROWS_SUCCESS", payload: [response.result, pageNumber] });
+        // Cập nhật tổng số lượng mục
         totalItems.current = response.meta.totalItems;
 
-    }, [])
+    }, []); // Hàm chỉ được tạo lại khi không có dependency nào thay đổi
+
+    // Đặt tiêu đề trang
     useLayoutEffect(() => SetWebPageTitle("Quản lý chủ đề"), []);
+
     useEffect(() => {
+        // Gọi hàm lấy danh sách chủ đề
+        fetchPermissions(state.currentPageIndex, state.searchText);
 
-        fetchPermissions(state.currentPageIndex);
+        // Cleanup: Hủy request khi dependency thay đổi hoặc component unmount
+        return () => abortControllerRef.current?.abort();
+    }, [state.isRefresh, state.searchText]);
 
-    }, [state.isRefresh]);
-
+    // Hàm xử lý khi người dùng thay đổi trang
     const onPageChange = (e: PaginatorPageChangeEvent) => {
-        fetchPermissions(e.page)
-    }
+        fetchPermissions(e.page, state.searchText); // Lấy dữ liệu của trang mới
+    };
 
     return {
-        state,
-        dispatch,
-        totalItems,
-        onPageChange,
-    }
+        state, // Trạng thái hiện tại
+        dispatch, // Hàm dispatch để cập nhật state
+        totalItems, // Tổng số lượng mục
+        onPageChange, // Hàm xử lý thay đổi trang
+    };
 }
+

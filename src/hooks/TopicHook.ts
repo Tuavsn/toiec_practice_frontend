@@ -3,12 +3,11 @@ import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "rea
 import { callGetTopicRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
 import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
-import { RowHookAction } from "../utils/types/action";
+import { TopicHookAction } from "../utils/types/action";
 import { initialTopicState } from "../utils/types/emptyValue";
-import { RowHookState } from "../utils/types/state";
-import { Topic } from "../utils/types/type";
+import { TopicHookState } from "../utils/types/state";
 
-const reducer = (state: RowHookState<Topic>, action: RowHookAction<Topic>): RowHookState<Topic> => {
+const reducer = (state: TopicHookState, action: TopicHookAction): TopicHookState => {
     switch (action.type) {
         case 'FETCH_ROWS_SUCCESS': {
             const [newCateogories, newPageIndex] = action.payload;
@@ -16,6 +15,8 @@ const reducer = (state: RowHookState<Topic>, action: RowHookAction<Topic>): RowH
         }
         case 'SET_PAGE':
             return { ...state, currentPageIndex: action.payload }
+        case 'SET_SEARCH':
+            return { ...state, searchText: action.payload }
         case 'REFRESH_DATA':
             return { ...state, isRefresh: !state.isRefresh }
         case 'TOGGLE_DIALOG':
@@ -39,9 +40,16 @@ export default function useTopic() {
     const [state, dispatch] = useReducer(reducer, initialTopicState);
     const totalItems = useRef(0);
     const { toast } = useToast();
-    const fetchTopics = useCallback(async (pageNumber: number) => {
-
-        const response = await callGetTopicRow(pageNumber);
+    const abortControllerRef = useRef<AbortController | null>(null);
+    const fetchTopics = useCallback(async (pageNumber: number, searchText: string) => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+        // Create a new AbortController and save it in the ref
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+        const response = await callGetTopicRow(controller.signal, pageNumber, searchText);
+        if (response === "abort") return;
         if (!response) {
             toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Không thể tải được danh sách chủ đề" });
             return;
@@ -53,12 +61,12 @@ export default function useTopic() {
     useLayoutEffect(() => SetWebPageTitle("Quản lý chủ đề"), []);
     useEffect(() => {
 
-        fetchTopics(state.currentPageIndex);
-
-    }, [state.isRefresh]);
+        fetchTopics(state.currentPageIndex, state.searchText);
+        return () => abortControllerRef.current?.abort();
+    }, [state.isRefresh, state.searchText]);
 
     const onPageChange = (e: PaginatorPageChangeEvent) => {
-        fetchTopics(e.page)
+        fetchTopics(e.page, state.searchText)
     }
 
     return {

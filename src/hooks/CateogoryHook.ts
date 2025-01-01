@@ -2,18 +2,20 @@ import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import { callGetCategoryRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
+import GetAbortController from "../utils/helperFunction/GetAbortController";
 import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
-import { RowHookAction } from "../utils/types/action";
+import { CategoryHookAction } from "../utils/types/action";
 import { initialCategoryState } from "../utils/types/emptyValue";
-import { RowHookState } from "../utils/types/state";
-import { CategoryRow, } from "../utils/types/type";
+import { CategoryHookState } from "../utils/types/state";
 
-const reducer = (state: RowHookState<CategoryRow>, action: RowHookAction<CategoryRow>): RowHookState<CategoryRow> => {
+const reducer = (state: CategoryHookState, action: CategoryHookAction): CategoryHookState => {
     switch (action.type) {
         case 'FETCH_ROWS_SUCCESS': {
             const [newCateogories, newPageIndex] = action.payload;
             return { ...state, rows: newCateogories, currentPageIndex: newPageIndex }
         }
+        case 'SET_SEARCH':
+            return { ...state, searchText: action.payload }
         case 'SET_PAGE':
             return { ...state, currentPageIndex: action.payload }
         case 'REFRESH_DATA':
@@ -37,9 +39,11 @@ export default function useCategory() {
     const [state, dispatch] = useReducer(reducer, initialCategoryState);
     const totalItems = useRef(0);
     const { toast } = useToast();
-    const fetchCategorys = useCallback(async (pageNumber: number) => {
-
-        const response = await callGetCategoryRow(pageNumber);
+    const abortControllerRef = useRef<AbortController | null>(null);
+    const fetchCategorys = useCallback(async (pageNumber: number, searchText: string) => {
+        const controller = GetAbortController(abortControllerRef);
+        const response = await callGetCategoryRow(controller.signal, pageNumber, searchText);
+        if (response === "abort") return;
         if (!response) {
             toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Không thể tải được danh sách bộ đề" });
             return;
@@ -51,12 +55,12 @@ export default function useCategory() {
     useLayoutEffect(() => SetWebPageTitle("Quản lý bộ đề"), []);
     useEffect(() => {
 
-        fetchCategorys(state.currentPageIndex);
+        fetchCategorys(state.currentPageIndex, state.searchText);
 
-    }, [state.isRefresh]);
+    }, [state.isRefresh, state.searchText]);
 
     const onPageChange = (e: PaginatorPageChangeEvent) => {
-        fetchCategorys(e.page)
+        fetchCategorys(e.page, state.searchText)
     }
 
     return {
