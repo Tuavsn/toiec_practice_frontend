@@ -26,7 +26,7 @@ export default function useLectureCard() {
     useEffect(() => {
         const fetchLectures = async (pageIndex: number) => {
             dispatch({ type: "RESET_ROWS" });
-            const response = await callGetLectureCard(pageIndex);
+            const response = await callGetLectureCard(pageIndex, state.keyword);
             if (response === null) {
                 return;
             }
@@ -34,7 +34,7 @@ export default function useLectureCard() {
             dispatch({ type: "FETCH_SUCCESS", payload: response.result });
         }
         fetchLectures(state.currentPageIndex);
-    }, [state.currentPageIndex])
+    }, [state.currentPageIndex, state.keyword])
     return {
         state,
         dispatch,

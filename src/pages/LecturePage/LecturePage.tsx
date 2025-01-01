@@ -13,11 +13,6 @@ import { LectureRow, Topic } from "../../utils/types/type";
 export default function LecturePage() {
 
     const { state, dispatch, totalItemsRef } = useLectureCard();
-    let filterLectures = state.lectures;
-    if (state.keyword) {
-        const searchKeyword = state.keyword.toLowerCase();
-        filterLectures = state.lectures.filter((l: LectureRow) => l.name.toLowerCase().includes(searchKeyword));
-    }
     return (
         <div className="p-4" data-testid="lecture-page">
             <section className="mt-5 bg-gray-300 shadow-5 p-3 glassmorphism" data-testid="lecture-header">
@@ -37,7 +32,7 @@ export default function LecturePage() {
                 </div>
             </div>
             <div className="flex flex-column mt-4" data-testid="lecture-list">
-                {RenderLecture(filterLectures)}
+                {RenderLecture(state.lectures)}
             </div>
             <Paginator
                 first={state.currentPageIndex * 5}

@@ -174,9 +174,9 @@ export const callGetLectureRow = async (pageNumber: number): Promise<TableData<L
         return (error as Error)
     }
 }
-export const callGetLectureCard = async (pageNumber: number): Promise<TableData<LectureRow> | null> => {
+export const callGetLectureCard = async (pageNumber: number, keyword: string): Promise<TableData<LectureRow> | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<LectureRow>>>(`${import.meta.env.VITE_API_URL}/lectures?info=true&current=${pageNumber + 1}&pageSize=5&active=true`);
+        const response = await axios.get<ApiResponse<TableData<LectureRow>>>(`${import.meta.env.VITE_API_URL}/lectures?info=true&current=${pageNumber + 1}&pageSize=5&active=true&search=${keyword}`);
         return response.data.data;
     } catch (error) {
         return null
