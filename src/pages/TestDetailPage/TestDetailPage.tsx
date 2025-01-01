@@ -11,7 +11,7 @@ import { useTestDetail } from "../../hooks/TestDetailPaperHook";
 
 function TestDetailPage() {
 
-    const { testInfo } = useTestDetail();
+    const { testInfo, id } = useTestDetail();
 
 
 
@@ -21,7 +21,7 @@ function TestDetailPage() {
 
                 <TestInfoBox limitTime={testInfo.limitTime} totalUserAttempt={testInfo.totalUserAttempt} />
                 <ResultTable id={testInfo.id} resultsOverview={testInfo.resultsOverview} />
-                <PartChooser limitTime={testInfo.limitTime} />
+                <PartChooser limitTime={testInfo.limitTime} testId={id} />
                 <PartDetailSection topicsOverview={testInfo.topicsOverview} />
             </Card>
             <CommentSection />

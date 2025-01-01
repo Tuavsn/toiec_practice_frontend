@@ -1,13 +1,14 @@
 import { Button } from "primereact/button";
 import { Checkbox, CheckboxChangeEvent } from "primereact/checkbox";
 import { InputNumber } from "primereact/inputnumber";
-import { memo, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useCheckBox } from "../../../hooks/TestDetailPaperHook";
+import { memo } from "react";
+import { Navigate } from "react-router-dom";
+import { useCheckBox, useTimeLimitChooser } from "../../../hooks/TestDetailPaperHook";
 import { AmINotLoggedIn } from "../../../utils/helperFunction/AuthCheck";
+import { TestID } from "../../../utils/types/type";
 
 
-const PartChooser: React.FC<{ limitTime: number }> = memo(({ limitTime }) => {
+const PartChooser: React.FC<{ limitTime: number, testId: TestID }> = memo(({ limitTime, testId }) => {
     const { parts, onPartSelectChange } = useCheckBox();
     const isNotLogIn = AmINotLoggedIn();
 
@@ -15,7 +16,7 @@ const PartChooser: React.FC<{ limitTime: number }> = memo(({ limitTime }) => {
         <main className="" data-testid="part-chooser">
             <hr />
             <PartCheckBoxes parts={parts} onPartSelectChange={onPartSelectChange} />
-            <TimeLimitChooser isNotLogIn={isNotLogIn} limitTime={limitTime} parts={parts} />
+            <TimeLimitChooser isNotLogIn={isNotLogIn} limitTime={limitTime} parts={parts} testId={testId} />
 
             {isNotLogIn && (
                 <div className="flex text-red-500 justify-content-center align-items-center column-gap-3" data-testid="login-warning">
@@ -35,30 +36,26 @@ export default PartChooser;
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 interface TimeLimitChooserProps {
-
+    testId: TestID,
     parts: boolean[],
     isNotLogIn: boolean,
     limitTime: number
 }
 
-const TimeLimitChooser: React.FC<TimeLimitChooserProps> = (props) => {
-    const [timeLimit, setTimeLimit] = useState<number>(props.limitTime);
-    useEffect(() => setTimeLimit(props.limitTime), [props.limitTime]);
-
-
-
+const TimeLimitChooser: React.FC<TimeLimitChooserProps> = ({ limitTime, parts, testId, isNotLogIn }) => {
+    const { setTimeLimit, timeLimit, isButtonClicked, isDoneLoading, setIsButtonClicked } = useTimeLimitChooser(limitTime, testId);
+    const isButtonDisabled = isButtonClicked && !isDoneLoading
     return (
         <div className="flex p-5 justify-content-center gap-2">
             <InputNumber
                 min={10}/*                  */ buttonLayout="horizontal"
                 showButtons/*               */ data-testid="time-limit-input"
                 suffix=" phút"/*            */ inputStyle={{ width: "6rem" }}
-                max={props.limitTime}/*     */ value={props.parts[0] ? props.limitTime : timeLimit}
-                disabled={props.parts[0]}/* */ onValueChange={(e) => setTimeLimit(e.value ?? props.limitTime)}
+                max={limitTime}/*     */ value={parts[0] ? limitTime : timeLimit}
+                disabled={parts[0]}/* */ onValueChange={(e) => setTimeLimit(e.value ?? limitTime)}
             />
-            <Link to={`dotest/${timeLimit}/${DecodeCheckBoxesToUrl(props.parts)}`} data-testid="link-button">
-                <Button disabled={props.isNotLogIn} label="Làm bài" data-testid="start-button" />
-            </Link>
+            <Button disabled={isNotLogIn || isButtonDisabled} loading={isButtonDisabled} label="Làm bài" data-testid="start-button" onClick={() => setIsButtonClicked(true)} />
+            {isButtonClicked && isDoneLoading && <Navigate to={`dotest/${timeLimit}/${DecodeCheckBoxesToUrl(parts)}`}></Navigate>}
         </div>
     )
 }

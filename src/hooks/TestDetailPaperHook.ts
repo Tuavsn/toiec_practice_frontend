@@ -1,5 +1,5 @@
 import { CheckboxChangeEvent } from "primereact/checkbox";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { callGetTestDetailPageData } from "../api/api";
 import { addQuestionListByPartIndex } from "../database/indexdb";
@@ -47,13 +47,12 @@ export function useTestDetail() {
                 setTestInfo(newTestInfo);
             }
         });
-        loadTestPaper(id);
     }, [id]);
 
-    return { testInfo };
+    return { testInfo, id };
 }
 
-function loadTestPaper(testId: TestID) {
+function loadTestPaper(testId: TestID, setIsDoneLoading: Dispatch<SetStateAction<boolean>>) {
     const worker = new Worker(new URL('../workers/getTestPaper.worker.ts', import.meta.url), { type: 'module' });
     // Send a message to the worker
     worker.postMessage({ testId, parts: "0" });
@@ -66,11 +65,10 @@ function loadTestPaper(testId: TestID) {
 
             await addQuestionListByPartIndex(data);
             console.log("Test Paper successfully loaded.");
+            setIsDoneLoading(true);
         } else {
             console.error(message || 'An error occurred.');
         }
-
-
         worker.terminate(); // Clean up the worker
     };
 
@@ -78,4 +76,19 @@ function loadTestPaper(testId: TestID) {
         console.error('Worker error:', error);
         worker.terminate(); // Clean up the worker
     };
+}
+
+export const useTimeLimitChooser = (limitTime: number, testId: TestID) => {
+    const [timeLimit, setTimeLimit] = useState<number>(limitTime);
+    const [isButtonClicked, setIsButtonClicked] = useState<boolean>(false);
+    const [isDoneLoading, setIsDoneLoading] = useState<boolean>(false);
+    useEffect(() => setTimeLimit(limitTime), [limitTime]);
+    useEffect(() => loadTestPaper(testId, setIsDoneLoading), [testId])
+    return {
+        setIsButtonClicked,
+        isButtonClicked,
+        isDoneLoading,
+        setTimeLimit,
+        timeLimit,
+    }
 }
