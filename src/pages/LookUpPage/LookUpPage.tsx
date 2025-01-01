@@ -1,14 +1,14 @@
 import React, { memo } from 'react';
-import ToeicScorePage from '../components/User/ToeicScoreTable/ToeicScoreTable';
+import ToeicScorePage from '../../components/User/ToeicScoreTable/ToeicScoreTable';
 
 
 
 const LookUpPage = () => {
-    
+
     return (
         <React.Fragment>
             <ToeicScorePage />
-            
+
         </React.Fragment>
     )
 };

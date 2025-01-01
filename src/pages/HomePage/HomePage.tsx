@@ -10,7 +10,7 @@ import sheetico from "../../assets/sheet_ico.svg";
 import slideico from "../../assets/slide_ico.svg";
 import testico from "../../assets/test_ico.svg";
 import website from "../../assets/website_flatform.jpg";
-import { Banner } from "../../components/User";
+import Banner from "../../components/User/Banner/Banner";
 import SetWebPageTitle from "../../utils/helperFunction/setTitlePage";
 
 export default function HomePage() {
