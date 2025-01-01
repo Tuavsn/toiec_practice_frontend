@@ -1,3 +1,4 @@
+import { isCancel } from "axios";
 import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ProfileHookState } from "../utils/types/state";
 import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, Permission, PermissionID, PracticePaper, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
@@ -166,12 +167,15 @@ export const callPostDoctrine = async (lectureId: LectureID, request: string): P
         return false;
     }
 }
-export const callGetLectureRow = async (pageNumber: number): Promise<TableData<LectureRow> | Error> => {
+export const callGetLectureRow = async (signal: AbortSignal, pageNumber: number, searchText: string = ""): Promise<TableData<LectureRow> | "abort" | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<LectureRow>>>(`${import.meta.env.VITE_API_URL}/lectures?info=true&current=${pageNumber + 1}&pageSize=5`);
+        const response = await axios.get<ApiResponse<TableData<LectureRow>>>(`${import.meta.env.VITE_API_URL}/lectures?info=true&current=${pageNumber + 1}&pageSize=5&search=${searchText}`, { signal });
         return response.data.data;
     } catch (error) {
-        return (error as Error)
+        if (isCancel(error)) {
+            return "abort";
+        }
+        return null;
     }
 }
 export const callGetLectureCard = async (pageNumber: number, keyword: string): Promise<TableData<LectureRow> | null> => {
@@ -308,31 +312,40 @@ export const callPostImportResource = async (resourceFiles: File[]): Promise<str
 
 
 
-export const callGetUserRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<UserRow> | null> => {
+export const callGetUserRow = async (signal: AbortSignal, currentPageIndex: number, searchText: string, pageSize: number = 5): Promise<TableData<UserRow> | "abort" | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<UserRow>>>(`${import.meta.env.VITE_API_URL}/users?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        const response = await axios.get<ApiResponse<TableData<UserRow>>>(`${import.meta.env.VITE_API_URL}/users?current=${currentPageIndex + 1}&pageSize=${pageSize}&search=${searchText}`, { signal });
         return response.data.data;
     } catch (error) {
+        if (isCancel(error)) {
+            return "abort";
+        }
         return null;
     }
 
 }
-export const callGetRole = async (): Promise<TableData<Role> | null> => {
+export const callGetRole = async (signal: AbortSignal, searchText: string = ""): Promise<TableData<Role> | "abort" | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<Role>>>(`${import.meta.env.VITE_API_URL}/roles`);
+        const response = await axios.get<ApiResponse<TableData<Role>>>(`${import.meta.env.VITE_API_URL}/roles?search=${searchText}`, { signal });
         return response.data.data;
 
     } catch (error) {
+        if (isCancel(error)) {
+            return "abort";
+        }
         return null;
     }
 }
 
-export const callGetPermission = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<Permission> | null> => {
+export const callGetPermission = async (signal: AbortSignal, currentPageIndex: number, searchText: string = "", pageSize: number = 5): Promise<TableData<Permission> | "abort" | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<Permission>>>(`${import.meta.env.VITE_API_URL}/permissions?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        const response = await axios.get<ApiResponse<TableData<Permission>>>(`${import.meta.env.VITE_API_URL}/permissions?current=${currentPageIndex + 1}&pageSize=${pageSize}&search=${searchText}`, { signal });
         return response.data.data;
 
     } catch (error) {
+        if (isCancel(error)) {
+            return "abort";
+        }
         return null;
     }
 }
@@ -390,28 +403,37 @@ export const callPutUpdatePermission = async (permission: Permission,): Promise<
         return false;
     }
 }
-export const callGetCategoryRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<CategoryRow> | null> => {
+export const callGetCategoryRow = async (signal: AbortSignal, currentPageIndex: number, searchText: string = "", pageSize: number = 5): Promise<TableData<CategoryRow> | "abort" | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<CategoryRow>>>(`${import.meta.env.VITE_API_URL}/categories?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        const response = await axios.get<ApiResponse<TableData<CategoryRow>>>(`${import.meta.env.VITE_API_URL}/categories?current=${currentPageIndex + 1}&pageSize=${pageSize}&search=${searchText}`, { signal });
         return response.data.data;
     } catch (error) {
+        if (isCancel(error)) {
+            return "abort";
+        }
         return null;
     }
 }
-export const callGetTestRow = async (categoryID: CategoryID, currentPageIndex: number, pageSize: number = 5): Promise<TableData<TestRow> | null> => {
+export const callGetTestRow = async (signal: AbortSignal, categoryID: CategoryID, currentPageIndex: number, searchText: string, pageSize: number = 5): Promise<TableData<TestRow> | "abort" | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<TestRow>>>(`${import.meta.env.VITE_API_URL}/categories/${categoryID}/tests?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        const response = await axios.get<ApiResponse<TableData<TestRow>>>(`${import.meta.env.VITE_API_URL}/categories/${categoryID}/tests?current=${currentPageIndex + 1}&pageSize=${pageSize}&search=${searchText}`, { signal });
         return response.data.data;
     } catch (error) {
+        if (isCancel(error)) {
+            return "abort";
+        }
         return null;
     }
 }
 
-export const callGetTopicRow = async (currentPageIndex: number, pageSize: number = 5): Promise<TableData<Topic> | null> => {
+export const callGetTopicRow = async (signal: AbortSignal, currentPageIndex: number, searchText: string = "", pageSize: number = 5): Promise<TableData<Topic> | "abort" | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<Topic>>>(`${import.meta.env.VITE_API_URL}/topics/pagination?current=${currentPageIndex + 1}&pageSize=${pageSize}`);
+        const response = await axios.get<ApiResponse<TableData<Topic>>>(`${import.meta.env.VITE_API_URL}/topics/pagination?current=${currentPageIndex + 1}&pageSize=${pageSize}&search=${searchText}`, { signal: signal });
         return response.data.data;
     } catch (e) {
+        if (isCancel(e)) {
+            return "abort";
+        }
         return null;
     }
 }

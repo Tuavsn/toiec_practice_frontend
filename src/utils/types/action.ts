@@ -1,5 +1,5 @@
 import { ProfileHookState } from "./state";
-import { DialogLectureJobType, DialogRowJobType, LectureRow, MultipleChoiceQuestion, Permission, QuestionID, QuestionNumber, QuestionPage, Role, TestAnswerSheet, TestReviewAnswerSheet, Topic, UserComment, UserRow } from "./type";
+import { CategoryRow, DialogLectureJobType, DialogRowJobType, LectureRow, MultipleChoiceQuestion, Permission, QuestionID, QuestionNumber, QuestionPage, Role, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, UserComment, UserRow } from "./type";
 
 type RenderTestActiion =
     | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber; qID: QuestionID; answer: string; } }
@@ -22,12 +22,23 @@ type RowHookAction<RowModel> =
     | { type: 'OPEN_UPDATE_DIALOG'; payload: RowModel }
     | { type: 'OPEN_DELETE_DIALOG'; payload: RowModel }
     | { type: 'OPEN_CREATE_DIALOG'; payload: RowModel }
+
+type TopicHookAction = RowHookAction<Topic> |
+{ type: 'SET_SEARCH'; payload: string }
+type PermissionHookAction = RowHookAction<Permission> |
+{ type: 'SET_SEARCH'; payload: string }
+type TestHookAction = RowHookAction<TestRow> |
+{ type: 'SET_SEARCH'; payload: string }
+type CategoryHookAction = RowHookAction<CategoryRow> |
+{ type: 'SET_SEARCH'; payload: string }
+
 type RoleHookAction =
     | { type: 'FETCH_ROWS_SUCCESS'; payload: [Role[], number] }
     | { type: 'FETCH_PERMISSIONS_SUCCESS'; payload: Permission[] }
     | { type: 'SET_PAGE'; payload: number }
     | { type: 'REFRESH_DATA' }
     | { type: 'RESET_ROWS' }
+    | { type: 'SET_SEARCH'; payload: string }
     | { type: 'SET_CURRENT_ROW'; payload: Role }
     | { type: 'TOGGLE_DIALOG'; payload: DialogRowJobType }
     | { type: 'OPEN_UPDATE_DIALOG'; payload: Role }
@@ -42,6 +53,7 @@ type UserHookAction =
     | { type: 'FETCH_ROWS_SUCCESS'; payload: [UserRow[], number] }
     | { type: 'FETCH_ROLES_SUCCESS'; payload: Role[] }
     | { type: 'SET_PAGE'; payload: number }
+    | { type: 'SET_SEARCH'; payload: string }
     | { type: 'REFRESH_DATA' }
     | { type: 'RESET_ROWS' }
     | { type: 'SET_CURRENT_ROW'; payload: UserRow }
@@ -57,6 +69,7 @@ type LectureHookAction =
     | { type: 'FETCH_LECTURE_SUCCESS'; payload: FetchLecture }
     | { type: 'FETCH_TOPIC_SUCCESS'; payload: Topic[] }
     | { type: 'SET_PAGE'; payload: number }
+    | { type: 'SET_SEARCH'; payload: string }
     | { type: 'REFRESH_DATA' }
     | { type: 'SET_CURRENT_LECTURE'; payload: LectureRow }
     | { type: 'TOGGLE_DIALOG'; payload: DialogLectureJobType }
@@ -97,16 +110,12 @@ type LectureCardAction =
 
 
 export type {
-    FullTestScreenAction,
+    CategoryHookAction, FullTestScreenAction,
     LectureCardAction,
     LectureHookAction,
-    MultiQuestionAction,
-    ProfileHookAction,
-    RenderTestActiion,
-    RoleHookAction,
-    RowHookAction,
-    TestReviewHookAction,
-    UserCommentAction,
+    MultiQuestionAction, PermissionHookAction, ProfileHookAction,
+    RenderTestActiion, RoleHookAction,
+    RowHookAction, TestHookAction, TestReviewHookAction, TopicHookAction, UserCommentAction,
     UserHookAction
 };
 
