@@ -7,8 +7,9 @@ import { MappingPageWithQuestionNum } from '../utils/helperFunction/convertToHTM
 import prepareForTest from '../utils/helperFunction/prepareForTest';
 import SetWebPageTitle from '../utils/helperFunction/setTitlePage';
 import { FullTestScreenAction } from '../utils/types/action';
+import { emptyDoTestData } from '../utils/types/emptyValue';
 import { FullTestScreenState } from '../utils/types/state';
-import { milisecond, Question_PageIndex, QuestionAnswerRecord, QuestionNumber, ResultID, TestID, TestRecord, TestSheet, TestType } from '../utils/types/type';
+import { AnswerRecord, milisecond, Question_PageIndex, QuestionAnswerRecord, QuestionNumber, ResultID, TestID, TestRecord, TestSheet, TestType } from '../utils/types/type';
 import { useMultipleQuestionX } from './MultipleQuestionHook';
 
 //------------------ Custom Hook: useTestPage ------------------//
@@ -88,11 +89,14 @@ const useTestPage = () => {
 
 export default useTestPage;
 
-export type TestScreenState = "SUBMITING" | "DOING_TEST" | "OTHER"
+export type TestScreenState = {
+    state: "SUBMITING" | "DOING_TEST" | "NAVIGATE_TO_RESULT" | "OTHER"
+    resultID: ResultID
+}
 
 export function useTestScreen() {
     const { setIsOnTest } = useTestState();
-    let currentState: TestScreenState = "DOING_TEST";
+    let currentState: TestScreenState = { state: "DOING_TEST", resultID: "" };
 
     useLayoutEffect(() => {
 
@@ -111,6 +115,7 @@ export function useTestScreen() {
 
 // Initial state
 const initFullTestScreenState: FullTestScreenState = {
+    isLoading: true,
     tutorials: Array<boolean>(7).fill(false),
     currentPageIndex: 0,
 };
@@ -123,6 +128,8 @@ function fullTestScreenReducer(
     switch (action.type) {
         case "SET_TUTORIALS":
             return { ...state, tutorials: action.payload };
+        case "SET_LOADING":
+            return { ...state, isLoading: action.payload };
         case "SET_TUTORIALS_DONE":
             const index = action.payload - 1;
             return { ...state, tutorials: state.tutorials.map((item, i) => (i === index ? true : item)) };
@@ -137,24 +144,47 @@ function fullTestScreenReducer(
 
 
 
-export function useTestFrame() {
+export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAction<TestScreenState>>) {
 
     const [fullTestScreenState, fullTestScreenDispatch] = useReducer(fullTestScreenReducer, initFullTestScreenState);
 
-    const doTestDataRef = useRef<TestSheet>({ questionList: [], totalQuestions: 0, answeredCount: 0 });
-    const { parts = "0" } = useParams<{ id: TestID, parts: string }>();
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const doTestDataRef = useRef<TestSheet>(emptyDoTestData);
+    const { id = "", parts = "0", testType = "practice", time = "10" } = useParams<{ id: TestID, parts: string, testType: TestType, time: string }>();
+    const thisQuestion: QuestionAnswerRecord = doTestDataRef.current.questionList[fullTestScreenState.currentPageIndex];
     const changePage = (offset: number) => {
         const newPageIndex = fullTestScreenState.currentPageIndex + offset;
         if (newPageIndex >= 0 && newPageIndex < doTestDataRef.current.questionList.length) {
+            CalculateTimeSpent(thisQuestion, doTestDataRef.current.timeCountStart);
             fullTestScreenDispatch({ type: "SET_CURRENT_PAGE_INDEX", payload: newPageIndex });
         }
     }
+    const moveToPage = (pageIndex: number) => {
+        CalculateTimeSpent(thisQuestion, doTestDataRef.current.timeCountStart);
+        fullTestScreenDispatch({ type: "SET_CURRENT_PAGE_INDEX", payload: pageIndex });
+    }
+    const onEndTest = async () => {
+        setTestScreenState({ state: "SUBMITING", resultID: "" });
+        sendFinalResultToServer().then((resultId: ResultID) => setTestScreenState({ state: "NAVIGATE_TO_RESULT", resultID: resultId }));
+    }
+
+    // hàm gửi dữ liệu bài  làm kết thúc của người dùng về server
+    const sendFinalResultToServer = async () => {
+        // tính thời gian làm trang cuối cùng
+        CalculateTimeSpent(thisQuestion, doTestDataRef.current.timeCountStart);
+        const [totalSeconds, userAnswers] = ExtractUserAnswerAndTimeSpent(doTestDataRef.current.questionList);
+        const resultBodyObject: TestRecord = {
+            testId: id,
+            type: testType,
+            parts: parts === "0" ? "1234567" : parts,
+            totalSeconds: totalSeconds,// khép lại thời gian làm bài ( đơn vị giây)
+            userAnswer: userAnswers
+        }
+        return (await callPostTestRecord(resultBodyObject)).data.resultId;
+    }
     useEffect(() => {
         GetQuestionFromIndexDB(parts).then((QnAList) => {
-            doTestDataRef.current = QnAList;
-
-            setIsLoading(false);
+            doTestDataRef.current = { ...QnAList, secondsLeft: Number(time) * 60, testType: testType };
+            fullTestScreenDispatch({ type: "SET_LOADING", payload: false });
         });
 
     }, [])
@@ -162,9 +192,10 @@ export function useTestFrame() {
         fullTestScreenDispatch,
         fullTestScreenState,
         doTestDataRef,
+        thisQuestion,
         changePage,
-        isLoading,
-        thisQuestion: doTestDataRef.current.questionList[fullTestScreenState.currentPageIndex]
+        moveToPage,
+        onEndTest,
     }
 }
 
@@ -178,25 +209,57 @@ async function GetQuestionFromIndexDB(parts: string): Promise<TestSheet> {
         finalTotalQuestions += totalQuestions;
     }
 
-    return { questionList: questionFinalList, totalQuestions: finalTotalQuestions, answeredCount: 0 };
+    return {
+        totalQuestions: finalTotalQuestions,
+        questionList: questionFinalList,
+        timeCountStart: 0,
+        answeredCount: 0,
+        secondsLeft: 0,
+        testType: "fulltest",
+    };
 
 }
 function ConvertQuestionMetaToQuestionAnswerRecord({ answers, content, questionId, pageIndex, partNum, questionNum, resources, subQuestions, type }: Question_PageIndex): QuestionAnswerRecord {
 
     return {
-        questionId: questionId,
-        questionNum: questionNum,
-        type: type,
-        partNum: partNum,
-        subQuestions: subQuestions.length > 0 ? subQuestions.map((sq: Question_PageIndex) => ConvertQuestionMetaToQuestionAnswerRecord(sq)) : [],
-        content: content,
-        resources: resources,
-        answers: answers,
-        pageIndex: pageIndex,
+        subQuestions: subQuestions.length > 0 ? subQuestions.map(sq => ConvertQuestionMetaToQuestionAnswerRecord(sq)) : [],
+        type, partNum, content, answers, pageIndex,
+        questionId, questionNum, resources,
         userAnswer: "",
-        flag: false,
         timeSpent: 0,
+        flag: false,
     };
 }
 
+
+function CalculateTimeSpent(thisQuestion: QuestionAnswerRecord, timeCountStart: number) {
+    let timeSpent = Date.now() - timeCountStart;
+    thisQuestion.timeSpent = timeSpent;
+}
+
+function ExtractUserAnswerAndTimeSpent(questionList: QuestionAnswerRecord[]): [number, AnswerRecord[]] {
+    let totalMiliseconds: milisecond = 0;
+    const answerList: AnswerRecord[] = [];
+    questionList.forEach(({ userAnswer, timeSpent, questionId, subQuestions }) => {
+        totalMiliseconds += timeSpent;
+        timeSpent /= 1000;
+        if (subQuestions.length > 0) {
+            timeSpent /= subQuestions.length;
+            subQuestions.forEach((sq: QuestionAnswerRecord) => {
+                answerList.push({
+                    userAnswer: sq.userAnswer,
+                    timeSpent: timeSpent,
+                    questionId: sq.questionId,
+                });
+            });
+        } else {
+            answerList.push({
+                userAnswer,
+                timeSpent,
+                questionId,
+            });
+        }
+    });
+    return [totalMiliseconds / 1000, answerList];
+}
 

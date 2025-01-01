@@ -6,7 +6,7 @@ import { Divider } from "primereact/divider";
 import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, QuestionRow, Resource, SelectedQuestionDialogTestOverallPage, SingleUserAnswerOverview, TestAnswerSheet, TestReviewAnswerSheet, TestType, UserAnswerRecord } from "../types/type";
+import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, QuestionRow, Resource, SelectedQuestionDialogTestOverallPage, SingleUserAnswerOverview, TestAnswerSheet, TestReviewAnswerSheet, TestSheet, TestType, UserAnswerRecord } from "../types/type";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
     const questionPages = [];
@@ -322,7 +322,7 @@ export function ConvertSolutionToHTML(question: UserAnswerRecord): JSX.Element {
         start = subQuestion[0].questionNum;
         for (const subpq of subQuestion) {
             if (subpq.solution && subpq.solution.trim()) {
-                solutionElement.push(<li>{subpq.solution}</li>)
+                solutionElement.push(<li key={`sol${subpq.questionId}`}>{subpq.solution}</li>)
             }
         }
     }
@@ -617,7 +617,8 @@ export function ConvertThisTestQuestionToHTML(
 export function ConvertThisFullTestQuestionToHTML(
     question: QuestionAnswerRecord,
     changePage: (offset: number) => void,
-    setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>
+    setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>,
+    doTestDataRef: React.MutableRefObject<TestSheet>,
 ): [JSX.Element[], JSX.Element[]] {
     const { resources, subQuestions, content, questionId, questionNum } = question;
 
@@ -651,13 +652,13 @@ export function ConvertThisFullTestQuestionToHTML(
             resoursesElement.push(...buildResources(resources, questionId));
 
             // Thêm phần tử HTML của câu hỏi con
-            questionsElement.push(BuildFullTestQuestionHTML(subq, setReloadToolbar));
+            questionsElement.push(BuildFullTestQuestionHTML(subq, setReloadToolbar, doTestDataRef));
         });
     } else {
         // Nếu không có câu hỏi con, thêm câu hỏi chính
         questionsElement.push(<QuestionHeader key={`h5-${questionNum}`} question={question} setReloadToolbar={setReloadToolbar} />);
         // Thêm phần tử HTML của câu hỏi chính
-        questionsElement.push(BuildFullTestQuestionHTML(question, setReloadToolbar));
+        questionsElement.push(BuildFullTestQuestionHTML(question, setReloadToolbar, doTestDataRef));
     }
 
     // Trả về hai mảng JSX: tài nguyên và câu hỏi
@@ -667,12 +668,12 @@ export function ConvertThisFullTestQuestionToHTML(
 const QuestionHeader: React.FC<{ question: QuestionAnswerRecord, setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>> }> = ({ question, setReloadToolbar }) => {
     const { questionNum, content, flag, } = question;
     const [, setReload] = React.useState(false);
-   
+
     return (
         <div>
             <h5 key={`h5-${questionNum}`}>{questionNum}. {content}</h5>
             <Button className={`p-0 m-0 ml-1 ${flag ? "text-red-500" : "text-gray-500"}`} icon="pi pi-flag-fill" text
-                onClick={() => { question.flag = !flag; setReload(pre => pre = !pre);  }} />
+                onClick={() => { question.flag = !flag; setReload(pre => pre = !pre); setReloadToolbar(pre => pre = !pre) }} />
         </div>
     )
 }
@@ -680,7 +681,8 @@ const QuestionHeader: React.FC<{ question: QuestionAnswerRecord, setReloadToolba
 // Hàm xây dựng HTML cho câu hỏi trắc nghiệm
 function BuildFullTestQuestionHTML(
     question: QuestionAnswerRecord,             // Đối tượng câu hỏi trắc nghiệm
-    setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>
+    setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>,
+    doTestDataRef: React.MutableRefObject<TestSheet>
 ): JSX.Element {
 
     // Lấy số câu hỏi hiện tại
@@ -692,13 +694,13 @@ function BuildFullTestQuestionHTML(
     // Trả về phần tử HTML cho câu hỏi
     return (
         <div key={"answer" + currentQuestionNumber} className={"flex flex-column gap-3 my-3"}>
-            <RadioButtonGroup currentQuestionNumber={currentQuestionNumber} question={question} answerTexts={answerTexts} setReloadToolbar={setReloadToolbar} />
+            <RadioButtonGroup currentQuestionNumber={currentQuestionNumber} question={question} answerTexts={answerTexts} setReloadToolbar={setReloadToolbar} doTestDataRef={doTestDataRef} />
         </div>
     )
 }
 
-const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: QuestionAnswerRecord, answerTexts: string[], setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>> }> =
-    ({ currentQuestionNumber, answerTexts, question, setReloadToolbar }) => {
+const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: QuestionAnswerRecord, answerTexts: string[], setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>, doTestDataRef: React.MutableRefObject<TestSheet> }> =
+    ({ currentQuestionNumber, answerTexts, question, setReloadToolbar, doTestDataRef }) => {
         const [, setReload] = React.useState(false);
         return (
             <>
@@ -717,9 +719,10 @@ const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: Ques
                                 onChange={() => {                     // Khi người dùng chọn, cập nhật phiếu trả lời
 
                                     setReload(pre => pre = !pre);
-                                    // if (question.userAnswer === "") {
-                                    //     setReloadToolbar(pre => pre = !pre);
-                                    // }
+                                    if (question.userAnswer === "") {
+                                        doTestDataRef.current.answeredCount += 1;
+                                        setReloadToolbar(pre => pre = !pre);
+                                    }
                                     question.userAnswer = thisAnswer;
                                 }}
                             />

@@ -95,6 +95,7 @@ export type QuestionCore = {
 export type SingleUserAnswerOverview = QuestionCore & {
   answer: string;
   solution: string;
+  correct: boolean;
   timeSpent: number;
   transcript: string;
   explanation: string;
@@ -493,11 +494,15 @@ export interface QuestionListByPart {
   totalQuestions: number,
 }
 
-export interface TestSheet {
-  answeredCount: number,
+export type TestSheet = {
   questionList: QuestionAnswerRecord[],
+  timeCountStart: milisecond,
   totalQuestions: number,
+  answeredCount: number,
+  secondsLeft: number,
+  testType: TestType,
 }
+
 //---------------------------- tên gọi khác
 export type TestAnswerSheet = Map<QuestionNumber, AnswerData>;
 export type ResultID = string;

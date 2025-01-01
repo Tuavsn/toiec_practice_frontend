@@ -35,11 +35,13 @@ const RenderMainPage: React.FC = () => {
     const navigate = useNavigate();
 
     // Kiểm tra trạng thái màn hình thi để quyết định nội dung cần hiển thị
-    switch (testScreenState) {
+    switch (testScreenState.state) {
         case "DOING_TEST": // Khi đang làm bài thi
             return <TestFrame setTestScreenState={setTestScreenState} />;
         case "SUBMITING": // Khi đang gửi bài
             return <SubmitLoading />;
+        case "NAVIGATE_TO_RESULT": // Khi đang gửi bài
+            return <Navigate to={`/test/${testScreenState.resultID}/review`} />;
         default: // Nếu trạng thái không xác định, điều hướng lại
             if (window.history.length > 1) {
                 navigate(-1);
@@ -53,27 +55,31 @@ const RenderMainPage: React.FC = () => {
 //--------------------------------------------------------------------------
 // Component `TestFrame` dùng để quản lý và hiển thị giao diện làm bài thi chính
 const TestFrame: React.FC<{ setTestScreenState: React.Dispatch<React.SetStateAction<TestScreenState>> }> = React.memo(
-    () => {
+    ({setTestScreenState}) => {
         const {
             fullTestScreenDispatch,
             fullTestScreenState,
             doTestDataRef,
             thisQuestion,
-            isLoading,
             changePage,
-        } = useTestFrame();
-        if (isLoading) return <SubmitLoading />
+            moveToPage,
+            onEndTest,
+        } = useTestFrame(setTestScreenState);
+        if (fullTestScreenState.isLoading) return <SubmitLoading />
         // Nếu chưa hiển thị phần hướng dẫn của bài thi hiện tại, hiển thị hướng dẫn
         if (NotShowThisPartTutorialYet(thisQuestion, fullTestScreenState.tutorials)) {
             return <RennderTutorial partNeedToShow={thisQuestion.partNum} dispatchTutorialIsDone={fullTestScreenDispatch} />
         }
+        doTestDataRef.current.timeCountStart = Date.now();
         // Khi đã tải xong, hiển thị giao diện làm bài thi
         return (
-            <RenderTest fullTestScreenDispatch={fullTestScreenDispatch}
+            <RenderTest
                 currentPageIndex={fullTestScreenState.currentPageIndex}
+                changePageOffset={changePage}
                 doTestDataRef={doTestDataRef}
                 thisQuestion={thisQuestion}
-                changePage={changePage}
+                moveToPage={moveToPage}
+                onEndTest={onEndTest}
             />
         )
     }
@@ -82,25 +88,27 @@ const TestFrame: React.FC<{ setTestScreenState: React.Dispatch<React.SetStateAct
 //--------------------------------------------------------------------------
 // Component `RenderTest` hiển thị giao diện chính khi làm bài thi
 const RenderTest: React.FC<RenderTestProps> = React.memo(
-    ({ changePage, fullTestScreenDispatch, currentPageIndex, doTestDataRef, thisQuestion }) => {
-        const [reloadToolbar, setReloadToolbar] = useState<boolean>(false);// bị mất khi render tutorial
+    ({ changePageOffset, moveToPage, currentPageIndex, doTestDataRef, thisQuestion,onEndTest }) => {
+        const [, setReloadToolbar] = useState<boolean>(false);
         return (
 
             < section className="flex flex-column justify-content-center" >
                 {/* Thanh công cụ khi làm bài thi */}
                 < TestToolbar
-                    fullTestScreenDispatch={fullTestScreenDispatch}
                     currentPageIndex={currentPageIndex}
                     doTestDataRef={doTestDataRef}
                     thisQuestion={thisQuestion}
+                    moveToPage={moveToPage}
+                    onEndTest={onEndTest}
                 />
 
                 {/* Khu vực chính hiển thị câu hỏi và các nút điều hướng */}
                 < div id="test-area-container" className="max-w-screen p-0" >
                     <FullTestArea
+                        thisQuestion={thisQuestion}
+                        doTestDataRef={doTestDataRef}
                         setReloadToolbar={setReloadToolbar}
-                        changePage={changePage}
-                        question={thisQuestion}
+                        changePageOffset={changePageOffset}
                     />
                 </div >
             </section >

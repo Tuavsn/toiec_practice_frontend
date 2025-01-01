@@ -7,6 +7,7 @@ type RenderTestActiion =
 
 type FullTestScreenAction =
     | { type: "SET_TUTORIALS"; payload: boolean[] }
+    | { type: "SET_LOADING"; payload: boolean }
     | { type: "SET_CURRENT_PAGE_INDEX"; payload: number }
     | { type: "SET_CURRENT_PAGE_OFFSET"; payload: number }
     | { type: "SET_TUTORIALS_DONE"; payload: number }

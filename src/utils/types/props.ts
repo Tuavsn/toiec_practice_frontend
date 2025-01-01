@@ -37,11 +37,12 @@ interface RennderTutorialProps {
     dispatchTutorialIsDone: React.Dispatch<FullTestScreenAction>
 }
 interface RenderTestProps {
+    onEndTest: () => Promise<void>,
     currentPageIndex: number,
-    doTestDataRef: React.MutableRefObject<TestSheet>
-    fullTestScreenDispatch: React.Dispatch<FullTestScreenAction>
     thisQuestion: QuestionAnswerRecord,
-    changePage: (offset: number) => void
+    doTestDataRef: React.MutableRefObject<TestSheet>
+    changePageOffset: (offset: number) => void
+    moveToPage: (pageIndex: number) => void
 }
 
 type RichEditorProps = {
@@ -213,25 +214,29 @@ interface TestAreaProps {
     changePage: (offset: number) => void
 }
 interface FullTestAreaProps {
+    thisQuestion: QuestionAnswerRecord
     setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>
-    question: QuestionAnswerRecord,
-    changePage: (offset: number) => void
+    changePageOffset: (offset: number) => void,
+    doTestDataRef: React.MutableRefObject<TestSheet>
 }
 interface SkillInsightsProps {
     parts: TopicStat[]
 }
-
+interface TimerClockProps {
+    onEndTest: () => Promise<void>,
+    doTestDataRef: React.MutableRefObject<TestSheet>
+}
 interface QuestionTableProps {
     setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
     setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
     setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
 }
 interface TestToolBarProps {
-    thisQuestion: QuestionAnswerRecord
-
     currentPageIndex: number,
+    onEndTest: () => Promise<void>,
+    thisQuestion: QuestionAnswerRecord
+    moveToPage: (pageIndex: number) => void
     doTestDataRef: React.MutableRefObject<TestSheet>
-    fullTestScreenDispatch: React.Dispatch<FullTestScreenAction>
 
 }
 interface ResourceSectionProps {
@@ -240,8 +245,7 @@ interface ResourceSectionProps {
 
 }
 interface ToolBarFrameProps {
-    thisQuestion: QuestionAnswerRecord
-
+    onEndTest: () => Promise<void>,
     buttonElementList: JSX.Element
     doTestDataRef: React.MutableRefObject<TestSheet>
 }
@@ -333,7 +337,7 @@ export type {
     SkillInsightsProps,
     TestAreaProps,
     TestReviewAreaProps,
-    TestToolBarProps, ToolBarFrameProps, UpdateQuestionDialogProps,
+    TestToolBarProps, TimerClockProps, ToolBarFrameProps, UpdateQuestionDialogProps,
     UserAnswerSheetFullTestProps,
     UserAnswerSheetProps,
     UserAnswerSheetReviewProps, UserAnswerSideBarProps, UserAnswerSideTabProps

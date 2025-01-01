@@ -73,6 +73,7 @@ interface RenderTestState {
   userAnswerSheet: TestAnswerSheet
 }
 type FullTestScreenState = {
+  isLoading: boolean;
   tutorials: boolean[];
   currentPageIndex: number;
 };

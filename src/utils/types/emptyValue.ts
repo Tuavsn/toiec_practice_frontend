@@ -1,6 +1,6 @@
 import { TreeNode } from "primereact/treenode";
 import { LectureCardState, LectureHookState, MultiQuestionState, ProfileHookState, RoleHookState, RowHookState, TestReviewHookState, UserHookState } from "./state";
-import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, Topic, UserRow } from "./type";
+import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, TestSheet, Topic, UserRow } from "./type";
 export const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
@@ -184,6 +184,14 @@ export const emptyTestDetailPageData: TestDetailPageData = {
     resultsOverview: [],
     topicsOverview: []
 } as const
+
+export const emptyDoTestData: TestSheet = {
+    questionList: [],
+    totalQuestions: 0,
+    answeredCount: 0,
+    secondsLeft: 0,
+    timeCountStart: 0
+} as const;
 
 
 export const emptyOverallStat: OverallStat = {
