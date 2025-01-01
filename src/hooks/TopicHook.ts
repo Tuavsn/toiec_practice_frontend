@@ -2,9 +2,11 @@ import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import { callGetTopicRow } from "../api/api";
 import { useToast } from "../context/ToastProvider";
-import SetWebPageTitle from "../utils/setTitlePage";
-import { RowHookAction, RowHookState, Topic } from "../utils/types/type";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
+import { RowHookAction } from "../utils/types/action";
 import { initialTopicState } from "../utils/types/emptyValue";
+import { RowHookState } from "../utils/types/state";
+import { Topic } from "../utils/types/type";
 
 const reducer = (state: RowHookState<Topic>, action: RowHookAction<Topic>): RowHookState<Topic> => {
     switch (action.type) {

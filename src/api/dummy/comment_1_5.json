@@ -1,0 +1,45 @@
+{
+    "statusCode": 200,
+    "message": "Success",
+    "data": {
+        "meta": {
+            "current": 2,
+            "pageSize": 5,
+            "totalPages": 2,
+            "totalItems": 10
+        },
+        "result": [
+            {
+                "id": "64dbf3c17a6c9b1a1d9b0f3c",
+                "text": "Comment from the second page.",
+                "email": "user6@example.com",
+                "userId": "64dbf3c57a6c9b1a1d9b0f3d"
+            },
+            {
+                "id": "64dbf3cf7a6c9b1a1d9b0f3e",
+                "text": "More thoughts on this topic.",
+                "email": "user7@example.com",
+                "userId": "64dbf3d37a6c9b1a1d9b0f3f"
+            },
+            {
+                "id": "64dbf3da7a6c9b1a1d9b0f40",
+                "text": "Insightful comment.",
+                "email": "user8@example.com",
+                "userId": "64dbf3df7a6c9b1a1d9b0f41"
+            },
+            {
+                "id": "64dbf3e57a6c9b1a1d9b0f42",
+                "text": "Learning a lot from these.",
+                "email": "user9@example.com",
+                "userId": "64dbf3ea7a6c9b1a1d9b0f43"
+            },
+            {
+                "id": "64dbf3f07a6c9b1a1d9b0f44",
+                "text": "Thanks for sharing this!",
+                "email": "user10@example.com",
+                "userId": "64dbf3f57a6c9b1a1d9b0f45"
+            }
+        ]
+    },
+    "error": ""
+}

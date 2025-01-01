@@ -1,8 +1,12 @@
 // TestRouteComponent.tsx
 
-import { Routes, Route } from "react-router-dom";
+import React from "react";
+import { Route, Routes } from "react-router-dom";
 import { TestQuestionProvider } from "../context/TestQuestionProvider";
-import { DoTestPage, TestDetailPage, TestPage } from "../pages/Index";
+const DoTestPage = React.lazy(() => import("../pages/DoTestPage/DoTestPage"));
+const TestDetailPage = React.lazy(() => import("../pages/TestDetailPage/TestDetailPage"));
+const TestPage = React.lazy(() => import("../pages/TestPage/TestPage"));
+
 
 
 

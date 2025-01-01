@@ -1,10 +1,10 @@
 import { Paginator } from "primereact/paginator";
 import React from "react";
-import AdminRoleTable from "./AdminRoleTable";
-import { DialogRoleActionButton } from "./DialogRoleRelate";
+import { DialogRoleActionButton } from "../../components/Admin/AdminDialog/DialogRoleRelate";
+import AdminRoleTable from "../../components/Admin/Table/AdminRoleTable";
 
-import { CustomBreadCrumb } from "../../components/Common/Index";
 import { Card } from "primereact/card";
+import { CustomBreadCrumb } from "../../components/Common/Index";
 import useRole from "../../hooks/RoleHook";
 
 

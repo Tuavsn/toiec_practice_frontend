@@ -2,8 +2,8 @@ import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { callGetCategoryLabel, callGetTestCard } from "../api/api";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
 import { CategoryLabel, TestCard } from "../utils/types/type";
-import SetWebPageTitle from "../utils/setTitlePage";
 
 export function useTestCard() {
     const navigate = useNavigate();

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { callGetResult, callGetReviewTestPaper } from "../api/api";
-import { UserReviewSingleAnswerToHTML } from "../utils/convertToHTML";
+import { UserReviewSingleAnswerToHTML } from "../utils/helperFunction/convertToHTML";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
 import { emptyTestResultSummaryValue } from "../utils/types/emptyValue";
-import { ResultID, SelectedQuestionDialogTestOverallPage, TestResultSummary, UserAnswerResult } from "../utils/types/type";
-import SetWebPageTitle from "../utils/setTitlePage";
+import { ResultID, SelectedQuestionDialogTestOverallPage, SingleUserAnswerOverview, TestResultSummary } from "../utils/types/type";
 
 
 export function useTestOverallResult() {
@@ -28,8 +28,7 @@ export function useTestOverallResult() {
         fetchResult();
     }, [])
     const gotoReviewPage = () => navigate("detail")
-    const onClickToView = (userAnswerResult: UserAnswerResult) => {
-        console.dir(userAnswerResult);
+    const onClickToView = (userAnswerResult: SingleUserAnswerOverview) => {
 
         setCurrentSelectedQuestion(
             UserReviewSingleAnswerToHTML(userAnswerResult),

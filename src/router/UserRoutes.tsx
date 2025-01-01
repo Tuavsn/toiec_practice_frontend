@@ -1,21 +1,19 @@
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import OAuth2RedirectHandler from "../components/Auth/OAuth2RedirectHandler";
 import { LoadingSpinner } from "../components/Common/Index";
-import {
-    DoExercisePage,
-    ExercisePage,
-    HomePage,
-    LectureDetailsPage,
-    LecturePage,
-    LookUpPage,
-    NotFoundPage,
-    TestOverallResultPage,
-    TestPage,
-    TestReviewPage,
-    TestRoutes,
-    UserProfilePage
-} from "../pages/Index";
+const TestRoutes = React.lazy(() => import("../router/TestRoutes"));
+const HomePage = React.lazy(() => import("../pages/HomePage/HomePage"));
+const TestPage = React.lazy(() => import("../pages/TestPage/TestPage"));
+const LookUpPage = React.lazy(() => import("../pages/LookUpPage/LookUpPage"));
+const LecturePage = React.lazy(() => import("../pages/LecturePage/LecturePage"));
+const NotFoundPage = React.lazy(() => import("../pages/NotFoundPage/NotFoundPage"));
+const ExercisePage = React.lazy(() => import("../pages/ExercisePage/ExercisePage"));
+const DoExercisePage = React.lazy(() => import("../pages/DoTestPage/DoExercisePage"));
+const TestReviewPage = React.lazy(() => import("../pages/TestReviewPage/TestReviewPage"));
+const UserProfilePage = React.lazy(() => import("../pages/UserProfilePage/UserProfilePage"));
+const LectureDetailsPage = React.lazy(() => import("../pages/LectureDetailsPage/LectureDetailsPage"));
+const TestOverallResultPage = React.lazy(() => import("../pages/TestOverallResultPage/TestOverallResultPage"));
 
 
 

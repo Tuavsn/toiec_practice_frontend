@@ -12,7 +12,6 @@ const instance = axiosClient.create({
 });
 
 
-
 // const handleRefreshToken = async (): Promise<string | null> => {
 //     return await mutex.runExclusive(async () => {
 //         const res = await instance.get<IBackendRes<AccessTokenResponse>>('/api/v1/auth/refresh');
@@ -58,7 +57,7 @@ instance.interceptors.response.use(
         // }
         if (error.status === 401) {
             localStorage.clear();
-            window.location.href = '/home'
+            window.location.href = '/home?login=true'
             return;
         }
         throw error;

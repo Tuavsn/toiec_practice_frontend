@@ -1,12 +1,13 @@
 import { Button } from "primereact/button";
 import { Menubar } from "primereact/menubar";
+import { MenuItem } from "primereact/menuitem";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { MouseEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../../assets/Header-Logo.png";
 import { useTestState } from "../../../context/TestStateProvider";
+import { AmINotLoggedIn } from "../../../utils/helperFunction/AuthCheck";
 import LoginDialog from "../LoginDialog/LoginDialog";
-import { IsNotLogIn } from "../../../utils/AuthCheck";
 
 
 
@@ -24,7 +25,7 @@ export default function Header() {
     const HeaderStart = <a href="#"><img src={Logo} height={70} alt="Logo" onClick={() => handleCommand('/home')} /></a>;
 
     // Định nghĩa danh sách các mục trong header
-    const HeaderItems = [
+    const HeaderItems: MenuItem[] = [
         { label: 'Bài học', icon: 'pi pi-book', command: () => handleCommand('/lecture') },
         { label: 'Đề thi', icon: 'pi pi-folder', command: () => handleCommand('/test') },
         { label: 'Luyện tập', icon: 'pi pi-book', command: () => handleCommand('/exercise') },
@@ -44,7 +45,7 @@ export default function Header() {
     }
 
     // Định nghĩa nội dung hiển thị ở cuối header
-    const HeaderEnd = IsNotLogIn() ?
+    const HeaderEnd = AmINotLoggedIn() ?
         <LoginDialog /> :
         (
             <div className="card flex justify-content-center pr-3">

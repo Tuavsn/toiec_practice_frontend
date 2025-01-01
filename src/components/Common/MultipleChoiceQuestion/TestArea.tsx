@@ -1,9 +1,9 @@
 import { Button } from "primereact/button"
+import { Image } from "primereact/image"
 import { ScrollPanel } from "primereact/scrollpanel"
 import React, { useState } from "react"
-import { ConvertThisTestQuestionToHTML } from "../../../utils/convertToHTML"
+import { ConvertThisTestQuestionToHTML } from "../../../utils/helperFunction/convertToHTML"
 import { TestAreaProps } from "../../../utils/types/type"
-import { Image } from "primereact/image"
 
 export const TestArea: React.FC<TestAreaProps> = React.memo(
     ({ changePage, question, userAnswerSheet, testType,

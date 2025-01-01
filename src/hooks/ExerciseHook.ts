@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { callGetExercisePaper, callPostTestRecord } from "../api/api";
-import { MappingPageWithQuestionRowNum } from "../utils/convertToHTML";
-import prepareForTest from "../utils/prepareForTest";
-import SetWebPageTitle from "../utils/setTitlePage";
+import { MappingPageWithQuestionRowNum } from "../utils/helperFunction/convertToHTML";
+import prepareForTest from "../utils/helperFunction/prepareForTest";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
 import { AnswerRecord, ExerciseType, milisecond, QuestionNumber, QuestionRow, ResultID, TestRecord } from "../utils/types/type";
 import { useMultipleQuestion } from "./MultipleQuestionHook";
 
@@ -81,7 +81,6 @@ const useExercisePage = () => {
         const fetchData = async () => {
             try {
                 setIsOnTest(true);
-                localStorage.removeItem('userAnswerSheet');
                 const responseData = await callGetExercisePaper(exerciseType);
                 const newList = ReCountQuestionNumber(responseData.data.result);
                 const newPageMapper = MappingPageWithQuestionRowNum(newList);

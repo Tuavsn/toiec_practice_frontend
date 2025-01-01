@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useToast } from "../context/ToastProvider";
-import { EditTextParams, LectureID, SaveTextParams } from "../utils/types/type";
 import { callGetLectureDoctrine, callPostDoctrine } from "../api/api";
+import { useToast } from "../context/ToastProvider";
+import { EditTextParams, SaveTextParams } from "../utils/types/prams";
+import { LectureID, } from "../utils/types/type";
 
 export default function useRichTextBox(lectureID: LectureID) {
     const text = useRef<string>("<p>á</p>");

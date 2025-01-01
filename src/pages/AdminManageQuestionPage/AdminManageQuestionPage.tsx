@@ -1,10 +1,10 @@
 
 import { Card } from 'primereact/card';
 import React, { memo } from 'react';
+import { DialogForQuestionPage } from '../../components/Admin/AdminDialog/DialogQuestionRelate';
+import QuestionTreeTable from '../../components/Admin/Table/TableQuestion';
 import { CustomBreadCrumb } from '../../components/Common/Index';
 import { useQuestion } from '../../hooks/QuestionHook';
-import { DialogForQuestionPage } from './DialogQuestionRelate';
-import QuestionTreeTable from './TableQuestion';
 
 // Hàm xuất trang quản lý câu hỏi của Admin
 export function AdminManageQuestionPage() {

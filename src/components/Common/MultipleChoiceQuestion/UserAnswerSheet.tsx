@@ -1,6 +1,6 @@
 import { Sidebar } from "primereact/sidebar";
 import React from "react";
-import { UserAnswerSheetProps } from "../../../utils/types/type";
+import { UserAnswerSheetProps } from "../../../utils/types/props";
 
 export const UserAnswerSheet: React.FC<UserAnswerSheetProps> = React.memo(
     ({ visible, setVisible, ButtonListElement }) => {
@@ -13,5 +13,6 @@ export const UserAnswerSheet: React.FC<UserAnswerSheetProps> = React.memo(
         );
     },
 );
+
 
 

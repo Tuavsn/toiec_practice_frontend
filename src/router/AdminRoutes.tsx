@@ -1,5 +1,5 @@
-import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { Suspense, lazy } from 'react';
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { LoadingSpinner } from "../components/Common/Index";
 const AdminManageUploadQuestionPage = lazy(() => import("../pages/AdminManageUploadQuestionPage/AdminManageUploadQuestionPage"))
 const AdminManageAssignmentPage = lazy(() => import("../pages/AdminManageAssignmentPage/AdminManageAssignmentPage"))
@@ -11,8 +11,8 @@ const AdminManageAccountPage = lazy(() => import("../pages/AdminManageUserPage/A
 const AdminManageTestPage = lazy(() => import("../pages/AdminManageTestPage/AdminManageTest"))
 const AdminManageTopic = lazy(() => import("../pages/AdminManageTopic/AdminManageTopic"));
 const AdminManageRole = lazy(() => import("../pages/AdminManageRole/AdminManageRole"))
+const TempAdminPage = lazy(() => import("../pages/TempAdminPage/TempAdminPage"))
 const AdminLayout = lazy(() => import('../components/Layout/AdminLayout'));
-const TempAdminPage = lazy(() => import("../pages/TempAdminPage"))
 
 export default function AdminRoutes() {
   if (localStorage.getItem("role") != "ADMIN") {

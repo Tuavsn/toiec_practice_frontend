@@ -1,10 +1,10 @@
+import { Card } from "primereact/card";
 import { Paginator } from "primereact/paginator";
 import React from "react";
-import AdminCategoryTable from "./AdminCategoryTable";
-import { DialogCategoryActionButton } from "./DialogCategoryRelate";
-import useCategory from "../../hooks/CateogoryHook";
+import { DialogCategoryActionButton } from "../../components/Admin/AdminDialog/DialogCategoryRelate";
+import AdminCategoryTable from "../../components/Admin/Table/AdminCategoryTable";
 import { CustomBreadCrumb } from "../../components/Common/Index";
-import { Card } from "primereact/card";
+import useCategory from "../../hooks/CateogoryHook";
 
 
 function AdminManageCategoryPage() {

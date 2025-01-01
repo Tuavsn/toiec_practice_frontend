@@ -2,10 +2,10 @@
 import { Card } from 'primereact/card';
 import { Toolbar } from 'primereact/toolbar';
 import React, { memo } from 'react';
-import { useQuestion } from '../../hooks/QuestionHook';
+import { DialogForQuestionPage } from '../../components/Admin/AdminDialog/DialogAssignmentRelate';
+import QuestionTreeTable from '../../components/Admin/Table/TableAssignment';
 import { CustomBreadCrumb } from '../../components/Common/Index';
-import QuestionTreeTable from './TableAssignment';
-import { DialogForQuestionPage } from './DialogAssignmentRelate';
+import { useQuestion } from '../../hooks/QuestionHook';
 
 // Hàm xuất trang quản lý câu hỏi của Admin
 export function AdminManageAssignmentPage() {

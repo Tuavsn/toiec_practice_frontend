@@ -2,10 +2,10 @@
 import { Card } from "primereact/card";
 import { Paginator } from "primereact/paginator";
 import React from "react";
+import { DialogPermissionActionButton } from "../../components/Admin/AdminDialog/DialogPermissionRelate";
+import AdminPermissionTable from "../../components/Admin/Table/AdminPermissionTable";
 import { CustomBreadCrumb } from "../../components/Common/Index";
 import usePermission from "../../hooks/PermissionHook";
-import AdminPermissionTable from "./AdminPermissionTable";
-import { DialogPermissionActionButton } from "./DialogPermissionRelate";
 
 
 function AdminManagePermissionPage() {

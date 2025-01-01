@@ -1,12 +1,12 @@
 import { FileUpload, FileUploadHandlerEvent } from "primereact/fileupload";
+import { Toast } from "primereact/toast";
 import React, { memo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { callPostImportExcel, callPostImportResource } from "../../api/api";
 import { CustomBreadCrumb } from "../../components/Common/Index";
 import { useToast } from "../../context/ToastProvider";
-import SplitNameIDFromURL from "../../utils/splitNameIDFromURL";
+import SplitNameIDFromURL from "../../utils/helperFunction/splitNameIDFromURL";
 import { Name_ID, TestID } from "../../utils/types/type";
-import { Toast } from "primereact/toast";
 
 export function AdminManageUploadQuestionPage() {
     // Lấy test_id từ URL thông qua hook useParams, nếu không có thì mặc định là "no_idTest_found"

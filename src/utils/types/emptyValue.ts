@@ -1,6 +1,7 @@
 import { TreeNode } from "primereact/treenode";
-import { CategoryRow, LectureHookState, LectureRow, OverallStat, Permission, ProfileHookState, Role, RoleHookState, RowHookState, TestDetailPageData, TestResultSummary, TestReviewHookState, TestRow, Topic, UserHookState, UserRow } from "./type";
-const emptyDate = new Date(0, 0, 0);
+import { LectureCardState, LectureHookState, MultiQuestionState, ProfileHookState, RoleHookState, RowHookState, TestReviewHookState, UserHookState } from "./state";
+import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, TestSheet, Topic, UserRow } from "./type";
+export const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
     id: "",
@@ -39,7 +40,6 @@ export const emptyTopicRowValue: Topic = {
 export const emptyUserRow: UserRow = {
     id: "",
     email: "",
-    avatar: "",
     role: {
         createdAt: "",
         updatedAt: "",
@@ -64,13 +64,16 @@ export const emptyCategoryRow: CategoryRow = {
     active: true
 } as const;
 
-
+export const initialLectureCardState: LectureCardState = {
+    lectures: [],
+    keyword: "",
+    currentPageIndex: 0
+} as const
 export const emptyTestRow: TestRow = {
     id: '',
     name: '',
     active: true,
     idCategory: "",
-    totalTestAttempt: 0,
     totalQuestion: 200,
     totalScore: 990,
     limitTime: 90,
@@ -177,10 +180,18 @@ export const emptyTestDetailPageData: TestDetailPageData = {
     totalUserAttempt: 0,
     totalQuestion: 0,
     totalScore: 0,
-    limitTime: 0,
+    limitTime: 999,
     resultsOverview: [],
     topicsOverview: []
 } as const
+
+export const emptyDoTestData: TestSheet = {
+    questionList: [],
+    totalQuestions: 0,
+    answeredCount: 0,
+    secondsLeft: 0,
+    timeCountStart: 0
+} as const;
 
 
 export const emptyOverallStat: OverallStat = {
@@ -223,3 +234,15 @@ export const initialRoleState: RoleHookState = {
     currentSelectedRow: emptyRole,
     permissionList: [],
 }
+
+export const initialState: MultiQuestionState = {
+    questionList: [],
+    pageMapper: [],
+    currentPageIndex: 0,
+    userAnswerSheet: new Map<QuestionNumber, AnswerData>(),
+    flags: [],
+    isVisible: false,
+    isUserAnswerSheetVisible: false,
+    start: false,
+    isSumit: false,
+} as const;

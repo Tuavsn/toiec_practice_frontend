@@ -2,9 +2,11 @@ import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 import { callGetPermission } from "../api/api";
 import { useToast } from "../context/ToastProvider";
-import SetWebPageTitle from "../utils/setTitlePage";
-import { RowHookAction, RowHookState, Permission } from "../utils/types/type";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
+import { RowHookAction } from "../utils/types/action";
 import { initialPermissionState } from "../utils/types/emptyValue";
+import { RowHookState } from "../utils/types/state";
+import { Permission } from "../utils/types/type";
 
 const reducer = (state: RowHookState<Permission>, action: RowHookAction<Permission>): RowHookState<Permission> => {
     switch (action.type) {

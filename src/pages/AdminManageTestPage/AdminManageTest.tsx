@@ -1,10 +1,10 @@
+import { Card } from "primereact/card";
 import { Paginator } from "primereact/paginator";
 import React from "react";
-import AdminTestTable from "./AdminTestTable";
-import { DialogTestActionButton } from "./DialogTestRelate";
-import useTest from "../../hooks/TestTableHook";
+import { DialogTestActionButton } from "../../components/Admin/AdminDialog/DialogTestRelate";
+import AdminTestTable from "../../components/Admin/Table/AdminTestTable";
 import { CustomBreadCrumb } from "../../components/Common/Index";
-import { Card } from "primereact/card";
+import useTest from "../../hooks/TestTableHook";
 
 
 function AdminManageTestPage() {

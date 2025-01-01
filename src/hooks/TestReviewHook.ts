@@ -1,10 +1,12 @@
 import { useEffect, useReducer } from "react";
-import { MappingPageWithQuestionNumReview } from "../utils/convertToHTML";
-import { initialTestReviewState } from "../utils/types/emptyValue";
-import { ResultID, TestReviewAnswerSheet, TestReviewHookAction, TestReviewHookState } from "../utils/types/type";
-import { callGetReviewTestPaper } from "../api/api";
 import { useParams } from "react-router-dom";
-import SetWebPageTitle from "../utils/setTitlePage";
+import { callGetReviewTestPaper } from "../api/api";
+import { MappingPageWithQuestionNumReview } from "../utils/helperFunction/convertToHTML";
+import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
+import { TestReviewHookAction } from "../utils/types/action";
+import { initialTestReviewState } from "../utils/types/emptyValue";
+import { TestReviewHookState } from "../utils/types/state";
+import { ResultID, TestReviewAnswerSheet } from "../utils/types/type";
 
 
 // Reducer để quản lý trạng thái của TestReview
