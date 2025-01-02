@@ -2,14 +2,13 @@ import { Button } from "primereact/button"
 import { Dialog } from "primereact/dialog"
 import { Dropdown } from "primereact/dropdown"
 import { Fieldset } from "primereact/fieldset"
-import { InputNumber } from "primereact/inputnumber"
 import { InputText } from "primereact/inputtext"
 import { InputTextarea } from "primereact/inputtextarea"
-import { MultiSelect } from "primereact/multiselect"
 import React, { useState } from "react"
-import { callPostAssignmentQuestion, callPutQuestionUpdate } from "../../../api/api"
+import { callPostAssignmentQuestion, callPutAssignmentQuestionUpdate } from "../../../api/api"
 import { useToast } from "../../../context/ToastProvider"
-import { DialogQuestionActionProps, DialogQuestionPageProps, Topic, UpdateQuestionDialogProps, UpdateQuestionForm } from "../../../utils/types/type"
+import { DialogQuestionActionProps, DialogQuestionPageProps, UpdateQuestionDialogProps } from "../../../utils/types/props"
+import { UpdateAssignmentQuestionForm } from "../../../utils/types/type"
 
 // Định nghĩa component DialogForQuestionPage sử dụng React.FC với React.memo để tối ưu hiệu suất
 export const DialogForQuestionPage: React.FC<DialogQuestionPageProps> = React.memo(
@@ -58,18 +57,14 @@ export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = R
 
 
 const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo(
-    ({ currentSelectedQuestion, topicList, }) => {
+    ({ currentSelectedQuestion }) => {
         const { toast } = useToast();
-        const [formData, setFormData] = useState<UpdateQuestionForm>({
-            listTopicIds: (currentSelectedQuestion.current.data.topic as Topic[]).map((t) => t.id),
+        const [formData, setFormData] = useState<UpdateAssignmentQuestionForm>({
             correctAnswer: currentSelectedQuestion.current.data.correctChoice as string,
             explanation: currentSelectedQuestion.current.data.explanation as string,
-            difficulty: currentSelectedQuestion.current.data.difficulty as number,
             transcript: currentSelectedQuestion.current.data.transcript as string,
-            practiceId: currentSelectedQuestion.current.data.practiceID as string,
             answers: currentSelectedQuestion.current.data.choices as string[],
             content: currentSelectedQuestion.current.data.ask as string,
-            testId: currentSelectedQuestion.current.data.testID,
             id: currentSelectedQuestion.current.key as string,
         });
 
@@ -82,7 +77,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
             const upsertQuestion = async () => {
                 let success = false;
                 if (formData.id) {
-                    success = await callPutQuestionUpdate(formData,[]);
+                    success = await callPutAssignmentQuestionUpdate(formData, []);
                 } else {
                     success = await callPostAssignmentQuestion(formData);
                 }
@@ -113,19 +108,6 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                             rows={10}
                         />
                     </div>
-
-                    {/* Difficulty */}
-                    <div className="field flex-1">
-                        <p className='m-0 mb-2'>Difficulty</p>
-                        <InputNumber
-                            name="difficulty"
-                            value={formData.difficulty}
-                            onValueChange={(e) => setFormData({ ...formData, difficulty: e.value ?? 0 })}
-                            min={1}
-                            max={990}
-                        />
-                    </div>
-
 
 
                     {/* Transcript */}
@@ -208,19 +190,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                             />
                         </div>
                     </div>
-                    {/* Topics */}
-                    <div className="field flex-1">
-                        <p className='m-0 mb-2'>Topics</p>
-                        <MultiSelect
-                            style={{ width: '100%', maxWidth: "70vw" }}
-                            name="listTopicIds"
-                            value={formData.listTopicIds}
-                            options={topicList.current.map((topic) => ({ label: topic.name, value: topic.id }))}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, listTopicIds: e.value as string[] }))}
-                            placeholder="Select Topics"
-                            display='chip'
-                        />
-                    </div>
+                    
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end">

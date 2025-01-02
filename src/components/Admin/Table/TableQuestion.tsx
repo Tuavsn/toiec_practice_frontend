@@ -5,7 +5,7 @@ import { TreeNode } from "primereact/treenode";
 import { TreeTable } from "primereact/treetable";
 import React from "react";
 import { useQuestionTable } from "../../../hooks/QuestionHook";
-import { QuestionTableProps } from "../../../utils/types/type";
+import { QuestionTableProps } from "../../../utils/types/props";
 import { LoadingSpinner } from "../../Common/Index";
 import { RenderColumnsForTable } from "../AdminColumn/ColumnsQuestionTestTreeTable";
 import { DialogQuestionActionButton } from "../AdminDialog/DialogQuestionRelate";

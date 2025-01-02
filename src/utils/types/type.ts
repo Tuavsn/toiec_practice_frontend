@@ -444,6 +444,14 @@ export interface UpdateQuestionForm {
   answers: string[];
   correctAnswer: string;
 }
+export interface UpdateAssignmentQuestionForm {
+  content: string;
+  id: QuestionID;
+  transcript: string;
+  explanation: string;
+  answers: string[];
+  correctAnswer: string;
+}
 
 export interface UpdateLectureForm {
   id: LectureID;

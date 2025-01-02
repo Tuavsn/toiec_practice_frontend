@@ -3,11 +3,11 @@ import { Divider } from 'primereact/divider';
 import { Paginator } from 'primereact/paginator';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { callGetLectureDoctrine, callGetPracticePaper } from '../api/api';
-import { AmINotLoggedIn } from '../utils/helperFunction/AuthCheck';
-import { ConvertThisPracticeQuestionToHTML } from '../utils/helperFunction/convertToHTML';
-import SplitNameIDFromURL from '../utils/helperFunction/splitNameIDFromURL';
-import { LectureID, Name_ID, PracticeAnswerSheet, PracticeQuestion, QuestionID } from '../utils/types/type';
+import { callGetLectureDoctrine, callGetPracticePaper } from '../../api/api';
+import { AmINotLoggedIn } from '../../utils/helperFunction/AuthCheck';
+import { ConvertThisPracticeQuestionToHTML } from '../../utils/helperFunction/convertToHTML';
+import SplitNameIDFromURL from '../../utils/helperFunction/splitNameIDFromURL';
+import { LectureID, Name_ID, PracticeAnswerSheet, PracticeQuestion, QuestionID } from '../../utils/types/type';
 
 
 // Component chi tiết khóa học
@@ -55,21 +55,7 @@ const LectureDetailsPage: React.FC = () => {
 
 export default LectureDetailsPage;
 
-
-
-// function headerTemplate(title: string, iscompleted: boolean) {
-//     return (
-//         <React.Fragment>
-//             <h3 className='inline'>{title}</h3>
-//             <Tag value={iscompleted ? "hoàn thành" : "chưa xong"} className="absolute right-0 mr-3" severity={iscompleted ? "success" : 'warning'} />
-//         </React.Fragment>
-//     )
-// }
-
 function RelateCoursesTemplate() {
-    // useEffect(() => {
-    //     callGetLectureRow
-    // })
 
     return (
         <React.Fragment>

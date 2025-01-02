@@ -4,10 +4,12 @@ import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Paginator } from "primereact/paginator";
+import { ProgressBar } from "primereact/progressbar";
 import { Skeleton } from "primereact/skeleton";
 import React from "react";
 import { Link } from "react-router-dom";
 import useLectureCard from "../../hooks/LectureCardHook";
+import GetColorBasedOnValue from "../../utils/helperFunction/GetColorHueValue";
 import { LectureRow, Topic } from "../../utils/types/type";
 
 export default function LecturePage() {
@@ -63,23 +65,28 @@ function RenderLecture(lectures: LectureRow[]): React.ReactNode {
     return (
         <React.Fragment>
             {
-                lectures.map((lecture) => (
-                    <Card
-                        key={lecture.id}
-                        title={lecture.name}
-                        className="border-round m-2 shadow-2 min-h-full bg-yellow-50 hover:shadow-4"
-                        data-testid={`lecture-card-${lecture.id}`}
-                    >
-                        <div>
-                            <p className="pb-5" data-testid={`lecture-content-${lecture.id}`}>
-                                <strong>Nội dung:</strong> {getTopicName(lecture.topic)}
-                            </p>
-                            <Link to={`${lecture.name}___${lecture.id}`} data-testid={`lecture-link-${lecture.id}`}>
-                                <Button severity="help" label="Học ngay" data-testid={`lecture-button-${lecture.id}`} />
-                            </Link>
-                        </div>
-                    </Card>
-                ))
+                lectures.map((lecture) => {
+                    const value = Math.round(Math.random() * 100);
+                    const hueValue = GetColorBasedOnValue(value);
+                    return (
+                        <Card
+                            key={lecture.id}
+                            title={lecture.name}
+                            className="border-round m-2 shadow-2 min-h-full bg-yellow-50 hover:shadow-4"
+                            data-testid={`lecture-card-${lecture.id}`}
+                        >
+                            <div>
+                                <p className="pb-5" data-testid={`lecture-content-${lecture.id}`}>
+                                    <strong>Nội dung:</strong> {getTopicName(lecture.topic)}
+                                </p>
+                                <Link to={`${lecture.name}___${lecture.id}`} data-testid={`lecture-link-${lecture.id}`}>
+                                    <Button severity="help" label="Học ngay" data-testid={`lecture-button-${lecture.id}`} />
+                                </Link>
+                                <ProgressBar className="mt-3" color={hueValue} value={value}></ProgressBar>
+                            </div>
+                        </Card>
+                    )
+                })
             }
         </React.Fragment>
     )

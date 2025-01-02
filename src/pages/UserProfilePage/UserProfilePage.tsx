@@ -13,14 +13,15 @@ import { Steps } from 'primereact/steps';
 import React, { useRef, useState } from "react";
 import { Doughnut, Pie } from "react-chartjs-2";
 import { Navigate } from 'react-router-dom';
-import { callPutUserTarget } from '../api/api';
-import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from "../components/Common/Column/CommonColumn";
-import useProfile from "../hooks/ProfileHook";
-import { AmINotLoggedIn } from '../utils/helperFunction/AuthCheck';
-import convertSecondsToString from "../utils/helperFunction/convertSecondsToString";
-import formatDate from "../utils/helperFunction/formatDateToString";
-import { ActivityLogProps, SkillInsightsProps } from '../utils/types/props';
-import { SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from "../utils/types/type";
+import { callPutUserTarget } from '../../api/api';
+import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from '../../components/Common/Column/CommonColumn';
+import useProfile from '../../hooks/ProfileHook';
+import { AmINotLoggedIn } from '../../utils/helperFunction/AuthCheck';
+import convertSecondsToString from '../../utils/helperFunction/convertSecondsToString';
+import formatDate from '../../utils/helperFunction/formatDateToString';
+import GetColorBasedOnValue from '../../utils/helperFunction/GetColorHueValue';
+import { ActivityLogProps, SkillInsightsProps } from '../../utils/types/props';
+import { SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from '../../utils/types/type';
 // Đăng ký các phần tử Chart.js cần thiết
 ChartJS.register(...registerables);
 // Đăng ký plugin DataLabels
@@ -357,20 +358,12 @@ function ConvertTopicStatToSuggestion(topicStats: TopicStat[]): SuggestionsForUs
 
 function correctPercentTemplate(rowData: TopicStat) {
     const correctPercent = Math.round(rowData.totalCorrect / ((rowData.totalCorrect + rowData.totalIncorrect) || 1) * 10000) / 100;
-    const colorString = getColorBasedOnValue(correctPercent);
+    const colorString = GetColorBasedOnValue(correctPercent);
     return (
         <p className="text-center" style={{ backgroundColor: colorString }}>{correctPercent}%</p>
     )
 }
 
-function getColorBasedOnValue(value: number): string {
-    if (value < 0) value = 0;
-    if (value > 100) value = 100;
-
-    // Map value (0–100) to hue (0–120), where 0 is red and 120 is green
-    const hue = (value / 100) * 120;
-    return `hsl(${hue}, 100%, 50%)`; // Saturation 100%, Lightness 50%
-}
 
 function getCurrentTitle(score: number): string {
     if (score >= 905 && score <= 990) {

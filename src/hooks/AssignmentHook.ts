@@ -2,10 +2,9 @@ import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { TreeNode } from "primereact/treenode";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { callGetAssignmentRows } from "../api/api";
+import { callGetPracticePaper } from "../api/api";
 import SetWebPageTitle from "../utils/helperFunction/setTitlePage";
-import { LectureID } from "../utils/types/type";
-import { ConvertQuestionRowListToTreeNodeList } from "./QuestionHook";
+import { LectureID, PracticeQuestion, QuestionNumber } from "../utils/types/type";
 import useTopicRef from "./TopicRefHook";
 
 export function useAssignmentTable() {
@@ -24,13 +23,13 @@ export function useAssignmentTable() {
     // === Hàm lấy dữ liệu câu hỏi theo trang ===
     const fetchQuestionByPage = useCallback(async (pageIndex: number) => {
         // Gọi API để lấy dữ liệu câu hỏi
-        const responseData = await callGetAssignmentRows(lecture_id);
+        const responseData = await callGetPracticePaper(lecture_id);//callGetAssignmentRows(lecture_id);
 
         // Lưu trữ tổng số mục
-        totalItems.current = responseData.length;
+        totalItems.current = responseData.data.totalQuestions;
 
         // Chuyển đổi dữ liệu thành dạng TreeNode và cập nhật state
-        setNodes(ConvertQuestionRowListToTreeNodeList(responseData));
+        setNodes(ConvertAssignmentRowListToTreeNodeList(responseData.data.practiceQuestions));
 
         // Cập nhật lại trang hiện tại
         setCurrentPageIndex(pageIndex);
@@ -60,4 +59,38 @@ export function useAssignmentTable() {
         title, // Tiêu đề của Dialog
         nodes, // Dữ liệu câu hỏi dạng TreeNode
     };
+}
+
+function ConvertAssignmentRowListToTreeNodeList(QuestionRowList: PracticeQuestion[]): TreeNode[] {
+
+    // Duyệt qua từng QuestionRow trong danh sách và chuyển đổi thành TreeNode
+    const questionNodeList = QuestionRowList.map((questionRow: PracticeQuestion, index: number): TreeNode => {
+        return {
+            // Chuyển đổi QuestionRow thành TreeNode, bao gồm cả id
+            ...ConvertAssignmentRowToNode(questionRow, index + 1),
+
+        }
+    });
+    return questionNodeList;
+}
+
+function ConvertAssignmentRowToNode(questionRow: PracticeQuestion, qNum: QuestionNumber): TreeNode {
+    return {
+        key: questionRow.id,
+        data: {
+            //----
+            questionNum: qNum,
+            type: questionRow.type,
+            //------
+            ask: questionRow.content,
+            choices: questionRow.answers,
+            correctChoice: questionRow.correctAnswer,
+            transcript: questionRow.transcript,
+            explanation: questionRow.explanation,
+            //------
+            //------
+            resources: questionRow.resources,
+            //------
+        }
+    }
 }
