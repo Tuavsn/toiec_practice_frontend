@@ -1,5 +1,5 @@
 import { ProfileHookState } from "./state";
-import { CategoryRow, DialogLectureJobType, DialogRowJobType, LectureRow, MultipleChoiceQuestion, Permission, QuestionID, QuestionNumber, QuestionPage, Role, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, UserComment, UserRow } from "./type";
+import { CategoryRow, DialogLectureJobType, DialogRowJobType, LectureCard, LectureRow, MultipleChoiceQuestion, Permission, QuestionID, QuestionNumber, QuestionPage, Role, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, UserComment, UserRow } from "./type";
 
 type RenderTestActiion =
     | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber; qID: QuestionID; answer: string; } }
@@ -103,7 +103,7 @@ type ProfileHookAction =
     | { type: 'SET_PAGE', payload: number }
 
 type LectureCardAction =
-    | { type: 'FETCH_SUCCESS'; payload: LectureRow[] }
+    | { type: 'FETCH_SUCCESS'; payload: LectureCard[] }
     | { type: 'SET_PAGE'; payload: number }
     | { type: 'SET_KEYWORD'; payload: string }
     | { type: 'RESET_ROWS' }

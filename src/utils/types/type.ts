@@ -198,6 +198,12 @@ export interface LectureCard {
   id: string,
   name: string,
   topic: string[],
+  percent: number,
+}
+
+export interface LectureProfile {
+  notCompleted: LectureCard[],
+  completed: LectureCard[],
 }
 
 export interface TestCard {
@@ -205,6 +211,8 @@ export interface TestCard {
   format: string;
   year: number;
   name: string;
+  completed: boolean,
+  totalUser: number,
 }
 
 export interface CategoryRow extends DataTableValue {
@@ -444,6 +452,14 @@ export interface UpdateQuestionForm {
   answers: string[];
   correctAnswer: string;
 }
+export interface UpdateAssignmentQuestionForm {
+  content: string;
+  id: QuestionID;
+  transcript: string;
+  explanation: string;
+  answers: string[];
+  correctAnswer: string;
+}
 
 export interface UpdateLectureForm {
   id: LectureID;
@@ -451,6 +467,10 @@ export interface UpdateLectureForm {
   topicIds: TopicID[];
 }
 
+export interface RelateLectureTitle {
+  id: LectureID,
+  name: string,
+}
 
 export interface DoTestFunction {
   updateTimeSpentOnEachQuestionInCurrentPage: () => void;

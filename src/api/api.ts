@@ -1,7 +1,7 @@
 import { isCancel } from "axios";
 import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ProfileHookState } from "../utils/types/state";
-import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureID, LectureRow, Permission, PermissionID, PracticePaper, QuestionID, QuestionRow, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
+import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureProfile, LectureRow, Permission, PermissionID, PracticePaper, QuestionID, QuestionRow, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -60,11 +60,31 @@ export const callPutQuestionUpdate = async (formData: UpdateQuestionForm, resour
         );
 
         // 2. Update question with the resources
-        await callPostQuestionResource(formData.id, resourceUrls, resources)
+        await callPutQuestionResource(formData.id, resourceUrls, resources)
 
 
         // 3. Update the question form data
-        await axios.post(`${import.meta.env.VITE_API_URL}/questions`, formData);
+        await axios.put(`${import.meta.env.VITE_API_URL}/questions`, formData);
+
+        return true;
+    } catch (error) {
+        console.error("Error updating question:", error);
+        return false;
+    }
+};
+export const callPutAssignmentQuestionUpdate = async (formData: UpdateAssignmentQuestionForm, resources: ResourceIndex[]): Promise<boolean> => {
+    try {
+        // 1. Upload resources and get their URLs
+        const resourceUrls = await Promise.all(
+            resources.map((r) => callPostConvertResourceToLink(r.file))
+        );
+
+        // 2. Update question with the resources
+        await callPutQuestionResource(formData.id, resourceUrls, resources)
+
+
+        // 3. Update the question form data
+        await axios.put(`${import.meta.env.VITE_API_URL}/questions`, formData);
 
         return true;
     } catch (error) {
@@ -73,7 +93,7 @@ export const callPutQuestionUpdate = async (formData: UpdateQuestionForm, resour
     }
 };
 
-const callPostQuestionResource = async (questionID: QuestionID, url: string[], resources: ResourceIndex[]): Promise<boolean> => {
+const callPutQuestionResource = async (questionID: QuestionID, url: string[], resources: ResourceIndex[]): Promise<boolean> => {
     try {
         const res = resources.map((r, i) => {
             return {
@@ -81,7 +101,7 @@ const callPostQuestionResource = async (questionID: QuestionID, url: string[], r
                 content: r.file ? url[i] : r.content
             } as Resource
         })
-        await axios.post(`${import.meta.env.VITE_API_URL}/questions/${questionID}/update/resource`,
+        await axios.put(`${import.meta.env.VITE_API_URL}/questions/${questionID}/update/resource`,
             { res }
         );
         return true;
@@ -91,15 +111,6 @@ const callPostQuestionResource = async (questionID: QuestionID, url: string[], r
     }
 }
 
-export const callPutAssignmentQuestionUpdate = async (formData: any): Promise<boolean> => {
-    try {
-        await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/lectures/${formData.id}/savePractice`, formData);
-        return true;
-    } catch (error) {
-        return false;
-
-    }
-}
 
 export const callPostAssignmentQuestion = async (formData: any): Promise<boolean> => {
     try {
@@ -146,8 +157,7 @@ export const callGetTestCard = async (format: string, year: number, pageIndex: n
 }
 
 export const callGetPracticePaper = async (lectureId: LectureID): Promise<ApiResponse<PracticePaper>> => {
-
-    const response = await fetch(`https://raw.githubusercontent.com/Tuavsn/toiec_practice_frontend/refs/heads/role-update/src/api/dummy/${lectureId}.json`);
+    const response = await fetch(`https://raw.githubusercontent.com/Tuavsn/toiec_practice_frontend/refs/heads/main/src/api/dummy/${lectureId}.json`);
     const apiResponse: ApiResponse<PracticePaper> = await response.json();
     return apiResponse
 }
@@ -178,12 +188,37 @@ export const callGetLectureRow = async (signal: AbortSignal, pageNumber: number,
         return null;
     }
 }
-export const callGetLectureCard = async (pageNumber: number, keyword: string): Promise<TableData<LectureRow> | null> => {
+export const callGetLectureCard = async (pageNumber: number, keyword: string, pageSize: number = 5): Promise<TableData<LectureCard> | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<LectureRow>>>(`${import.meta.env.VITE_API_URL}/lectures?info=true&current=${pageNumber + 1}&pageSize=5&active=true&search=${keyword}`);
+        const response = await axios.get<ApiResponse<TableData<LectureCard>>>(`${import.meta.env.VITE_API_URL}/lectures/client?info=true&current=${pageNumber + 1}&pageSize=${pageSize}&active=true&search=${keyword}`);
         return response.data.data;
     } catch (error) {
         return null
+    }
+}
+
+export const callGetRelateLectures = async (lectureId: LectureID): Promise<RelateLectureTitle[] | null> => {
+    try {
+        const response = await axios.get<ApiResponse<RelateLectureTitle[]>>(`${import.meta.env.VITE_API_URL}/lectures/${lectureId}/random`);
+        return response.data.data;
+    } catch (error) {
+        return null
+    }
+}
+export const callGetLectureCardProfile = async (): Promise<LectureProfile | null> => {
+    try {
+        const response = await axios.get<ApiResponse<LectureProfile>>(`${import.meta.env.VITE_API_URL}/users/lectures`);
+        return response.data.data;
+    } catch (error) {
+        return null
+    }
+}
+
+export const callPutPercentLecture = async (lectureId: LectureID, percent: number): Promise<void> => {
+    try {
+        await axios.put<ApiResponse<any>>(`${import.meta.env.VITE_API_URL}/lectures/${lectureId}/percent`, { percent });
+    } catch (error) {
+        return
     }
 }
 export const callPutLectureDetailUpdate = async (lectureID: LectureID, name: string, topicIds: TopicID[]): Promise<boolean> => {
@@ -251,9 +286,9 @@ export const callPutPermissionRowActive = async (permission: Permission): Promis
     }
 }
 
-export const callGetAssignmentRows = async (lectureID: LectureID): Promise<QuestionRow[]> => {
-    const response = await axios.get<ApiResponse<Lecture>>(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}?PRACTICE=true`)
-    return response.data.data.practiceQuestions || [];
+export const callGetAssignmentRows = async (lectureID: LectureID): Promise<TableData<QuestionRow>> => {
+    const response = await axios.get<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}?PRACTICE=true`)
+    return response.data.data;
 }
 
 export const callPostImportExcel = async (testID: TestID, excelFiles: File[]): Promise<string> => {
@@ -383,7 +418,7 @@ export const callPostPermission = async (permission: Permission): Promise<boolea
 }
 export const callPutUpdateRole = async (role: Role, permissionIDList: PermissionID[]): Promise<boolean> => {
     try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/roles/${role.id}`, {
+        await axios.put(`${import.meta.env.VITE_API_URL}/roles/${role.id}`, {
             name: role.name,
             description: role.description,
             permissionIds: permissionIDList,
@@ -447,9 +482,9 @@ export const callGetComments = async (currentPageIndex: number, pageSize: number
     }
 }
 
-export const callPostUpdateCategoryRow = async (category: CategoryRow): Promise<boolean> => {
+export const callPutUpdateCategoryRow = async (category: CategoryRow): Promise<boolean> => {
     try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/categories/${category.id}`, {
+        await axios.put(`${import.meta.env.VITE_API_URL}/categories/${category.id}`, {
             format: category.format,
             year: category.year
         });
@@ -526,9 +561,9 @@ export const callPostTest = async (testRow: TestRow): Promise<boolean> => {
         return false
     }
 }
-export const callPostUpdateTest = async (testRow: TestRow): Promise<boolean> => {
+export const callPutUpdateTest = async (testRow: TestRow): Promise<boolean> => {
     try {
-        await axios.post<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests/${testRow.id}`, {
+        await axios.put<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests/${testRow.id}`, {
             name: testRow.name,
             categoryId: testRow.idCategory,
             totalUserAttempt: testRow.totalUserAttempt,
@@ -583,6 +618,7 @@ export const callGetProfile = async (): Promise<ProfileHookState | null> => {
         if (!response.data.data.overallStat) {
             response.data.data.overallStat = emptyOverallStat;
         }
+
         return response.data.data;
     } catch (error) {
         return null;

@@ -8,7 +8,7 @@ import { TreeNode } from "primereact/treenode";
 import React from "react";
 import { emptyQuestionTreeNode } from "../../../utils/types/emptyValue";
 import { QuestionActionButtonProps } from "../../../utils/types/props";
-import { ColorString, QuestionContext, Resource, Topic } from "../../../utils/types/type";
+import { QuestionContext, Resource, Topic } from "../../../utils/types/type";
 import { timeStampBodyTemplate } from "../../Common/Column/CommonColumn";
 
 
@@ -49,8 +49,9 @@ export function QuestionTimeStampBodyTemplate(questionNode: TreeNode): JSX.Eleme
 }
 
 // Hiển thị loại câu hỏi, với các màu sắc khác nhau dựa trên loại
+type BadgeColor = "danger" | "success" | "info" | "warning";
 export function ExpandTypeBodyTemplate(questionNode: TreeNode): JSX.Element {
-    const colors: ColorString[] = ["danger", "success", "info", "warning"];
+    const colors: BadgeColor[] = ["danger", "success", "info", "warning"];
     const partNum = Number(questionNode.data.type);
     if (!isNaN(partNum)) {
         // Hiển thị badge với màu sắc tương ứng loại
@@ -93,7 +94,7 @@ export const ActionBodyTemplate: React.FC<QuestionActionButtonProps> = React.mem
     ({ questionNode, setTitle, setIsVisible, currentSelectedQuestion }) => {
 
 
-        return (questionNode.key as string).startsWith("part") ? <></> : ( // Kiểm tra key của questionNode có bắt đầu bằng "part" không. Nếu có, trả về rỗng.
+        return  ( 
             <div className='flex justify-content-around'>
 
                 {/* Nút chỉnh sửa */}

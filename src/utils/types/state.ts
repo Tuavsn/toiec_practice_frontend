@@ -1,4 +1,4 @@
-import { CategoryRow, DialogLectureJobType, DialogRowJobType, LectureRow, MultipleChoiceQuestion, OverallStat, Permission, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow } from "./type";
+import { CategoryRow, DialogLectureJobType, DialogRowJobType, LectureCard, LectureRow, MultipleChoiceQuestion, OverallStat, Permission, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow } from "./type";
 
 interface LectureHookState {
   isRefresh: boolean;
@@ -90,7 +90,7 @@ type FullTestScreenState = {
   currentPageIndex: number;
 };
 interface LectureCardState {
-  lectures: LectureRow[],
+  lectures: LectureCard[],
   keyword: string,
   currentPageIndex: number,
 

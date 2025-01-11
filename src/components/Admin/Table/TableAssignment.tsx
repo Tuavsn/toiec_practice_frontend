@@ -5,7 +5,7 @@ import { TreeNode } from "primereact/treenode";
 import { TreeTable } from "primereact/treetable";
 import React from "react";
 import { useAssignmentTable } from "../../../hooks/AssignmentHook";
-import { QuestionTableProps } from "../../../utils/types/type";
+import { QuestionTableProps } from "../../../utils/types/props";
 import { LoadingSpinner } from "../../Common/Index";
 import { RenderColumnsForTable } from "../AdminColumn/ColumnsQuestionAssignmentTreeTable";
 import { DialogQuestionActionButton } from "../AdminDialog/DialogAssignmentRelate";
