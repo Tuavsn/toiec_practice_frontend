@@ -4,24 +4,28 @@ import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Column } from "primereact/column";
+import { DataScroller } from 'primereact/datascroller';
 import { DataTable } from "primereact/datatable";
 import { InputNumber } from 'primereact/inputnumber';
 import { MenuItem } from 'primereact/menuitem';
+import { ProgressBar } from 'primereact/progressbar';
 import { Stepper, StepperRefAttributes } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
 import { Steps } from 'primereact/steps';
+import { TabPanel, TabView } from 'primereact/tabview';
 import React, { useRef, useState } from "react";
 import { Doughnut, Pie } from "react-chartjs-2";
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { callPutUserTarget } from '../../api/api';
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from '../../components/Common/Column/CommonColumn';
+import useLectureProfile from '../../hooks/LectureProfileHook';
 import useProfile from '../../hooks/ProfileHook';
 import { AmINotLoggedIn } from '../../utils/helperFunction/AuthCheck';
 import convertSecondsToString from '../../utils/helperFunction/convertSecondsToString';
 import formatDate from '../../utils/helperFunction/formatDateToString';
 import GetColorBasedOnValue from '../../utils/helperFunction/GetColorHueValue';
 import { ActivityLogProps, SkillInsightsProps } from '../../utils/types/props';
-import { SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from '../../utils/types/type';
+import { LectureCard, SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from '../../utils/types/type';
 // Đăng ký các phần tử Chart.js cần thiết
 ChartJS.register(...registerables);
 // Đăng ký plugin DataLabels
@@ -30,28 +34,28 @@ ChartJS.register(ChartDataLabels as Plugin<"pie">);
 export default function UserProfilePage() {
 
     const {
-        state,
+        state: { overallStat, topicStats, results, skillStats },
         targetRef,
     } = useProfile();
 
     if (AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
 
-
+    const { averageListeningScore, averageReadingScore } = overallStat!;
 
     return (
         <main className="pt-8 flex gap-3 flex-column">
             <div key="area-1">
-                <Card key="user-goal" className='shadow-7' title="1. Mục tiêu bản thân"><UserGoal currentScore={state.overallStat!.averageListeningScore + state.overallStat!.averageReadingScore} targetRef={targetRef} /></Card>
-                {/* <Card key="current-course" className='shadow-7' title="2. Đang diễn ra"><CurrentCourse /></Card> */}
+                <Card key="user-goal" className='shadow-7' title="1. Mục tiêu bản thân"><UserGoal currentScore={averageListeningScore + averageReadingScore} targetRef={targetRef} /></Card>
+                <Card key="current-lecture" className='shadow-7' title="2. Các bài học đã tham gia"><CurrentLecture /></Card>
             </div>
             <div key="area-2" className="flex gap-3 flex-wrap">
-                <Card key="progress-overview" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="2. Tổng quan tiến độ ">{ProgressOverview(state.overallStat!.averageListeningScore, state.overallStat!.averageReadingScore)}</Card>
-                <Card key="skill-insight" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="3. Thông tin chi tiết kỹ năng"><SkillInsights parts={state.topicStats} /></Card>
+                <Card key="progress-overview" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="2. Tổng quan tiến độ ">{ProgressOverview(overallStat!.averageListeningScore, overallStat!.averageReadingScore)}</Card>
+                <Card key="skill-insight" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="3. Thông tin chi tiết kỹ năng"><SkillInsights parts={topicStats} /></Card>
             </div>
-            <Card key="activity-log" className='shadow-7' title="4. Nhật ký học tập"><ActivityLog userResultRows={state.results} /></Card>
+            <Card key="activity-log" className='shadow-7' title="4. Nhật ký học tập"><ActivityLog userResultRows={results} /></Card>
             <div key="area-3" className="flex gap-3 flex-wrap">
-                <Card key="time-spent" className="shadow-7 flex-1" style={{ minWidth: "590px" }} title="5. Thời gian học tập theo kỹ năng">{TimeSpent(state.skillStats)}</Card>
-                <Card key="suggestion" className='shadow-7 flex-1' title="6. Đề xuất cải thiện">{Suggestions(ConvertTopicStatToSuggestion(state.topicStats))}</Card>
+                <Card key="time-spent" className="shadow-7 flex-1" style={{ minWidth: "590px" }} title="5. Thời gian học tập theo kỹ năng">{TimeSpent(skillStats)}</Card>
+                <Card key="suggestion" className='shadow-7 flex-1' title="6. Đề xuất cải thiện">{Suggestions(ConvertTopicStatToSuggestion(topicStats))}</Card>
 
             </div>
             {/* <Card key="stat" className='shadow-7' title="7. Thống kê"></Card> */}
@@ -97,15 +101,46 @@ const UserGoal: React.FC<{ targetRef: React.MutableRefObject<number>; currentSco
     );
 });
 
-//---[2]-------------------------------------------------------------------------------------------------------------------------------------------
-// const CurrentCourse: React.FC = React.memo(
-//     () => {
-//         return (
-//             <main>
-//             </main>
-//         )
-//     }
-// )
+//--- [2]-------------------------------------------------------------------------------------------------------------------------------------------
+const CurrentLecture: React.FC = React.memo(
+    () => {
+        const { onGoingLectures, completeLectures } = useLectureProfile();
+
+        return (
+            <TabView>
+                <TabPanel header="Đang tiếp diễn" leftIcon="pi pi-calendar mr-2">
+                    <DataScroller value={onGoingLectures} itemTemplate={itemLectureTemplate} rows={5} inline scrollHeight="700px" header="Kéo xuống để hiển thị thêm" />
+
+                </TabPanel>
+                <TabPanel header="Đã hoàn thành" rightIcon="pi pi-check ml-2">
+                    <DataScroller value={completeLectures} itemTemplate={itemLectureTemplate} rows={5} inline scrollHeight="700px" header="Kéo xuống để hiển thị thêm" />
+                </TabPanel>
+            </TabView>
+        )
+    }
+)
+
+function itemLectureTemplate({ id, name, topic, percent: completePercent }: LectureCard) {
+    const hueValue = GetColorBasedOnValue(completePercent);
+    return (
+        <Card
+            key={id}
+            title={name}
+            className="border-round m-2 shadow-2 min-h-full bg-yellow-50 hover:shadow-4"
+            data-testid={`lecture-card-${id}`}
+        >
+            <div>
+                <p className="pb-5" data-testid={`lecture-content-${id}`}>
+                    <strong>Nội dung:</strong> {topic.join(", ")}
+                </p>
+                <Link to={`${name}___${id}`} data-testid={`lecture-link-${id}`}>
+                    <Button severity="help" label="Học ngay" data-testid={`lecture-button-${id}`} />
+                </Link>
+                <ProgressBar className="mt-3" color={hueValue} value={completePercent}></ProgressBar>
+            </div>
+        </Card>
+    )
+}
 
 //---[3]-------------------------------------------------------------------------------------------------------------------------------------------
 function ProgressOverview(averageListeningScore: number, averageReadingScore: number) {
@@ -344,15 +379,15 @@ function Suggestions(suggestionOnParts: SuggestionsForUser[]) {
     )
 }
 function ConvertTopicStatToSuggestion(topicStats: TopicStat[]): SuggestionsForUser[] {
-    return topicStats.filter(t=>t.totalCorrect !== 0 || t.totalIncorrect !== 0).toSorted((a,b)=> 
-        Math.round(a.totalCorrect / ((a.totalCorrect + a.totalIncorrect) || 1) * 10000) / 100 
-    - Math.round(b.totalCorrect / ((b.totalCorrect + b.totalIncorrect) || 1) * 10000) / 100
-    ).map(ts=> {
+    return topicStats.filter(t => t.totalCorrect !== 0 || t.totalIncorrect !== 0).toSorted((a, b) =>
+        Math.round(a.totalCorrect / ((a.totalCorrect + a.totalIncorrect) || 1) * 10000) / 100
+        - Math.round(b.totalCorrect / ((b.totalCorrect + b.totalIncorrect) || 1) * 10000) / 100
+    ).map(ts => {
         return {
             title: ts.topic.name,
             content: ts.topic.solution
         }
-    }).slice(0,5);
+    }).slice(0, 5);
 
 }
 

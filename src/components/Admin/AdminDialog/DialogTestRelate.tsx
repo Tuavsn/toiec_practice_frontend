@@ -4,7 +4,7 @@ import { Fieldset } from "primereact/fieldset";
 import { InputNumber, InputNumberValueChangeEvent } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import React, { useRef, useState } from "react";
-import { callPostTest, callPostUpdateTest, callPutDeleteTestRow } from "../../../api/api";
+import { callPostTest, callPutDeleteTestRow, callPutUpdateTest } from "../../../api/api";
 import { useToast } from "../../../context/ToastProvider";
 import { RenderTestRowDialogParams, handeDeleteRowParams, handeSaveRowParams } from "../../../utils/types/prams";
 import { DialogDeleteRowBodyProps, DialogTestRowProps, DialogUpdateTestBodyProps } from "../../../utils/types/props";
@@ -149,7 +149,7 @@ async function handleSave(params: handeSaveRowParams<TestRow>) {
     params.setIsDisabled(true);
     let success = false;
     if (params.row.id) {
-        success = await callPostUpdateTest(params.row);
+        success = await callPutUpdateTest(params.row);
     } else {
         success = await callPostTest(params.row);
     }

@@ -4,7 +4,7 @@ import { Dialog } from "primereact/dialog";
 import { Fieldset } from "primereact/fieldset";
 import { InputText } from "primereact/inputtext";
 import React, { useRef, useState } from "react";
-import { callCreateCategory, callPostUpdateCategoryRow, callPutCategoryRowActive } from "../../../api/api";
+import { callCreateCategory, callPutCategoryRowActive, callPutUpdateCategoryRow } from "../../../api/api";
 import { useToast } from "../../../context/ToastProvider";
 import { CategoryRow, DialogDeleteRowBodyProps, DialogRowProps, DialogUpdateCategoryBodyProps, handeDeleteRowParams, handeSaveRowParams, RenderRowDialogParams } from "../../../utils/types/type";
 
@@ -129,7 +129,7 @@ async function handleSave(params: handeSaveRowParams<CategoryRow>) {
     params.setIsDisabled(true);
     let success = false;
     if (params.row.id) {
-        success = await callPostUpdateCategoryRow(params.row);
+        success = await callPutUpdateCategoryRow(params.row);
     } else {
         success = await callCreateCategory(params.row);
     }

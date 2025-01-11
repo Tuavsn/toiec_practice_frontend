@@ -3,18 +3,18 @@ import { Divider } from 'primereact/divider';
 import { Paginator } from 'primereact/paginator';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { callGetLectureDoctrine, callGetPracticePaper } from '../../api/api';
+import { callGetLectureDoctrine, callGetPracticePaper, callGetRelateLectures } from '../../api/api';
 import { AmINotLoggedIn } from '../../utils/helperFunction/AuthCheck';
 import { ConvertThisPracticeQuestionToHTML } from '../../utils/helperFunction/convertToHTML';
 import SplitNameIDFromURL from '../../utils/helperFunction/splitNameIDFromURL';
-import { LectureID, Name_ID, PracticeAnswerSheet, PracticeQuestion, QuestionID } from '../../utils/types/type';
+import { LectureID, Name_ID, PracticeAnswerSheet, PracticeQuestion, QuestionID, RelateLectureTitle } from '../../utils/types/type';
 
 
 // Component chi tiết khóa học
 const LectureDetailsPage: React.FC = () => {
     // Lấy ID của khóa học từ tham số URL
     const { lecture_name_id = "" } = useParams<{ lecture_name_id: Name_ID<LectureID> }>();
-    if(AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
+    if (AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
     const [lectureName, lectureId] = SplitNameIDFromURL(lecture_name_id);
     // Hook useEffect chạy khi component mount
     useEffect(() => {
@@ -37,7 +37,7 @@ const LectureDetailsPage: React.FC = () => {
                         <aside className='align-items-center justify-content-center border-round m-2' style={{ minWidth: '28%' }}>
                             <Card className='shadow-6'>
                                 <h1 className='text-center'>Một số bài học khác</h1>
-                                {RelateCoursesTemplate()}
+                                <RelateLectures lectureId={lectureId} />
                             </Card>
                         </aside>
                     </div>
@@ -55,29 +55,41 @@ const LectureDetailsPage: React.FC = () => {
 
 export default LectureDetailsPage;
 
-function RelateCoursesTemplate() {
+const RelateLectures: React.FC<{ lectureId: LectureID }> = React.memo(
+    ({ lectureId }) => {
+        const [relateLectures, setRelateLecture] = useState<RelateLectureTitle[]>([]);
+        useEffect(() => {
+            callGetRelateLectures(lectureId).then((result) => {
+                if (!result) return
+                setRelateLecture(result);
 
-    return (
-        <React.Fragment>
-            <Link target="_blank" rel="noopener noreferrer" to={'/lectures/Câu%20hỏi%20đuôi___67461cba477a82561b5a8fb4'}>
-                <p className='hover:shadow-2 py-2' >Câu hỏi đuôi</p>
-            </Link>
-            <Divider />
-            <Link target="_blank" rel="noopener noreferrer" to={''}>
-                <p className='hover:shadow-2 py-2' >Câu hỏi yes/ no</p>
-            </Link>
-            <Divider />
-            <Link target="_blank" rel="noopener noreferrer" to={'/lectures/Loại%20tranh%20tả%20người%20và%20vật___67461b11477a82561b5a8fb3'}>
-                <p className='hover:shadow-2 py-2' >Loại tranh tả người và vật</p>
-            </Link>
-            <Divider />
-            <Link target="_blank" rel="noopener noreferrer" to={'/lectures/Cách%20phân%20biệt%20câu%20hỏi%20when%20liên%20quan%20tới%20thời%20gian___67489285fcdfa12b4133eecd'}>
-                <p className='hover:shadow-2 py-2' >Cách phân biệt câu hỏi when liên quan tới thời gian</p>
-            </Link>
-        </React.Fragment>
-    )
+            })
+        }, [lectureId])
+        let last = relateLectures.length - 1;
+        if (last < 0) {
+            return <></>
+        }
+        return (
+            <React.Fragment>
+                {
+                    relateLectures.map(({ id, name }, index) => {
+                        return (
+                            <React.Fragment key={index}>
+                                <Link target="_blank" rel="noopener noreferrer" to={`/lectures/${name}___${id}`}>
+                                    <p className='hover:shadow-2 py-2' >{name}</p>
+                                </Link>
+                                {
+                                    index != last && < Divider />
+                                }
+                            </React.Fragment>
+                        )
+                    })
+                }
+            </React.Fragment>
+        )
 
-}
+    }
+)
 
 const DoctrineSection: React.FC<{ lectureId: LectureID }> = React.memo(
     ({ lectureId }) => {
