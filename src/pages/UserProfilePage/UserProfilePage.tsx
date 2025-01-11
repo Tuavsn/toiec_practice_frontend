@@ -105,15 +105,16 @@ const UserGoal: React.FC<{ targetRef: React.MutableRefObject<number>; currentSco
 const CurrentLecture: React.FC = React.memo(
     () => {
         const { onGoingLectures, completeLectures } = useLectureProfile();
-
+        const totalOnGoing = onGoingLectures.length;
+        const totalComplete = completeLectures.length;
         return (
             <TabView>
                 <TabPanel header="Đang tiếp diễn" leftIcon="pi pi-calendar mr-2">
-                    <DataScroller value={onGoingLectures} itemTemplate={itemLectureTemplate} rows={5} inline scrollHeight="700px" header="Kéo xuống để hiển thị thêm" />
+                    <DataScroller value={onGoingLectures} itemTemplate={itemLectureTemplate} rows={5} inline scrollHeight="700px" footer={`Tổng có ${totalOnGoing} bài học`} header={totalOnGoing >= 2 ? "Kéo xuống để hiển thị thêm" : ""} />
 
                 </TabPanel>
                 <TabPanel header="Đã hoàn thành" rightIcon="pi pi-check ml-2">
-                    <DataScroller value={completeLectures} itemTemplate={itemLectureTemplate} rows={5} inline scrollHeight="700px" header="Kéo xuống để hiển thị thêm" />
+                    <DataScroller value={completeLectures} itemTemplate={itemLectureTemplate} rows={5} inline scrollHeight="700px" footer={`Tổng có ${totalComplete} bài học`} header={totalComplete >= 2 ? "Kéo xuống để hiển thị thêm" : ""} />
                 </TabPanel>
             </TabView>
         )

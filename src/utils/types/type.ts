@@ -211,6 +211,8 @@ export interface TestCard {
   format: string;
   year: number;
   name: string;
+  completed: boolean,
+  totalUser: number,
 }
 
 export interface CategoryRow extends DataTableValue {

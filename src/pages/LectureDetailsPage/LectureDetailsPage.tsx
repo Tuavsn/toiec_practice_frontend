@@ -55,65 +55,74 @@ const LectureDetailsPage: React.FC = () => {
 
 export default LectureDetailsPage;
 
+
+//----------------------------------------------------------------------------------------
+// Thành phần RelateLectures hiển thị danh sách bài giảng liên quan
 const RelateLectures: React.FC<{ lectureId: LectureID }> = React.memo(
     ({ lectureId }) => {
         const [relateLectures, setRelateLecture] = useState<RelateLectureTitle[]>([]);
+
+        // Gọi API để lấy danh sách bài giảng liên quan mỗi khi lectureId thay đổi
         useEffect(() => {
             callGetRelateLectures(lectureId).then((result) => {
-                if (!result) return
-                setRelateLecture(result);
+                if (!result) return;
+                setRelateLecture(result); // Cập nhật danh sách bài giảng
+            });
+        }, [lectureId]);
 
-            })
-        }, [lectureId])
         let last = relateLectures.length - 1;
         if (last < 0) {
-            return <></>
+            return <></>; // Không hiển thị nếu không có bài giảng liên quan
         }
+
         return (
             <React.Fragment>
                 {
                     relateLectures.map(({ id, name }, index) => {
                         return (
                             <React.Fragment key={index}>
-                                <Link target="_blank" rel="noopener noreferrer" to={`/lectures/${name}___${id}`}>
-                                    <p className='hover:shadow-2 py-2' >{name}</p>
+                                {/* Link tới bài giảng liên quan */}
+                                <Link target="_blank" rel="noopener noreferrer" to={`/lecture/${name}___${id}`}>
+                                    <p className='hover:shadow-2 py-2'>{name}</p>
                                 </Link>
                                 {
-                                    index != last && < Divider />
+                                    index !== last && <Divider /> // Hiển thị dấu phân cách trừ bài cuối cùng
                                 }
                             </React.Fragment>
-                        )
+                        );
                     })
                 }
             </React.Fragment>
-        )
-
+        );
     }
-)
+);
 
+// Thành phần DoctrineSection hiển thị nội dung lý thuyết của bài giảng
 const DoctrineSection: React.FC<{ lectureId: LectureID }> = React.memo(
     ({ lectureId }) => {
         const divRef = useRef<HTMLDivElement | null>(null);
+
+        // Gọi API để lấy nội dung lý thuyết và chèn vào DOM
         useLayoutEffect(() => {
             callGetLectureDoctrine(lectureId).then((response) => {
                 if (response instanceof Error) {
-                    return;
+                    return; // Không làm gì nếu có lỗi
                 }
-                divRef.current!.innerHTML = response;
+                divRef.current!.innerHTML = response; // Chèn nội dung lý thuyết
             });
-        }, [])
-        return <Card title="Lý thuyết" className='shadow-8 flex-1' style={{ flexBasis: '900', minWidth: '700px' }}>
+        }, [lectureId]);
 
-            {/* <div dangerouslySetInnerHTML={{ __html: currentLesson }} /> */}
-            <div ref={divRef} >
-                <section style={{ fontFamily: "Arial, sans-serif", lineHeight: "1.6" }}>
-                    Không có nội dung
-                </section>
-            </div>
-        </Card>
-
+        return (
+            <Card title="Lý thuyết" className='shadow-8 flex-1' style={{ flexBasis: '900', minWidth: '700px' }}>
+                <div ref={divRef}>
+                    <section style={{ fontFamily: "Arial, sans-serif", lineHeight: "1.6" }}>
+                        Không có nội dung {/* Nội dung mặc định nếu không có dữ liệu */}
+                    </section>
+                </div>
+            </Card>
+        );
     }
-)
+);
 
 // Component PracticeSection dùng để hiển thị các bài tập của khóa học
 const PracticeSection: React.FC<{ lectureID: LectureID }> = React.memo(

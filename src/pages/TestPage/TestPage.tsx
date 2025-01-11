@@ -1,7 +1,6 @@
 
 import { Button } from "primereact/button";
 import { Paginator } from "primereact/paginator";
-import { Rating } from "primereact/rating";
 import { Skeleton } from "primereact/skeleton";
 import { Tag } from "primereact/tag";
 import React, { ReactNode } from "react";
@@ -96,22 +95,21 @@ function RenderTestCards(testCards: TestCard[] | null): ReactNode {
         </div>
     );
 }
-const TestCardGridItem: React.FC<{ testCard: TestCard }> = ({ testCard }) => {
-    const isDone = Boolean(Math.round(Math.random()));
-    const getSeverity = () => (isDone ? 'success' : 'warning');
+const TestCardGridItem: React.FC<{ testCard: TestCard }> = ({ testCard: { id, name, completed, format, totalUser, year } }) => {
 
     return (
         <div className="col-12 sm:col-12 md:col-9 lg:col-6 xl:col-4 p-2">
             <div className="p-4 border-1 surface-border surface-card border-round">
                 <div className="flex flex-column align-items-center gap-3 py-5">
-                    <h3 className="text-2xl font-bold white-space-nowrap text-overflow-ellipsis">{testCard.name}</h3>
-                    <h5 className="font-semibold">{testCard.format}</h5>
-                    <Rating value={testCard.year % 5} readOnly cancel={false}></Rating>
-                    <Tag value={isDone ? 'Hoàn thành' : 'Chưa thử'} severity={getSeverity()}></Tag>
+                    <h3 className="text-2xl font-bold white-space-nowrap text-overflow-ellipsis">{name}</h3>
+                    <h5 className="font-semibold">{format}</h5>
+                    <h4><b className="pr-3 inline">{totalUser}</b><i className="inline pi pi-user" style={{ color: 'var(--primary-color)' }}></i></h4>
+                    
+                    <Tag value={completed ? 'Hoàn thành' : 'Chưa thử'} severity={completed ? 'success' : 'warning'}></Tag>
                 </div>
                 <div className="flex align-items-center justify-content-between">
-                    <h5 className="text-2xl font-semibold">{testCard.year}</h5>
-                    <Link to={`/test/${testCard.id}`}>
+                    <h5 className="text-2xl font-semibold">{year}</h5>
+                    <Link to={`/test/${id}`}>
                         <Button
                             label="Xem chi tiết"
                             className="p-button-rounded"
