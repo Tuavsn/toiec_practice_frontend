@@ -614,7 +614,7 @@ export const callGetTestDetailPageData = async (testID: TestID): Promise<TestDet
 
 export const callGetProfile = async (): Promise<ProfileHookState | null> => {
     try {
-        const response = await axios.get<ApiResponse<ProfileHookState>>(`${import.meta.env.VITE_API_URL}/auth/account`);
+        const response = await axios.get<ApiResponse<ProfileHookState>>(`${import.meta.env.VITE_API_URL}/users/account`);
         if (!response.data.data.overallStat) {
             response.data.data.overallStat = emptyOverallStat;
         }
@@ -627,7 +627,7 @@ export const callGetProfile = async (): Promise<ProfileHookState | null> => {
 
 export const callPutUserTarget = async (targetScore: number): Promise<void> => {
     try {
-        await axios.put<any>(`${import.meta.env.VITE_API_URL}/auth/account/target`, { target: targetScore });
+        await axios.put<any>(`${import.meta.env.VITE_API_URL}/users/account/target`, { target: targetScore });
         console.log("ok");
 
     } catch (error) {
