@@ -6,6 +6,7 @@ import { Divider } from "primereact/divider";
 import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
+import ChatWindow from "../../components/User/ChatWindow/ChatWindow";
 import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, QuestionRow, Resource, SelectedQuestionDialogTestOverallPage, SingleUserAnswerOverview, TestAnswerSheet, TestReviewAnswerSheet, TestSheet, TestType, UserAnswerRecord } from "../types/type";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
@@ -429,9 +430,7 @@ export function UserReviewSingleAnswerToHTML(question: SingleUserAnswerOverview)
                 {ConvertReviewTopicToHTML(question)}
 
             </Card>
-            <Card title="Gợi ý giúp bạn cải thiện tốt hơn">
-                {ConvertReviewSolutionToHTML(question)}
-            </Card>
+            <ChatWindow />
         </section>
     return { body: body, title: title }
 }
@@ -638,7 +637,7 @@ export function ConvertThisFullTestQuestionToHTML(
     // Hàm phụ để xây dựng phần tử tài nguyên
     const buildResources = (resources: Resource[], questionId: string) =>
         resources?.length
-            ? FullTestResourcesToHTML(doTestDataRef.current.testType,resources, questionId, changePage)
+            ? FullTestResourcesToHTML(doTestDataRef.current.testType, resources, questionId, changePage)
             : [];
 
 

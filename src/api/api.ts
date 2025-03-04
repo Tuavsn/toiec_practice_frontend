@@ -634,3 +634,16 @@ export const callPutUserTarget = async (targetScore: number): Promise<void> => {
         console.error(error);
     }
 }
+
+export const callGetChatMessage = async (_message: string): Promise<string> => {
+    try {
+        // Simulate API call to virtual assistant
+        // const response: ApiResponse<string> = await axios.post("/api/chat", { message });
+
+        const resfetch = await fetch("https://uselessfacts.jsph.pl/api/v2/facts/random?language=en")//`https://raw.githubusercontent.com/trhanhtu/dummyjson/refs/heads/main/chatbotresponse_${index}.json`);
+        const response = await resfetch.json();
+        return response.text;
+    } catch (error) {
+        return "Error: Unable to connect.";
+    }
+}
