@@ -9,11 +9,12 @@ const ChatWindow: React.FC = React.memo(() => {
     const { input, setInput, messageLogs, sendMessage, handleKeyPress } = useChat();
 
     return (
-        <Card title="Chat with Assistant" className="p-4 w-96">
-            <div className="chat-box p-2 max-h-80 overflow-auto border rounded mb-2">
+        <Card title="Hỏi cùng chuyên gia" className="bg-yellow-100 border-solid p-4 w-96">
+            <hr></hr>
+            <div className="chat-box p-2 max-h-80 overflow-auto mb-2">
                 {messageLogs.map((msg, index) => (
                     <div key={index} className={`flex ${msg.sender === "user" ? "justify-content-end" : "justify-content-start"} mb-2`}>
-                        <span className={`p-2 rounded-lg inline-block max-w-xs ${msg.sender === "user" ? "bg-blue-500 text-white" : "bg-gray-300 text-black"}`}>
+                        <span className={`p-2 border-round-lg inline-block max-w-xs ${msg.sender === "user" ? "bg-blue-500 text-white" : "bg-gray-300 text-black"}`}>
                             {msg.text}
                         </span>
                     </div>
