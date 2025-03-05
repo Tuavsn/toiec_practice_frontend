@@ -107,10 +107,42 @@ const CurrentLecture: React.FC = React.memo(
         const { onGoingLectures, completeLectures } = useLectureProfile();
         const totalOnGoing = onGoingLectures.length;
         const totalComplete = completeLectures.length;
+        const xonGoingLectures = [
+            {
+                id: "1",
+                name: "Introduction to TOEIC",
+                topic: ["Overview", "Test Structure", "Tips"],
+                percent: 25,
+            },
+            {
+                id: "2",
+                name: "Listening Practice - Part 1",
+                topic: ["Photographs", "Key Strategies", "Common Traps"],
+                percent: 50,
+            },
+            {
+                id: "3",
+                name: "Reading Comprehension - Part 7",
+                topic: ["Passage Analysis", "Question Types", "Time Management"],
+                percent: 75,
+            },
+            {
+                id: "4",
+                name: "Vocabulary Building",
+                topic: ["Common Words", "Business Terminology", "Synonyms"],
+                percent: 40,
+            },
+            {
+                id: "5",
+                name: "Mock Test and Review",
+                topic: ["Full Test", "Error Review", "Score Analysis"],
+                percent: 10,
+            },
+        ];
         return (
             <TabView>
                 <TabPanel header="Đang tiếp diễn" leftIcon="pi pi-calendar mr-2">
-                    <DataScroller value={onGoingLectures} itemTemplate={itemLectureTemplate} rows={5} inline scrollHeight="700px" footer={`Tổng có ${totalOnGoing} bài học`} header={totalOnGoing >= 2 ? "Kéo xuống để hiển thị thêm" : ""} />
+                    <DataScroller value={xonGoingLectures} itemTemplate={itemLectureTemplate} rows={5} inline scrollHeight="700px" footer={`Tổng có ${totalOnGoing} bài học`} header={totalOnGoing >= 2 ? "Kéo xuống để hiển thị thêm" : ""} />
 
                 </TabPanel>
                 <TabPanel header="Đã hoàn thành" rightIcon="pi pi-check ml-2">

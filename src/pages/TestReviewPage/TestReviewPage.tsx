@@ -6,9 +6,10 @@ import { Toolbar } from "primereact/toolbar";
 import React, { Dispatch, memo, useCallback, useMemo } from "react";
 import { Navigate } from "react-router-dom";
 import { LoadingSpinner } from "../../components/Common/Index";
+import ChatWindow from "../../components/User/ChatWindow/ChatWindow";
 import useTestReview from "../../hooks/TestReviewHook";
 import { AmINotLoggedIn } from "../../utils/helperFunction/AuthCheck";
-import { ConvertSolutionToHTML, ConvertTopicToHTML, ConvertUserAnswerRecordToHTML } from "../../utils/helperFunction/convertToHTML";
+import { ConvertTopicToHTML, ConvertUserAnswerRecordToHTML } from "../../utils/helperFunction/convertToHTML";
 import { TestReviewHookAction } from "../../utils/types/action";
 import { TestReviewAreaProps, UserAnswerSheetReviewProps } from "../../utils/types/props";
 import { ColorString, QuestionPage, UserAnswerRecord } from "../../utils/types/type";
@@ -18,7 +19,7 @@ import { ColorString, QuestionPage, UserAnswerRecord } from "../../utils/types/t
 function TestReviewPage() {
     const { state, dispatch } = useTestReview();
 
-    if(AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
+    if (AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
 
     const question = state.testReviewAnswerSheet[state.currentPageIndex];
 
@@ -153,7 +154,7 @@ const UserAnswerSheet: React.FC<UserAnswerSheetReviewProps> = React.memo(({ stat
             return [<h1 key="error-button-list">Lỗi rồi</h1>];
         }
         let part = 0;
-        return state.pageMapper.map((pq:QuestionPage, index:number) => {
+        return state.pageMapper.map((pq: QuestionPage, index: number) => {
             const isOnPage = state.currentPageIndex === pq.page;
             let newPart = false;
             if (part != pq.part) {
@@ -213,9 +214,7 @@ const TopicAndSolution: React.FC<{ question: UserAnswerRecord }> = React.memo(
                     {ConvertTopicToHTML(question)}
 
                 </Card>
-                <Card title="Gợi ý giúp bạn cải thiện tốt hơn">
-                    {ConvertSolutionToHTML(question)}
-                </Card>
+                <ChatWindow />
             </React.Fragment>
         )
     }

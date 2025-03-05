@@ -2,7 +2,10 @@ import { DataTableValue } from "primereact/datatable";
 import { Dispatch, SetStateAction } from "react";
 import { NavigateFunction } from "react-router-dom";
 
-
+export interface ChatMessage {
+  sender: "user" | "bot";
+  text: string;
+}
 export interface Category extends CategoryRow {
   tests: Test[];
 }
