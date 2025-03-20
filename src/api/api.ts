@@ -22,7 +22,7 @@ export const callCreateCategory = async (category: CategoryRow): Promise<boolean
 }
 
 export const callGetTestPaper = async (testId: TestID, parts: string): Promise<ApiResponse<TestPaper> | null> => {
-    const postfix = parts === '0' ? 'full-test' : `practice?parts=${parts}`;
+    const postfix = parts === '0' ? 'practice?parts=1234567' : `practice?parts=${parts}`;
     try {
         const response = await axios.get<ApiResponse<TestPaper>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}`);
         return response.data;
