@@ -152,7 +152,7 @@ export const callGetCategoryLabel = async (): Promise<ApiResponse<CategoryLabel[
 }
 
 export const callGetTestCard = async (format: string, year: number, pageIndex: number): Promise<ApiResponse<TableData<TestCard>>> => {
-    const response = await axios.get<ApiResponse<TableData<TestCard>>>(`${import.meta.env.VITE_API_URL}/categories/tests?format=${format}&year=${year}&current=${pageIndex + 1}&pageSize=6`);
+    const response = await axios.get<ApiResponse<TableData<TestCard>>>(`${import.meta.env.VITE_API_URL}/tests/public?format=${format}&year=${year}&current=${pageIndex + 1}&pageSize=6`);
     return response.data;
 }
 
@@ -451,7 +451,7 @@ export const callGetCategoryRow = async (signal: AbortSignal, currentPageIndex: 
 }
 export const callGetTestRow = async (signal: AbortSignal, categoryID: CategoryID, currentPageIndex: number, searchText: string, pageSize: number = 5): Promise<TableData<TestRow> | "abort" | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<TestRow>>>(`${import.meta.env.VITE_API_URL}/categories/${categoryID}/tests?current=${currentPageIndex + 1}&pageSize=${pageSize}&search=${searchText}`, { signal });
+        const response = await axios.get<ApiResponse<TableData<TestRow>>>(`${import.meta.env.VITE_API_URL}/tests/${categoryID}?current=${currentPageIndex + 1}&pageSize=${pageSize}&search=${searchText}`, { signal });
         return response.data.data;
     } catch (error) {
         if (isCancel(error)) {
