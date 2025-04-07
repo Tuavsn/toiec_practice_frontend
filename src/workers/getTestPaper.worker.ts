@@ -7,7 +7,7 @@ interface TestPaperWorkerRequest {
 
 self.onmessage = async (event: MessageEvent<TestPaperWorkerRequest>) => {
     const { testId, parts } = event.data;
-    const postfix = parts === '0' ? 'full-test' : `practice?parts=${parts}`;
+    const postfix = parts === '0' ? 'practice?parts=1234567' : `practice?parts=${parts}`;
 
     try {
         const response = await axios.get<ApiResponse<TestPaper>>(

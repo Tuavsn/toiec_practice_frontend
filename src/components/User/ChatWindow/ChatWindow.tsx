@@ -25,7 +25,7 @@ const ChatWindow: React.FC<ChatWindowProps> = React.memo(({ questionId }) => {
     } = useChat(questionId);
 
     return (
-        <Card title="Hỏi cùng chuyên gia" className="bg-yellow-100 border-solid p-4 w-96">
+        <Card title="Hỏi cùng chuyên gia" className="bg-white-100 shadow-7 border-solid p-4 w-96">
             <hr></hr>
             <ScrollPanel className="chat-box p-2 h-24rem mb-2">
                 {messageLogs.map((msg, index) => (

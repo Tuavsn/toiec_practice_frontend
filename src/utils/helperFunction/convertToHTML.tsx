@@ -278,7 +278,7 @@ export function ConvertTopicToHTML(question: UserAnswerRecord): JSX.Element {
         for (const subpq of question.subUserAnswer) {
             topicElement.push(...subpq.listTopics.map((topic, index) => {
                 return (
-                    <React.Fragment key={"topicsquest_" + index}>
+                    <React.Fragment key={`topicsquest_${index}_${subpq.questionNum}`}>
                         <Chip key={"topicsq_" + index} label={topic.name} />
                         <p className="pl-6">⎣{topic.solution}</p>
                     </React.Fragment>
@@ -550,7 +550,7 @@ export function ConvertUserAnswerRecordToHTML(question: UserAnswerRecord): [JSX.
                 UserAnswerToHTML(subq)
             );
         }
-        resoursesElement.push(<TranscriptAndExplain transcript={question.transcript} explanation={question.explanation} />)
+        resoursesElement.push(<TranscriptAndExplain key={`${question.questionId}`} transcript={question.transcript} explanation={question.explanation} />)
     } else {
         // Nếu là câu hỏi đơn lẻ, thêm nội dung câu hỏi
         questionsElement.push(
