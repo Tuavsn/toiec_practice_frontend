@@ -98,7 +98,6 @@ function currentStatusBodyTemplate(dispatch: Dispatch<TestReviewHookAction>): JS
 
 const TextReviewArea: React.FC<TestReviewAreaProps> = React.memo(({ question, dispatch }) => {
     const [resourcesElement, questionsElement] = ConvertUserAnswerRecordToHTML(question);
-
     return (
         <div className="flex xl:flex-row lg:flex-row flex-wrap md:flex-column sm:flex-column justify-content-between gap-1 custom-scrollpanel px-0 py-0">
             {/* Khu vực tài liệu tham khảo */}
@@ -119,6 +118,11 @@ const TextReviewArea: React.FC<TestReviewAreaProps> = React.memo(({ question, di
                 <ScrollPanel className="custombar1 border-round m-2 shadow-2 pl-2 test-quest" >
                     {questionsElement}
                 </ScrollPanel>
+            </div>
+
+            {/* Chat Window */}
+            <div className="flex-1" style={{ minWidth: "400px" }}>
+                <ChatWindow questionId={question.questionId} />
             </div>
         </div>
     );
@@ -212,9 +216,7 @@ const TopicAndSolution: React.FC<{ question: UserAnswerRecord }> = React.memo(
             <React.Fragment>
                 <Card title="Chủ đề trong câu hỏi">
                     {ConvertTopicToHTML(question)}
-
                 </Card>
-                <ChatWindow />
             </React.Fragment>
         )
     }

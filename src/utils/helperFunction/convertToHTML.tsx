@@ -430,7 +430,7 @@ export function UserReviewSingleAnswerToHTML(question: SingleUserAnswerOverview)
                 {ConvertReviewTopicToHTML(question)}
 
             </Card>
-            <ChatWindow />
+            <ChatWindow questionId={question.questionId}/>
         </section>
     return { body: body, title: title }
 }

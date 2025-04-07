@@ -3,7 +3,7 @@ import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ProfileHookState } from "../utils/types/state";
 import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureProfile, LectureRow, Permission, PermissionID, PracticePaper, QuestionID, QuestionRow, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
-const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
+const host = "toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
 export const loginUrl = `${host}/oauth2/authorize/google`;
 
@@ -645,5 +645,31 @@ export const callGetChatMessage = async (_message: string): Promise<string> => {
         return response.text;
     } catch (error) {
         return "Error: Unable to connect.";
+    }
+}
+
+export const callStartChat = async (questionId: string): Promise<ApiResponse<{ sessionId: string, chatResponse: { choices: [{ message: { role: string, content: string } }] } }> | null> => {
+    try {
+        const response = await axios.post<ApiResponse<{ sessionId: string, chatResponse: { choices: [{ message: { role: string, content: string } }] } }>>(
+            `${import.meta.env.VITE_API_URL}/chatgpt/tutor`,
+            { questionId }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error starting chat:", error);
+        return null;
+    }
+}
+
+export const callContinueChat = async (questionId: string, sessionId: string, message: string): Promise<ApiResponse<{ chatResponse: { choices: [{ message: { role: string, content: string } }] } }> | null> => {
+    try {
+        const response = await axios.post<ApiResponse<{ chatResponse: { choices: [{ message: { role: string, content: string } }] } }>>(
+            `${import.meta.env.VITE_API_URL}/chatgpt/tutor`,
+            { questionId, sessionId, message }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error continuing chat:", error);
+        return null;
     }
 }
