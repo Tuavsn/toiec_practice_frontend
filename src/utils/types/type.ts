@@ -445,8 +445,6 @@ export interface SuggestionsForUser {
 
 export interface UpdateQuestionForm {
   id: QuestionID;
-  testId: TestID;
-  practiceId: string;
   content: string;
   difficulty: number;
   listTopicIds: TopicID[];

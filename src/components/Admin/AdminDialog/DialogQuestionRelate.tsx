@@ -69,10 +69,8 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
             explanation: currentSelectedQuestion.current.data.explanation as string,
             difficulty: currentSelectedQuestion.current.data.difficulty as number,
             transcript: currentSelectedQuestion.current.data.transcript as string,
-            practiceId: currentSelectedQuestion.current.data.practiceID as string,
             answers: currentSelectedQuestion.current.data.choices as string[],
             content: currentSelectedQuestion.current.data.ask as string,
-            testId: currentSelectedQuestion.current.data.testID,
             id: currentSelectedQuestion.current.key as string,
         });
 
