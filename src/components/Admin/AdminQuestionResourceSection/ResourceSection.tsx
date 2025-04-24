@@ -100,6 +100,13 @@ interface ResourceRowProps {
 
 const ResourceRow: React.FC<ResourceRowProps> = ({ rowIndex, rows, handleContentChange, handleTypeChange, deleteRow, handleFileCancel, handleFileChange }) => {
     const fileUpload = useRef<FileUpload | null>(null);
+    
+    // Create temporary URL for file preview
+    const getPreviewUrl = (file: File | null): string | undefined => {
+        if (!file) return undefined;
+        return URL.createObjectURL(file);
+    };
+    
     return (
         <tr>
             <td>
@@ -121,6 +128,38 @@ const ResourceRow: React.FC<ResourceRowProps> = ({ rowIndex, rows, handleContent
                             onChange={(e) => handleContentChange(e, rowIndex)}
                         />
                     }
+                    </td>
+                ) : rows[rowIndex].type === "image" ? (
+                    <td className="bg-gray-200">
+                        {rows[rowIndex].content && (
+                            <img 
+                                src={rows[rowIndex].content} 
+                                alt="Resource" 
+                                style={{ maxWidth: "100%", maxHeight: "150px" }} 
+                            />
+                        )}
+                        {!rows[rowIndex].content && rows[rowIndex].file && (
+                            <img 
+                                src={getPreviewUrl(rows[rowIndex].file)} 
+                                alt="Preview" 
+                                style={{ maxWidth: "100%", maxHeight: "150px" }} 
+                            />
+                        )}
+                    </td>
+                ) : rows[rowIndex].type === "audio" ? (
+                    <td className="bg-gray-200">
+                        {rows[rowIndex].content && (
+                            <audio controls style={{ width: "100%" }}>
+                                <source src={rows[rowIndex].content} />
+                                Your browser does not support the audio element.
+                            </audio>
+                        )}
+                        {!rows[rowIndex].content && rows[rowIndex].file && (
+                            <audio controls style={{ width: "100%" }}>
+                                <source src={getPreviewUrl(rows[rowIndex].file)} />
+                                Your browser does not support the audio element.
+                            </audio>
+                        )}
                     </td>
                 ) : (
                     <td className="bg-gray-200">{rows[rowIndex].content}</td>
