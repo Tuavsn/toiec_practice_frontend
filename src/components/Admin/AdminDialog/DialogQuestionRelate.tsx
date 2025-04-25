@@ -97,7 +97,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
         };
 
         return (
-            <Fieldset legend="Sửa câu hỏi" >
+            <Fieldset legend={`Sửa câu hỏi số #${currentSelectedQuestion.current.data.questionNum}`} >
                 <section className='flex flex-wrap gap-4 justify-content-space'>
 
 
