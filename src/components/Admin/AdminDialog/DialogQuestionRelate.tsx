@@ -219,6 +219,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                             onChange={(e) => setFormData((prev) => ({ ...prev, listTopicIds: e.value as string[] }))}
                             placeholder="Chọn chủ đề"
                             display='chip'
+                            filter
                         />
                     </div>
                 </section>
