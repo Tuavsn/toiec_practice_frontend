@@ -555,6 +555,7 @@ export const callPostTest = async (testRow: TestRow): Promise<boolean> => {
             totalQuestion: testRow.totalQuestion,
             totalScore: testRow.totalScore,
             limitTime: testRow.limitTime,
+            difficulty: testRow.difficulty,
         });
         return true
     } catch (error) {
@@ -565,11 +566,10 @@ export const callPutUpdateTest = async (testRow: TestRow): Promise<boolean> => {
     try {
         await axios.put<ApiResponse<Test>>(`${import.meta.env.VITE_API_URL}/tests/${testRow.id}`, {
             name: testRow.name,
-            categoryId: testRow.idCategory,
-            totalUserAttempt: testRow.totalUserAttempt,
             totalQuestion: testRow.totalQuestion,
             totalScore: testRow.totalScore,
             limitTime: testRow.limitTime,
+            difficulty: testRow.difficulty,
         });
         return true
     } catch (error) {
