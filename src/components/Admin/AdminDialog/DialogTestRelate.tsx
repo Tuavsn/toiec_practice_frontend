@@ -127,6 +127,12 @@ const RenderUpsertTestBody: React.FC<DialogUpdateTestBodyProps> = React.memo(
                             <InputNumber inputId="totalScore" value={formData.totalScore} onValueChange={(e) => onInputNumberChange(e, 'totalScore')} />
                         </div>
                     }
+                    {
+                        <div className="field flex-1">
+                            <label htmlFor="difficulty" className="font-bold block mb-2">Độ khó</label>
+                            <InputNumber inputId="difficulty" value={formData.difficulty} onValueChange={(e) => onInputNumberChange(e, 'difficulty')} min={1} max={10} />
+                        </div>
+                    }
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end">
