@@ -9,7 +9,8 @@ import { MultiSelect } from "primereact/multiselect"
 import React, { useState } from "react"
 import { callPutQuestionUpdate } from "../../../api/api"
 import { useToast } from "../../../context/ToastProvider"
-import { DialogQuestionActionProps, DialogQuestionPageProps, Resource, ResourceIndex, Topic, UpdateQuestionDialogProps, UpdateQuestionForm } from "../../../utils/types/type"
+import { DialogQuestionActionProps, DialogQuestionPageProps, UpdateQuestionDialogProps } from "../../../utils/types/props"
+import { Resource, ResourceIndex, Topic, UpdateQuestionForm } from "../../../utils/types/type"
 import ResourceSection from "../AdminQuestionResourceSection/ResourceSection"
 
 // Định nghĩa component DialogForQuestionPage sử dụng React.FC với React.memo để tối ưu hiệu suất
@@ -215,7 +216,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                             style={{ width: '100%', maxWidth: "70vw" }}
                             name="listTopicIds"
                             value={formData.listTopicIds}
-                            options={topicList.current.map((topic) => ({ label: topic.name, value: topic.id }))}
+                            options={topicList.current.map((topic: Topic) => ({ label: topic.name, value: topic.id }))}
                             onChange={(e) => setFormData((prev) => ({ ...prev, listTopicIds: e.value as string[] }))}
                             placeholder="Chọn chủ đề"
                             display='chip'

@@ -7,7 +7,7 @@ import { DataTable } from "primereact/datatable";
 import { TreeNode } from "primereact/treenode";
 import React from "react";
 import { QuestionActionButtonProps } from "../../../utils/types/props";
-import { ColorString, QuestionContext, Resource, Topic } from "../../../utils/types/type";
+import { BadgeColor, QuestionContext, Resource, Topic } from "../../../utils/types/type";
 import { timeStampBodyTemplate } from "../../Common/Column/CommonColumn";
 
 
@@ -53,7 +53,7 @@ export function QuestionTimeStampBodyTemplate(questionNode: TreeNode): JSX.Eleme
 // Hiển thị loại câu hỏi, với các màu sắc khác nhau dựa trên loại
 export function ExpandTypeBodyTemplate(questionNode: TreeNode): JSX.Element {
     ;
-    const colors: ColorString[] = ["danger", "success", "info", "warning"];
+    const colors: BadgeColor[] = ["danger", "success", "info", "warning"];
     const partNum = Number(questionNode.data.type);
     if (!isNaN(partNum)) {
         // Hiển thị badge với màu sắc tương ứng loại

@@ -8,7 +8,9 @@ import { callPostLectureDetail, callPutLectureActive, callPutLectureDetailUpdate
 import { useToast } from "../../../context/ToastProvider";
 import useTopicRef from "../../../hooks/TopicRefHook";
 import { emptyLectureRowValue } from "../../../utils/types/emptyValue";
-import { DialogDeleteLectureBodyProps, DialogLectureProps, DialogUpdateLectureBodyProps, handeDeleteLectureParams, handeSaveLectureParams, RenderLectureDialogParams, Topic, TopicID } from "../../../utils/types/type";
+import { RenderLectureDialogParams, handeDeleteLectureParams, handeSaveLectureParams } from "../../../utils/types/prams";
+import { DialogDeleteLectureBodyProps, DialogLectureProps, DialogUpdateLectureBodyProps } from "../../../utils/types/props";
+import { Topic, TopicID } from "../../../utils/types/type";
 import EditCourseRichTextBox from "../../Common/richTextBox/richTextBox";
 
 
@@ -102,7 +104,7 @@ function GetIDNameTopicPair(topicList: Topic[]) {
 const RenderUpdateLectureBody: React.FC<DialogUpdateLectureBodyProps> = React.memo(
     (props) => {
         const inputRef = useRef<HTMLInputElement | null>(null);
-        const [topicIds, setTopicIds] = useState<TopicID[]>(props.currentSelectedLecture.topic.map(t => t.id));
+        const [topicIds, setTopicIds] = useState<TopicID[]>(props.currentSelectedLecture.topic.map((t: Topic) => t.id));
         const { toast } = useToast();
         const [isDisabled, setIsDisabled] = useState(false);
         const title = useRef<string>(props.currentSelectedLecture.id ? "Sửa bài học" : "Thêm bài học");

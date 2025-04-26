@@ -5,7 +5,9 @@ import { InputText } from "primereact/inputtext";
 import React, { useRef, useState } from "react";
 import { callPostPermission, callPutPermissionRowActive, callPutUpdatePermission } from "../../../api/api";
 import { useToast } from "../../../context/ToastProvider";
-import { DialogDeleteRowBodyProps, DialogRowProps, DialogUpdatePermissionBodyProps, Permission, RenderRowDialogParams, handeDeleteRowParams, handeSaveRowParams } from "../../../utils/types/type";
+import { RenderRowDialogParams, handeDeleteRowParams, handeSaveRowParams } from "../../../utils/types/prams";
+import { DialogDeleteRowBodyProps, DialogRowProps, DialogUpdatePermissionBodyProps } from "../../../utils/types/props";
+import { Permission } from "../../../utils/types/type";
 
 // Thành phần DialogPermissionActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)
 export const DialogPermissionActionButton: React.FC<DialogRowProps<Permission>> = React.memo(

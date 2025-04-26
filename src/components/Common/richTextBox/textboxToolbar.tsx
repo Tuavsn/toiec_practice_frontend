@@ -1,5 +1,5 @@
 import React from "react";
-import { RichEditorProps } from "../../../utils/types/type";
+import { RichEditorProps } from "../../../utils/types/props";
 
 const RenderHeader: React.FC<RichEditorProps> = React.memo(
     (props) => {

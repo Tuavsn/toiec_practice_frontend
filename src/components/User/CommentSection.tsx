@@ -6,7 +6,8 @@ import { Skeleton } from 'primereact/skeleton';
 import React, { useRef } from 'react';
 import useComments from '../../hooks/CommentSectionHook';
 import { GetMyIDUser } from '../../utils/helperFunction/AuthCheck';
-import { UserComment, UserCommentAction, UserID } from '../../utils/types/type';
+import { UserCommentAction } from '../../utils/types/action';
+import { UserComment, UserID } from '../../utils/types/type';
 
 const CommentSection: React.FC = () => {
 

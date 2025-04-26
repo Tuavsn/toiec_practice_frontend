@@ -6,7 +6,9 @@ import { InputText } from "primereact/inputtext";
 import React, { useRef, useState } from "react";
 import { callCreateCategory, callPutCategoryRowActive, callPutUpdateCategoryRow } from "../../../api/api";
 import { useToast } from "../../../context/ToastProvider";
-import { CategoryRow, DialogDeleteRowBodyProps, DialogRowProps, DialogUpdateCategoryBodyProps, handeDeleteRowParams, handeSaveRowParams, RenderRowDialogParams } from "../../../utils/types/type";
+import { RenderRowDialogParams, handeDeleteRowParams, handeSaveRowParams } from "../../../utils/types/prams";
+import { DialogDeleteRowBodyProps, DialogRowProps, DialogUpdateCategoryBodyProps } from "../../../utils/types/props";
+import { CategoryRow } from "../../../utils/types/type";
 
 
 // Thành phần DialogCategoryActionButton sử dụng React.memo để tối ưu hiệu suất (chỉ render lại khi props thay đổi)

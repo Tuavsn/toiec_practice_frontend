@@ -549,6 +549,7 @@ export type ExerciseType = "partNum=1" | "partNum=2" | "partNum=3" | "partNum=4"
 export type DialogLectureJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE' | 'PAGE_DESIGNER' | 'QUESTION_EDITOR';
 export type DialogRowJobType = '' | 'CREATE' | 'UPDATE' | 'DELETE';
 export type ColorString = "success" | "info" | "warning" | "danger" | 'secondary' | 'help';
+export type BadgeColor = "danger" | "secondary" | "success" | "info" | "warning" | "contrast" | null | undefined;
 export type Name_ID<T extends string> = T;
 export type TestDocument = QuestionListByPart[]
 //-----------------------------reducer---------------------
