@@ -14,6 +14,38 @@
     background-color: var(--primary-400);
 }
 
+/* MultiSelect with horizontal scrolling */
+.multiselect-horizontal-scroll .p-multiselect-label {
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+.multiselect-horizontal-scroll .p-multiselect-token {
+    flex-shrink: 0;
+}
+
+/* MultiSelect with wrapping chips */
+.multiselect-custom-wrap .p-multiselect-token-label {
+    white-space: normal;
+    word-break: break-word;
+}
+
+.multiselect-custom-wrap .p-multiselect-token {
+    margin-bottom: 4px;
+    max-width: 100%;
+}
+
+.multiselect-custom-wrap .p-multiselect-trigger {
+    align-self: flex-start;
+}
+
+.multiselect-custom-wrap .p-multiselect-label {
+    white-space: normal;
+    flex-wrap: wrap;
+    display: flex;
+    align-items: flex-start;
+}
+
 .custom-box {
     border: 2px dashed;
     border-color: var(--surface-border);

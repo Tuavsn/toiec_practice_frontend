@@ -87,7 +87,18 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                 if (success) {
                     if (success) {
                         toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
-
+                        
+                        // Update the current question data in the reference to reflect changes immediately
+                        currentSelectedQuestion.current.data = {
+                            ...currentSelectedQuestion.current.data,
+                            ask: formData.content,
+                            choices: formData.answers,
+                            correctChoice: formData.correctAnswer,
+                            explanation: formData.explanation,
+                            transcript: formData.transcript,
+                            difficulty: formData.difficulty,
+                            topic: topicList.current.filter(topic => formData.listTopicIds.includes(topic.id))
+                        };
                     } else {
                         toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Có lỗi khi lưu" });
                     }
@@ -213,14 +224,16 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                     <div className="field flex-1">
                         <p className='m-0 mb-2'>Chủ đề</p>
                         <MultiSelect
-                            style={{ width: '100%', maxWidth: "70vw" }}
+                            style={{ width: '100%', maxWidth: "70vw", display: 'flex', alignItems: 'center' }}
                             name="listTopicIds"
                             value={formData.listTopicIds}
                             options={topicList.current.map((topic: Topic) => ({ label: topic.name, value: topic.id }))}
                             onChange={(e) => setFormData((prev) => ({ ...prev, listTopicIds: e.value as string[] }))}
                             placeholder="Chọn chủ đề"
-                            display='chip'
                             filter
+                            display='chip'
+                            maxSelectedLabels={999}
+                            className="multiselect-custom-wrap"
                         />
                     </div>
                 </section>

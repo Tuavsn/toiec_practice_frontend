@@ -76,7 +76,8 @@ export const emptyTestRow: TestRow = {
     idCategory: "",
     totalQuestion: 200,
     totalScore: 990,
-    limitTime: 90,
+    limitTime: 120,
+    difficulty: 500,
     totalUserAttempt: 0,
     createdAt: emptyDate,
     updatedAt: emptyDate

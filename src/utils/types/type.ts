@@ -236,6 +236,7 @@ export interface TestRow extends DataTableValue {
   totalScore: number;
   idCategory: string;
   limitTime: number;
+  difficulty: number;
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
