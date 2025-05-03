@@ -55,7 +55,7 @@ export default function useUser() {
     // Hàm lấy danh sách người dùng
     const fetchUsers = useCallback(async (pageNumber: number, searchText: string) => {
         // Lấy hoặc tạo AbortController mới
-        const controller = GetAbortController(abortControllerRef);
+        let controller = GetAbortController(abortControllerRef);
 
         // Gọi API để lấy dữ liệu người dùng
         const response = await callGetUserRow(controller.signal, pageNumber, searchText);
@@ -69,6 +69,15 @@ export default function useUser() {
         dispatch({ type: "FETCH_ROWS_SUCCESS", payload: [response.result, pageNumber] });
         totalItems.current = response.meta.totalItems; // Cập nhật tổng số lượng mục
 
+        controller = GetAbortController(abortControllerRef); // Tạo lại AbortController mới
+        const response2 = await callGetRole(controller.signal);
+        if (response2 === "abort") return; // Nếu request bị hủy, kết thúc hàm
+        if (!response2) {
+            // Hiển thị thông báo lỗi nếu không lấy được dữ liệu
+            toast.current?.show({ severity: "error", summary: "Lỗi", detail: "Không thể tải được danh sách vai trò" });
+            return;
+        }
+        dispatch({ type: "FETCH_ROLES_SUCCESS", payload: response2.result }); // Cập nhật danh sách vai trò
     }, []); // Hàm chỉ được tạo lại nếu không có dependency nào thay đổi
 
     useEffect(() => {

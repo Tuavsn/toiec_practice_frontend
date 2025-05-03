@@ -60,10 +60,39 @@
     text-align: start;
 }
 
-/* .custom-container:has(#do-test-page) {
-    
- 
-} */
+/* Card hover effect */
+.test-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+}
+
+/* Line clamp for text overflow */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Skill tabs styling */
+.skill-tabs .p-tabview-nav {
+    justify-content: center;
+}
+
+.skill-tabs .p-tabview-nav li .p-tabview-nav-link {
+    padding: 1rem 1.5rem;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .skill-tabs .p-tabview-nav li .p-tabview-nav-link {
+        padding: 0.75rem 1rem;
+    }
+}
+
+
 
 #user-layout:has(#do-test-page) {
     margin: 20px auto !important;
@@ -96,50 +125,71 @@ h6,
 
 #table-resources table {
     border: 1px solid black;
-    border-collapse: collapse; /* Ensures borders are collapsed into a single border */
+    border-collapse: collapse;
+    /* Ensures borders are collapsed into a single border */
 }
 
 #table-resources th,
 #table-resources td {
-    border: 1px solid black; /* Applies borders to all header and data cells */
-    padding: 8px; /* Optional: Adds some spacing for better readability */
+    border: 1px solid black;
+    /* Applies borders to all header and data cells */
+    padding: 8px;
+    /* Optional: Adds some spacing for better readability */
     text-align: center;
 }
 
 .glassmorphism {
-    background: rgba(255, 255, 255, 0.1); /* Transparent white */
-    backdrop-filter: blur(10px); /* Blur effect */
-    border-radius: 15px; /* Rounded corners */
-    padding: 20px; /* Padding inside the container */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border */
-    position: relative; /* To position the shiny stripe */
-    overflow: hidden; /* Prevent the shiny stripe from overflowing */
-  }
-  
-  .glassmorphism::after {
+    background: rgba(255, 255, 255, 0.1);
+    /* Transparent white */
+    backdrop-filter: blur(10px);
+    /* Blur effect */
+    border-radius: 15px;
+    /* Rounded corners */
+    padding: 20px;
+    /* Padding inside the container */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Light shadow for depth */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* Subtle border */
+    position: relative;
+    /* To position the shiny stripe */
+    overflow: hidden;
+    /* Prevent the shiny stripe from overflowing */
+}
+
+.glassmorphism::after {
     content: '';
     position: absolute;
     top: 0;
-    left: -50%; /* Position the stripe off-screen */
-    width: 200%; /* Make the stripe twice as wide */
-    height: 100%; /* Full height of the element */
-    background: rgba(255, 255, 255, 0.4); /* Light reflective stripe */
-    transform: skewX(-30deg); /* Skew the stripe for a glossy look */
-    opacity: 0; /* Start with the stripe hidden */
-    transition: opacity 0.3s ease; /* Smooth transition for opacity */
-  }
-  
-  .glassmorphism:hover::after {
-    opacity: 1; /* Show the stripe on hover */
-    animation: shine 1s forwards; /* Run animation only once */
-  }
-  
-  @keyframes shine {
+    left: -50%;
+    /* Position the stripe off-screen */
+    width: 200%;
+    /* Make the stripe twice as wide */
+    height: 100%;
+    /* Full height of the element */
+    background: rgba(255, 255, 255, 0.4);
+    /* Light reflective stripe */
+    transform: skewX(-30deg);
+    /* Skew the stripe for a glossy look */
+    opacity: 0;
+    /* Start with the stripe hidden */
+    transition: opacity 0.3s ease;
+    /* Smooth transition for opacity */
+}
+
+.glassmorphism:hover::after {
+    opacity: 1;
+    /* Show the stripe on hover */
+    animation: shine 1s forwards;
+    /* Run animation only once */
+}
+
+@keyframes shine {
     0% {
-      left: -50%;
+        left: -50%;
     }
+
     100% {
-      left: 100%;
+        left: 100%;
     }
-  }
+}
