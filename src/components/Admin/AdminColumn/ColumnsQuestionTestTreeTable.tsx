@@ -33,7 +33,7 @@ export function RenderColumnsForTable(setContextDialogBody: React.Dispatch<React
 
         /* Cột hiển thị thời gian tạo và cập nhật */
         <Column key="col-time" bodyStyle={{ width: "220px" }} headerClassName='text-center' header="Thời gian" body={QuestionTimeStampBodyTemplate} />,
-        
+
         /* Cột hiển thị nút sửa và xóa */
         <Column key="col-action" headerClassName='text-center' header="" body={(data) => <ActionBodyTemplate questionNode={data} setTitle={setTitle} setIsVisible={setIsVisible} topicList={topics} currentSelectedQuestion={currentSelectedQuestion} />} />,
     ]
@@ -100,7 +100,7 @@ export const ActionBodyTemplate: React.FC<QuestionActionButtonProps> = React.mem
             <div className='flex justify-content-around'>
 
                 {/* Nút chỉnh sửa */}
-                <Button icon="pi pi-pencil" rounded outlined style={{ width: "50px", height: "50px" }} onClick={() => {
+                <Button id={`edit button for question #${questionNode.data.questionNum} quest_id=${questionNode.key}`} icon="pi pi-pencil" rounded outlined style={{ width: "50px", height: "50px" }} onClick={() => {
                     currentSelectedQuestion.current = questionNode;
                     setTitle("Cập nhật"); // Thiết lập tiêu đề cho Dialog là "Cập nhật"
                     setIsVisible(true); // Hiển thị Dialog
@@ -140,7 +140,7 @@ function ConvertTopicsToSimpleTable(topics: Topic[]): JSX.Element {
 function ConvertContextToSimpleTable(questionContext: QuestionContext): JSX.Element {
 
     return ( // Bao bọc nội dung trong một section với kiểu layout flex
-        <section className='flex flex-wrap gap-3'>  
+        <section className='flex flex-wrap gap-3'>
             {
                 questionContext.ask &&                 // Kiểm tra nếu có câu hỏi (ask) Hiển thị câu hỏi trong div với border và padding
                 <div className='border-solid p-2'>

@@ -118,7 +118,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                         <label className='block' htmlFor="content">Nội dung câu hỏi</label>
                         <InputTextarea
                             style={{ width: '20vw', resize: 'none' }}
-                            id="content"
+                            id="content input textbox"
                             name="content"
                             value={formData.content || ""}
                             onChange={handleChange}
@@ -130,6 +130,8 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                     <div className="field flex-1">
                         <p className='m-0 mb-2'>Độ khó</p>
                         <InputNumber
+                            inputId="difficulty input number ID"
+                            id="difficulty input number"
                             name="difficulty"
                             value={formData.difficulty}
                             onValueChange={(e) => setFormData({ ...formData, difficulty: e.value ?? 0 })}
@@ -145,7 +147,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                         <label className='block' htmlFor="transcript">Transcript</label>
                         <InputTextarea
                             style={{ width: '30vw', resize: 'none' }}
-                            id="transcript"
+                            id="transcript input textbox"
                             name="transcript"
                             value={formData.transcript || ''}
                             onChange={handleChange}
@@ -160,7 +162,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                         <label className='block' htmlFor="explanation">Giải thích</label>
                         <InputTextarea
                             className='' style={{ width: '30vw', resize: 'none' }}
-                            id="explanation"
+                            id="explanation input textbox"
                             name="explanation"
                             value={formData.explanation || ''}
                             onChange={handleChange}
@@ -177,6 +179,7 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                             {formData.answers.map((answer, index) => (
                                 <div key={index} className='flex'>
                                     <InputText
+                                        id={`answer= ${answer}`}
                                         name={'answer' + index}
                                         className='flex-1'
                                         value={answer}
@@ -211,6 +214,8 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                         <div className="field flex-1">
                             <p className='block m-0 mb-2 text-right'><b>Đáp án đúng</b></p>
                             <Dropdown
+                                id="correct answer dropdown id"
+                                inputId="input correct answer dropdown id"
                                 className='bg-green-200'
                                 name="correctAnswer"
                                 value={formData.correctAnswer}
@@ -224,6 +229,9 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
                     <div className="field flex-1">
                         <p className='m-0 mb-2'>Chủ đề</p>
                         <MultiSelect
+                            id="multiple select topic id"
+                            inputId="input topic id"
+                            itemID="item topic id"
                             style={{ width: '100%', maxWidth: "70vw", display: 'flex', alignItems: 'center' }}
                             name="listTopicIds"
                             value={formData.listTopicIds}
