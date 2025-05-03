@@ -42,8 +42,8 @@ const QuestionTreeTable: React.FC<QuestionTableProps> = React.memo(
 
         return (
             <React.Fragment>
-               
-                <ToolbarQuestion />
+
+                <ToolbarQuestion disabled={totalItems.current > 0} />
                 {/* Dialog dùng để hiển thị nội dung xác nhận xóa hoặc cập nhật câu hỏi. */}
                 <DialogQuestionActionButton isVisible={isVisible} title={title} topicList={topics} setIsVisible={setIsVisible} currentSelectedQuestion={currentSelectedQuestion} />
 
