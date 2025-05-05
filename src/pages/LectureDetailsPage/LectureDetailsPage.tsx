@@ -3,11 +3,12 @@ import { Divider } from 'primereact/divider';
 import { Paginator } from 'primereact/paginator';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { callGetLectureDoctrine, callGetPracticePaper, callGetRelateLectures } from '../../api/api';
+import { callGetAssignmentRows, callGetLectureDoctrine, callGetRelateLectures, callPutPercentLecture } from '../../api/api';
+import { useToast } from '../../context/ToastProvider';
 import { AmINotLoggedIn } from '../../utils/helperFunction/AuthCheck';
-import { ConvertThisPracticeQuestionToHTML } from '../../utils/helperFunction/convertToHTML';
+import { ConvertThisAssignmentQuestionToHTML } from '../../utils/helperFunction/convertToHTML';
 import SplitNameIDFromURL from '../../utils/helperFunction/splitNameIDFromURL';
-import { LectureID, Name_ID, PracticeAnswerSheet, PracticeQuestion, QuestionID, RelateLectureTitle } from '../../utils/types/type';
+import { AssignmentQuestion, LectureID, Name_ID, PracticeAnswerSheet, QuestionID, RelateLectureTitle } from '../../utils/types/type';
 
 
 // Component chi tiết khóa học
@@ -45,7 +46,7 @@ const LectureDetailsPage: React.FC = () => {
 
                     <br />
                     {/* Phần hiển thị các bài tập */}
-                    <PracticeSection lectureID={lectureId} />
+                    <AssignmentSection lectureID={lectureId} />
                 </main>
 
             </div>
@@ -125,28 +126,30 @@ const DoctrineSection: React.FC<{ lectureId: LectureID }> = React.memo(
 );
 
 // Component PracticeSection dùng để hiển thị các bài tập của khóa học
-const PracticeSection: React.FC<{ lectureID: LectureID }> = React.memo(
+const AssignmentSection: React.FC<{ lectureID: LectureID }> = React.memo(
     ({ lectureID }) => {
         // Trạng thái lưu câu trả lời của người dùng
         const [userAnswerSheet, setUserAnswerSheet] = useState<PracticeAnswerSheet>(new Map<QuestionID, string>());
 
         // Trạng thái lưu danh sách các câu hỏi hiển thị
-        const [questionPage, setQuestionPage] = useState<PracticeQuestion[]>([]);
+        const [questionPage, setQuestionPage] = useState<AssignmentQuestion[]>([]);
 
         // Trạng thái lưu vị trí câu hỏi đầu tiên được hiển thị trong paginator
         const [first, setFirst] = useState<number>(0);
 
         // tổng số câu hỏi cần phải trả lời để tính hoàn thành bài tập
         const totalQuestions = useRef<number>(-1);
-
+        // Lưu trữ Toast để hiển thị thông báo
+        const { toast } = useToast();
         // cập nhật vào danh sách các câu trả lời của người dùng. nếu trả lời đủ số câu thì coi như kết thúc 
         const updateUserAnswerSheet = (qID: QuestionID, answer: string) => {
             const newAnswerSheet = new Map(userAnswerSheet);
             newAnswerSheet.set(qID, answer);
             setUserAnswerSheet(newAnswerSheet);
             if (newAnswerSheet.size >= totalQuestions.current) {
-                alert("làm xong");
-
+                callPutPercentLecture(lectureID, 100).then(() => {
+                    toast.current?.show({ severity: 'success', summary: 'Thành công', detail: 'Hoàn thành bài tập' });
+                });
             }
         }
         // điều hướng sang trang mới / cũ
@@ -159,18 +162,21 @@ const PracticeSection: React.FC<{ lectureID: LectureID }> = React.memo(
                 onPageChange={(event) => setFirst(event.first)}
                 template={{ layout: 'PrevPageLink CurrentPageReport NextPageLink' }} />
         useEffect(() => {
-            const fetchPraticeQuestion = async () => {
-                const response = await callGetPracticePaper(lectureID);
-                totalQuestions.current = response.data.totalQuestions;
-                setQuestionPage(response.data.practiceQuestions);
+            const fetchAssignmentQuestion = async () => {
+                const response = await callGetAssignmentRows(lectureID);
+                if (!response) {
+                    return;
+                }
+                totalQuestions.current = response.length;
+                setQuestionPage(response);
             }
-            fetchPraticeQuestion();
+            fetchAssignmentQuestion();
         }, [])
         // Trả về phần giao diện của component
         return <Card title="Bài tập" className='shadow-7'>
             {
                 (questionPage.length) ?
-                    ConvertThisPracticeQuestionToHTML(questionPage[first], userAnswerSheet, updateUserAnswerSheet, paginator) /* Hiển thị câu hỏi hiện tại */
+                    ConvertThisAssignmentQuestionToHTML(questionPage[first], first + 1, userAnswerSheet, updateUserAnswerSheet, paginator) /* Hiển thị câu hỏi hiện tại */
                     :
                     <div className='flex justify-content-center align-item-center p-8'>Không có bài tập</div>
             }

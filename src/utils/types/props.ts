@@ -188,7 +188,7 @@ interface DoExercisePageProps {
 interface DialogQuestionActionProps {
     isVisible: boolean,
     title: string,
-    topicList: React.MutableRefObject<Topic[]>,
+    setReload: React.Dispatch<React.SetStateAction<boolean>>
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
     currentSelectedQuestion: React.MutableRefObject<TreeNode>,
 }
@@ -248,6 +248,10 @@ interface QuestionTableProps {
     setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
     setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
 }
+interface AssignmentQuestionTableProps {
+    setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
+    setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
+}
 interface TestToolBarProps {
     currentPageIndex: number,
     onEndTest: () => Promise<void>,
@@ -283,7 +287,6 @@ interface ActivityLogProps {
 }
 interface QuestionActionButtonProps {
     questionNode: TreeNode,
-    topicList: React.MutableRefObject<Topic[]>,
     setTitle: React.Dispatch<React.SetStateAction<string>>,
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
     currentSelectedQuestion: React.MutableRefObject<TreeNode>,
@@ -313,7 +316,7 @@ interface UserAnswerSideTabProps {
 }
 
 export type {
-    ActivityLogProps, AdminCategoryTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, ButtonListProps,
+    ActivityLogProps, AdminCategoryTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AssignmentQuestionTableProps, ButtonListProps,
     ConfirmSubmitDialogProps,
     DialogDeleteLectureBodyProps,
     DialogDeleteRowBodyProps,

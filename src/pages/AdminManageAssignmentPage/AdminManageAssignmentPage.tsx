@@ -3,7 +3,7 @@ import { Card } from 'primereact/card';
 import { Toolbar } from 'primereact/toolbar';
 import React, { memo } from 'react';
 import { DialogForQuestionPage } from '../../components/Admin/AdminDialog/DialogAssignmentRelate';
-import QuestionTreeTable from '../../components/Admin/Table/TableAssignment';
+import AssignmentQuestionTreeTable from '../../components/Admin/Table/TableAssignment';
 import { CustomBreadCrumb } from '../../components/Common/Index';
 import { useQuestion } from '../../hooks/QuestionHook';
 
@@ -16,9 +16,7 @@ export function AdminManageAssignmentPage() {
         setResourceDialogBodyVisible,
         setContextDialogBodyVisible,
         resourceDialogBodyVisible,
-        setTopicDialogBodyVisible,
         contextDialogBodyVisible,
-        topicDialogBodyVisible,
     } = useQuestion()
 
     return (
@@ -33,10 +31,9 @@ export function AdminManageAssignmentPage() {
                         </div>
 
                         {/* Hiển thị bảng cây chứa các câu hỏi có phân trang */}
-                        <QuestionTreeTable
+                        <AssignmentQuestionTreeTable
                             setContextDialogBody={setContextDialogBodyVisible}
                             setResourceDialogBody={setResourceDialogBodyVisible}
-                            setTopicDialogBody={setTopicDialogBodyVisible}
                         />
                         <DialogForQuestionPage
                             title='Tài nguyên của câu hỏi'
@@ -47,11 +44,6 @@ export function AdminManageAssignmentPage() {
                             title='Nội dung câu hỏi'
                             dialogBodyVisible={contextDialogBodyVisible}
                             setIsDialogVisible={setContextDialogBodyVisible}
-                        />
-                        <DialogForQuestionPage
-                            title='Chủ đề của câu hỏi'
-                            dialogBodyVisible={topicDialogBodyVisible}
-                            setIsDialogVisible={setTopicDialogBodyVisible}
                         />
 
                     </div>
