@@ -10,7 +10,7 @@ import React, { MutableRefObject, useState } from "react"
 import { useParams } from "react-router-dom"
 import { callDeleteAssignmentQuestion, callPostAssignmentQuestion, callPutAssignmentQuestionUpdate } from "../../../api/api"
 import { useToast } from "../../../context/ToastProvider"
-import { DialogQuestionActionProps, DialogQuestionPageProps } from "../../../utils/types/props"
+import { DialogAssignmentQuestionActionProps, DialogQuestionPageProps } from "../../../utils/types/props"
 import { LectureID, QuestionNumber, Resource, ResourceIndex, UpdateAssignmentQuestionForm } from "../../../utils/types/type"
 import ResourceSection from "../AdminQuestionResourceSection/ResourceSection"
 
@@ -35,7 +35,7 @@ export const DialogForQuestionPage: React.FC<DialogQuestionPageProps> = React.me
 
 
 // Định nghĩa component DialogActionButton sử dụng React.FC với React.memo để tối ưu hiệu suất
-export const DialogQuestionActionButton: React.FC<DialogQuestionActionProps> = React.memo(
+export const DialogQuestionActionButton: React.FC<DialogAssignmentQuestionActionProps> = React.memo(
     ({ setIsVisible, isVisible, title, currentSelectedQuestion, setReload }) => {
 
         return (
@@ -67,7 +67,7 @@ interface RenderDeleteAssignmentQuestionBodyProps {
     setReload: React.Dispatch<React.SetStateAction<boolean>>; // Hàm để thay đổi trạng thái reload
 }
 const RenderDeleteAssignmentQuestionBody: React.FC<RenderDeleteAssignmentQuestionBodyProps> = React.memo(
-    ({ currentSelectedQuestion,setReload }) => {
+    ({ currentSelectedQuestion, setReload }) => {
         const { toast } = useToast();
         const { lecture_id = "" } = useParams<{ lecture_id: LectureID }>();
         const [isDisabled, setIsDisabled] = useState<boolean>(false);
@@ -77,7 +77,7 @@ const RenderDeleteAssignmentQuestionBody: React.FC<RenderDeleteAssignmentQuestio
 
                 <h1 className='text-center'>Bạn có chắc muốn xóa câu <q>#{questionNum}</q> ?</h1>
                 <div className="flex justify-content-end">
-                    <Button disabled={isDisabled} label="Xác nhận" icon="pi pi-save" onClick={() => { handleDelete( lecture_id,questionNum,toast,setReload ); setIsDisabled(true) }} />
+                    <Button disabled={isDisabled} label="Xác nhận" icon="pi pi-save" onClick={() => { handleDelete(lecture_id, questionNum, toast, setReload); setIsDisabled(true) }} />
                 </div>
             </React.Fragment>
         )
@@ -85,7 +85,7 @@ const RenderDeleteAssignmentQuestionBody: React.FC<RenderDeleteAssignmentQuestio
 );
 
 // khi nhấn nút Xóa
-async function handleDelete(lecture_id: LectureID, index: number, toast: React.MutableRefObject<Toast | null>,setReload: React.Dispatch<React.SetStateAction<boolean>>) {
+async function handleDelete(lecture_id: LectureID, index: number, toast: React.MutableRefObject<Toast | null>, setReload: React.Dispatch<React.SetStateAction<boolean>>) {
     const success = await callDeleteAssignmentQuestion(lecture_id, index);
 
 
@@ -102,7 +102,7 @@ interface RenderUpdateAssignmentQuestionBodyProps {
     setReload: React.Dispatch<React.SetStateAction<boolean>>; // Hàm để thay đổi trạng thái reload
 }
 const RenderUpdateQuestionBody: React.FC<RenderUpdateAssignmentQuestionBodyProps> = React.memo(
-    ({ currentSelectedQuestion,setReload }) => {
+    ({ currentSelectedQuestion, setReload }) => {
         const { toast } = useToast();
         const [resources, setResourses] = useState<ResourceIndex[]>((currentSelectedQuestion.current.data.resources as Resource[]).map((res, index) => ({ ...res, index, file: null })))
         const { lecture_id = "" } = useParams<{ lecture_id: LectureID }>();

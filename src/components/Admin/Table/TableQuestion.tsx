@@ -49,7 +49,7 @@ const QuestionTreeTable: React.FC<QuestionTableProps> = React.memo(
 
                 <TreeTable emptyMessage="Không có câu hỏi" value={nodes} rows={5} scrollable rowClassName={rowClassName}>
 
-                    {RenderColumnsForTable(setContextDialogBody, setResourceDialogBody, setTopicDialogBody, topics, setTitle, setIsVisible, currentSelectedQuestion)}
+                    {RenderColumnsForTable(setContextDialogBody, setResourceDialogBody, setTopicDialogBody, setTitle, setIsVisible, currentSelectedQuestion)}
 
                 </TreeTable>
 

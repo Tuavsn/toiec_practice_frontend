@@ -11,7 +11,7 @@ import { BadgeColor, QuestionContext, Resource, Topic } from "../../../utils/typ
 import { timeStampBodyTemplate } from "../../Common/Column/CommonColumn";
 
 
-export function RenderColumnsForTable(setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, topics: React.MutableRefObject<Topic[]>, setTitle: React.Dispatch<React.SetStateAction<string>>, setIsVisible: React.Dispatch<React.SetStateAction<boolean>>, currentSelectedQuestion: React.MutableRefObject<TreeNode>): JSX.Element[] {
+export function RenderColumnsForTable(setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>, setTitle: React.Dispatch<React.SetStateAction<string>>, setIsVisible: React.Dispatch<React.SetStateAction<boolean>>, currentSelectedQuestion: React.MutableRefObject<TreeNode>): JSX.Element[] {
     return [
         /* Cột hiển thị loại câu hỏi, cho phép mở rộng */
         < Column key="col-type" headerClassName='text-center' field="type" header="Loại" body={ExpandTypeBodyTemplate} expander />,
@@ -35,7 +35,7 @@ export function RenderColumnsForTable(setContextDialogBody: React.Dispatch<React
         <Column key="col-time" bodyStyle={{ width: "220px" }} headerClassName='text-center' header="Thời gian" body={QuestionTimeStampBodyTemplate} />,
 
         /* Cột hiển thị nút sửa và xóa */
-        <Column key="col-action" headerClassName='text-center' header="" body={(data) => <ActionBodyTemplate questionNode={data} setTitle={setTitle} setIsVisible={setIsVisible} topicList={topics} currentSelectedQuestion={currentSelectedQuestion} />} />,
+        <Column key="col-action" headerClassName='text-center' header="" body={(data) => <ActionBodyTemplate questionNode={data} setTitle={setTitle} setIsVisible={setIsVisible} currentSelectedQuestion={currentSelectedQuestion} />} />,
     ]
 }
 

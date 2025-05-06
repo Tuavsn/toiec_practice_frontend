@@ -188,9 +188,18 @@ interface DoExercisePageProps {
 interface DialogQuestionActionProps {
     isVisible: boolean,
     title: string,
-    setReload: React.Dispatch<React.SetStateAction<boolean>>
+  
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
     currentSelectedQuestion: React.MutableRefObject<TreeNode>,
+    topicList: React.MutableRefObject<Topic[]>,
+}
+
+interface DialogAssignmentQuestionActionProps {
+    isVisible: boolean,
+    title: string,
+    setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
+    currentSelectedQuestion: React.MutableRefObject<TreeNode>,
+    setReload: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 type LectureReduceProps = {
@@ -317,8 +326,7 @@ interface UserAnswerSideTabProps {
 
 export type {
     ActivityLogProps, AdminCategoryTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AssignmentQuestionTableProps, ButtonListProps,
-    ConfirmSubmitDialogProps,
-    DialogDeleteLectureBodyProps,
+    ConfirmSubmitDialogProps, DialogAssignmentQuestionActionProps, DialogDeleteLectureBodyProps,
     DialogDeleteRowBodyProps,
     DialogLectureProps,
     DialogQuestionActionProps,
@@ -338,8 +346,7 @@ export type {
     DoTestPageProps,
     FullTestAreaProps,
     FullTestScreenProps,
-    LectureActionButtonProps,
-    LectureReduceProps,
+    LectureActionButtonProps, LectureReduceProps,
     PartDetailSectionProps,
     QuestionActionButtonProps,
     QuestionTableProps,
