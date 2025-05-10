@@ -1,7 +1,7 @@
 import { isCancel } from "axios";
 import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ProfileHookState } from "../utils/types/state";
-import { ApiResponse, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureProfile, LectureRow, Permission, PermissionID, PracticePaper, QuestionID, QuestionRow, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
+import { ApiResponse, AssignmentQuestion, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureProfile, LectureRow, Permission, PermissionID, QuestionID, QuestionRow, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net/";
 
@@ -72,19 +72,35 @@ export const callPutQuestionUpdate = async (formData: UpdateQuestionForm, resour
         return false;
     }
 };
-export const callPutAssignmentQuestionUpdate = async (formData: UpdateAssignmentQuestionForm, resources: ResourceIndex[]): Promise<boolean> => {
+export const callPutAssignmentQuestionUpdate = async (formData: UpdateAssignmentQuestionForm, lectureId: LectureID, resources: ResourceIndex[]): Promise<boolean> => {
     try {
         // 1. Upload resources and get their URLs
         const resourceUrls = await Promise.all(
             resources.map((r) => callPostConvertResourceToLink(r.file))
         );
 
-        // 2. Update question with the resources
-        await callPutQuestionResource(formData.id, resourceUrls, resources)
+        const res = resources.map((r, i) => {
+            return {
+                type: r.type,
+                content: r.file ? resourceUrls[i] : r.content
+            } as Resource
+        })
 
 
         // 3. Update the question form data
-        await axios.put(`${import.meta.env.VITE_API_URL}/questions`, formData);
+        await axios.put(`${import.meta.env.VITE_API_URL}/lectures/${lectureId}/practice`,
+            {
+                index: formData.questionNum - 1,
+                practiceQuestion: {
+                    content: formData.content,
+                    resources: res,
+                    transcript: formData.transcript,
+                    explanation: formData.explanation,
+                    answers: formData.answers,
+                    correctAnswer: formData.correctAnswer,
+                }
+            }
+        );
 
         return true;
     } catch (error) {
@@ -92,6 +108,20 @@ export const callPutAssignmentQuestionUpdate = async (formData: UpdateAssignment
         return false;
     }
 };
+
+export const callDeleteAssignmentQuestion = async (lectureId: LectureID, questionNum: number): Promise<boolean> => {
+    try {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/lectures/${lectureId}/practice`, {
+            data: {
+                index: questionNum - 1,
+            }
+        });
+        return true;
+    } catch (error) {
+        console.error("Error deleting question:", error);
+        return false;
+    }
+}
 
 const callPutQuestionResource = async (questionID: QuestionID, url: string[], resources: ResourceIndex[]): Promise<boolean> => {
     try {
@@ -112,9 +142,31 @@ const callPutQuestionResource = async (questionID: QuestionID, url: string[], re
 }
 
 
-export const callPostAssignmentQuestion = async (formData: any): Promise<boolean> => {
+export const callPostAssignmentQuestion = async (formData: UpdateAssignmentQuestionForm, lecture_id: LectureID, resources: ResourceIndex[]): Promise<boolean> => {
     try {
-        await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/lectures/${formData.id}/savePractice`, formData);
+        const resourceUrls = await Promise.all(
+            resources.map((r) => callPostConvertResourceToLink(r.file))
+        );
+
+        const res = resources.map((r, i) => {
+            return {
+                type: r.type,
+                content: r.file ? resourceUrls[i] : r.content
+            } as Resource
+        })
+
+        await axios.post<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/lectures/${lecture_id}/practice`,
+            {
+                practiceQuestion: {
+                    content: formData.content,
+                    resources: res,
+                    transcript: formData.transcript,
+                    explanation: formData.explanation,
+                    answers: formData.answers,
+                    correctAnswer: formData.correctAnswer,
+                }
+            }
+        );
         return true;
     } catch (error) {
         return false;
@@ -146,6 +198,8 @@ export const callGetReviewTestPaper = async (id: ResultID): Promise<TestReviewAn
     }
 }
 
+
+
 export const callGetCategoryLabel = async (): Promise<ApiResponse<CategoryLabel[]>> => {
     const response = await axios.get<ApiResponse<CategoryLabel[]>>(`${import.meta.env.VITE_API_URL}/categories/none-page`);
     return response.data;
@@ -156,11 +210,6 @@ export const callGetTestCard = async (format: string, year: number, pageIndex: n
     return response.data;
 }
 
-export const callGetPracticePaper = async (lectureId: LectureID): Promise<ApiResponse<PracticePaper>> => {
-    const response = await fetch(`https://raw.githubusercontent.com/Tuavsn/toiec_practice_frontend/refs/heads/main/src/api/dummy/${lectureId}.json`);
-    const apiResponse: ApiResponse<PracticePaper> = await response.json();
-    return apiResponse
-}
 
 export const callPostDoctrine = async (lectureId: LectureID, request: string): Promise<boolean> => {
     try {
@@ -249,7 +298,7 @@ export const callPostLectureDetail = async (name: string, topicIds: TopicID[]): 
 export const callGetLectureDoctrine = async (lectureID: LectureID): Promise<string | Error> => {
     try {
         const response = await axios.get<ApiResponse<Lecture>>(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}?content=true`);
-        return response.data.data.content;
+        return response.data.data.content ?? "không có nội dung";
     } catch (error) {
         return (error as Error);
     }
@@ -286,9 +335,15 @@ export const callPutPermissionRowActive = async (permission: Permission): Promis
     }
 }
 
-export const callGetAssignmentRows = async (lectureID: LectureID): Promise<TableData<QuestionRow>> => {
-    const response = await axios.get<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}?PRACTICE=true`)
-    return response.data.data;
+export const callGetAssignmentRows = async (lectureID: LectureID): Promise<AssignmentQuestion[] | null> => {
+    try {
+
+        const response = await axios.get<ApiResponse<Lecture>>(`${import.meta.env.VITE_API_URL}/lectures/${lectureID}?practice=true`)
+        return response.data.data.practiceQuestions ?? [];
+    } catch
+    (e) {
+        return null
+    }
 }
 
 export const callPostImportExcel = async (testID: TestID, excelFiles: File[]): Promise<string> => {

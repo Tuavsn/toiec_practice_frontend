@@ -13,7 +13,7 @@ import { Stepper, StepperRefAttributes } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
 import { Steps } from 'primereact/steps';
 import { TabPanel, TabView } from 'primereact/tabview';
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { Doughnut, Pie } from "react-chartjs-2";
 import { Link, Navigate } from 'react-router-dom';
 import { callPutUserTarget } from '../../api/api';
@@ -24,6 +24,7 @@ import { AmINotLoggedIn } from '../../utils/helperFunction/AuthCheck';
 import convertSecondsToString from '../../utils/helperFunction/convertSecondsToString';
 import formatDate from '../../utils/helperFunction/formatDateToString';
 import GetColorBasedOnValue from '../../utils/helperFunction/GetColorHueValue';
+import { ProfileHookAction } from '../../utils/types/action';
 import { ActivityLogProps, SkillInsightsProps } from '../../utils/types/props';
 import { LectureCard, SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from '../../utils/types/type';
 // Đăng ký các phần tử Chart.js cần thiết
@@ -34,8 +35,9 @@ ChartJS.register(ChartDataLabels as Plugin<"pie">);
 export default function UserProfilePage() {
 
     const {
-        state: { overallStat, topicStats, results, skillStats },
-        targetRef,
+        state: { overallStat, topicStats, results, skillStats, target },
+        dispatch
+
     } = useProfile();
 
     if (AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
@@ -45,7 +47,7 @@ export default function UserProfilePage() {
     return (
         <main className="pt-8 flex gap-3 flex-column">
             <div key="area-1">
-                <Card key="user-goal" className='shadow-7' title="1. Mục tiêu bản thân"><UserGoal currentScore={averageListeningScore + averageReadingScore} targetRef={targetRef} /></Card>
+                <Card key="user-goal" className='shadow-7' title="1. Mục tiêu bản thân"><UserGoal currentScore={averageListeningScore + averageReadingScore} target={target} dispatch={dispatch} /></Card>
                 <Card key="current-lecture" className='shadow-7' title="2. Các bài học đã tham gia"><CurrentLecture /></Card>
             </div>
             <div key="area-2" className="flex gap-3 flex-wrap">
@@ -66,31 +68,28 @@ export default function UserProfilePage() {
 //==================================================helper HTML ELEMENT =============================================================================================
 
 //---[1]-------------------------------------------------------------------------------------------------------------------------------------------
-const UserGoal: React.FC<{ targetRef: React.MutableRefObject<number>; currentScore: number }> = React.memo(({ targetRef, currentScore }) => {
-    const [targetScore, setTargetScore] = useState<number>(-1);
-    if (targetRef.current !== -1 && targetScore === -1) {
-        setTargetScore(targetRef.current);
-    }
-    const GoalLabel = Array.from(new Set([0, 10, 255, 405, 605, 785, 905, 990, targetScore, currentScore])).sort((a, b) => a - b);
+const UserGoal: React.FC<{ target: number; currentScore: number, dispatch: React.Dispatch<ProfileHookAction> }> = React.memo(({ target, currentScore, dispatch }) => {
+
+    const GoalLabel = Array.from(new Set([0, 10, 255, 405, 605, 785, 905, 990, target, currentScore])).sort((a, b) => a - b);
     const currentScoreIndex = GoalLabel.indexOf(currentScore);
 
 
     // Generate unique and sorted GoalLabel dynamically
-    const steps = GetSteps({ GoalLabel, currentScore, setTargetScore, targetScore, currentScoreIndex });
+    const steps = GetSteps({ GoalLabel, currentScore, dispatch, target, currentScoreIndex });
     return (
         <div className="card">
             <h3>
-                Cần cố gắng <i className="text-red-500">{targetScore - currentScore}</i> điểm nữa để đạt được mục tiêu :{getCurrentTitle(targetScore)}
+                Cần cố gắng <i className="text-red-500">{target - currentScore}</i> điểm nữa để đạt được mục tiêu :{getCurrentTitle(target)}
             </h3>
             <Steps model={steps} activeIndex={currentScoreIndex} readOnly={false} className="m-2 pt-4" />
             <section className="flex justify-content-center gap-5 mt-7">
                 <div className="p-inputgroup w-fit">
-                    <Button severity="success" label="Đặt mục tiêu mới" onClick={() => callPutUserTarget(targetScore)} />
+                    <Button severity="success" label="Đặt mục tiêu mới" onClick={() => callPutUserTarget(target)} />
                     <InputNumber
                         inputStyle={{ maxWidth: '7rem', backgroundColor: 'aliceblue' }}
-                        value={targetScore} suffix="  điểm" showButtons
+                        value={target} suffix="  điểm" showButtons
                         onChange={(e) => {
-                            setTargetScore(Number(e.value) || currentScore);
+                            dispatch({ type: "SET_TARGET", payload: (Number(e.value) || currentScore) });
                         }}
                         max={990} min={10} step={10}
 
@@ -454,15 +453,15 @@ function getCurrentTitle(score: number): string {
 export type UserStepGoalParams = {
     GoalLabel: number[],
     currentScore: number,
-    targetScore: number,
+    target: number,
     currentScoreIndex: number,
-    setTargetScore: React.Dispatch<React.SetStateAction<number>>,
+    dispatch: React.Dispatch<ProfileHookAction>
 }
 function GetSteps(params: UserStepGoalParams): MenuItem[] {
 
     // Find indexes for special icons
 
-    const targetIndex = params.GoalLabel.indexOf(params.targetScore);
+    const targetIndex = params.GoalLabel.indexOf(params.target);
     const endIndex = params.GoalLabel.length - 1;
 
     const getIcon = (itemIndex: number) => {
@@ -504,7 +503,7 @@ function GetSteps(params: UserStepGoalParams): MenuItem[] {
                     marginTop: '-25px',
                 }}
                 onClick={() => {
-                    params.setTargetScore(params.GoalLabel[index]);
+                    params.dispatch({ type: "SET_TARGET", payload: params.GoalLabel[index] });
                 }}
             >
                 <div>

@@ -188,9 +188,18 @@ interface DoExercisePageProps {
 interface DialogQuestionActionProps {
     isVisible: boolean,
     title: string,
-    topicList: React.MutableRefObject<Topic[]>,
+  
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
     currentSelectedQuestion: React.MutableRefObject<TreeNode>,
+    topicList: React.MutableRefObject<Topic[]>,
+}
+
+interface DialogAssignmentQuestionActionProps {
+    isVisible: boolean,
+    title: string,
+    setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
+    currentSelectedQuestion: React.MutableRefObject<TreeNode>,
+    setReload: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 type LectureReduceProps = {
@@ -248,6 +257,10 @@ interface QuestionTableProps {
     setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
     setTopicDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
 }
+interface AssignmentQuestionTableProps {
+    setContextDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
+    setResourceDialogBody: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
+}
 interface TestToolBarProps {
     currentPageIndex: number,
     onEndTest: () => Promise<void>,
@@ -283,7 +296,6 @@ interface ActivityLogProps {
 }
 interface QuestionActionButtonProps {
     questionNode: TreeNode,
-    topicList: React.MutableRefObject<Topic[]>,
     setTitle: React.Dispatch<React.SetStateAction<string>>,
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
     currentSelectedQuestion: React.MutableRefObject<TreeNode>,
@@ -313,9 +325,8 @@ interface UserAnswerSideTabProps {
 }
 
 export type {
-    ActivityLogProps, AdminCategoryTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, ButtonListProps,
-    ConfirmSubmitDialogProps,
-    DialogDeleteLectureBodyProps,
+    ActivityLogProps, AdminCategoryTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AssignmentQuestionTableProps, ButtonListProps,
+    ConfirmSubmitDialogProps, DialogAssignmentQuestionActionProps, DialogDeleteLectureBodyProps,
     DialogDeleteRowBodyProps,
     DialogLectureProps,
     DialogQuestionActionProps,
@@ -335,8 +346,7 @@ export type {
     DoTestPageProps,
     FullTestAreaProps,
     FullTestScreenProps,
-    LectureActionButtonProps,
-    LectureReduceProps,
+    LectureActionButtonProps, LectureReduceProps,
     PartDetailSectionProps,
     QuestionActionButtonProps,
     QuestionTableProps,
