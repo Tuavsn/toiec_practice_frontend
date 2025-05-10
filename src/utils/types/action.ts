@@ -101,6 +101,7 @@ type TestReviewHookAction =
 type ProfileHookAction =
     | { type: 'FETCH_SUCCESS', payload: ProfileHookState }
     | { type: 'SET_PAGE', payload: number }
+    | { type: 'SET_TARGET', payload: number }
 
 type LectureCardAction =
     | { type: 'FETCH_SUCCESS'; payload: LectureCard[] }
