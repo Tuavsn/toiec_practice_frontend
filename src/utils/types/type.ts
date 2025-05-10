@@ -13,10 +13,10 @@ export interface Category extends CategoryRow {
 // Lecture Collection
 export interface Lecture extends DataTableValue {
   id: LectureID;
-  name: string;
+  name: string|null;
   topic: Topic[];
-  content: string;
-  practiceQuestions: QuestionRow[] | null;
+  content: string | null;
+  practiceQuestions: AssignmentQuestion[] | null;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -396,10 +396,17 @@ export type TestResultSummary = {
   userAnswers: SingleUserAnswerOverview[];
 }
 
-export interface PracticePaper {
-  totalQuestions: number,
-  practiceQuestions: PracticeQuestion[]
-}
+// export interface AssignmentPaper {
+//   totalQuestions: number,
+//   active: boolean,
+//   createdAt: Date,
+//   updatedAt: Date,
+//   id: string,
+//   name: string|null,
+//   content: string|null,
+//   tocpic: Topic[],
+//   practiceQuestions: AssignmentQuestion[]
+// }
 
 export interface PracticeQuestion {
   id: QuestionID;
@@ -412,6 +419,17 @@ export interface PracticeQuestion {
   answers: string[];
   correctAnswer: string;
 }
+
+export interface AssignmentQuestion {
+
+  content: string,
+  resources: Resource[],
+  transcript: string,
+  explanation: string,
+  answers:     string[],
+  correctAnswer: string
+}
+
 
 export interface UserAnswerRecord {
   questionId: QuestionID;
@@ -456,7 +474,7 @@ export interface UpdateQuestionForm {
 }
 export interface UpdateAssignmentQuestionForm {
   content: string;
-  id: QuestionID;
+  questionNum: QuestionNumber;
   transcript: string;
   explanation: string;
   answers: string[];

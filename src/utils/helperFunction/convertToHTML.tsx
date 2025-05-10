@@ -7,7 +7,7 @@ import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
 import ChatWindow from "../../components/User/ChatWindow/ChatWindow";
-import { MultipleChoiceQuestion, PracticeAnswerSheet, PracticeQuestion, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, QuestionRow, Resource, SelectedQuestionDialogTestOverallPage, SingleUserAnswerOverview, TestAnswerSheet, TestReviewAnswerSheet, TestSheet, TestType, UserAnswerRecord } from "../types/type";
+import { AssignmentQuestion, MultipleChoiceQuestion, PracticeAnswerSheet, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, QuestionRow, Resource, SelectedQuestionDialogTestOverallPage, SingleUserAnswerOverview, TestAnswerSheet, TestReviewAnswerSheet, TestSheet, TestType, UserAnswerRecord } from "../types/type";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
     const questionPages = [];
@@ -58,47 +58,28 @@ export function MappingPageWithQuestionNumReview(questionList: TestReviewAnswerS
     return questionPages;
 }
 
-export function ConvertThisPracticeQuestionToHTML(
-    practiceQuestion: PracticeQuestion,
+export function ConvertThisAssignmentQuestionToHTML(
+    assignmentQuestion: AssignmentQuestion,
+    assignmentQuestionNum: QuestionNumber = 0,
     userAnswerSheet: PracticeAnswerSheet,
     updateUserAnswerSheet: (qID: QuestionID, answer: string) => void,
-    paginator: JSX.Element
+    paginator: JSX.Element,
 ): JSX.Element {
 
 
     const resourcesElement: JSX.Element[] = [];
     const questionsElement: JSX.Element[] = [];
-    let qNum: QuestionNumber = 0;
-    if (practiceQuestion.resources) {
-        resourcesElement.push(...ResourcesToHTML(practiceQuestion.resources, qNum));
+    
+    if (assignmentQuestion.resources) {
+        resourcesElement.push(...ResourcesToHTML(assignmentQuestion.resources, assignmentQuestionNum));
     }
-    if (practiceQuestion.subQuestions) {
+    questionsElement.push(<h5 key={"group" + assignmentQuestionNum} > {assignmentQuestionNum}. {assignmentQuestion.content} </h5>);
+    questionsElement.push(
+        AssignmentAnswerToHTML(assignmentQuestion, assignmentQuestionNum,userAnswerSheet.get(assignmentQuestionNum.toString()) ?? "", updateUserAnswerSheet),
+        <Divider key={"divider" + assignmentQuestionNum} />
+    )
 
 
-        questionsElement.push(
-            <h3 key={"group" + qNum} > {practiceQuestion.content} </h3>
-        );
-        for (const subpq of practiceQuestion.subQuestions) {
-            qNum += 1;
-            questionsElement.push(<h5 key={"h5" + qNum} > {qNum}.{subpq.content} </h5>)
-            resourcesElement.push(...ResourcesToHTML(subpq.resources, qNum));
-            questionsElement.push(
-                PracticeAnswerToHTML(subpq, userAnswerSheet.get(subpq.id) ?? "", updateUserAnswerSheet),
-                <Divider key={"divider" + subpq.id} />
-            )
-
-        }
-
-    }
-    else {
-        qNum += 1;
-        questionsElement.push(<h5 key={"group" + qNum} > {qNum}. {practiceQuestion.content} </h5>);
-        questionsElement.push(
-            PracticeAnswerToHTML(practiceQuestion, userAnswerSheet.get(practiceQuestion.id) ?? "", updateUserAnswerSheet),
-            <Divider key={"divider" + practiceQuestion.id} />
-        )
-
-    }
     return (
         <div className="flex xl:flex-row lg:flex-row flex-wrap md:flex-row sm:flex-row justify-content-between p-5 gap-4 custom-scrollpanel w-full px-0 py-0 text-sm">
             <ScrollPanel
@@ -110,7 +91,7 @@ export function ConvertThisPracticeQuestionToHTML(
 
             <div className="flex-1" style={{ minWidth: '600px' }}>
                 <div className="flex justify-content-around">
-                    <p className="inline m-auto bg-blue-200 p-2">trang này có {qNum} câu</p>
+                    <p className="inline m-auto bg-blue-200 p-2">trang này có 1 câu</p>
                     {paginator}
                 </div>
                 <ScrollPanel
@@ -430,7 +411,7 @@ export function UserReviewSingleAnswerToHTML(question: SingleUserAnswerOverview)
                 {ConvertReviewTopicToHTML(question)}
 
             </Card>
-            <ChatWindow questionId={question.questionId}/>
+            <ChatWindow questionId={question.questionId} />
         </section>
     return { body: body, title: title }
 }
@@ -456,10 +437,10 @@ function TranscriptAndExplain({ transcript, explanation }: { transcript: string,
     )
 }
 
-function PracticeAnswerToHTML(question: PracticeQuestion, userAnswer: string, updateUserAnswerSheet: (qID: QuestionID, answer: string) => void) {
-    const answerTexts: string[] = (question.type === 'ABCD') ? ['A', 'B', 'C', 'D'] : question.answers;
+function AssignmentAnswerToHTML(question: AssignmentQuestion, assignmentQuestionNum:number,userAnswer: string, updateUserAnswerSheet: (qID: QuestionID, answer: string) => void) {
+    const answerTexts: string[] =question.answers;
     return (
-        <div key={"panswer" + question.id} className={"flex flex-column gap-3"}>
+        <div key={"panswer" + assignmentQuestionNum} className={"flex flex-column gap-3"}>
             {question.answers.map((answer, index) => {
                 let colorBackground = '';
                 if (userAnswer && answer === question.correctAnswer) {
@@ -471,18 +452,18 @@ function PracticeAnswerToHTML(question: PracticeQuestion, userAnswer: string, up
                 return (
                     <div key={"answerbox" + index} className={"flex align-items-center " + colorBackground}>
                         <input
-                            key={index + "radio" + question.id}
+                            key={index + "radio" + assignmentQuestionNum}
                             style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative' }}
                             type="radio"
-                            id={"id" + question.id + index}
-                            name={`answer-${question.id}`}
+                            id={"id" + assignmentQuestionNum + index}
+                            name={`answer-${assignmentQuestionNum}`}
                             value={answer}
                             checked={userAnswer === answer}
                             onChange={() => {
-                                updateUserAnswerSheet(question.id, answer);
+                                updateUserAnswerSheet(assignmentQuestionNum.toString(), answer);
                             }}
                         />
-                        <label key={index + "label" + question.id} htmlFor={"id" + question.id + index} style={{ marginLeft: '8px' }}>
+                        <label key={index + "label" + assignmentQuestionNum} htmlFor={"id" + assignmentQuestionNum + index} style={{ marginLeft: '8px' }}>
                             {answerTexts[index]}
                         </label>
                     </div>
