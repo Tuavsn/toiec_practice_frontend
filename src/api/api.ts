@@ -1,7 +1,7 @@
 import { isCancel } from "axios";
 import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ProfileHookState } from "../utils/types/state";
-import { ApiResponse, AssignmentQuestion, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureProfile, LectureRow, Permission, PermissionID, QuestionID, QuestionRow, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
+import { ApiResponse, AssignmentQuestion, CategoryID, CategoryLabel, CategoryRow, Comment_t, ExerciseType, Lecture, LectureCard, LectureID, LectureProfile, LectureRow, Permission, PermissionID, QuestionID, QuestionRow, RelateLectureTitle, ReportReason, Resource, ResourceIndex, ResultID, Role, ScoresPayload, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
@@ -726,5 +726,93 @@ export const callContinueChat = async (questionId: string, sessionId: string, me
     } catch (error) {
         console.error("Error continuing chat:", error);
         return null;
+    }
+}
+
+
+
+export const fetchComments = async (testId: string, page: number): Promise<TableData<Comment_t> | null> => {
+    try {
+        const url = `https://raw.githubusercontent.com/trhanhtu/dummyjson/refs/heads/main/dummy_comments_${page-1}.json`
+
+        const response = await fetch(url)
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
+
+        return (await response.json()).data
+    } catch (error) {
+        console.error("Error fetching comments:", error)
+        return null
+    }
+}
+
+export const reportComment = async (id: string, reason: ReportReason): Promise<void | null> => {
+    try {
+        const url = `${import.meta.env.VITE_API_URL}/comments/${id}/report`
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reason }),
+        })
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
+
+        return
+    } catch (error) {
+        console.error("Error reporting comment:", error)
+        return null
+    }
+}
+
+export const deleteComment = async (id: string): Promise<void | null> => {
+    try {
+        const url = `${import.meta.env.VITE_API_URL}/comments/${id}`
+
+        const response = await fetch(url, {
+            method: "DELETE",
+        })
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
+
+        return
+    } catch (error) {
+        console.error("Error deleting comment:", error)
+        return null
+    }
+}
+
+export const updateCommentScores = async (id: string, scores: ScoresPayload): Promise<void | null> => {
+    try {
+        const url = `${import.meta.env.VITE_API_URL}/comments/${id}/scores`
+
+        const response = await fetch(url, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(scores),
+        })
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
+
+        return
+    } catch (error) {
+        console.error("Error updating comment scores:", error)
+        return null
+    }
+}
+
+export const undoDeleteComment = async (id: string): Promise<void | null> => {
+    try {
+        const url = `${import.meta.env.VITE_API_URL}/comments/${id}/restore`
+
+        const response = await fetch(url, {
+            method: "POST",
+        })
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
+
+        return
+    } catch (error) {
+        console.error("Error restoring comment:", error)
+        return null
     }
 }

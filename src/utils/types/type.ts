@@ -491,6 +491,31 @@ export interface RelateLectureTitle {
   id: LectureID,
   name: string,
 }
+export interface Comment_t {
+  id: string
+  test_id: string
+  user_id: string
+  email: string
+  text: string
+  created_at: string
+  predict?: string
+  prob_insult: number
+  prob_threat: number
+  prob_hate_speech: number
+  prob_spam: number
+  prob_severe_toxicity: number
+  prob_obscene: number
+  reporter_reason?: string
+}
+
+export interface ScoresPayload {
+  prob_insult: number
+  prob_threat: number
+  prob_hate_speech: number
+  prob_spam: number
+  prob_severe_toxicity: number
+  prob_obscene: number
+}
 
 export interface DoTestFunction {
   updateTimeSpentOnEachQuestionInCurrentPage: () => void;
@@ -571,6 +596,12 @@ export type ColorString = "success" | "info" | "warning" | "danger" | 'secondary
 export type BadgeColor = "danger" | "secondary" | "success" | "info" | "warning" | "contrast" | null | undefined;
 export type Name_ID<T extends string> = T;
 export type TestDocument = QuestionListByPart[]
+export type ReportReason = string
+export enum UserRole {
+  ADMIN = "ADMIN",
+  USER = "USER",
+  GUEST = "GUEST",
+}
 //-----------------------------reducer---------------------
 
 

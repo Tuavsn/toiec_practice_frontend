@@ -1,6 +1,6 @@
 import { Card } from "primereact/card";
 import { memo } from "react";
-import CommentSection from "../../components/User/CommentSection";
+import { CommentList } from "../../components/User/Comment/CommentList";
 import PartChooser from "../../components/User/TestDetail/PartChooser";
 import PartDetailSection from "../../components/User/TestDetail/PartDetail";
 import ResultTable from "../../components/User/TestDetail/ResultTable";
@@ -24,7 +24,8 @@ function TestDetailPage() {
                 <PartChooser limitTime={testInfo.limitTime} testId={id} />
                 <PartDetailSection topicsOverview={testInfo.topicsOverview} />
             </Card>
-            <CommentSection />
+            {/* <CommentSection /> */}
+            <CommentList testId="test-123" currentUserId={localStorage.getItem("idUser")?? "empty id"} />
         </main >
     )
 }

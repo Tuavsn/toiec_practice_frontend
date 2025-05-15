@@ -1,4 +1,4 @@
-import { CategoryRow, DialogLectureJobType, DialogRowJobType, LectureCard, LectureRow, MultipleChoiceQuestion, OverallStat, Permission, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow } from "./type";
+import { CategoryRow, Comment_t, DialogLectureJobType, DialogRowJobType, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, OverallStat, Permission, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow } from "./type";
 
 interface LectureHookState {
   isRefresh: boolean;
@@ -9,6 +9,12 @@ interface LectureHookState {
   searchText: string,
 }
 
+type CommentsState = {
+    comments: Comment_t[]
+    loading: boolean
+    error: string | null
+    meta: Meta | null
+}
 
 type ProfileHookState = {
   id: UserID,
@@ -96,8 +102,7 @@ interface LectureCardState {
 
 }
 export type {
-  CategoryHookState,
-  FullTestScreenState,
+  CategoryHookState, CommentsState, FullTestScreenState,
   LectureCardState,
   LectureHookState,
   MultiQuestionState, PermissionHookState, ProfileHookState,

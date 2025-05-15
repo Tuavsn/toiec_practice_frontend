@@ -1,5 +1,5 @@
 import { TreeNode } from "primereact/treenode";
-import { CategoryHookState, LectureCardState, LectureHookState, MultiQuestionState, PermissionHookState, ProfileHookState, RoleHookState, TestHookState, TestReviewHookState, TopicHookState, UserHookState } from "./state";
+import { CategoryHookState, CommentsState, LectureCardState, LectureHookState, MultiQuestionState, PermissionHookState, ProfileHookState, RoleHookState, TestHookState, TestReviewHookState, TopicHookState, UserHookState } from "./state";
 import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, TestSheet, Topic, UserRow } from "./type";
 export const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
@@ -255,3 +255,10 @@ export const initialState: MultiQuestionState = {
     start: false,
     isSumit: false,
 } as const;
+
+export const initialStateCommentList: CommentsState = {
+    comments: [],
+    loading: false,
+    error: null,
+    meta: null,
+} as const
