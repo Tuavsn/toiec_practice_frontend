@@ -1,294 +1,215 @@
-"use client"
+// Filename: src/features/comments/components/CommentItem.tsx
+import { Avatar } from 'primereact/avatar';
+import { Button } from 'primereact/button';
+import { confirmDialog } from 'primereact/confirmdialog'; // For delete confirmation
+import { Tag } from 'primereact/tag'; // Optional for other indicators
+import React from 'react';
 
-import { Avatar } from "primereact/avatar"
-import { Button } from "primereact/button"
-import { Card } from "primereact/card"
-import { ConfirmDialog } from "primereact/confirmdialog"
-import { Dialog } from "primereact/dialog"
-import { Divider } from "primereact/divider"
-import { InputTextarea } from "primereact/inputtextarea"
-import { Tag } from "primereact/tag"
-import type React from "react"
-import { useState } from "react"
-import { deleteComment, reportComment, undoDeleteComment } from "../../../api/api"
-import { TOXIC_THRESHOLD } from "../../../constant/Constant"
-import { useToast } from "../../../context/ToastProvider"
-import formatDateToString from "../../../utils/helperFunction/formatDateToString"
-import { Comment_t, UserRole } from "../../../utils/types/type"
+import formatDate from '../../../utils/helperFunction/formatDateToString';
+import { Comment_t, DeleteReason, Meta } from '../../../utils/types/type';
+import CommentContentRenderer from './CommentContentRenderer';
+import CommentForm from './CommentForm'; // The form for replying
 
-interface CommentItemProps {
-  comment: Comment_t
-  onAnswer: (email: string) => void
-  onDelete: (id: string) => void
-  onUndo: (id: string) => void
-  isCurrentUser?: boolean
+//------------------------------------------------------
+// Định nghĩa Types cho Props
+//------------------------------------------------------
+export interface CommentItemProps {
+  comment: Comment_t;
+  currentUserId: string | null;
+  potentialMentionedUsers: Array<{ id: string; name: string; avatar?: string }>; // For CommentContentRenderer & reply form
+
+  // Actions
+  onToggleLike: (commentId: string) => void;
+  onDeleteComment: (commentId: string, reason: DeleteReason, parentId?: string | null) => void;
+
+  // Reply handling for this specific comment (if it's a root comment)
+  onShowReplyForm?: (parentId: string) => void; // Tells hook to set this comment.id as activeReplyParentId
+  isReplyFormVisible?: boolean; // True if form to reply TO THIS comment is visible
+  onPostReply?: (text: string, mentionedUserIds: string[], parentId: string) => Promise<void | unknown>;
+  isPostingReply?: boolean; // Loading state for the reply form
+
+  // Handling display of replies TO THIS comment
+  onShowReplies?: (parentId: string, currentReplyPage?: number) => void; // To load/show replies
+  // Replies to this comment are passed down and rendered by CommentSection directly after this item.
+  // This item only needs to trigger loading/showing them.
+  // We can show a "hide replies" button if they are visible for this parent.
+  areRepliesVisible?: boolean; // True if replies for THIS comment are currently shown by parent
+  isLoadingReplies?: boolean; // True if replies for THIS comment are being loaded
+  replyMeta?: Meta | null; // Pagination for this comment's replies
 }
 
-export const CommentItem: React.FC<CommentItemProps> = ({
+interface MentionUser {
+  id: string;
+  name: string;
+  avatar?: string;
+}
+
+
+//------------------------------------------------------
+// Component hiển thị một mục bình luận
+//------------------------------------------------------
+const CommentItem: React.FC<CommentItemProps> = ({
   comment,
-  onAnswer,
-  onDelete,
-  onUndo,
-  isCurrentUser = false,
+  currentUserId,
+  potentialMentionedUsers,
+  onToggleLike,
+  onDeleteComment,
+  onShowReplyForm,
+  isReplyFormVisible,
+  onPostReply,
+  isPostingReply,
+  onShowReplies,
+  areRepliesVisible,
+  isLoadingReplies,
+  replyMeta,
 }) => {
-  const [reportDialogVisible, setReportDialogVisible] = useState<boolean>(false)
-  const [reportReason, setReportReason] = useState<string>("")
-  const [submitting, setSubmitting] = useState<boolean>(false)
-  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState<boolean>(false)
-  const { toast } = useToast()
-  const userRole = (localStorage.getItem("role") as UserRole) || UserRole.GUEST
+  const isOwner = comment.userId === currentUserId;
+  const canReplyToThisComment = comment.level === 0; // Only root comments can be replied to
 
-  const handleReport = async () => {
-    if (!reportReason.trim()) return
+  //------------------------------------------------------
+  // Xử lý xóa bình luận với xác nhận
+  //------------------------------------------------------
+  const handleDelete = () => {
+    confirmDialog({
+      message: 'Bạn có chắc chắn muốn xóa bình luận này không?',
+      header: 'Xác nhận xóa',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Xóa',
+      rejectLabel: 'Hủy',
+      acceptClassName: 'p-button-danger',
+      accept: () => onDeleteComment(comment.id, DeleteReason.USER_DELETE, comment.parentId),
+    });
+  };
 
-    setSubmitting(true)
-
-    const result = await reportComment(comment.id, reportReason)
-
-    if (result !== null) {
-      toast.current?.show({
-        severity: "success",
-        summary: "Success",
-        detail: "Comment reported successfully",
-        life: 3000,
-      })
-      setReportDialogVisible(false)
-      setReportReason("")
-    } else {
-      toast.current?.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to report comment",
-        life: 3000,
-      })
+  //------------------------------------------------------
+  // Xử lý nhấn nút "Phản hồi"
+  //------------------------------------------------------
+  const handleReplyClick = () => {
+    if (onShowReplyForm) {
+      onShowReplyForm(comment.id); // This will set activeReplyParentId to comment.id
     }
+  };
 
-    setSubmitting(false)
-  }
-
-  const handleDelete = async () => {
-    setDeleteConfirmVisible(false)
-
-    const result = await deleteComment(comment.id)
-
-    if (result !== null) {
-      onDelete(comment.id)
-
-      toast.current?.show({
-        severity: "success",
-        summary: "Success",
-        detail: "Comment deleted. Click Undo to restore.",
-        life: 5000,
-        sticky: false,
-        content: (
-          <div className="flex align-items-center justify-content-between">
-            <span>Comment deleted</span>
-            <Button label="Undo" className="p-button-text p-button-sm" onClick={() => handleUndo()} />
-          </div>
-        ),
-      })
-    } else {
-      toast.current?.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to delete comment",
-        life: 3000,
-      })
+  //------------------------------------------------------
+  // Xử lý khi form phản hồi được submit
+  //------------------------------------------------------
+  const handleReplySubmit = async (text: string, mentionedUserIds: string[]) => {
+    if (onPostReply) {
+      await onPostReply(text, mentionedUserIds, comment.id);
+      // The form itself might be hidden by the hook resetting activeReplyParentId
     }
-  }
+  };
 
-  const handleUndo = async () => {
-    const result = await undoDeleteComment(comment.id)
-
-    if (result !== null) {
-      onUndo(comment.id)
-
-      toast.current?.show({
-        severity: "success",
-        summary: "Success",
-        detail: "Comment restored",
-        life: 3000,
-      })
-    } else {
-      toast.current?.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to restore comment",
-        life: 3000,
-      })
+  //------------------------------------------------------
+  // Xử lý nhấn nút "Xem phản hồi" / "Ẩn phản hồi"
+  //------------------------------------------------------
+  const handleToggleRepliesVisibility = () => {
+    if (onShowReplies) {
+      // If replies are visible, calling with parentId might mean "hide" or "refresh page 1"
+      // If not visible, it means "show/load page 1"
+      // The hook's toggleRepliesVisibility handles this logic.
+      // We pass current reply page if we want to load next page. For initial toggle, it's page 1.
+      onShowReplies(comment.id, areRepliesVisible ? undefined : 1);
     }
-  }
+  };
 
-  const renderToxicityFlags = () => {
-    if (userRole !== UserRole.ADMIN) return null
+  const renderViewRepliesButton = () => {
+    if (!onShowReplies || comment.directReplyCount === 0) return null;
 
-    const toxicFields = [
-      { key: "prob_insult", label: "Insult" },
-      { key: "prob_threat", label: "Threat" },
-      { key: "prob_hate_speech", label: "Hate Speech" },
-      { key: "prob_spam", label: "Spam" },
-      { key: "prob_severe_toxicity", label: "Severe Toxicity" },
-      { key: "prob_obscene", label: "Obscene" },
-    ]
+    const buttonLabel = areRepliesVisible
+      ? `Ẩn phản hồi`
+      : `Xem ${comment.directReplyCount} phản hồi`;
 
     return (
-      <div className="mt-3">
-        <Divider />
-        <div className="flex flex-wrap gap-2">
-          {toxicFields.map((field) => {
-            const value = comment[field.key as keyof Comment_t] as number
-            const isToxic = value > TOXIC_THRESHOLD
-
-            return (
-              <Tag
-                key={field.key}
-                severity={isToxic ? "danger" : "info"}
-                value={`${field.label}: ${value.toFixed(2)}`}
-              />
-            )
-          })}
-        </div>
-      </div>
-    )
+      <Button
+        label={buttonLabel}
+        icon={isLoadingReplies ? "pi pi-spin pi-spinner" : (areRepliesVisible ? "pi pi-chevron-up" : "pi pi-chevron-down")}
+        className="p-button-text p-button-sm text-xs ml-auto" /* Align to right of actions */
+        onClick={handleToggleRepliesVisibility}
+        disabled={isLoadingReplies}
+      />
+    );
   }
 
-  // Generate initials for avatar
-  const getInitials = (email: string): string => {
-    return email.split("@")[0].substring(0, 2).toUpperCase()
-  }
+  const likeButtonTooltip = comment.likedByCurrentUser ? "Bỏ thích" : "Thích";
+  const likeButtonIcon = comment.likedByCurrentUser ? "pi pi-heart-fill" : "pi pi-heart";
+  const likeButtonClass = comment.likedByCurrentUser ? "p-button-danger p-button-text" : "p-button-secondary p-button-text";
 
-  // Get a consistent color based on email
-  const getAvatarColor = (email: string): string => {
-    const colors = ["var(--blue-500)", "var(--green-500)", "var(--yellow-500)", "var(--cyan-500)", "var(--pink-500)"]
-    const index = email.charCodeAt(0) % colors.length
-    return colors[index]
-  }
-
-  const formatCommentText = (text: string): JSX.Element => {
-    // Simple regex to highlight mentions
-    const parts = text.split(/(@\w+(?:\.\w+)*)/g)
-
-    return (
-      <>
-        {parts.map((part, index) => {
-          if (part.startsWith("@")) {
-            return (
-              <span key={index} className="text-primary font-medium">
-                {part}
-              </span>
-            )
-          }
-          return <span key={index}>{part}</span>
-        })}
-      </>
-    )
-  }
 
   return (
-    <Card
-      className={`mb-3 ${isCurrentUser ? "border-primary border-1" : ""}`}
-      pt={{
-        root: { className: "shadow-2" },
-        content: { className: "p-0" },
-      }}
-    >
-      <div className="p-3">
-        <div className="flex justify-content-between align-items-start">
-          <div className="flex align-items-center gap-2">
-            <Avatar
-              label={getInitials(comment.email)}
-              shape="circle"
-              style={{ backgroundColor: getAvatarColor(comment.email) }}
-            />
-            <div>
-              <address className="m-0 font-medium">{comment.email}</address>
-              <time dateTime={comment.created_at} className="text-sm text-500">
-                {formatDateToString(comment.created_at)}
-              </time>
-            </div>
+    <div className={`comment-item py-3 ${comment.level > 0 ? 'ml-5 pl-4 border-left-2 surface-border' : ''}`}>
+      {/* Global ConfirmDialog needed for confirmDialog() to work */}
+      {/* <ConfirmDialog /> */} {/* Add this if you want local control, or ensure global one exists */}
+
+      <div className="flex align-items-start mb-2">
+        <Avatar
+          image={comment.userAvatarUrl || undefined}
+          label={comment.userDisplayName ? comment.userDisplayName[0].toUpperCase() : 'U'}
+          shape="circle"
+          size="large"
+          className="mr-3 flex-shrink-0"
+          style={{ backgroundColor: '#007bff', color: '#ffffff' }} // Default avatar style
+        />
+        <div className="flex-grow-1">
+          <div className="flex align-items-center justify-content-between">
+            <span className="font-semibold text-sm">{comment.userDisplayName || 'Người dùng ẩn danh'}</span>
+            {comment.deleted && <Tag severity="warning" value="Đã xóa" className="ml-2 text-xs"></Tag>}
           </div>
-
-          <div className="flex gap-1">
+          <div className={`text-sm surface-content ${comment.deleted ? 'italic text-color-secondary' : ''} mt-1 break-word`}>
+            {comment.deleted
+              ? (comment.deleteReason || 'Bình luận này đã bị xóa.')
+              : <CommentContentRenderer content={comment.content} potentialMentionedUsers={potentialMentionedUsers} />
+            }
+          </div>
+          <div className="comment-actions text-xs text-color-secondary mt-2 flex align-items-center">
             <Button
-              icon="pi pi-reply"
-              className="p-button-rounded p-button-text p-button-sm"
-              tooltip="Answer"
-              onClick={() => onAnswer(comment.email)}
-              data-testid={`btn-answer-${comment.id}`}
+              icon={likeButtonIcon}
+              className={`${likeButtonClass} p-button-rounded p-button-sm mr-1`}
+              onClick={() => onToggleLike(comment.id)}
+              tooltip={likeButtonTooltip}
+              tooltipOptions={{position: 'top'}}
             />
+            <span className="mr-3">{comment.likeCounts > 0 ? comment.likeCounts : ''}</span>
 
-            <Button
-              icon="pi pi-flag"
-              className="p-button-rounded p-button-text p-button-sm p-button-danger"
-              tooltip="Report"
-              onClick={() => setReportDialogVisible(true)}
-              data-testid={`btn-report-${comment.id}`}
-            />
-
-            {userRole === UserRole.ADMIN && (
+            {canReplyToThisComment && onShowReplyForm && (
               <Button
-                icon="pi pi-trash"
-                className="p-button-rounded p-button-text p-button-sm p-button-danger"
-                tooltip="Delete"
-                onClick={() => setDeleteConfirmVisible(true)}
-                data-testid={`btn-delete-${comment.id}`}
+                label="Phản hồi"
+                icon="pi pi-reply"
+                className="p-button-text p-button-sm mr-3 text-xs"
+                onClick={handleReplyClick}
               />
             )}
+            {isOwner && !comment.deleted && (
+              <Button
+                label="Xóa"
+                icon="pi pi-trash"
+                className="p-button-text p-button-danger p-button-sm mr-3 text-xs"
+                onClick={handleDelete}
+              />
+            )}
+            <span className="ml-auto text-xs">{formatDate(comment.createdAt)}</span>
           </div>
+            {/* Button to show/hide replies for this comment (if it's a root comment) */}
+            {canReplyToThisComment && comment.directReplyCount > 0 && renderViewRepliesButton()}
         </div>
-
-        <div className="mt-3 line-height-3">{formatCommentText(comment.text)}</div>
-
-        {renderToxicityFlags()}
       </div>
 
-      <Dialog
-        header="Report Comment"
-        visible={reportDialogVisible}
-        onHide={() => setReportDialogVisible(false)}
-        style={{ width: "450px" }}
-        modal
-        footer={
-          <div>
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              className="p-button-text"
-              onClick={() => setReportDialogVisible(false)}
-              disabled={submitting}
-            />
-            <Button
-              label="Report"
-              icon="pi pi-check"
-              onClick={handleReport}
-              loading={submitting}
-              disabled={!reportReason.trim() || submitting}
-            />
-          </div>
-        }
-      >
-        <div className="field">
-          <label htmlFor="reason">Reason for reporting</label>
-          <InputTextarea
-            id="reason"
-            value={reportReason}
-            onChange={(e) => setReportReason(e.target.value)}
-            rows={5}
-            autoResize
-            className="w-full mt-1"
+
+      {/* Form để trả lời bình luận này */}
+      {canReplyToThisComment && isReplyFormVisible && onPostReply && (
+        <div className="ml-5 pl-4 mt-2"> {/* Indent reply form */}
+          <CommentForm
+            onSubmit={handleReplySubmit}
+            placeholder={`Trả lời ${comment.userDisplayName || 'người dùng'}...`}
+            isLoading={isPostingReply || false}
+            mentionSuggestions={potentialMentionedUsers}
+            onCancel={() => onShowReplyForm && onShowReplyForm(comment.id)} // Click reply again to close
+            autoFocus={true}
           />
         </div>
-      </Dialog>
+      )}
+    </div>
+  );
+};
 
-      <ConfirmDialog
-        visible={deleteConfirmVisible}
-        onHide={() => setDeleteConfirmVisible(false)}
-        message="Are you sure you want to delete this comment?"
-        header="Confirm Delete"
-        icon="pi pi-exclamation-triangle"
-        accept={handleDelete}
-        reject={() => setDeleteConfirmVisible(false)}
-      />
-    </Card>
-  )
-}
+export default CommentItem;

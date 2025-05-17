@@ -1,11 +1,12 @@
 import { Card } from "primereact/card";
 import { memo } from "react";
-import { CommentList } from "../../components/User/Comment/CommentList";
+import CommentSection from "../../components/User/Comment/CommentSection";
 import PartChooser from "../../components/User/TestDetail/PartChooser";
 import PartDetailSection from "../../components/User/TestDetail/PartDetail";
 import ResultTable from "../../components/User/TestDetail/ResultTable";
 import TestInfoBox from "../../components/User/TestDetail/TestInfoBox";
 import { useTestDetail } from "../../hooks/TestDetailPaperHook";
+import { TargetType } from "../../utils/types/type";
 
 
 
@@ -24,8 +25,8 @@ function TestDetailPage() {
                 <PartChooser limitTime={testInfo.limitTime} testId={id} />
                 <PartDetailSection topicsOverview={testInfo.topicsOverview} />
             </Card>
-            {/* <CommentSection /> */}
-            <CommentList testId="test-123" currentUserId={localStorage.getItem("idUser")?? "empty id"} />
+            <CommentSection targetId={testInfo.id} targetType={TargetType.TEST} />
+
         </main >
     )
 }

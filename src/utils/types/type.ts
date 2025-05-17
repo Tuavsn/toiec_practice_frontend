@@ -13,7 +13,7 @@ export interface Category extends CategoryRow {
 // Lecture Collection
 export interface Lecture extends DataTableValue {
   id: LectureID;
-  name: string|null;
+  name: string | null;
   topic: Topic[];
   content: string | null;
   practiceQuestions: AssignmentQuestion[] | null;
@@ -426,7 +426,7 @@ export interface AssignmentQuestion {
   resources: Resource[],
   transcript: string,
   explanation: string,
-  answers:     string[],
+  answers: string[],
   correctAnswer: string
 }
 
@@ -491,21 +491,76 @@ export interface RelateLectureTitle {
   id: LectureID,
   name: string,
 }
-export interface Comment_t {
-  id: string
-  test_id: string
-  user_id: string
-  email: string
+export interface CommentPage {
+  result: Comment_t[]
+  meta: Meta
+}
+
+
+export interface CreateCommentRequest {
+  targetType: TargetType
+  targetId: string
+  parentId?: string
   text: string
-  created_at: string
-  predict?: string
+  mentionedUserIds?: string[]
+}
+
+export interface DeleteCommentRequest {
+  reason: DeleteReason
+}
+
+export enum TargetType {
+  TEST = "TEST",
+  LESSON = "LESSON",
+  COURSE = "COURSE",
+}
+
+export enum DeleteReason {
+  VIOLATE_COMMUNITY_STANDARDS = "VIOLATE_COMMUNITY_STANDARDS",
+  USER_DELETE = "USER_DELETE",
+  ADMIN_DELETE = "ADMIN_DELETE",
+}
+
+
+export interface ScoresPayload {
   prob_insult: number
   prob_threat: number
   prob_hate_speech: number
   prob_spam: number
   prob_severe_toxicity: number
   prob_obscene: number
-  reporter_reason?: string
+}
+
+
+export type DeleteReasonTag = "VIOLATE_COMMUNITY_STANDARDS" | "USER_DELETE" | "ADMIN_DELETE"
+
+
+export interface Comment_t {
+  id: string,
+  content: string,
+  userId: string,
+  userDisplayName: string,
+  userAvatarUrl: string,
+  parentId: string,
+  rootId: string,
+  mentionedUserIds: string[],
+  targetType: TargetType,
+  targetId: string,
+  likeCounts: number,
+  directReplyCount: number,
+  level: number,
+  deleted: true,
+  deleteReasonTag: DeleteReason,
+  deleteReason: string,
+  createdAt: string,
+  active: true,
+  probInsult: number,
+  probThreat: number,
+  probHateSpeech: number,
+  probSpam: number,
+  probSevereToxicity: number,
+  probObscene: number,
+  likedByCurrentUser: true
 }
 
 export interface ScoresPayload {

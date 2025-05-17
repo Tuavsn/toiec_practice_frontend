@@ -1,13 +1,27 @@
 import { isCancel } from "axios";
 import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ProfileHookState } from "../utils/types/state";
-import { ApiResponse, AssignmentQuestion, CategoryID, CategoryLabel, CategoryRow, Comment_t, ExerciseType, Lecture, LectureCard, LectureID, LectureProfile, LectureRow, Permission, PermissionID, QuestionID, QuestionRow, RelateLectureTitle, ReportReason, Resource, ResourceIndex, ResultID, Role, ScoresPayload, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
+import { ApiResponse, AssignmentQuestion, CategoryID, CategoryLabel, CategoryRow, Comment_t, CommentPage, CreateCommentRequest, DeleteCommentRequest, ExerciseType, Lecture, LectureCard, LectureID, LectureProfile, LectureRow, Permission, PermissionID, QuestionID, QuestionRow, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, TargetType, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 
 export const loginUrl = `${host}/oauth2/authorize/google`;
 
+export const wakeupServers = async (): Promise<void> => {
+    try {
 
+
+        await Promise.all(
+            [
+                axios.head(host),
+                axios.head(import.meta.env.TOXIC_CLASSIFIER_API_URL)
+            ]
+        )
+    } catch (e: unknown) {
+        console.error("wakeup server fail !!!");
+        
+    }
+}
 
 export const callCreateCategory = async (category: CategoryRow): Promise<boolean> => {
     try {
@@ -729,90 +743,128 @@ export const callContinueChat = async (questionId: string, sessionId: string, me
     }
 }
 
-
-
-export const fetchComments = async (testId: string, page: number): Promise<TableData<Comment_t> | null> => {
+export const fetchRootCommentList = async (
+    targetType: TargetType,
+    targetId: string,
+    signal?: AbortSignal,
+    page = 1,
+    pageSize = 10,
+    term?: string,
+    sortBy: string[] = ["createdAt"],
+    sortDirection: string[] = ["desc"],
+    active?: boolean,
+): Promise<CommentPage | null> => {
     try {
-        const url = `https://raw.githubusercontent.com/trhanhtu/dummyjson/refs/heads/main/dummy_comments_${page-1}.json`
+        const params = new URLSearchParams()
+        params.append("current", page.toString())
+        params.append("pageSize", pageSize.toString())
 
-        const response = await fetch(url)
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
+        if (term) params.append("term", term)
 
-        return (await response.json()).data
+        sortBy.forEach((sort, index) => {
+            params.append("sortBy", sort)
+            if (sortDirection[index]) {
+                params.append("sortDirection", sortDirection[index])
+            }
+        })
+
+        if (active !== undefined) params.append("active", active.toString())
+
+        const response = await axios.get<ApiResponse<CommentPage>>(
+            `${import.meta.env.VITE_API_URL}/comments/root/${targetType}/${targetId}?${params.toString()}`, { signal }
+        )
+
+        return response.data.data
     } catch (error) {
-        console.error("Error fetching comments:", error)
+        console.error("Error fetching root comments:", error)
         return null
     }
 }
 
-export const reportComment = async (id: string, reason: ReportReason): Promise<void | null> => {
+export const fetchRepliesList = async (
+    targetType: TargetType,
+    targetId: string,
+    parentId: string,
+    signal?: AbortSignal,
+    page = 1,
+    pageSize = 10,
+    term?: string,
+    sortBy: string[] = ["createdAt"],
+    sortDirection: string[] = ["desc"],
+    active?: boolean,
+): Promise<CommentPage | null> => {
     try {
-        const url = `${import.meta.env.VITE_API_URL}/comments/${id}/report`
+        const params = new URLSearchParams()
+        params.append("current", page.toString())
+        params.append("pageSize", pageSize.toString())
 
-        const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ reason }),
+        if (term) params.append("term", term)
+
+        sortBy.forEach((sort, index) => {
+            params.append("sortBy", sort)
+            if (sortDirection[index]) {
+                params.append("sortDirection", sortDirection[index])
+            }
         })
 
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
+        if (active !== undefined) params.append("active", active.toString())
 
-        return
+        const response = await axios.get<ApiResponse<CommentPage>>(
+            `${import.meta.env.VITE_API_URL}/comments/replies/${targetType}/${targetId}/${parentId}?${params.toString()}`, { signal }
+        )
+
+        return response.data.data
     } catch (error) {
-        console.error("Error reporting comment:", error)
+        console.error("Error fetching replies:", error)
         return null
     }
 }
 
-export const deleteComment = async (id: string): Promise<void | null> => {
+export const createComment = async (commentData: CreateCommentRequest, signal?: AbortSignal): Promise<Comment_t | null> => {
     try {
-        const url = `${import.meta.env.VITE_API_URL}/comments/${id}`
+        const response = await axios.post<ApiResponse<Comment_t>>(`${import.meta.env.VITE_API_URL}/comments`, commentData, { signal })
 
-        const response = await fetch(url, {
-            method: "DELETE",
-        })
+        return response.data.data
+    } catch (error) {
+        console.error("Error creating comment:", error)
+        return null
+    }
+}
 
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
+export const deleteOneComment = async (
+    commentId: string,
+    deleteRequest: DeleteCommentRequest,
+    signal?: AbortSignal
+): Promise<Comment_t | null> => {
+    try {
+        const response = await axios.delete<ApiResponse<Comment_t>>(`${import.meta.env.VITE_API_URL}/comments/${commentId}`, { data: deleteRequest, signal })
 
-        return
+        return response.data.data
     } catch (error) {
         console.error("Error deleting comment:", error)
         return null
     }
 }
 
-export const updateCommentScores = async (id: string, scores: ScoresPayload): Promise<void | null> => {
+export const toggleOneLike = async (commentId: string, signal?: AbortSignal): Promise<Comment_t | null> => {
     try {
-        const url = `${import.meta.env.VITE_API_URL}/comments/${id}/scores`
+        const response = await axios.put<ApiResponse<Comment_t>>(`${import.meta.env.VITE_API_URL}/comments/toggle-like/${commentId}`, undefined, { signal })
 
-        const response = await fetch(url, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(scores),
-        })
-
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
-
-        return
+        return response.data.data
     } catch (error) {
-        console.error("Error updating comment scores:", error)
+        console.error("Error toggling like:", error)
         return null
     }
 }
 
-export const undoDeleteComment = async (id: string): Promise<void | null> => {
+export const toggleActive = async (commentId: string): Promise<Comment_t | null> => {
     try {
-        const url = `${import.meta.env.VITE_API_URL}/comments/${id}/restore`
+        const response = await axios.put<ApiResponse<Comment_t>>(`${import.meta.env.VITE_API_URL}/comments/toggle-active/${commentId}`)
 
-        const response = await fetch(url, {
-            method: "POST",
-        })
-
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
-
-        return
+        return response.data.data
     } catch (error) {
-        console.error("Error restoring comment:", error)
+        console.error("Error toggling active status:", error)
         return null
     }
 }
+
