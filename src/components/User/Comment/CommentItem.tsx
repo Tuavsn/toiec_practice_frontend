@@ -1,5 +1,4 @@
 // Filename: src/features/comments/components/CommentItem.tsx
-import { Avatar } from 'primereact/avatar';
 import { Button } from 'primereact/button';
 import { confirmDialog } from 'primereact/confirmdialog'; // For delete confirmation
 import { Tag } from 'primereact/tag'; // Optional for other indicators
@@ -7,6 +6,7 @@ import React from 'react';
 
 import formatDate from '../../../utils/helperFunction/formatDateToString';
 import { Comment_t, DeleteReason, Meta } from '../../../utils/types/type';
+import UserAvatar from '../Avatar/UserAvatar';
 import CommentContentRenderer from './CommentContentRenderer';
 import CommentForm from './CommentForm'; // The form for replying
 
@@ -38,12 +38,6 @@ export interface CommentItemProps {
   replyMeta?: Meta | null; // Pagination for this comment's replies
 }
 
-interface MentionUser {
-  id: string;
-  name: string;
-  avatar?: string;
-}
-
 
 //------------------------------------------------------
 // Component hiển thị một mục bình luận
@@ -61,7 +55,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onShowReplies,
   areRepliesVisible,
   isLoadingReplies,
-  replyMeta,
+
 }) => {
   const isOwner = comment.userId === currentUserId;
   const canReplyToThisComment = comment.level === 0; // Only root comments can be replied to
@@ -139,17 +133,10 @@ const CommentItem: React.FC<CommentItemProps> = ({
   return (
     <div className={`comment-item py-3 ${comment.level > 0 ? 'ml-5 pl-4 border-left-2 surface-border' : ''}`}>
       {/* Global ConfirmDialog needed for confirmDialog() to work */}
-      {/* <ConfirmDialog /> */} {/* Add this if you want local control, or ensure global one exists */}
+
 
       <div className="flex align-items-start mb-2">
-        <Avatar
-          image={comment.userAvatarUrl || undefined}
-          label={comment.userDisplayName ? comment.userDisplayName[0].toUpperCase() : 'U'}
-          shape="circle"
-          size="large"
-          className="mr-3 flex-shrink-0"
-          style={{ backgroundColor: '#007bff', color: '#ffffff' }} // Default avatar style
-        />
+        <UserAvatar comment={comment} />
         <div className="flex-grow-1">
           <div className="flex align-items-center justify-content-between">
             <span className="font-semibold text-sm">{comment.userDisplayName || 'Người dùng ẩn danh'}</span>
@@ -167,7 +154,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               className={`${likeButtonClass} p-button-rounded p-button-sm mr-1`}
               onClick={() => onToggleLike(comment.id)}
               tooltip={likeButtonTooltip}
-              tooltipOptions={{position: 'top'}}
+              tooltipOptions={{ position: 'top' }}
             />
             <span className="mr-3">{comment.likeCounts > 0 ? comment.likeCounts : ''}</span>
 
@@ -189,8 +176,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
             )}
             <span className="ml-auto text-xs">{formatDate(comment.createdAt)}</span>
           </div>
-            {/* Button to show/hide replies for this comment (if it's a root comment) */}
-            {canReplyToThisComment && comment.directReplyCount > 0 && renderViewRepliesButton()}
+          {/* Button to show/hide replies for this comment (if it's a root comment) */}
+          {canReplyToThisComment && comment.directReplyCount > 0 && renderViewRepliesButton()}
         </div>
       </div>
 
@@ -213,3 +200,4 @@ const CommentItem: React.FC<CommentItemProps> = ({
 };
 
 export default CommentItem;
+

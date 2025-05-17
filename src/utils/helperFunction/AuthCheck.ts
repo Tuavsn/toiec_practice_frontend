@@ -19,7 +19,7 @@ export function GetMyIDUser(): UserID {
  * @returns ID người dùng hoặc null nếu không tìm thấy.
  */
 export const getCurrentUserId = (): string | null => {
-  return localStorage.getItem("idUser");
+  return localStorage.getItem("iduser");
 };
 
 /**

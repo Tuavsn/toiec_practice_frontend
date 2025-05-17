@@ -10,11 +10,10 @@ export const loginUrl = `${host}/oauth2/authorize/google`;
 export const wakeupServers = async (): Promise<void> => {
     try {
 
-
         await Promise.all(
             [
-                axios.head(host),
-                axios.head(import.meta.env.TOXIC_CLASSIFIER_API_URL)
+                axios.get(`${import.meta.env.VITE_API_URL}/categories?current=1&pageSize=1`),
+                fetch(import.meta.env.VITE_TOXIC_CLASSIFIER_API_URL,{method: "HEAD"})
             ]
         )
     } catch (e: unknown) {

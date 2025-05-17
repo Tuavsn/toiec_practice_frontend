@@ -6,18 +6,20 @@ import { ConfirmDialog } from "primereact/confirmdialog"
 import { DataTable } from "primereact/datatable"
 import { Dialog } from "primereact/dialog"
 import { Dropdown } from "primereact/dropdown"
+import { IconField } from "primereact/iconfield"
+import { InputIcon } from "primereact/inputicon"
 import { InputNumber } from "primereact/inputnumber"
 import { InputText } from "primereact/inputtext"
 import { Tag } from "primereact/tag"
 import type React from "react"
 import { useEffect, useRef, useState } from "react"
-import { deleteComment, fetchRootComments, toggleActive } from "../../api/api"
+import { deleteOneComment, fetchRootCommentList, toggleActive } from "../../api/api"
 import { TOXIC_THRESHOLD } from "../../constant/Constant"
 import { useToast } from "../../context/ToastProvider"
 import formatDateToString from "../../utils/helperFunction/formatDateToString"
-import { Comment_t, DeleteReasonTag, TargetType } from "../../utils/types/type"
+import { Comment_t, DeleteCommentRequest, TargetType } from "../../utils/types/type"
 
-export const AdminManagementPage: React.FC = () => {
+const AdminManagementCommentPage: React.FC = () => {
   const [comments, setComments] = useState<Comment_t[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [totalRecords, setTotalRecords] = useState<number>(0)
@@ -58,9 +60,10 @@ export const AdminManagementPage: React.FC = () => {
     setLoading(true)
 
     try {
-      const result = await fetchRootComments(
+      const result = await fetchRootCommentList(
         "TEST" as TargetType, // You might want to make this configurable
         "all",
+        abortController.current.signal,
         lazyParams.page,
         lazyParams.rows,
         globalFilter || undefined,
@@ -155,11 +158,11 @@ export const AdminManagementPage: React.FC = () => {
 
   const handleDelete = async () => {
     if (!commentToDelete) return
-
-    const result = await deleteComment(commentToDelete.id, {
-      reasonTag: deleteReason as DeleteReasonTag,
+    const deleteRequest: DeleteCommentRequest = {
       reason: "Admin deleted via management page",
-    })
+      reasonTag: "ADMIN_DELETE"
+    }
+    const result = await deleteOneComment(commentToDelete.id, deleteRequest)
 
     if (result !== null) {
       toast.current?.show({
@@ -274,10 +277,11 @@ export const AdminManagementPage: React.FC = () => {
           placeholder="Filter by Status"
           className="mr-2"
         />
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
+        <IconField iconPosition="left">
+          <InputIcon className="pi pi-search"> </InputIcon>
           <InputText value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
-        </span>
+        </IconField>
+        
       </div>
     </div>
   )
@@ -493,3 +497,5 @@ export const AdminManagementPage: React.FC = () => {
     </div>
   )
 }
+
+export default AdminManagementCommentPage

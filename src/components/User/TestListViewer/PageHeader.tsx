@@ -1,5 +1,7 @@
 "use client"
 
+import { IconField } from "primereact/iconfield"
+import { InputIcon } from "primereact/inputicon"
 import { InputText } from "primereact/inputtext"
 
 interface PageHeaderProps {
@@ -13,15 +15,15 @@ export default function PageHeader({ searchTerm, setSearchTerm }: PageHeaderProp
             <header className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                 <h1 className="text-3xl font-bold text-900 m-0">Thư viện đề thi</h1>
                 <section className="mt-3 md:mt-0">
-                    <span className="p-input-icon-left w-full md:w-auto">
-                        <i className="pi pi-search" />
+                    <IconField iconPosition="left">
+                        <InputIcon className="pi pi-search"> </InputIcon>
                         <InputText
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder="Tìm kiếm đề thi..."
                             className="w-full"
                         />
-                    </span>
+                    </IconField>
                 </section>
             </header>
         </main>

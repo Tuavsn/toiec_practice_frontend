@@ -84,6 +84,9 @@ export const useCommentSection = ({
     const fetchRootComments = useCallback(
         async (page = 1, pageSize = 10, term?: string) => {
             // Hủy controller cũ và tạo mới cho request này để tránh race condition nếu fetch nhanh liên tiếp
+            if (!targetId) {
+                return;
+            }
             abortControllerRef.current?.abort();
             abortControllerRef.current = new AbortController();
 
@@ -125,7 +128,7 @@ export const useCommentSection = ({
             const newCommentData: CreateCommentRequest = {
                 targetType,
                 targetId,
-                text,
+                content: text,
                 mentionedUserIds,
                 parentId: parentCommentId,
             };

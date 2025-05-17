@@ -501,18 +501,19 @@ export interface CreateCommentRequest {
   targetType: TargetType
   targetId: string
   parentId?: string
-  text: string
+  content: string
   mentionedUserIds?: string[]
 }
 
 export interface DeleteCommentRequest {
-  reason: DeleteReason
+  reason: string,
+  reasonTag: DeleteReasonTag,
+
 }
 
 export enum TargetType {
   TEST = "TEST",
-  LESSON = "LESSON",
-  COURSE = "COURSE",
+  LESSON = "LECTURE",
 }
 
 export enum DeleteReason {
