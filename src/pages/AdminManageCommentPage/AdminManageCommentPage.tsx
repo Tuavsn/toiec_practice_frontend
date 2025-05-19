@@ -10,14 +10,16 @@ import { IconField } from "primereact/iconfield"
 import { InputIcon } from "primereact/inputicon"
 import { InputNumber } from "primereact/inputnumber"
 import { InputText } from "primereact/inputtext"
+import { Paginator, PaginatorPageChangeEvent } from "primereact/paginator"
 import { Tag } from "primereact/tag"
 import type React from "react"
 import { useEffect, useRef, useState } from "react"
-import { deleteOneComment, fetchRootCommentList, toggleActive } from "../../api/api"
+import { deleteOneComment, fetchTableOfComments, toggleActive } from "../../api/api"
+import AdminCommentReportsTable from "../../components/Admin/Table/AdminCommentReportTable"
 import { TOXIC_THRESHOLD } from "../../constant/Constant"
 import { useToast } from "../../context/ToastProvider"
 import formatDateToString from "../../utils/helperFunction/formatDateToString"
-import { Comment_t, DeleteCommentRequest, TargetType } from "../../utils/types/type"
+import { Comment_t, DeleteCommentRequest } from "../../utils/types/type"
 
 const AdminManagementCommentPage: React.FC = () => {
   const [comments, setComments] = useState<Comment_t[]>([])
@@ -30,7 +32,7 @@ const AdminManagementCommentPage: React.FC = () => {
     sortField: "createdAt",
     sortOrder: -1 as -1 | 1,
     filters: {},
-    active: undefined as boolean | undefined,
+    active: "all" as "all" | "true" | "false",
   })
   const [editDialog, setEditDialog] = useState<boolean>(false)
   const [editComment, setEditComment] = useState<Comment_t | null>(null)
@@ -58,46 +60,27 @@ const AdminManagementCommentPage: React.FC = () => {
 
     abortController.current = new AbortController()
     setLoading(true)
+    const result = await fetchTableOfComments(
+      toast,
+      lazyParams.page,
+      lazyParams.rows,
+      globalFilter || undefined,
+      abortController.current.signal,
+      [lazyParams.sortField],
+      [lazyParams.sortOrder === 1 ? "asc" : "desc"],
+      lazyParams.active === "all" ? undefined : JSON.parse(lazyParams.active),
+    )
 
-    try {
-      const result = await fetchRootCommentList(
-        "TEST" as TargetType, // You might want to make this configurable
-        "all",
-        abortController.current.signal,
-        lazyParams.page,
-        lazyParams.rows,
-        globalFilter || undefined,
-        [lazyParams.sortField],
-        [lazyParams.sortOrder === 1 ? "asc" : "desc"],
-        lazyParams.active,
-      )
-
-      if (result) {
-        setComments(result.result)
-        setTotalRecords(result.meta.totalItems)
-      } else {
-        toast.current?.show({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to load comments",
-          life: 3000,
-        })
-      }
-    } catch (error) {
-      if ((error as Error).name !== "AbortError") {
-        toast.current?.show({
-          severity: "error",
-          summary: "Error",
-          detail: "Failed to load comments",
-          life: 3000,
-        })
-      }
-    } finally {
-      setLoading(false)
+    if (result) {
+      setComments(result.result)
+      setTotalRecords(result.meta.totalItems)
     }
+    setLoading(false)
+
   }
 
-  const onPage = (event: any) => {
+  const onPage = (event: PaginatorPageChangeEvent) => {
+    console.dir(event);
     setLazyParams({
       ...lazyParams,
       first: event.first,
@@ -167,8 +150,8 @@ const AdminManagementCommentPage: React.FC = () => {
     if (result !== null) {
       toast.current?.show({
         severity: "success",
-        summary: "Success",
-        detail: "Comment deleted successfully",
+        summary: "Thành công",
+        detail: `Xóa bình luận của ${commentToDelete.userDisplayName} thành công`,
         life: 3000,
       })
 
@@ -176,8 +159,8 @@ const AdminManagementCommentPage: React.FC = () => {
     } else {
       toast.current?.show({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to delete comment",
+        summary: "Lỗi",
+        detail: `Lỗi xóa bình luận của ${commentToDelete.userDisplayName}`,
         life: 3000,
       })
     }
@@ -252,36 +235,41 @@ const AdminManagementCommentPage: React.FC = () => {
     ).length
 
     if (toxicCount === 0) {
-      return <Tag severity="success" value="Clean" />
+      return <Tag severity="success" value="Ổn" />
     }
 
-    return <Tag severity="danger" value={`${toxicCount} issues`} />
+    return <Tag severity="danger" value={`${toxicCount} vấn đề`} />
   }
 
   const activeBodyTemplate = (rowData: Comment_t) => {
-    return rowData.active ? <Tag severity="success" value="Active" /> : <Tag severity="danger" value="Hidden" />
+    return rowData.active ? <Tag severity="success" value="Hiện" /> : <Tag severity="danger" value="Ẩn" />
   }
 
   const header = (
     <div className="flex justify-content-between align-items-center">
-      <h3 className="m-0">Comment Management</h3>
+      <h3 className="m-0">Quản lý bình luận</h3>
       <div className="flex align-items-center">
         <Dropdown
           value={lazyParams.active}
           options={[
-            { label: "All Comments", value: undefined },
-            { label: "Active Only", value: true },
-            { label: "Hidden Only", value: false },
+            { label: "Tất cả", value: "all" },
+            { label: "Chỉ hiện", value: "true" },
+            { label: "Chỉ ẩn", value: "false" },
           ]}
-          onChange={(e) => setLazyParams({ ...lazyParams, active: e.value, page: 1, first: 0 })}
-          placeholder="Filter by Status"
+          onChange={(e) => {
+            console.log(e.target.value);
+
+            setLazyParams({ ...lazyParams, active: e.target.value, page: 1, first: 0 })
+          }
+          }
+          placeholder="Lọc theo trạng thái"
           className="mr-2"
         />
         <IconField iconPosition="left">
           <InputIcon className="pi pi-search"> </InputIcon>
-          <InputText value={globalFilter} onChange={onGlobalFilterChange} placeholder="Search..." />
+          <InputText value={globalFilter} onChange={onGlobalFilterChange} placeholder="Tìm..." />
         </IconField>
-        
+
       </div>
     </div>
   )
@@ -299,41 +287,45 @@ const AdminManagementCommentPage: React.FC = () => {
         <DataTable
           value={comments}
           lazy
-          paginator
           first={lazyParams.first}
           rows={lazyParams.rows}
           totalRecords={totalRecords}
-          onPage={onPage}
           onSort={onSort}
           sortField={lazyParams.sortField}
           sortOrder={lazyParams.sortOrder}
           onFilter={onFilter}
           loading={loading}
           header={header}
-          emptyMessage="No comments found"
+          tableStyle={{ tableLayout: "auto" }}
+          emptyMessage="Không có bình luận nào"
           className="p-datatable-responsive"
           rowHover
           scrollable
           scrollHeight="calc(100vh - 200px)"
         >
           <Column field="id" header="ID" sortable style={{ width: "10%" }} />
-          <Column field="targetId" header="Target ID" sortable style={{ width: "10%" }} />
-          <Column field="userId" header="User ID" sortable style={{ width: "10%" }} />
-          <Column field="userDisplayName" header="User" sortable style={{ width: "15%" }} />
-          <Column field="content" header="Content" sortable style={{ width: "20%" }} />
-          <Column field="createdAt" header="Created At" body={formatDate} sortable style={{ width: "10%" }} />
-          <Column field="likeCounts" header="Likes" sortable style={{ width: "5%" }} />
-          <Column field="directReplyCount" header="Replies" sortable style={{ width: "5%" }} />
-          <Column header="Toxicity" body={toxicityBodyTemplate} style={{ width: "10%" }} />
-          <Column field="active" header="Status" body={activeBodyTemplate} sortable style={{ width: "5%" }} />
+          <Column field="targetId" header="ID nhóm" sortable style={{ width: "10%" }} />
+          <Column field="userId" header="ID người dùng" sortable style={{ width: "10%" }} />
+          <Column field="userDisplayName" header="email" sortable style={{ width: "15%" }} />
+          <Column field="content" header="Nội dụng" sortable style={{ minWidth: "10vw" }} />
+          <Column field="createdAt" header="Ngày tạo" body={formatDate} sortable style={{ width: "10%" }} />
+          <Column field="likeCounts" header="Thích" sortable style={{ width: "5%" }} />
+          <Column field="directReplyCount" header="Phản hồi" sortable style={{ width: "5%" }} />
+          <Column header="Mức độc hại" body={toxicityBodyTemplate} style={{ whiteSpace: "nowrap", minWidth: "10%" }} />
+          <Column field="active" header="Trạng thái" body={activeBodyTemplate} sortable style={{ width: "5%" }} />
           <Column body={actionBodyTemplate} header="Actions" style={{ width: "10%" }} />
         </DataTable>
+        <Paginator first={lazyParams.first} rows={lazyParams.rows} totalRecords={totalRecords} onPageChange={(e) => onPage(e)} />
       </div>
-
+      <section>
+        <AdminCommentReportsTable
+          setAdminCommentGlobalSearchTerm={setGlobalFilter}
+        />
+      </section>
       <Dialog
         visible={editDialog}
         style={{ width: "50vw" }}
-        header="Edit Comment"
+        header="Sửa bình luận"
         modal
         className="p-fluid"
         footer={editDialogFooter}
@@ -350,21 +342,21 @@ const AdminManagementCommentPage: React.FC = () => {
 
             <div className="col-12 md:col-6">
               <div className="field">
-                <label htmlFor="userDisplayName">User</label>
+                <label htmlFor="userDisplayName">Email</label>
                 <InputText id="userDisplayName" value={editComment.userDisplayName} disabled />
               </div>
             </div>
 
             <div className="col-12">
               <div className="field">
-                <label htmlFor="content">Content</label>
+                <label htmlFor="content">Nội dung</label>
                 <InputText id="content" value={editComment.content} disabled />
               </div>
             </div>
 
             <div className="col-12 md:col-4">
               <div className="field">
-                <label htmlFor="probInsult">Insult Score</label>
+                <label htmlFor="probInsult">Chỉ số sỉ nhục</label>
                 <InputNumber
                   id="probInsult"
                   value={editComment.probInsult}
@@ -378,7 +370,7 @@ const AdminManagementCommentPage: React.FC = () => {
 
             <div className="col-12 md:col-4">
               <div className="field">
-                <label htmlFor="probThreat">Threat Score</label>
+                <label htmlFor="probThreat">Chỉ số đe dọa</label>
                 <InputNumber
                   id="probThreat"
                   value={editComment.probThreat}
@@ -392,7 +384,7 @@ const AdminManagementCommentPage: React.FC = () => {
 
             <div className="col-12 md:col-4">
               <div className="field">
-                <label htmlFor="probHateSpeech">Hate Speech Score</label>
+                <label htmlFor="probHateSpeech">Chỉ số phát ngôn thù ghét</label>
                 <InputNumber
                   id="probHateSpeech"
                   value={editComment.probHateSpeech}
@@ -406,7 +398,7 @@ const AdminManagementCommentPage: React.FC = () => {
 
             <div className="col-12 md:col-4">
               <div className="field">
-                <label htmlFor="probSpam">Spam Score</label>
+                <label htmlFor="probSpam">Chỉ số tin rác</label>
                 <InputNumber
                   id="probSpam"
                   value={editComment.probSpam}
@@ -420,7 +412,7 @@ const AdminManagementCommentPage: React.FC = () => {
 
             <div className="col-12 md:col-4">
               <div className="field">
-                <label htmlFor="probSevereToxicity">Severe Toxicity Score</label>
+                <label htmlFor="probSevereToxicity">Chỉ số độc hại cao</label>
                 <InputNumber
                   id="probSevereToxicity"
                   value={editComment.probSevereToxicity}
@@ -434,7 +426,7 @@ const AdminManagementCommentPage: React.FC = () => {
 
             <div className="col-12 md:col-4">
               <div className="field">
-                <label htmlFor="probObscene">Obscene Score</label>
+                <label htmlFor="probObscene">Chỉ số tục tĩu</label>
                 <InputNumber
                   id="probObscene"
                   value={editComment.probObscene}

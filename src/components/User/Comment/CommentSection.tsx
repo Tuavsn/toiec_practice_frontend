@@ -9,6 +9,7 @@ import { useCommentSection } from '../../../hooks/useCommentSection';
 import { TargetType } from '../../../utils/types/type';
 import CommentForm from './CommentForm';
 import CommentItem from './CommentItem';
+import ReportCommentDialog from './ReportCommentDialog';
 
 //------------------------------------------------------
 // Props cho CommentSection
@@ -36,12 +37,12 @@ const CommentSection: React.FC<CommentSectionComponentProps> = ({
         toggleLike,
         setActiveReplyForm,
         toggleRepliesVisibility,
-        clearError,
-        currentUserId,
-    } = useCommentSection({ targetType, targetId });
 
-    // const { toast } = useToast(); // If useToast hook manages its own context or global ref
-    // If using a passed ref: const toast = toastRef;
+        currentUserId,
+        closeReportDialog,
+        openReportDialog,
+        handleSubmitReportWithToast,
+    } = useCommentSection({ targetType, targetId });
 
     //------------------------------------------------------
     // Tải bình luận gốc khi component mount hoặc target thay đổi
@@ -94,7 +95,6 @@ const CommentSection: React.FC<CommentSectionComponentProps> = ({
             </div>
         ))
     );
-
     const renderRepliesForComment = (parentId: string) => {
         const replies = state.repliesByParentId[parentId] || [];
         const isLoading = state.isLoadingReplies[parentId];
@@ -114,6 +114,8 @@ const CommentSection: React.FC<CommentSectionComponentProps> = ({
                         potentialMentionedUsers={state.mentionSuggestions}
                         onToggleLike={toggleLike}
                         onDeleteComment={(commentId, reason) => deleteComment(commentId, reply.parentId, reason)}
+                        onOpenReportDialog={openReportDialog}
+
                     // Replies (level 1) cannot be replied to, nor can they show replies.
                     // So, no onShowReplyForm, onPostReply, onShowReplies for level 1 items.
                     // isReplyFormVisible, isPostingReply etc. are not relevant here.
@@ -134,7 +136,6 @@ const CommentSection: React.FC<CommentSectionComponentProps> = ({
         );
     };
 
-
     //------------------------------------------------------
     // Render chính của CommentSection
     //------------------------------------------------------
@@ -154,8 +155,13 @@ const CommentSection: React.FC<CommentSectionComponentProps> = ({
     return (
         <div className="comment-section p-card p-4 shadow-1">
             {/* Ensure Toast and ConfirmDialog are globally available or add them here if controlled locally */}
-            {/* <Toast ref={toast} /> */}
-            {/* <ConfirmDialog global /> */}
+            <ReportCommentDialog
+                commentContextType= {targetType}
+                visible={state.isReportDialogVisible}
+                onHide={closeReportDialog}
+                commentToReport={state.commentForReporting}
+                onSubmitReport={handleSubmitReportWithToast}
+            />
 
             <h3 className="mt-0 mb-4 text-xl font-semibold">
                 Bình luận ({state.meta?.totalItems || 0})
@@ -185,6 +191,7 @@ const CommentSection: React.FC<CommentSectionComponentProps> = ({
                         areRepliesVisible={state.visibleRepliesParentId === comment.id}
                         isLoadingReplies={state.isLoadingReplies[comment.id]}
                         replyMeta={state.replyMetaByParentId[comment.id]}
+                        onOpenReportDialog={openReportDialog}
                     />
                     {state.visibleRepliesParentId === comment.id && renderRepliesForComment(comment.id)}
                     <Divider className="my-0 py-0" />

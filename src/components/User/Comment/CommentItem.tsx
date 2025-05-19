@@ -36,6 +36,7 @@ export interface CommentItemProps {
   areRepliesVisible?: boolean; // True if replies for THIS comment are currently shown by parent
   isLoadingReplies?: boolean; // True if replies for THIS comment are being loaded
   replyMeta?: Meta | null; // Pagination for this comment's replies
+  onOpenReportDialog: (comment: Comment_t) => void;
 }
 
 
@@ -55,7 +56,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onShowReplies,
   areRepliesVisible,
   isLoadingReplies,
-
+  onOpenReportDialog
 }) => {
   const isOwner = comment.userId === currentUserId;
   const canReplyToThisComment = comment.level === 0; // Only root comments can be replied to
@@ -172,6 +173,15 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 icon="pi pi-trash"
                 className="p-button-text p-button-danger p-button-sm mr-3 text-xs"
                 onClick={handleDelete}
+              />
+            )}
+            {!isOwner && !comment.deleted && (
+              <Button
+                icon="pi pi-flag"
+                className="p-button-text p-button-sm p-button-secondary ml-2 text-xs"
+                tooltip="Báo cáo bình luận này"
+                tooltipOptions={{ position: 'top' }}
+                onClick={() => onOpenReportDialog(comment)} // onOpenReportDialog sẽ được truyền từ CommentSection
               />
             )}
             <span className="ml-auto text-xs">{formatDate(comment.createdAt)}</span>

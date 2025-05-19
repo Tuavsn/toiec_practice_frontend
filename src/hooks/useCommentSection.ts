@@ -1,9 +1,13 @@
 // Filename: src/features/comments/useCommentSection.ts
+
 import { useCallback, useEffect, useReducer, useRef } from "react";
-import { createComment, deleteOneComment, fetchRepliesList, fetchRootCommentList, toggleOneLike } from "../api/api";
+import { createComment, deleteOneComment, fetchRepliesList, fetchRootCommentList, submitCommentReport, toggleOneLike } from "../api/api";
+import { useToast } from "../context/ToastProvider";
 import { getCurrentUserId } from "../utils/helperFunction/AuthCheck";
-import { Comment_t, CommentPage, CreateCommentRequest, DeleteCommentRequest, DeleteReason, TargetType } from "../utils/types/type";
-import { CommentAction, CommentActionType, initialCommentSectionState } from "./_CommentSectionHook";
+import { CommentAction } from "../utils/types/action";
+import { initialCommentSectionState } from "../utils/types/emptyValue";
+import { Comment_t, CommentPage, CreateCommentReportPayload, CreateCommentRequest, DeleteCommentRequest, DeleteReason, TargetType } from "../utils/types/type";
+import { CommentActionType } from "./_CommentSectionHook";
 import { commentReducer } from "./CommentReducer";
 
 //------------------------------------------------------
@@ -20,7 +24,7 @@ export const useCommentSection = ({
 }: UseCommentSectionProps) => {
     const [state, dispatch] = useReducer(commentReducer, initialCommentSectionState);
     const abortControllerRef = useRef<AbortController | null>(null);
-
+    const { toast } = useToast();
     //------------------------------------------------------
     // Hủy các request API đang thực hiện khi component unmount
     //------------------------------------------------------
@@ -52,7 +56,8 @@ export const useCommentSection = ({
         }
         const currentController = abortControllerRef.current ?? new AbortController(); // Đảm bảo controller luôn tồn tại
 
-        dispatch({ type: startActionType, payload: failurePayload } as CommentAction); // payload dùng cho START actions cần nó (e.g. DELETE_COMMENT_START)
+        dispatch({ type: startActionType, payload: failurePayload }); // payload dùng cho START actions cần nó (e.g. DELETE_COMMENT_START)
+        console.dir(startActionType)
         try {
             const result = await apiCall(currentController.signal);
             if (currentController.signal.aborted) return null; // Kiểm tra nếu đã bị hủy trong lúc chờ
@@ -89,7 +94,7 @@ export const useCommentSection = ({
             }
             abortControllerRef.current?.abort();
             abortControllerRef.current = new AbortController();
-
+         
             await callApi(
                 (signal) => fetchRootCommentList(targetType, targetId, signal, page, pageSize, term, ["createdAt"], ["desc"], undefined),
                 CommentActionType.FETCH_ROOT_COMMENTS_START,
@@ -148,7 +153,7 @@ export const useCommentSection = ({
     //------------------------------------------------------
     const deleteComment = useCallback(
         async (commentId: string, parentId?: string | null, reason: DeleteReason = DeleteReason.USER_DELETE) => {
-            const deleteRequest: DeleteCommentRequest = { reason };
+            const deleteRequest: DeleteCommentRequest = { reasonTag: "USER_DELETE", reason };
             // Không hủy controller chung
             await callApi(
                 (signal) => deleteOneComment(commentId, deleteRequest, signal), // Giả sử apiDeleteComment chấp nhận signal
@@ -242,6 +247,48 @@ export const useCommentSection = ({
         dispatch({ type: CommentActionType.CLEAR_ERROR });
     }, [dispatch]);
 
+
+    const openReportDialog = useCallback((commentToReport: Comment_t) => {
+        // Pick only necessary fields to avoid passing a large object if not needed
+        // Ensure 'userId' is included if your dialog or logic needs it for any checks
+        dispatch({
+            type: CommentActionType.OPEN_REPORT_DIALOG,
+            payload: {
+                id: commentToReport.id,
+                content: commentToReport.content,
+                userDisplayName: commentToReport.userDisplayName,
+                userId: commentToReport.userId, // Important for any checks
+            }
+        });
+    }, [dispatch]);
+
+    const closeReportDialog = useCallback(() => {
+        dispatch({ type: CommentActionType.CLOSE_REPORT_DIALOG });
+    }, [dispatch]);
+
+    const handleSubmitReportWithToast = useCallback(async (
+       
+        payload: CreateCommentReportPayload
+    ): Promise<boolean> => { // Returns true for success, false for failure to let dialog know
+        dispatch({ type: CommentActionType.SUBMIT_COMMENT_REPORT_START });
+        try {
+            const report = await submitCommentReport( payload ,);
+            dispatch({ type: CommentActionType.SUBMIT_COMMENT_REPORT_SUCCESS, payload: { report } });
+            toast?.current?.show({ severity: 'success', summary: 'Đã gửi', detail: 'Báo cáo của bạn đã được gửi thành công.' });
+            return true;
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.message || error.message || "Lỗi không xác định khi gửi báo cáo.";
+            dispatch({ type: CommentActionType.SUBMIT_COMMENT_REPORT_FAILURE, payload: errorMessage });
+            toast?.current?.show({ severity: 'error', summary: 'Lỗi', detail: errorMessage });
+            return false;
+        }
+    }, [dispatch /*, callApi if you adapt it for this, toast (if used here) */]);
+
+    const clearReportSubmitStatus = useCallback(() => {
+        dispatch({ type: CommentActionType.CLEAR_REPORT_SUBMIT_STATUS });
+    }, [dispatch]);
+
+
     //------------------------------------------------------
     // Giá trị trả về từ Hook
     //------------------------------------------------------
@@ -256,5 +303,9 @@ export const useCommentSection = ({
         toggleRepliesVisibility,
         clearError,
         currentUserId: getCurrentUserId(), // Trả về userId hiện tại để component dễ dàng sử dụng
+        openReportDialog,
+        closeReportDialog,
+        handleSubmitReportWithToast,
+        clearReportSubmitStatus,
     };
 };

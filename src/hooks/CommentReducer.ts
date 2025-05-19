@@ -1,57 +1,75 @@
-// Filename: src/features/comments/commentReducer.ts
+// Filename: src/features/comments/CommentReducer.ts
 
-import { Comment_t } from "../utils/types/type";
-import { CommentAction, CommentActionType, CommentSectionState } from "./_CommentSectionHook";
-
+import { CommentAction } from "../utils/types/action";
+import { CommentSectionState } from "../utils/types/state";
+import { CommentActionType } from "./_CommentSectionHook";
 
 //------------------------------------------------------
 // Reducer cho quản lý trạng thái khu vực bình luận
+// (Reducer for managing comment section state)
 //------------------------------------------------------
 export const commentReducer = (
   state: CommentSectionState,
   action: CommentAction,
 ): CommentSectionState => {
+  // console.log("REDUCER: Action received - ", action.type, action.payload); // General log for all actions
+
   switch (action.type) {
     //----------------------------------
-    // Tải Root Comments
+    // Tải Bình Luận Gốc (Fetch Root Comments)
     //----------------------------------
     case CommentActionType.FETCH_ROOT_COMMENTS_START:
+      console.log("REDUCER: FETCH_ROOT_COMMENTS_START");
       return {
         ...state,
         isLoadingRootComments: true,
-        error: null,
+        error: null, // Clear previous general errors
       };
     case CommentActionType.FETCH_ROOT_COMMENTS_SUCCESS:
-      return {
+      console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - Raw Payload:", action.payload);
+      console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - Current rootComments count before update:", state.rootComments.length);
+      // Ensure payload and its nested properties are valid before spreading
+      const newRootComments = action.payload?.comments || [];
+      const newMeta = action.payload?.meta || null;
+      const newStateAfterRootSuccess = {
         ...state,
         isLoadingRootComments: false,
-        rootComments: action.payload.comments,
-        meta: action.payload.meta,
+        rootComments: newRootComments,
+        meta: newMeta,
+        error: null,
       };
+      console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - New rootComments count after update:", newStateAfterRootSuccess.rootComments.length);
+      if (newRootComments.length > 0) {
+        console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - First new comment:", newRootComments[0]);
+      }
+      return newStateAfterRootSuccess;
     case CommentActionType.FETCH_ROOT_COMMENTS_FAILURE:
+      console.error("REDUCER: FETCH_ROOT_COMMENTS_FAILURE - Payload:", action.payload);
       return {
         ...state,
         isLoadingRootComments: false,
-        error: action.payload,
+        error: action.payload, // Payload is the error message string
       };
 
     //----------------------------------
-    // Tải Replies
+    // Tải Phản Hồi (Fetch Replies)
     //----------------------------------
     case CommentActionType.FETCH_REPLIES_START:
+      // console.log("REDUCER: FETCH_REPLIES_START - Parent ID:", action.payload.parentId);
       return {
         ...state,
         isLoadingReplies: {
           ...state.isLoadingReplies,
           [action.payload.parentId]: true,
         },
-        error: null, // Xóa lỗi cục bộ cho replies này
+        // Do not clear general error here, as this is a specific reply load
       };
-    case CommentActionType.FETCH_REPLIES_SUCCESS: {
-      // Cập nhật directReplyCount cho comment cha
-      const updatedRootComments = state.rootComments.map(comment =>
+    case CommentActionType.FETCH_REPLIES_SUCCESS:
+      // console.log("REDUCER: FETCH_REPLIES_SUCCESS - Parent ID:", action.payload.parentId, "Replies count:", action.payload.replies.length);
+      // Update directReplyCount for the parent comment if it's a root comment
+      const updatedRootCommentsForReplyCount = state.rootComments.map(comment =>
         comment.id === action.payload.parentId
-          ? { ...comment, directReplyCount: action.payload.replies.length } // Hoặc action.payload.meta.totalItems nếu API trả về tổng số reply chính xác
+          ? { ...comment, directReplyCount: action.payload.meta?.totalItems || action.payload.replies.length }
           : comment
       );
       return {
@@ -68,67 +86,64 @@ export const commentReducer = (
           ...state.replyMetaByParentId,
           [action.payload.parentId]: action.payload.meta,
         },
-        rootComments: updatedRootComments, // Cập nhật rootComments với directReplyCount mới
+        rootComments: updatedRootCommentsForReplyCount,
       };
-    }
     case CommentActionType.FETCH_REPLIES_FAILURE:
+      // console.error("REDUCER: FETCH_REPLIES_FAILURE - Parent ID:", action.payload.parentId, "Error:", action.payload.error);
       return {
         ...state,
         isLoadingReplies: {
           ...state.isLoadingReplies,
           [action.payload.parentId]: false,
         },
-        error: action.payload.error, // Hoặc có thể lưu lỗi theo parentId: errorByParentId: { ...state.errorByParentId, [action.payload.parentId]: action.payload.error }
+        // Potentially set a specific error for this reply loading, or use general error
+        error: `Lỗi tải phản hồi cho ${action.payload.parentId}: ${action.payload.error}`,
       };
 
     //----------------------------------
-    // Tạo Comment
+    // Tạo Bình Luận (Create Comment)
     //----------------------------------
     case CommentActionType.CREATE_COMMENT_START:
       return {
         ...state,
         isCreatingComment: true,
-        error: null,
+        error: null, // Clear error before attempting to create
       };
     case CommentActionType.CREATE_COMMENT_SUCCESS: {
       const newComment = action.payload;
-      let newRootComments = state.rootComments;
-      let newRepliesByParentId = state.repliesByParentId;
+      let newRootCommentsList = state.rootComments;
+      let newRepliesMap = { ...state.repliesByParentId }; // Ensure new map for immutability
 
-      if (newComment.parentId) {
-        // Đây là một reply
+      if (newComment.parentId) { // It's a reply
         const parentReplies = state.repliesByParentId[newComment.parentId] || [];
-        newRepliesByParentId = {
-          ...state.repliesByParentId,
-          [newComment.parentId]: [...parentReplies, newComment],
-        };
-        // Cập nhật directReplyCount cho comment cha
-        newRootComments = state.rootComments.map(comment =>
+        newRepliesMap[newComment.parentId] = [newComment, ...parentReplies]; // Add new reply to the beginning
+
+        // Update directReplyCount of the parent comment in rootComments
+        newRootCommentsList = state.rootComments.map(comment =>
           comment.id === newComment.parentId
             ? { ...comment, directReplyCount: (comment.directReplyCount || 0) + 1 }
             : comment
         );
-      } else {
-        // Đây là một root comment
-        newRootComments = [newComment, ...state.rootComments]; // Thêm vào đầu danh sách
+      } else { // It's a new root comment
+        newRootCommentsList = [newComment, ...state.rootComments]; // Add to the beginning of root comments
       }
       return {
         ...state,
         isCreatingComment: false,
-        rootComments: newRootComments,
-        repliesByParentId: newRepliesByParentId,
-        activeReplyParentId: null, // Đóng form reply sau khi gửi thành công
+        rootComments: newRootCommentsList,
+        repliesByParentId: newRepliesMap,
+        activeReplyParentId: null, // Close reply form after successful submission
       };
     }
     case CommentActionType.CREATE_COMMENT_FAILURE:
       return {
         ...state,
         isCreatingComment: false,
-        error: action.payload,
+        error: action.payload, // Payload is the error message string
       };
 
     //----------------------------------
-    // Xóa Comment
+    // Xóa Bình Luận (Delete Comment)
     //----------------------------------
     case CommentActionType.DELETE_COMMENT_START:
       return {
@@ -137,57 +152,50 @@ export const commentReducer = (
           ...state.isDeletingComment,
           [action.payload.commentId]: true,
         },
-        error: null,
       };
     case CommentActionType.DELETE_COMMENT_SUCCESS: {
       const { commentId, parentId } = action.payload;
-      let newRootComments = state.rootComments;
-      let newRepliesByParentId = state.repliesByParentId;
+      let updatedRootComments = state.rootComments;
+      let updatedRepliesByParentId = { ...state.repliesByParentId };
 
-      if (parentId) {
-        // Xóa một reply
+      if (parentId) { // Deleting a reply
         const parentReplies = state.repliesByParentId[parentId] || [];
-        newRepliesByParentId = {
-          ...state.repliesByParentId,
-          [parentId]: parentReplies.filter(reply => reply.id !== commentId),
-        };
-        // Cập nhật directReplyCount cho comment cha
-        newRootComments = state.rootComments.map(comment =>
+        updatedRepliesByParentId[parentId] = parentReplies.filter(reply => reply.id !== commentId);
+        // Update directReplyCount of the parent
+        updatedRootComments = state.rootComments.map(comment =>
           comment.id === parentId
-            ? { ...comment, directReplyCount: Math.max(0, (comment.directReplyCount || 0) - 1) }
+            ? { ...comment, directReplyCount: Math.max(0, (comment.directReplyCount || 1) - 1) }
             : comment
         );
-      } else {
-        // Xóa một root comment
-        newRootComments = state.rootComments.filter(comment => comment.id !== commentId);
-        // Nếu root comment bị xóa, cũng xóa các replies của nó (nếu có)
-        if (state.repliesByParentId[commentId]) {
-            const { [commentId]: _deletedReplies, ...remainingReplies } = state.repliesByParentId;
-            newRepliesByParentId = remainingReplies;
+      } else { // Deleting a root comment
+        updatedRootComments = state.rootComments.filter(comment => comment.id !== commentId);
+        // Also remove its replies from the map if they exist
+        if (updatedRepliesByParentId[commentId]) {
+          delete updatedRepliesByParentId[commentId];
         }
       }
+      // Create a new object for isDeletingComment to ensure immutability if needed, though deleting a key is fine for this pattern
+      const newIsDeletingComment = { ...state.isDeletingComment };
+      delete newIsDeletingComment[commentId];
+
       return {
         ...state,
-        isDeletingComment: {
-          ...state.isDeletingComment,
-          [commentId]: false,
-        },
-        rootComments: newRootComments,
-        repliesByParentId: newRepliesByParentId,
+        isDeletingComment: newIsDeletingComment,
+        rootComments: updatedRootComments,
+        repliesByParentId: updatedRepliesByParentId,
       };
     }
     case CommentActionType.DELETE_COMMENT_FAILURE:
+      const newIsDeletingCommentFailure = { ...state.isDeletingComment };
+      delete newIsDeletingCommentFailure[action.payload.commentId];
       return {
         ...state,
-        isDeletingComment: {
-          ...state.isDeletingComment,
-          [action.payload.commentId]: false,
-        },
+        isDeletingComment: newIsDeletingCommentFailure,
         error: action.payload.error,
       };
 
     //----------------------------------
-    // Toggle Like
+    // Thích/Bỏ Thích (Toggle Like)
     //----------------------------------
     case CommentActionType.TOGGLE_LIKE_START:
       return {
@@ -198,60 +206,44 @@ export const commentReducer = (
         },
       };
     case CommentActionType.TOGGLE_LIKE_SUCCESS: {
-      const updatedComment = action.payload;
-      const updateCommentList = (list: Comment_t[]) =>
-        list.map(c => (c.id === updatedComment.id ? updatedComment : c));
+      const likedComment = action.payload;
+      const updateCommentInList = (list: any[]) => // Using any[] for Comment_t for brevity here
+        list.map(c => (c.id === likedComment.id ? likedComment : c));
 
-      let newRootComments = state.rootComments;
-      let newRepliesByParentId = state.repliesByParentId;
+      let newRootCommentsAfterLike = state.rootComments;
+      let newRepliesMapAfterLike = { ...state.repliesByParentId };
 
-      // Kiểm tra xem comment được like có trong rootComments không
-      if (state.rootComments.some(c => c.id === updatedComment.id)) {
-          newRootComments = updateCommentList(state.rootComments);
-      }
-      // Kiểm tra xem comment được like có trong repliesByParentId không
-      if (updatedComment.parentId && state.repliesByParentId[updatedComment.parentId]) {
-        newRepliesByParentId = {
-            ...state.repliesByParentId,
-            [updatedComment.parentId]: updateCommentList(state.repliesByParentId[updatedComment.parentId]),
-        };
+      if (state.rootComments.some(c => c.id === likedComment.id)) {
+        newRootCommentsAfterLike = updateCommentInList(state.rootComments);
       } else {
-        // Xử lý trường hợp comment có parentId nhưng không tìm thấy trong repliesByParentId
-        // Hoặc comment không có parentId nhưng cũng không có trong rootComments (trường hợp hiếm)
-        // Tìm trong tất cả các list replies nếu không có parentId rõ ràng (ít khả năng xảy ra với cấu trúc hiện tại)
-        for (const parentKey in state.repliesByParentId) {
-            if (state.repliesByParentId[parentKey].some(c => c.id === updatedComment.id)) {
-                newRepliesByParentId = {
-                    ...state.repliesByParentId,
-                    [parentKey]: updateCommentList(state.repliesByParentId[parentKey]),
-                };
-                break;
-            }
+        for (const pid in state.repliesByParentId) {
+          if (state.repliesByParentId[pid].some(reply => reply.id === likedComment.id)) {
+            newRepliesMapAfterLike[pid] = updateCommentInList(state.repliesByParentId[pid]);
+            break;
+          }
         }
       }
+      const newIsTogglingLike = { ...state.isTogglingLike };
+      delete newIsTogglingLike[likedComment.id];
 
       return {
         ...state,
-        isTogglingLike: {
-          ...state.isTogglingLike,
-          [updatedComment.id]: false,
-        },
-        rootComments: newRootComments,
-        repliesByParentId: newRepliesByParentId,
+        isTogglingLike: newIsTogglingLike,
+        rootComments: newRootCommentsAfterLike,
+        repliesByParentId: newRepliesMapAfterLike,
       };
     }
     case CommentActionType.TOGGLE_LIKE_FAILURE:
+      const newIsTogglingLikeFailure = { ...state.isTogglingLike };
+      delete newIsTogglingLikeFailure[action.payload.commentId];
       return {
         ...state,
-        isTogglingLike: {
-          ...state.isTogglingLike,
-          [action.payload.commentId]: false,
-        },
+        isTogglingLike: newIsTogglingLikeFailure,
         error: action.payload.error,
       };
 
     //----------------------------------
-    // Gợi ý Mention
+    // Gợi Ý Mention (Mention Suggestions)
     //----------------------------------
     case CommentActionType.SET_MENTION_SUGGESTIONS:
       return {
@@ -260,37 +252,26 @@ export const commentReducer = (
       };
 
     //----------------------------------
-    // Trạng thái UI
+    // Trạng Thái UI (UI State - Forms, Visibility)
     //----------------------------------
     case CommentActionType.SET_ACTIVE_REPLY_FORM:
-      // Nếu click vào nút reply của comment đang mở form, thì đóng form lại
-      if (state.activeReplyParentId === action.payload) {
-        return { ...state, activeReplyParentId: null };
-      }
-      // Ngược lại, mở form cho comment được click và đóng form của comment khác (nếu có)
       return {
         ...state,
-        activeReplyParentId: action.payload,
-        // Nếu mở form reply, cũng nên đảm bảo replies của nó được hiển thị (nếu chưa)
-        // visibleRepliesParentId: action.payload ? (state.visibleRepliesParentId === action.payload ? state.visibleRepliesParentId : action.payload) : state.visibleRepliesParentId,
+        // Toggle: if clicking the same parent's reply button, close it. Otherwise, open for new parent.
+        activeReplyParentId: state.activeReplyParentId === action.payload ? null : action.payload,
       };
-
     case CommentActionType.TOGGLE_REPLIES_VISIBILITY: {
       const parentIdToToggle = action.payload;
-      // Nếu payload là null, ẩn tất cả replies
+      // If payload is null, hide all replies and active forms
       if (parentIdToToggle === null) {
-        return { ...state, visibleRepliesParentId: null };
+          return { ...state, visibleRepliesParentId: null, activeReplyParentId: null };
       }
-      // Nếu click vào comment đang hiển thị replies, thì ẩn nó đi
+      // If clicking the same parent that's already visible, hide its replies and any active form
       if (state.visibleRepliesParentId === parentIdToToggle) {
-        return { ...state, visibleRepliesParentId: null, activeReplyParentId: null }; // Cũng đóng form reply nếu có
+          return { ...state, visibleRepliesParentId: null, activeReplyParentId: null };
       }
-      // Ngược lại, hiển thị replies cho comment này và ẩn của comment khác (nếu có)
-      return {
-        ...state,
-        visibleRepliesParentId: parentIdToToggle,
-        activeReplyParentId: null, // Đóng form reply khi chuyển đổi hiển thị replies
-      };
+      // Otherwise, show replies for this parent and hide others/active forms
+      return { ...state, visibleRepliesParentId: parentIdToToggle, activeReplyParentId: null };
     }
 
     case CommentActionType.CLEAR_ERROR:
@@ -299,9 +280,60 @@ export const commentReducer = (
         error: null,
       };
 
+    //----------------------------------
+    // Báo Cáo Bình Luận (Report Comment Flow)
+    //----------------------------------
+    case CommentActionType.OPEN_REPORT_DIALOG:
+      return {
+        ...state,
+        isReportDialogVisible: true,
+        commentForReporting: action.payload, // Payload is Pick<Comment_t, 'id' | 'content' | 'userDisplayName' | 'userId'>
+        reportSubmitError: null, // Clear previous report errors
+      };
+    case CommentActionType.CLOSE_REPORT_DIALOG:
+      return {
+        ...state,
+        isReportDialogVisible: false,
+        commentForReporting: null,
+        isSubmittingReport: false, // Reset submitting state if dialog is closed manually
+        // Keep reportSubmitError so user can see it if dialog reopens, unless explicitly cleared
+      };
+    case CommentActionType.SUBMIT_COMMENT_REPORT_START:
+      return {
+        ...state,
+        isSubmittingReport: true,
+        reportSubmitError: null,
+      };
+    case CommentActionType.SUBMIT_COMMENT_REPORT_SUCCESS:
+      // action.payload is { report: CommentReport_t; message?: string }
+      return {
+        ...state,
+        isSubmittingReport: false,
+        isReportDialogVisible: false, // Close dialog on successful report
+        commentForReporting: null,    // Clear the reported comment
+        reportSubmitError: null,
+        // Optional: Could set a success message in state if needed by UI beyond a toast
+        // reportSubmitSuccessMessage: action.payload.message || "Báo cáo đã được gửi thành công.",
+      };
+    case CommentActionType.SUBMIT_COMMENT_REPORT_FAILURE:
+      // action.payload is error string
+      return {
+        ...state,
+        isSubmittingReport: false,
+        reportSubmitError: action.payload,
+        // Dialog might stay open to show the error within it, or CommentSection can show a toast
+      };
+    case CommentActionType.CLEAR_REPORT_SUBMIT_STATUS:
+        return {
+            ...state,
+            reportSubmitError: null,
+            // reportSubmitSuccessMessage: null, // If you were using this
+        };
+
     default:
-      // TypeScript sẽ cảnh báo nếu chúng ta quên xử lý một action nào đó nhờ vào `never` type trick (nếu action là never)
-      // const _exhaustiveCheck: never = action;
+      // Optional: Log unhandled actions if any for debugging
+      // const _exhaustiveCheck: never = action; // For compile-time check if all actions are handled
+      // console.warn("REDUCER: Unhandled action type -", (action as any).type);
       return state;
   }
 };
