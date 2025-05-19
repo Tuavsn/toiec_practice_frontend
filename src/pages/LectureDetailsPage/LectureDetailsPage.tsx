@@ -4,11 +4,12 @@ import { Paginator } from 'primereact/paginator';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { callGetAssignmentRows, callGetLectureDoctrine, callGetRelateLectures, callPutPercentLecture } from '../../api/api';
+import CommentSection from '../../components/User/Comment/CommentSection';
 import { useToast } from '../../context/ToastProvider';
 import { AmINotLoggedIn } from '../../utils/helperFunction/AuthCheck';
 import { ConvertThisAssignmentQuestionToHTML } from '../../utils/helperFunction/convertToHTML';
 import SplitNameIDFromURL from '../../utils/helperFunction/splitNameIDFromURL';
-import { AssignmentQuestion, LectureID, Name_ID, PracticeAnswerSheet, QuestionID, RelateLectureTitle } from '../../utils/types/type';
+import { AssignmentQuestion, LectureID, Name_ID, PracticeAnswerSheet, QuestionID, RelateLectureTitle, TargetType } from '../../utils/types/type';
 
 
 // Component chi tiết khóa học
@@ -47,6 +48,10 @@ const LectureDetailsPage: React.FC = () => {
                     <br />
                     {/* Phần hiển thị các bài tập */}
                     <AssignmentSection lectureID={lectureId} />
+                    <br />
+                    <section className='mt-7 shadow-7'>
+                        <CommentSection targetType={TargetType.LESSON} targetId={lectureId} />
+                    </section>
                 </main>
 
             </div>
@@ -184,227 +189,3 @@ const AssignmentSection: React.FC<{ lectureID: LectureID }> = React.memo(
 
     })
 
-
-// async function LoadPractice(practicePosition: number | null,
-//     courseID: string,
-//     setCurrentQuestionList: React.Dispatch<React.SetStateAction<PracticeQuestion[]>>,
-//     setFirst: React.Dispatch<React.SetStateAction<number>>,
-//     setUserAnswerSheet: React.Dispatch<React.SetStateAction<PracticeAnswerSheet>>,
-//     setToTalQuestions: React.Dispatch<React.SetStateAction<number>>
-// ): Promise<void> {
-//     if (!practicePosition && typeof practicePosition != 'number' || !courseID) {
-//         return;
-//     }
-//     const apiPath: string[] = [
-//         "https://dummyjson.com/c/e6c2-181c-4ceb-86b1",
-//         "https://dummyjson.com/c/f192-bdf5-4f29-b409",
-//         "https://dummyjson.com/c/66ae-8554-4737-b4f7",
-
-//     ]
-
-//     try {
-//         const response = await fetch(apiPath.at(practicePosition) ?? apiPath[0]);
-
-//         if (!response.ok) {
-//             throw new Error('Network response was not ok');
-//         }
-
-//         // Assuming the response structure matches your LessonDetail type
-//         const apiResponse: ApiResponse<PracticePaper> = await response.json();
-//         setUserAnswerSheet(new Map<QuestionID, string>());
-//         setToTalQuestions(apiResponse.data.totalQuestions)
-//         setCurrentQuestionList(apiResponse.data.practiceQuestions);
-//         setFirst(0);
-
-//     } catch (error) {
-//         console.error('There was a problem with the fetch operation:', error);
-//     }
-// }
-
-
-// async function LoadLessons(lessonIndex: number | null, courseId: string, setCurrentLesson: (value: React.SetStateAction<string>) => void): Promise<void> {
-//     if (!lessonIndex && typeof lessonIndex != 'number' || !courseId) {
-//         return;
-//     }
-//     const apiPath: string[] = [
-//         "https://dummyjson.com/c/cc09-2da5-45eb-886d",
-//         "https://dummyjson.com/c/36ee-c249-4efc-af5a",
-//         "https://dummyjson.com/c/07dc-f441-4ce1-af6e"
-//     ]
-//     try {
-//         const response = await fetch(apiPath.at(lessonIndex) ?? apiPath[0]);
-
-//         if (!response.ok) {
-//             throw new Error('Network response was not ok');
-//         }
-
-//         // Assuming the response structure matches your LessonDetail type
-//         const apiResponse: ApiResponse<string> = await response.json();
-//         setCurrentLesson(apiResponse.data)
-//         console.log("ok");
-
-
-//     } catch (error) {
-//         console.error('There was a problem with the fetch operation:', error);
-//         setCurrentLesson("lỗi rồi");
-//     }
-// }
-// function GetFakeData(): MultipleChoiceQuestion[] {
-//     return [
-//         {
-//             type: 'single',
-//             subQuestions: [],
-//             content: 'What is the main purpose of the passage?',
-//             resources: [{ type: 'paragraph', content: 'The company is offering a new promotion...' }],
-//             answers: ['To advertise a new product', 'To announce a promotion', 'To explain company policies', 'To request feedback'],
-//         },
-//         {
-//             type: 'single',
-//             subQuestions: [],
-//             content: 'What does the speaker suggest?',
-//             resources: [{ type: 'audio', content: 'https://tuine09.blob.core.windows.net/resources/TOEIC%20Inter_001.mp3' }]
-//             answers: ['Bring ID to the meeting', 'Prepare presentation', 'Book a conference room', 'Submit a report'],
-//             correctAnswer: 'Bring ID to the meeting',
-//             explanation: ''
-//         },
-//         {
-//             questionNum: 3,
-//             type: 'group',
-//             subQuestions: [
-//                 {
-//                     questionNum: 3.1,
-//                     type: 'subquestion',
-//                     subQuestions: [],
-//                     content: 'Where is the company located?',
-//                     resources: [{ type: 'paragraph', content: 'The company headquarters is located in Tokyo, Japan.' }],
-//                     answers: ['New York', 'London', 'Tokyo', 'Seoul'],
-//                     correctAnswer: 'Tokyo',
-//                     transcript: '',
-//                     explanation: ''
-//                 },
-//                 {
-//                     questionNum: 3.2,
-//                     type: 'subquestion',
-//                     subQuestions: [],
-//                     content: 'What is the main product sold?',
-//                     resources: [{ type: 'paragraph', content: 'The company specializes in electronic devices, such as smartphones and laptops.' }],
-//                     answers: ['Automobiles', 'Clothing', 'Electronic devices', 'Furniture'],
-//                     correctAnswer: 'Electronic devices',
-//                     transcript: '',
-//                     explanation: ''
-//                 },
-//             ],
-//             content: 'Read the following passage and answer the questions.',
-//             resources: [{
-//                 type: 'paragraph', content: ' At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti \
-//                                     quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt \
-//                                     mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. \
-//                                     Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.' }],
-//             answers: [],
-//             correctAnswer: '',
-//             transcript: '',
-//             explanation: ''
-//         },
-//         {
-//             questionNum: 4,
-//             type: 'single',
-//             subQuestions: [],
-//             content: 'What does the chart suggest about the sales performance?',
-//             resources: [{ type: 'image', content: 'https://img.freepik.com/free-vector/hand-drawn-game-pad-logo_23-2148236558.jpg' }],
-//             answers: ['Sales increased steadily', 'Sales decreased sharply', 'Sales remained constant', 'Sales fluctuated'],
-//             correctAnswer: 'Sales increased steadily',
-//             transcript: '',
-//             explanation: ''
-//         },
-//         {
-//             questionNum: 5,
-//             type: 'single',
-//             subQuestions: [],
-//             content: 'When will the meeting take place?',
-//             resources: [{ type: 'paragraph', content: 'The meeting is scheduled for Friday at 2:00 PM.' }],
-//             answers: ['Monday', 'Wednesday', 'Friday', 'Sunday'],
-//             correctAnswer: 'Friday',
-//             transcript: '',
-//             explanation: ''
-//         },
-//         {
-//             questionNum: 6,
-//             type: 'single',
-//             subQuestions: [],
-//             content: 'What does the speaker ask the team to do?',
-//             resources: [{ type: 'audio', content: 'https://tuine09.blob.core.windows.net/resources/TOEIC%20Inter_001.mp3' }],
-//             transcript: 'Please ensure that all reports are submitted by the end of the day.',
-//             answers: ['Submit reports', 'Prepare presentations', 'Review financial statements', 'Schedule meetings'],
-//             correctAnswer: 'Submit reports',
-//             explanation: ''
-//         },
-//         {
-//             questionNum: 7,
-//             type: 'single',
-//             subQuestions: [],
-//             content: 'Which of the following is true about the new policy?',
-//             resources: [{ type: 'paragraph', content: 'The new policy requires all employees to clock in using the company app.' }],
-//             answers: ['Employees must clock in by phone', 'The policy applies to managers only', 'Employees use the company app to clock in', 'The policy was implemented last year'],
-//             correctAnswer: 'Employees use the company app to clock in',
-//             transcript: '',
-//             explanation: ''
-//         },
-//         {
-//             questionNum: 8,
-//             type: 'group',
-//             subQuestions: [
-//                 {
-//                     questionNum: 8.1,
-//                     type: 'subquestion',
-//                     subQuestions: [],
-//                     content: 'Who is the email from?',
-//                     resources: [{ type: 'paragraph', content: 'From: John Smith <john.smith@company.com>' }],
-//                     answers: ['John Smith', 'Jane Doe', 'Richard Lee', 'Anna Kim'],
-//                     correctAnswer: 'John Smith',
-//                     transcript: '',
-//                     explanation: ''
-//                 },
-//                 {
-//                     questionNum: 8.2,
-//                     type: 'subquestion',
-//                     subQuestions: [],
-//                     content: 'What is the purpose of the email?',
-//                     resources: [{ type: 'paragraph', content: 'Subject: Quarterly Financial Report' }],
-//                     answers: ['To request a meeting', 'To send the financial report', 'To provide feedback', 'To ask for a project update'],
-//                     correctAnswer: 'To send the financial report',
-//                     transcript: '',
-//                     explanation: ''
-//                 },
-//             ],
-//             content: 'Read the email and answer the following questions.',
-//             resources: [{ type: 'paragraph', content: 'From: John Smith...' }],
-//             answers: [],
-//             correctAnswer: '',
-//             transcript: '',
-//             explanation: ''
-//         },
-//         {
-//             questionNum: 9,
-//             type: 'single',
-//             subQuestions: [],
-//             content: 'What is the main topic of the presentation?',
-//             resources: [{ type: 'audio', content: 'https://tuine09.blob.core.windows.net/resources/TOEIC%20Inter_001.mp3' }],
-//             transcript: 'Today we will be discussing the company\'s new marketing strategy...',
-//             answers: ['Sales performance', 'New marketing strategy', 'Employee benefits', 'Annual report'],
-//             correctAnswer: 'New marketing strategy',
-//             explanation: ''
-//         },
-//         {
-//             questionNum: 10,
-//             type: 'single',
-//             subQuestions: [],
-//             content: 'What is the speaker\'s opinion about the new product?',
-//             resources: [{ type: 'paragraph', content: 'The speaker mentioned that the product is innovative and easy to use.' }],
-//             answers: ['It is difficult to use', 'It is outdated', 'It is innovative and easy to use', 'It is too expensive'],
-//             correctAnswer: 'It is innovative and easy to use',
-//             transcript: '',
-//             explanation: ''
-//         }
-//     ];
-
-// }

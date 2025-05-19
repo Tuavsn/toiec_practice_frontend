@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom';
 import { Menu } from 'primereact/menu';
+import { useNavigate } from 'react-router-dom';
 
 export default function LeftNavigationBar() {
 
@@ -28,6 +28,7 @@ export default function LeftNavigationBar() {
         {
             label: 'Quản lý người dùng',
             items: [
+                { label: 'Quản lý bình luận', icon: 'pi pi-comments', command: () => navigate('/dashboard/comment') },
                 { label: 'Quản lý tài khoản', icon: 'pi pi-user', command: () => navigate('/dashboard/account') },
                 { label: 'Quản lý chức danh', icon: 'pi pi-shield', command: () => navigate('/dashboard/role') },
                 { label: 'Quản lý quyền', icon: 'pi pi-lock-open', command: () => navigate('/dashboard/permission') },

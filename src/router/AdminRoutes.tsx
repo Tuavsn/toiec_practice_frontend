@@ -4,6 +4,7 @@ import { LoadingSpinner } from "../components/Common/Index";
 const AdminManageUploadQuestionPage = lazy(() => import("../pages/AdminManageUploadQuestionPage/AdminManageUploadQuestionPage"))
 const AdminManageAssignmentPage = lazy(() => import("../pages/AdminManageAssignmentPage/AdminManageAssignmentPage"))
 const AdminManageQuestionPage = lazy(() => import("../pages/AdminManageQuestionPage/AdminManageQuestionPage"))
+const AdminManagementCommentPage = lazy(()=>import("../pages/AdminManageCommentPage/AdminManageCommentPage"))
 const AdminManageLecturePage = lazy(() => import("../pages/AdminManageLecturePage/AdminManageLecturePage"))
 const AdminManageCategoryPage = lazy(() => import("../pages/AdminManageCategoryPage/AdminManageCategory"))
 const AdminManagePermission =lazy(()=> import("../pages/AdminManagePermission/AdminManagePermission"))
@@ -13,7 +14,6 @@ const AdminManageTopic = lazy(() => import("../pages/AdminManageTopic/AdminManag
 const AdminManageRole = lazy(() => import("../pages/AdminManageRole/AdminManageRole"))
 const TempAdminPage = lazy(() => import("../pages/TempAdminPage/TempAdminPage"))
 const AdminLayout = lazy(() => import('../components/Layout/AdminLayout'));
-
 export default function AdminRoutes() {
   if (localStorage.getItem("role") != "ADMIN") {
     return <Navigate to="/home" />
@@ -38,6 +38,7 @@ export default function AdminRoutes() {
           <Route path="categories" element={<AdminManageCategoryPage />} /> {/* Quản lý các danh mục */}
 
           <Route path="account" element={<AdminManageAccountPage />} />
+          <Route path="comment" element={<AdminManagementCommentPage />} />
           <Route path="role" element={<AdminManageRole />} />
           <Route path="lecture" element={<AdminManageLecturePage />} />
           <Route path="topic" element={<AdminManageTopic />} />
