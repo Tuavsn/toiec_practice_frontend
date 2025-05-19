@@ -7,7 +7,6 @@ import { Dialog } from 'primereact/dialog'; // For editing status + notes
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { InputTextarea } from 'primereact/inputtextarea'; // For admin notes
 import { OverlayPanel } from 'primereact/overlaypanel'; // For showing full details
-import { ProgressBar } from 'primereact/progressbar'; // For toxicity scores
 import { Tag } from 'primereact/tag';
 import { Tooltip } from 'primereact/tooltip'; // For truncating text
 import React, { useEffect, useRef, useState } from 'react';
@@ -15,6 +14,8 @@ import { useToast } from '../../../context/ToastProvider';
 import formatDate from '../../../utils/helperFunction/formatDateToString';
 import { reportReasonToLabel } from '../../../utils/helperFunction/ReportEnumToLabel';
 import { CommentReport, CommentReportReasonCategory, CommentReportStatus, UpdateCommentReportStatusPayload } from '../../../utils/types/type';
+import IDGroupCell, { IDGroup } from '../../Common/IDGroup/IDGroupCell';
+import ColumnManageCommentTable from '../AdminColumn/ColumnManageCommentTable';
 import { reportStatusToLabel } from '../AdminToolbar/ReportTableToolbar';
 
 
@@ -148,13 +149,16 @@ const ReportDataTable: React.FC<ReportDataTableProps> = ({
 
     // --- Column Body Templates ---
 
-    const idBodyTemplate = (rowData: CommentReport) => (
-        <span title={rowData.id} className="text-xs">{rowData.id.substring(0, 8)}...</span>
-    );
+    const idBodyTemplate = (rowData: CommentReport) => {
 
-    const commentIdBodyTemplate = (rowData: CommentReport) => (
-        <span title={rowData.reportedCommentId} className="text-xs">{rowData.reportedCommentId.substring(0, 8)}...</span>
-    );
+        const idgs: IDGroup[] = [
+            { title: "ID", idValue: rowData.id },
+            { title: "ID bình luận", idValue: rowData.reportedCommentId },
+            { title: "ID người báo", idValue: rowData.reporterUserId }
+        ]
+        return IDGroupCell(idgs);
+
+    }
 
     const reasonBodyTemplate = (rowData: CommentReport) => (
         <Tag value={reportReasonToLabel(rowData.reasonCategory)} severity={getReasonSeverity(rowData.reasonCategory)} />
@@ -221,23 +225,6 @@ const ReportDataTable: React.FC<ReportDataTableProps> = ({
         }
     };
 
-    const toxicityScoreBodyTemplate = (rowData: CommentReport, field: keyof CommentReport) => {
-        const value = rowData[field] as number | undefined;
-        if (typeof value !== 'number') return <span className="text-color-secondary text-xs">N/A</span>;
-        const percentage = Math.round(value * 100);
-        let color = '#607D8B'; // Default grey
-        if (percentage > 75) color = '#F44336'; // Red
-        else if (percentage > 50) color = '#FF9800'; // Orange
-        else if (percentage > 25) color = '#FFEB3B'; // Yellow (text might need to be dark)
-
-        return (
-            <div className="flex align-items-center" style={{ width: '100px' }}>
-                <ProgressBar value={percentage} showValue={false} style={{ height: '8px', flexGrow: 1, backgroundColor: '#e0e0e0' }} color={color}></ProgressBar>
-                <span className="ml-2 text-xs">{percentage}%</span>
-            </div>
-        );
-    };
-
 
     const actionsBodyTemplate = (rowData: CommentReport) => {
         const isDeleting = isDeletingReport[rowData.id];
@@ -285,7 +272,7 @@ const ReportDataTable: React.FC<ReportDataTableProps> = ({
     return (
         <>
             <DataTable
-                
+                tableStyle={{ tableLayout: 'auto' }}
                 value={reports as DataTableValue[]} // Cast needed if DataTableValue[] is stricter
                 loading={isLoading}
                 paginator={false} // External paginator will be used
@@ -296,17 +283,18 @@ const ReportDataTable: React.FC<ReportDataTableProps> = ({
                 className="p-datatable-sm admin-reports-table mt-3" // Smaller table
                 rowHover
                 emptyMessage="Không tìm thấy báo cáo nào."
+
             >
-                <Column field="id" header="ID Báo cáo" body={idBodyTemplate} sortable style={{ minWidth: '100px' }} />
-                <Column field="reportedCommentId" header="ID Bình luận" body={commentIdBodyTemplate} sortable style={{ minWidth: '100px' }} />
-                {/* <Column field="originalCommentContent" header="Nội dung bình luận" body={commentContentBodyTemplate} style={{minWidth: '200px', maxWidth: '300px'}} /> */}
-                <Column field="reporterUserId" header="Người báo cáo" sortable style={{ minWidth: '120px' }} body={(rowData: CommentReport) => <span className="text-xs" title={rowData.reporterUserId}>{rowData.reporterUserId.substring(0, 12)}...</span>} />
+
+                <Column header="ID Báo cáo" body={idBodyTemplate} sortable style={{ minWidth: '100px' }} headerStyle={{ whiteSpace: 'nowrap' }}   // ← Prevent header wrapping
+                    bodyStyle={{
+                        whiteSpace: 'nowrap',                  // ← Prevent cell wrapping
+                        overflow: 'hidden',                    // ← Hide overflowed text
+                        textOverflow: 'ellipsis'               // ← Show “…” for overflow
+                    }} />
                 <Column field="reasonCategory" header="Lý do" body={reasonBodyTemplate} sortable style={{ minWidth: '180px' }} />
                 <Column field="reasonDetails" header="Chi tiết" body={detailsBodyTemplate} style={{ minWidth: '200px', maxWidth: '300px' }} />
-                <Column header="Lăng mạ" body={(rowData: CommentReport) => toxicityScoreBodyTemplate(rowData, 'probInsult')} style={{ minWidth: '120px' }} />
-                <Column header="Đe dọa" body={(rowData: CommentReport) => toxicityScoreBodyTemplate(rowData, 'probThreat')} style={{ minWidth: '120px' }} />
-                <Column header="Thù ghét" body={(rowData: CommentReport) => toxicityScoreBodyTemplate(rowData, 'probHateSpeech')} style={{ minWidth: '120px' }} />
-                {/* Add other toxicity scores similarly */}
+                <Column header="Mức độ độc hại" body={(rowData: CommentReport) => ColumnManageCommentTable.CommentToxicityCell({ rowData })} style={{ minWidth: '120px' }} />
                 <Column field="createdAt" header="Ngày báo cáo" body={dateBodyTemplate} sortable style={{ minWidth: '120px' }} />
                 <Column field="status" header="Trạng thái" body={statusBodyTemplate} sortable style={{ minWidth: '180px' }} />
                 <Column header="Hành động" body={actionsBodyTemplate} exportable={false} style={{ minWidth: '120px', textAlign: 'center' }} />
