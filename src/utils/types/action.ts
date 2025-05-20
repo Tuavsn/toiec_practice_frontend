@@ -1,6 +1,6 @@
 import { CommentActionType } from "../../hooks/_CommentSectionHook";
 import { ProfileHookState } from "./state";
-import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, Permission, QuestionID, QuestionNumber, QuestionPage, Role, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, UserComment, UserRow } from "./type";
+import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, GradedFeedback, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, Permission, PexelsPhoto, QuestionID, QuestionNumber, QuestionPage, Role, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, UserComment, UserRow, WritingPart1Prompt, WritingSheetData } from "./type";
 
 type RenderTestActiion =
     | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber; qID: QuestionID; answer: string; } }
@@ -158,13 +158,40 @@ type AdminReportAction =
     | { type: 'DELETE_REPORT_FAILURE'; payload: { reportId: string; error: string } }
     | { type: 'CLEAR_DELETE_ERROR'; payload: { reportId: string } };
 
-
+/**
+ * @type ActionType
+ * @description Các loại hành động cho reducer của ToeicPart1.
+ */
+type ToeicWritingPart1Action =
+    | { type: 'FETCH_IMAGE_AND_GENERATE_PROMPT_START' }
+    | { type: 'FETCH_IMAGE_SUCCESS'; payload: PexelsPhoto }
+    | { type: 'FETCH_IMAGE_FAILURE'; payload: string } // Error message for UI
+    | {
+        type: 'GENERATE_PROMPT_SUCCESS';
+        payload: Pick<WritingPart1Prompt, 'id' | 'promptText' | 'mandatoryKeyword1' | 'mandatoryKeyword2' | 'createdAt' | 'part' | 'imageUrl' | 'imageAltText'>
+    }
+    | { type: 'GENERATE_PROMPT_FAILURE'; payload: string } // Error message for UI
+    | { type: 'UPDATE_USER_ANSWER'; payload: string }
+    | { type: 'SUBMIT_ANSWER_START' }
+    | { type: 'SUBMIT_ANSWER_SUCCESS'; payload: GradedFeedback }
+    | { type: 'SUBMIT_ANSWER_FAILURE'; payload: string }
+    | { type: 'CLEAR_ERROR' }
+    | { type: 'RESET_STATE_FOR_NEW_PROMPT' }
+    | { type: 'DB_INIT_START' }
+    | { type: 'DB_INIT_SUCCESS'; payload: { latestSheet: WritingSheetData | null; totalSheets: number } }
+    | { type: 'DB_OPERATION_ERROR'; payload: string } // General DB error
+    | { type: 'LOAD_SHEET_START'; payload: { sheetId: number } }
+    | { type: 'LOAD_SHEET_SUCCESS'; payload: { sheetData: WritingSheetData; totalSheets: number } } // totalSheets might be redundant if already known
+    | { type: 'CREATE_SHEET_SUCCESS'; payload: { newSheet: WritingSheetData; totalSheets: number } } // For newly created sheets
+    | { type: 'UPDATE_SHEET_IN_STATE'; payload: Partial<WritingSheetData> } // To update parts of currentSheetData locally after DB update
+    | { type: 'SET_CURRENT_SHEET_ID'; payload: number }
+    | { type: 'SET_TOTAL_SHEETS'; payload: number }
+    | { type: 'INTERNAL_NEW_SHEET_READY'; payload: { newActiveSheet: WritingSheetData; totalSheets: number } };
 export type {
     AdminReportAction, CategoryHookAction, CommentAction, FullTestScreenAction, LectureCardAction,
-    LectureHookAction,
-    MultiQuestionAction, PermissionHookAction, ProfileHookAction,
+    LectureHookAction, MultiQuestionAction, PermissionHookAction, ProfileHookAction,
     RenderTestActiion, RoleHookAction,
-    RowHookAction, TestHookAction, TestReviewHookAction, TopicHookAction, UserCommentAction,
+    RowHookAction, TestHookAction, TestReviewHookAction, ToeicWritingPart1Action, TopicHookAction, UserCommentAction,
     UserHookAction
 };
 

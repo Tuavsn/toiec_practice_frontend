@@ -1,4 +1,4 @@
-import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, OverallStat, Permission, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow } from "./type";
+import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, GradedFeedback, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, OverallStat, Permission, PexelsPhoto, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow, WritingPart1Prompt, WritingSheetData } from "./type";
 
 interface LectureHookState {
   isRefresh: boolean;
@@ -144,12 +144,31 @@ interface AdminReportsState {
   deleteReportError: Record<string, string | null>; // Key: reportId, for delete operation error
 }
 
+/**
+ * @interface ToeicWritingPart1State 
+ * @description Định nghĩa trạng thái cho trang TOEIC Part 1.
+ */
+interface ToeicWritingPart1State {
+  isLoadingImage: boolean; // Trạng thái đang tải hình ảnh
+  isCreatingQuestion: boolean; // Trạng thái đang tạo đề bài
+  isLoadingGrade: boolean; // Trạng thái đang chấm điểm
+  currentImage: PexelsPhoto | null; // Hình ảnh hiện tại từ Pexels
+  currentPrompt: WritingPart1Prompt | null; // Đề bài hiện tại
+  userAnswerText: string; // Nội dung câu trả lời của người dùng
+  currentFeedback: GradedFeedback | null; // Phản hồi và điểm số hiện tại
+  error: string | null; // Thông báo lỗi (nếu có)
+  currentSheetId: number | null; // ID of the currently loaded/active sheet
+  currentSheetData: WritingSheetData | null; // Full data of the loaded sheet
+  totalSheets: number; // Total number of sheets in DB for Paginator
+  isDbLoading: boolean; // For initial DB load or sheet switching
+}
+
 export type {
   AdminReportsState, CategoryHookState, CommentSectionState, CommentsState, FullTestScreenState,
   LectureCardState,
   LectureHookState, MultiQuestionState, PermissionHookState, ProfileHookState,
   RenderTestState,
-  RoleHookState, RowHookState, TestHookState, TestReviewHookState, TopicHookState, UserCommentState,
+  RoleHookState, RowHookState, TestHookState, TestReviewHookState, ToeicWritingPart1State, TopicHookState, UserCommentState,
   UserHookState
 };
 
