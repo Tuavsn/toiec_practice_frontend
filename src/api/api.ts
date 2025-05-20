@@ -1,13 +1,27 @@
 import { isCancel } from "axios";
+import { Toast } from "primereact/toast";
 import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ProfileHookState } from "../utils/types/state";
-import { ApiResponse, AssignmentQuestion, CategoryID, CategoryLabel, CategoryRow, ExerciseType, Lecture, LectureCard, LectureID, LectureProfile, LectureRow, Permission, PermissionID, QuestionID, QuestionRow, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
+import { ApiResponse, AssignmentQuestion, CategoryID, CategoryLabel, CategoryRow, Comment_t, CommentPage, CommentReport, CreateCommentReportPayload, CreateCommentRequest, DeleteCommentRequest, ExerciseType, Lecture, LectureCard, LectureID, LectureProfile, LectureRow, Permission, PermissionID, QuestionID, QuestionRow, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, TargetType, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateCommentReportStatusPayload, UpdateQuestionForm, UserComment, UserRow } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net/";
 
 export const loginUrl = `${host}/oauth2/authorize/google`;
 
+export const wakeupServers = async (): Promise<void> => {
+    try {
 
+        await Promise.all(
+            [
+                axios.get(`${import.meta.env.VITE_API_URL}/categories?current=1&pageSize=1`),
+                fetch(import.meta.env.VITE_TOXIC_CLASSIFIER_API_URL, { method: "HEAD" })
+            ]
+        )
+    } catch (e: unknown) {
+        console.error("wakeup server fail !!!");
+
+    }
+}
 
 export const callCreateCategory = async (category: CategoryRow): Promise<boolean> => {
     try {
@@ -728,3 +742,322 @@ export const callContinueChat = async (questionId: string, sessionId: string, me
         return null;
     }
 }
+
+export const fetchTableOfComments = async (toast: React.MutableRefObject<Toast | null>,
+    page: number = 1,
+    pageSize: number = 10,
+    term?: string,
+    signal?: AbortSignal,
+    sortBy: string[] = ["createdAt"],
+    sortDirection: string[] = ["desc"],
+    active?: boolean,
+): Promise<TableData<Comment_t> | null> => {
+    try {
+        const params = new URLSearchParams()
+        params.append("current", page.toString())
+        params.append("pageSize", pageSize.toString())
+
+        if (term) params.append("term", term)
+
+        sortBy.forEach((sort, index) => {
+            params.append("sortBy", sort)
+            if (sortDirection[index]) {
+                params.append("sortDirection", sortDirection[index])
+            }
+        })
+
+        if (active !== undefined) params.append("active", active.toString())
+
+        const response = await axios.get<ApiResponse<TableData<Comment_t>>>(`${import.meta.env.VITE_API_URL}/comments?${params.toString()}`, { signal })
+        return response.data.data
+    } catch (error) {
+        console.dir(error);
+        if (isCancel(error) || (error as any).code === 'ERR_CANCELED') {
+            return null
+        }
+
+        // Các lỗi khác thì show toast
+        toast.current?.show({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Không tải được bình luận',
+            life: 3000,
+        })
+        return null
+    }
+}
+
+
+export const fetchRootCommentList = async (
+    targetType: TargetType,
+    targetId: string,
+    signal?: AbortSignal,
+    page = 1,
+    pageSize = 10,
+    term?: string,
+    sortBy: string[] = ["createdAt"],
+    sortDirection: string[] = ["desc"],
+    active?: boolean,
+): Promise<CommentPage | null> => {
+    try {
+        const params = new URLSearchParams()
+        params.append("current", page.toString())
+        params.append("pageSize", pageSize.toString())
+
+        if (term) params.append("term", term)
+
+        sortBy.forEach((sort, index) => {
+            params.append("sortBy", sort)
+            if (sortDirection[index]) {
+                params.append("sortDirection", sortDirection[index])
+            }
+        })
+
+        if (active !== undefined) params.append("active", active.toString())
+
+        const response = await axios.get<ApiResponse<CommentPage>>(
+            `${import.meta.env.VITE_API_URL}/comments/root/${targetType}/${targetId}?${params.toString()}`, { signal }
+        )
+
+        return response.data.data
+    } catch (error) {
+        console.error("Error fetching root comments:", error)
+        return null
+    }
+}
+
+export const fetchRepliesList = async (
+    targetType: TargetType,
+    targetId: string,
+    parentId: string,
+    signal?: AbortSignal,
+    page = 1,
+    pageSize = 10,
+    term?: string,
+    sortBy: string[] = ["createdAt"],
+    sortDirection: string[] = ["desc"],
+    active?: boolean,
+): Promise<CommentPage | null> => {
+    try {
+        const params = new URLSearchParams()
+        params.append("current", page.toString())
+        params.append("pageSize", pageSize.toString())
+
+        if (term) params.append("term", term)
+
+        sortBy.forEach((sort, index) => {
+            params.append("sortBy", sort)
+            if (sortDirection[index]) {
+                params.append("sortDirection", sortDirection[index])
+            }
+        })
+
+        if (active !== undefined) params.append("active", active.toString())
+
+        const response = await axios.get<ApiResponse<CommentPage>>(
+            `${import.meta.env.VITE_API_URL}/comments/replies/${targetType}/${targetId}/${parentId}?${params.toString()}`, { signal }
+        )
+
+        return response.data.data
+    } catch (error) {
+        console.error("Error fetching replies:", error)
+        return null
+    }
+}
+
+export const createComment = async (commentData: CreateCommentRequest, signal?: AbortSignal): Promise<Comment_t | null> => {
+    try {
+        const response = await axios.post<ApiResponse<Comment_t>>(`${import.meta.env.VITE_API_URL}/comments`, commentData, { signal })
+
+        return response.data.data
+    } catch (error) {
+        console.error("Error creating comment:", error)
+        return null
+    }
+}
+
+export const deleteOneComment = async (
+    commentId: string,
+    deleteRequest: DeleteCommentRequest,
+    signal?: AbortSignal
+): Promise<Comment_t | null> => {
+    try {
+        const response = await axios.delete<ApiResponse<Comment_t>>(`${import.meta.env.VITE_API_URL}/comments/${commentId}`, { data: deleteRequest, signal })
+
+        return response.data.data
+    } catch (error) {
+        console.error("Error deleting comment:", error)
+        return null
+    }
+}
+
+export const toggleOneLike = async (commentId: string, signal?: AbortSignal): Promise<Comment_t | null> => {
+    try {
+        const response = await axios.put<ApiResponse<Comment_t>>(`${import.meta.env.VITE_API_URL}/comments/toggle-like/${commentId}`, undefined, { signal })
+
+        return response.data.data
+    } catch (error) {
+        console.error("Error toggling like:", error)
+        return null
+    }
+}
+
+export const toggleActive = async (commentId: string): Promise<Comment_t | null> => {
+    try {
+        const response = await axios.put<ApiResponse<Comment_t>>(`${import.meta.env.VITE_API_URL}/comments/toggle-active/${commentId}`)
+
+        return response.data.data
+    } catch (error) {
+        console.error("Error toggling active status:", error)
+        return null
+    }
+}
+
+/**
+ * Gửi báo cáo cho một bình luận cụ thể.
+ * (Submits a report for a specific comment.)
+ *
+ * @param commentId ID của bình luận cần báo cáo. (ID of the comment to be reported.)
+ * @param reportData Dữ liệu báo cáo bao gồm lý do và chi tiết. (Report data including reason and details.)
+ * @param signal (Tùy chọn) AbortSignal để có thể hủy request. (Optional AbortSignal to cancel the request.)
+ * @returns Promise chứa đối tượng báo cáo đã được tạo (CommentReport_t) nếu thành công, hoặc null nếu thất bại trước khi request được gửi.
+ * Ném lỗi (throws error) nếu API trả về lỗi, để component gọi có thể xử lý (ví dụ: hiển thị toast).
+ * (Returns a Promise with the created report object (CommentReport_t) on success, or null if failed before request.
+ * Throws an error if the API returns an error, allowing the calling component to handle it (e.g., show a toast).)
+ */
+export const submitCommentReport = async (
+    reportData: CreateCommentReportPayload,
+    signal?: AbortSignal
+): Promise<CommentReport> => { // Changed to throw error instead of returning null for API errors
+    try {
+        // Endpoint: POST /comments/{commentId}/reports
+        const response = await axios.post<ApiResponse<CommentReport>>(
+            `${import.meta.env.VITE_API_URL}/comment-reports`,
+            reportData,
+            { signal } // Pass the AbortSignal to axios config
+        );
+
+        // Assuming your backend's ApiResponse wraps the actual data in a 'data' property
+        // and includes a success message and statusCode.
+        if (response.data && response.data.data) {
+            // Log success message from API if needed, or let UI handle generic success
+            // console.log(response.data.message);
+            return response.data.data;
+        } else {
+            // This case should ideally not happen if backend follows ApiResponse strictly for success
+            throw new Error('Phản hồi API không hợp lệ sau khi gửi báo cáo.');
+            // (Invalid API response after submitting the report.)
+        }
+    } catch (error: any) {
+        // Log the detailed error for debugging
+        console.error(
+            "Lỗi khi gửi báo cáo bình luận (Error submitting comment report):",
+            error.response?.data?.message || error.response?.data || error.message
+        );
+
+        // Rethrow the error so the calling component (e.g., in UI, using a toast) can handle it
+        // This allows for more specific error messages in the UI based on backend response
+        throw error;
+    }
+};
+
+/**
+ * @en Fetches a paginated list of comment reports for admin.
+ * @vi Lấy danh sách báo cáo bình luận đã phân trang cho quản trị viên.
+ */
+export const fetchAdminCommentReports = async (
+    params: {
+        page?: number;
+        pageSize?: number;
+        sortBy?: string;
+        sortDirection?: 'asc' | 'desc';
+        status?: string; // Assuming CommentReportStatus enum values are strings
+        reasonCategory?: string;
+        commentId?: string;
+        reportedByUserId?: string;
+    },
+    signal?: AbortSignal
+): Promise<TableData<CommentReport> | null> => {
+    try {
+        const queryParams = new URLSearchParams();
+        if (params.page) queryParams.append('current', params.page.toString());
+        if (params.pageSize) queryParams.append('pageSize', params.pageSize.toString());
+        if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+        if (params.sortDirection) queryParams.append('sortDirection', params.sortDirection);
+        if (params.status) queryParams.append('status', params.status);
+        if (params.reasonCategory) queryParams.append('reasonCategory', params.reasonCategory);
+        if (params.commentId) queryParams.append('commentId', params.commentId);
+        if (params.reportedByUserId) queryParams.append('reportedByUserId', params.reportedByUserId);
+
+        const response = await axios.get<ApiResponse<TableData<CommentReport>>>(
+            `${import.meta.env.VITE_API_URL}/comment-reports?${queryParams.toString()}`, // Corrected URL
+            { signal }
+        );
+        return response.data.data;
+    } catch (error: any) {
+        if (isCancel(error)) {
+            console.log('Fetch admin comment reports cancelled');
+        } else {
+            console.error("Lỗi khi tải danh sách báo cáo (Error fetching admin comment reports):", error.response?.data || error.message);
+        }
+        return null; // Return null on error as per project pattern
+    }
+};
+
+/**
+ * @en Updates the status and admin notes of a specific comment report.
+ * @vi Cập nhật trạng thái và ghi chú của quản trị viên cho một báo cáo bình luận cụ thể.
+ */
+export const updateAdminCommentReportStatus = async (
+    reportId: string,
+    payload: UpdateCommentReportStatusPayload,
+    signal?: AbortSignal
+): Promise<CommentReport | null> => {
+    try {
+        const response = await axios.put<ApiResponse<CommentReport>>(
+            `${import.meta.env.VITE_API_URL}/comment-reports/${reportId}`, // Corrected URL, assuming status update is via PUT to the report itself
+            payload,
+            { signal }
+        );
+        return response.data.data;
+    } catch (error: any) {
+        if (isCancel(error)) {
+            console.log('Update admin comment report status cancelled');
+        } else {
+            console.error("Lỗi khi cập nhật trạng thái báo cáo (Error updating report status):", error.response?.data || error.message);
+        }
+        return null;
+    }
+};
+
+/**
+ * @en Deletes a specific comment report. This typically means the report itself is removed, not the comment.
+ * @vi Xóa một báo cáo bình luận cụ thể. Thao tác này thường xóa chính báo cáo đó, không phải bình luận.
+ *
+ * @param reportId The ID of the comment report to delete.
+ * @param signal Optional AbortSignal.
+ * @returns A Promise resolving to true if deletion was successful (e.g., 204 No Content), false otherwise.
+ */
+export const deleteAdminCommentReport = async (
+    reportId: string,
+    signal?: AbortSignal
+): Promise<boolean | null> => { // Return boolean for success/fail, null for cancellation/network error
+    try {
+        // DELETE requests might return 204 No Content on success, or the deleted object, or a success message.
+        // Adjust based on your actual backend response. Here, we assume 2xx means success.
+        const response = await axios.delete<ApiResponse<null | { id: string }>>( // Backend might return null or the ID of deleted item
+            `${import.meta.env.VITE_API_URL}/comment-reports/${reportId}`,
+            { signal }
+        );
+        // Check for 2xx status codes for success.
+        // Axios typically throws for non-2xx, but if it doesn't for some reason:
+        return response.status >= 200 && response.status < 300;
+    } catch (error: any) {
+        if (isCancel(error)) {
+            console.log('Delete admin comment report cancelled');
+        } else {
+            console.error("Lỗi khi xóa báo cáo (Error deleting report):", error.response?.data || error.message);
+        }
+        return null; // Returning null to indicate error or cancellation
+    }
+};

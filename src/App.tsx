@@ -2,9 +2,11 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import 'primeflex/primeflex.css'; // flex
 import 'primeicons/primeicons.css'; // icons
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import 'primereact/resources/primereact.min.css'; // core css
 import 'primereact/resources/themes/lara-light-blue/theme.css'; // theme
 import { Suspense, lazy } from 'react';
+import { wakeupServers } from './api/api';
 import './App.css';
 import { LoadingSpinner } from './components/Common/Index';
 import Container from './components/Layout/Container';
@@ -19,8 +21,11 @@ const UserRoutes = lazy(() => import('./router/UserRoutes'));
 
 function App() {
   SetWebPageTitle("UTE TOEIC")
+  wakeupServers().then(() => console.log("servers is up!!!"));
+
   return (
     <BrowserRouter>
+      <ConfirmDialog />
       <Suspense fallback={<main className='flex justify-content-center h-screen'><LoadingSpinner text="Trang Toeic đang tải...." /></main>}>
         <ToastProvider>
           <Container>

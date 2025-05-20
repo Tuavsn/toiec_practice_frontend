@@ -1,5 +1,6 @@
+import { CommentActionType } from "../../hooks/_CommentSectionHook";
 import { ProfileHookState } from "./state";
-import { CategoryRow, DialogLectureJobType, DialogRowJobType, LectureCard, LectureRow, MultipleChoiceQuestion, Permission, QuestionID, QuestionNumber, QuestionPage, Role, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, UserComment, UserRow } from "./type";
+import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, Permission, QuestionID, QuestionNumber, QuestionPage, Role, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, UserComment, UserRow } from "./type";
 
 type RenderTestActiion =
     | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber; qID: QuestionID; answer: string; } }
@@ -49,6 +50,41 @@ type UserCommentAction =
     | { type: 'FETCH_COMMENTS'; payload: [UserComment[], number] }
     | { type: 'SET_PAGE'; payload: number }
     | { type: 'REFRESH_DATA' }
+
+type CommentAction =
+    // Root Comments
+    | { type: CommentActionType.FETCH_ROOT_COMMENTS_START }
+    | { type: CommentActionType.FETCH_ROOT_COMMENTS_SUCCESS; payload: { comments: Comment_t[]; meta: Meta } }
+    | { type: CommentActionType.FETCH_ROOT_COMMENTS_FAILURE; payload: string }
+    // Replies
+    | { type: CommentActionType.FETCH_REPLIES_START; payload: { parentId: string } }
+    | { type: CommentActionType.FETCH_REPLIES_SUCCESS; payload: { parentId: string; replies: Comment_t[]; meta: Meta } }
+    | { type: CommentActionType.FETCH_REPLIES_FAILURE; payload: { parentId: string; error: string } }
+    // Create Comment
+    | { type: CommentActionType.CREATE_COMMENT_START }
+    | { type: CommentActionType.CREATE_COMMENT_SUCCESS; payload: Comment_t }
+    | { type: CommentActionType.CREATE_COMMENT_FAILURE; payload: string }
+    // Delete Comment
+    | { type: CommentActionType.DELETE_COMMENT_START; payload: { commentId: string } }
+    | { type: CommentActionType.DELETE_COMMENT_SUCCESS; payload: { commentId: string; parentId?: string | null } } // parentId để biết cập nhật list nào
+    | { type: CommentActionType.DELETE_COMMENT_FAILURE; payload: { commentId: string; error: string } }
+    // Toggle Like
+    | { type: CommentActionType.TOGGLE_LIKE_START; payload: { commentId: string } }
+    | { type: CommentActionType.TOGGLE_LIKE_SUCCESS; payload: Comment_t }
+    | { type: CommentActionType.TOGGLE_LIKE_FAILURE; payload: { commentId: string; error: string } }
+    // Mentions
+    | { type: CommentActionType.SET_MENTION_SUGGESTIONS; payload: Array<{ id: string; name: string; avatar?: string }> }
+    // UI State
+    | { type: CommentActionType.SET_ACTIVE_REPLY_FORM; payload: string | null }
+    | { type: CommentActionType.TOGGLE_REPLIES_VISIBILITY; payload: string | null } // null để đóng tất cả
+    | { type: CommentActionType.CLEAR_ERROR }
+    | { type: CommentActionType.OPEN_REPORT_DIALOG; payload: Pick<Comment_t, 'id' | 'content' | 'userDisplayName' | 'userId'> }
+    | { type: CommentActionType.CLOSE_REPORT_DIALOG }
+    | { type: CommentActionType.SUBMIT_COMMENT_REPORT_START }
+    | { type: CommentActionType.SUBMIT_COMMENT_REPORT_SUCCESS; payload: { report: CommentReport; message?: string } }
+    | { type: CommentActionType.SUBMIT_COMMENT_REPORT_FAILURE; payload: string }
+    | { type: CommentActionType.CLEAR_REPORT_SUBMIT_STATUS };
+
 type UserHookAction =
     | { type: 'FETCH_ROWS_SUCCESS'; payload: [UserRow[], number] }
     | { type: 'FETCH_ROLES_SUCCESS'; payload: Role[] }
@@ -109,10 +145,22 @@ type LectureCardAction =
     | { type: 'SET_KEYWORD'; payload: string }
     | { type: 'RESET_ROWS' }
 
+type AdminReportAction =
+    | { type: 'FETCH_REPORTS_START' }
+    | { type: 'FETCH_REPORTS_SUCCESS'; payload: TableData<CommentReport> }
+    | { type: 'FETCH_REPORTS_FAILURE'; payload: string }
+    | { type: 'UPDATE_STATUS_START'; payload: { reportId: string } }
+    | { type: 'UPDATE_STATUS_SUCCESS'; payload: CommentReport } // Payload is the updated report
+    | { type: 'UPDATE_STATUS_FAILURE'; payload: { reportId: string; error: string } }
+    | { type: 'CLEAR_UPDATE_ERROR'; payload: { reportId: string } }
+    | { type: 'DELETE_REPORT_START'; payload: { reportId: string } }
+    | { type: 'DELETE_REPORT_SUCCESS'; payload: { reportId: string } } // reportId of deleted item
+    | { type: 'DELETE_REPORT_FAILURE'; payload: { reportId: string; error: string } }
+    | { type: 'CLEAR_DELETE_ERROR'; payload: { reportId: string } };
+
 
 export type {
-    CategoryHookAction, FullTestScreenAction,
-    LectureCardAction,
+    AdminReportAction, CategoryHookAction, CommentAction, FullTestScreenAction, LectureCardAction,
     LectureHookAction,
     MultiQuestionAction, PermissionHookAction, ProfileHookAction,
     RenderTestActiion, RoleHookAction,
