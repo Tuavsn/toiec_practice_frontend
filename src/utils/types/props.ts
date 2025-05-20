@@ -2,7 +2,7 @@ import { TreeNode } from "primereact/treenode";
 import { Dispatch, MutableRefObject } from "react";
 import { CategoryHookAction, FullTestScreenAction, LectureHookAction, MultiQuestionAction, PermissionHookAction, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, TopicHookAction, UserHookAction } from "./action";
 import { LectureHookState, MultiQuestionState, TestReviewHookState } from "./state";
-import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Permission, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, Topic, TopicOverview, TopicStat, UserAnswerRecord, UserDetailResultRow, UserRow } from "./type";
+import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, GradedFeedback, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Permission, PexelsPhoto, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, Topic, TopicOverview, TopicStat, UIWritingPart1Control, UserAnswerRecord, UserDetailResultRow, UserRow, WritingPart1Prompt } from "./type";
 
 interface ButtonListProps {
     pageMapper: QuestionPage[],
@@ -188,7 +188,7 @@ interface DoExercisePageProps {
 interface DialogQuestionActionProps {
     isVisible: boolean,
     title: string,
-  
+
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
     currentSelectedQuestion: React.MutableRefObject<TreeNode>,
     topicList: React.MutableRefObject<Topic[]>,
@@ -324,17 +324,42 @@ interface UserAnswerSideTabProps {
     dotestDataRef: React.MutableRefObject<TestSheet>
 }
 
+interface ImageDisplayProps {
+    image: PexelsPhoto | null;
+    isLoading: boolean;
+    imageAltText?: string; // Văn bản thay thế cho ảnh
+}
+
+interface PromptDisplayProps {
+    prompt: WritingPart1Prompt | null;
+    isLoading: boolean;
+}
+interface AnswerFormProps {
+    answerText: string;
+    onAnswerChange: (text: string) => void;
+    onSubmit: () => void;
+    isSubmitting: boolean;
+    isSubmitAnswerButtonDisable: boolean; // Để vô hiệu hoá nếu chưa có đề
+}
+interface PanelHeaderProps {
+    generateNewQuestion: () => void,
+    currentSheetId: number | null,
+    uiControl: UIWritingPart1Control,
+    totalSheets: number,
+}
+
+interface GradeDisplayProps {
+    feedback: GradedFeedback | null;
+  
+    uiControls: UIWritingPart1Control
+}
 export type {
-    ActivityLogProps, AdminCategoryTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AssignmentQuestionTableProps, ButtonListProps,
+    ActivityLogProps, AdminCategoryTableProps, AdminGenericTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AnswerFormProps, AssignmentQuestionTableProps, ButtonListProps,
     ConfirmSubmitDialogProps, DialogAssignmentQuestionActionProps, DialogDeleteLectureBodyProps,
-    DialogDeleteRowBodyProps,
-    DialogLectureProps,
-    DialogQuestionActionProps,
+    DialogDeleteRowBodyProps, DialogLectureProps, DialogQuestionActionProps,
     DialogQuestionPageProps,
-    DialogRoleRowProps,
-    DialogRowProps,
-    DialogTestRowProps,
-    DialogUpdateCategoryBodyProps,
+    DialogRoleRowProps, DialogRowProps,
+    DialogTestRowProps, DialogUpdateCategoryBodyProps,
     DialogUpdateLectureBodyProps,
     DialogUpdatePermissionBodyProps,
     DialogUpdateRoleBodyProps,
@@ -345,10 +370,7 @@ export type {
     DoExercisePageProps,
     DoTestPageProps,
     FullTestAreaProps,
-    FullTestScreenProps,
-    LectureActionButtonProps, LectureReduceProps,
-    PartDetailSectionProps,
-    QuestionActionButtonProps,
+    FullTestScreenProps, GradeDisplayProps, ImageDisplayProps, LectureActionButtonProps, LectureReduceProps, PanelHeaderProps, PartDetailSectionProps, PromptDisplayProps, QuestionActionButtonProps,
     QuestionTableProps,
     RenderPressStartButtonProps,
     RenderTestProps,

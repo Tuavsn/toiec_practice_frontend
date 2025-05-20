@@ -13,10 +13,10 @@ import { Stepper, StepperRefAttributes } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
 import { Steps } from 'primereact/steps';
 import { TabPanel, TabView } from 'primereact/tabview';
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Doughnut, Pie } from "react-chartjs-2";
 import { Link, Navigate } from 'react-router-dom';
-import { callPutUserTarget } from '../../api/api';
+import { callGetMyRecommend, callPutUserTarget } from '../../api/api';
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from '../../components/Common/Column/CommonColumn';
 import useLectureProfile from '../../hooks/LectureProfileHook';
 import useProfile from '../../hooks/ProfileHook';
@@ -26,7 +26,7 @@ import formatDate from '../../utils/helperFunction/formatDateToString';
 import GetColorBasedOnValue from '../../utils/helperFunction/GetColorHueValue';
 import { ProfileHookAction } from '../../utils/types/action';
 import { ActivityLogProps, SkillInsightsProps } from '../../utils/types/props';
-import { LectureCard, SkillStat, SuggestionsForUser, TopicStat, UserDetailResultRow } from '../../utils/types/type';
+import { LectureCard, RecommendLecture, RecommendTest, SkillStat, TopicStat, UserDetailResultRow } from '../../utils/types/type';
 // Đăng ký các phần tử Chart.js cần thiết
 ChartJS.register(...registerables);
 // Đăng ký plugin DataLabels
@@ -57,7 +57,7 @@ export default function UserProfilePage() {
             <Card key="activity-log" className='shadow-7' title="4. Nhật ký học tập"><ActivityLog userResultRows={results} /></Card>
             <div key="area-3" className="flex gap-3 flex-wrap">
                 <Card key="time-spent" className="shadow-7 flex-1" style={{ minWidth: "590px" }} title="5. Thời gian học tập theo kỹ năng">{TimeSpent(skillStats)}</Card>
-                <Card key="suggestion" className='shadow-7 flex-1' title="6. Đề xuất cải thiện">{Suggestions(ConvertTopicStatToSuggestion(topicStats))}</Card>
+                <Card key="suggestion" className='shadow-7 flex-1' title="6. Đề xuất cải thiện"><Suggestions /></Card>
 
             </div>
             {/* <Card key="stat" className='shadow-7' title="7. Thống kê"></Card> */}
@@ -106,42 +106,11 @@ const CurrentLecture: React.FC = React.memo(
         const { onGoingLectures, completeLectures } = useLectureProfile();
         const totalOnGoing = onGoingLectures.length;
         const totalComplete = completeLectures.length;
-        const xonGoingLectures = [
-            {
-                id: "1",
-                name: "Introduction to TOEIC",
-                topic: ["Overview", "Test Structure", "Tips"],
-                percent: 25,
-            },
-            {
-                id: "2",
-                name: "Listening Practice - Part 1",
-                topic: ["Photographs", "Key Strategies", "Common Traps"],
-                percent: 50,
-            },
-            {
-                id: "3",
-                name: "Reading Comprehension - Part 7",
-                topic: ["Passage Analysis", "Question Types", "Time Management"],
-                percent: 75,
-            },
-            {
-                id: "4",
-                name: "Vocabulary Building",
-                topic: ["Common Words", "Business Terminology", "Synonyms"],
-                percent: 40,
-            },
-            {
-                id: "5",
-                name: "Mock Test and Review",
-                topic: ["Full Test", "Error Review", "Score Analysis"],
-                percent: 10,
-            },
-        ];
+
         return (
             <TabView>
                 <TabPanel header="Đang tiếp diễn" leftIcon="pi pi-calendar mr-2">
-                    <DataScroller value={xonGoingLectures} itemTemplate={itemLectureTemplate} rows={5} inline scrollHeight="700px" footer={`Tổng có ${totalOnGoing} bài học`} header={totalOnGoing >= 2 ? "Kéo xuống để hiển thị thêm" : ""} />
+                    <DataScroller value={onGoingLectures} itemTemplate={itemLectureTemplate} rows={5} inline scrollHeight="700px" footer={`Tổng có ${totalOnGoing} bài học`} header={totalOnGoing >= 2 ? "Kéo xuống để hiển thị thêm" : ""} />
 
                 </TabPanel>
                 <TabPanel header="Đã hoàn thành" rightIcon="pi pi-check ml-2">
@@ -372,25 +341,64 @@ function TimeSpent(skillStats: SkillStat[]) {
     )
 }
 
+
+
 //---[7]-------------------------------------------------------------------------------------------------------------------------------------------
 // Hàm Suggestions hiển thị danh sách các gợi ý học TOEIC dưới dạng các bước với Stepper.
-function Suggestions(suggestionOnParts: SuggestionsForUser[]) {
+function Suggestions() {
     // stepperRef dùng để lưu trữ tham chiếu đến Stepper và sử dụng các phương thức điều hướng.
-    const stepperRef = useRef<StepperRefAttributes | null>(null);
-    const lastIndex = suggestionOnParts.length - 1; // Xác định chỉ mục của gợi ý cuối cùng.
-
+    const [recommendLectures, setRecommendLectures] = useState<RecommendLecture[] | null>([])
+    const [recommendTests, setRecommendTests] = useState<RecommendTest[] | null>([])
+    useEffect(() => {
+        callGetMyRecommend().then(([lectureList, testList]) => {
+            setRecommendLectures(lectureList);
+            setRecommendTests(testList);
+        });
+    }, [])
     return (
-        <main>
-            {/* Hiển thị Stepper với các gợi ý trong dạng dọc */}
+        <TabView>
+            <TabPanel header="Bài học phù hợp với bạn">
+                <RecommendLectureStepper recommendLectures={recommendLectures} />
+            </TabPanel>
+            <TabPanel header="Đề thi phù hợp với bạn">
+                <RecommendTestStepper recommendTests={recommendTests} />
+            </TabPanel>
+        </TabView>
+    )
+}
+
+const RecommendLectureStepper: React.FC<{ recommendLectures: RecommendLecture[] | null }> = React.memo(
+    ({ recommendLectures }) => {
+        const stepperRef = useRef<StepperRefAttributes | null>(null);
+        if (!recommendLectures) {
+            recommendLectures = [{
+                explanation: "không có gợi ý cải thiện nào",
+                id: "",
+                lectureId: "",
+                name: ""
+            }]
+        }
+        const lastIndex = recommendLectures.length - 1;
+        return (
             <Stepper ref={stepperRef} orientation="vertical">
                 {
                     // Duyệt qua từng phần gợi ý trong suggestionOnParts
-                    suggestionOnParts.map((suggestion, index) => {
+                    recommendLectures.map((suggestion, index) => {
+                        console.log(suggestion);
+                        const url = suggestion.id === "" ? "#" : `/lecture/${suggestion.name}___${suggestion.lectureId}`
                         return (
-                            <StepperPanel key={"step" + index} header={suggestion.title}>
+                            <StepperPanel key={"step" + index} header={suggestion.name ?? index}>
                                 {/* Hiển thị nội dung gợi ý */}
                                 <div className="flex flex-column h-12rem">
-                                    <div className="custom-box">{suggestion.content}</div>
+                                    <div className="custom-box">
+                                        <section>
+                                            <p>{suggestion.explanation}</p>
+                                            <Link to={url}>
+                                                <p className='text-center text-blue-300 hover:text-blue-500'>{">> "}Xem thêm tại đây{" <<"}</p>
+                                            </Link>
+                                        </section>
+                                    </div>
+
                                 </div>
                                 <div className="flex py-4 gap-2">
 
@@ -407,21 +415,64 @@ function Suggestions(suggestionOnParts: SuggestionsForUser[]) {
                     })
                 }
             </Stepper>
-        </main>
-    )
-}
-function ConvertTopicStatToSuggestion(topicStats: TopicStat[]): SuggestionsForUser[] {
-    return topicStats.filter(t => t.totalCorrect !== 0 || t.totalIncorrect !== 0).toSorted((a, b) =>
-        Math.round(a.totalCorrect / ((a.totalCorrect + a.totalIncorrect) || 1) * 10000) / 100
-        - Math.round(b.totalCorrect / ((b.totalCorrect + b.totalIncorrect) || 1) * 10000) / 100
-    ).map(ts => {
-        return {
-            title: ts.topic.name,
-            content: ts.topic.solution
+        )
+    }
+)
+const RecommendTestStepper: React.FC<{ recommendTests: RecommendTest[] | null }> = React.memo(
+    ({ recommendTests }) => {
+        const stepperRef = useRef<StepperRefAttributes | null>(null);
+        if (!recommendTests) {
+            recommendTests = [{
+                explanation: "không có gợi ý cải thiện nào",
+                id: "",
+                testId: "",
+                name: ""
+            }]
         }
-    }).slice(0, 5);
+        const lastIndex = recommendTests.length - 1;
+        return (
+            <Stepper ref={stepperRef} orientation="vertical">
+                {
+                    // Duyệt qua từng phần gợi ý trong suggestionOnParts
+                    recommendTests.map((suggestion, index) => {
+                        console.log(suggestion);
+                        const url = suggestion.id === "" ? "#" : `/test/${suggestion.testId}`
+                        return (
+                            <StepperPanel key={"step" + index} header={suggestion.name ?? index}>
+                                {/* Hiển thị nội dung gợi ý */}
+                                <div className="flex flex-column h-12rem">
+                                    <div className="custom-box">
+                                        <section>
+                                            <p>{suggestion.explanation}</p>
+                                            <Link to={url}>
+                                                <p className='text-center text-blue-300 hover:text-blue-500'>{">> "}Xem thêm tại đây{" <<"}</p>
+                                            </Link>
+                                        </section>
+                                    </div>
 
-}
+                                </div>
+                                <div className="flex py-4 gap-2">
+
+                                    {index !== 0 /* Nút "Trước" - chỉ hiển thị nếu không phải gợi ý đầu tiên */ &&
+                                        <Button label="Trước" severity="secondary" icon="pi pi-arrow-left" onClick={() => stepperRef.current?.prevCallback()} />
+                                    }
+
+                                    {index !== lastIndex /* Nút "Tiếp" - chỉ hiển thị nếu không phải gợi ý cuối cùng */ &&
+                                        <Button label="Tiếp" icon="pi pi-arrow-right" iconPos="right" onClick={() => stepperRef.current?.nextCallback()} />
+                                    }
+                                </div>
+                            </StepperPanel>
+                        )
+                    })
+                }
+            </Stepper>
+        )
+    }
+)
+
+
+
+
 
 function correctPercentTemplate(rowData: TopicStat) {
     const correctPercent = Math.round(rowData.totalCorrect / ((rowData.totalCorrect + rowData.totalIncorrect) || 1) * 10000) / 100;

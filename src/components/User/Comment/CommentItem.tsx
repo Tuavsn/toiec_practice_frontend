@@ -132,7 +132,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
 
   return (
-    <div className={`comment-item py-3 ${comment.level > 0 ? 'ml-5 pl-4 border-left-2 surface-border' : ''}`}>
+    <div className={`comment-item pt-3 ${comment.level > 0 ? 'ml-5 pl-4 border-left-2 surface-border' : ''}`}>
       {/* Global ConfirmDialog needed for confirmDialog() to work */}
 
 
@@ -140,7 +140,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
         <UserAvatar comment={comment} />
         <div className="flex-grow-1">
           <div className="flex align-items-center justify-content-between">
-            <span className="font-semibold text-sm">{comment.userDisplayName || 'Người dùng ẩn danh'}</span>
+            <span className="font-semibold text-sm"
+              style={{ fontFamily: `'Segoe UI', Roboto, 'Helvetica Neue', sans-serif` }}
+            >{comment.userDisplayName || 'Người dùng ẩn danh'}</span>
             {comment.deleted && <Tag severity="warning" value="Đã xóa" className="ml-2 text-xs"></Tag>}
           </div>
           <div className={`text-sm surface-content ${comment.deleted ? 'italic text-color-secondary' : ''} mt-1 break-word`}>

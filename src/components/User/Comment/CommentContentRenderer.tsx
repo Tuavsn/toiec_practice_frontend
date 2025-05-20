@@ -25,7 +25,7 @@ const CommentContentRenderer: React.FC<CommentContentRendererProps> = ({
   );
 
   // Regex to find @[userId] patterns
-  const mentionRegex = /@\[([^\]]+)\]/g;
+  const mentionRegex = /@([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
 
   // Split the content by mentions and interleave with styled spans
   const parts = [];
@@ -43,7 +43,9 @@ const CommentContentRenderer: React.FC<CommentContentRendererProps> = ({
 
     // Add highlighted mention
     parts.push(
-      <span key={`${userId}-${match.index}`} className="p-mention-item font-semibold text-primary">
+      <span key={`${userId}-${match.index}`} className="p-mention-item font-semibold text-blue-500"
+        style={{ fontFamily: `'Segoe UI', Roboto, 'Helvetica Neue', sans-serif` }}
+      >
         @{mentionName}
       </span>
     );

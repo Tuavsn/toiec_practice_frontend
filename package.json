@@ -12,6 +12,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@google/genai": "^0.15.0",
     "@types/chart.js": "^2.9.41",
     "axios": "^1.7.7",
     "chart.js": "^4.4.6",

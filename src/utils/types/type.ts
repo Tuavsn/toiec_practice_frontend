@@ -481,6 +481,25 @@ export interface UpdateAssignmentQuestionForm {
   correctAnswer: string;
 }
 
+export type RecommendLecture = {
+  id: string,
+  explanation: string,
+  lectureId: string,
+  name: string
+}
+export type RecommendTest = {
+  id: string,
+  explanation: string,
+  name: string,
+  testId: string,
+}
+
+export type RecommendDoc = {
+  userId: string,
+  recommendedLectures: RecommendLecture[],
+  recommendedTests: RecommendTest[],
+}
+
 export interface UpdateLectureForm {
   id: LectureID;
   name: string;
@@ -882,6 +901,191 @@ export type TestSheet = {
   testType: TestType,
 }
 
+
+/**
+ * @type WritingSheetStatus
+ * @description Defines the possible states of a practice sheet.
+ * - 'blank': Newly created, no prompt yet. Ready for "Tạo đề mới".
+ * - 'prompt_generated': Prompt is available, awaiting user's answer.
+ * - 'answered': User has submitted an answer, awaiting grading. (May be a brief state if grading is auto)
+ * - 'graded': Grading is complete, feedback is available.
+ */
+export type WritingSheetStatus = 'blank' | 'prompt_generated' | 'answered' | 'graded';
+
+/**
+ * @interface WritingSheetData
+ * @description Defines the structure for a single practice sheet stored in IndexedDB.
+ * This will use a flat structure as requested.
+ */
+export interface WritingSheetData {
+  id: number; // Auto-incrementing primary key, also used as page number
+  status: WritingSheetStatus;
+  createdAt: number; // Timestamp (Date.now()) for creation and sorting
+
+  // Prompt related fields (populated when status is 'prompt_generated' or later)
+  promptImageUrl?: string;
+  promptImageAltText?: string;
+  promptText?: string; // Main instruction text including keywords
+  promptMandatoryKeyword1?: string;
+  promptMandatoryKeyword2?: string;
+  promptGeneratedAt?: number; // Timestamp
+
+  // User Answer related fields (populated when status is 'answered' or 'graded')
+  userAnswerText?: string;
+  userAnswerSubmittedAt?: number; // Timestamp
+
+  // Grade/Feedback related fields (populated when status is 'graded')
+  gradeScore?: number;
+  gradeFeedbackText?: string; // In Vietnamese
+  gradeGrammarCorrections?: Array<{ // As defined in GradedFeedback
+    original: string;
+    suggestion: string;
+    explanation: string; // In Vietnamese
+  }>;
+  gradeGradedAt?: number; // Timestamp
+}
+
+/**
+ * @interface PexelsPhotoSource
+ * @description Định nghĩa cấu trúc nguồn của ảnh từ Pexels.
+ */
+export interface PexelsPhotoSource {
+  original: string; // URL ảnh gốc
+  large2x: string; // URL ảnh lớn 2x
+  large: string; // URL ảnh lớn
+  medium: string; // URL ảnh trung bình
+  small: string; // URL ảnh nhỏ
+  portrait: string; // URL ảnh dọc
+  landscape: string; // URL ảnh ngang
+  tiny: string; // URL ảnh rất nhỏ
+}
+
+/**
+ * @interface PexelsPhoto
+ * @description Định nghĩa cấu trúc dữ liệu một ảnh từ Pexels.
+ */
+export interface PexelsPhoto {
+  id: number; // ID của ảnh
+  width: number; // Chiều rộng ảnh
+  height: number; // Chiều cao ảnh
+  url: string; // URL trang Pexels của ảnh
+  photographer: string; // Tên nhiếp ảnh gia
+  photographer_url: string; // URL trang Pexels của nhiếp ảnh gia
+  photographer_id: number; // ID nhiếp ảnh gia
+  avg_color: string; // Màu trung bình của ảnh (hex code)
+  src: PexelsPhotoSource; // Các nguồn ảnh với kích thước khác nhau
+  alt: string; // Mô tả thay thế cho ảnh (thường là mô tả ngắn gọn)
+}
+
+/**
+* @interface PexelsSearchResponse
+* @description Cấu trúc response từ Pexels search API.
+*/
+export interface PexelsSearchResponse {
+  photos: PexelsPhoto[];
+  page: number;
+  per_page: number;
+  total_results: number;
+  next_page?: string;
+}
+
+/**
+ * @interface WritingPart1Prompt
+ * @description Định nghĩa cấu trúc của một đề bài viết.
+ */
+export interface WritingPart1Prompt {
+  id: string; // ID duy nhất của đề bài (có thể tạo bằng UUID)
+  part: 1 | 2 | 3; // Phần thi TOEIC (1: Miêu tả tranh, 2: Viết email, 3: Viết luận)
+  imageUrl?: string; // URL hình ảnh cho Part 1
+  imageAltText?: string; // Mô tả hình ảnh (quan trọng cho accessibility và có thể là một phần của prompt)
+  promptText: string; // Nội dung đề bài do LLM tạo ra
+  mandatoryKeyword1?: string; // First mandatory word/phrase
+  mandatoryKeyword2?: string; // Second mandatory word/phrase
+  createdAt: Date; // Ngày tạo
+}
+
+/**
+ * @interface ImageKeywords
+ * @description Defines the structure for two keywords extracted from an image.
+ */
+export interface ImageKeywords {
+  keyword1: string;
+  keyword2: string;
+}
+
+/**
+ * @interface UserAnswer
+ * @description Định nghĩa cấu trúc bài làm của người dùng.
+ */
+export interface UserAnswer {
+  id: string; // ID duy nhất của bài làm
+  promptId: string; // ID của đề bài tương ứng
+  text: string; // Nội dung bài làm của người dùng
+  submittedAt: Date; // Ngày nộp bài
+  isAutoSaved?: boolean; // Đánh dấu nếu đây là bản lưu tự động
+}
+
+/**
+ * @interface GradedFeedback
+ * @description Định nghĩa cấu trúc phản hồi và điểm số sau khi chấm bài.
+ */
+export interface GradedFeedback {
+  id: string; // ID duy nhất của feedback
+  answerId: string; // ID của bài làm tương ứng
+  score: number; // Điểm số (ví dụ: 0-5 cho Part 1)
+  feedbackText: string; // Nhận xét chi tiết từ LLM
+  grammarCorrections?: Array<{
+    original: string; // Phần văn bản gốc có lỗi
+    suggestion: string; // Gợi ý sửa lỗi
+    explanation?: string; // Giải thích (nếu có)
+  }>; // Danh sách sửa lỗi ngữ pháp
+  gradedAt: Date; // Ngày chấm bài
+}
+
+export interface ImageDataWithMimeType {
+  base64Data: string;
+  mimeType: string;
+}
+
+export interface GeminiSafetyRating {
+  category: string;
+  probability: string;
+}
+
+export interface GeminiCandidate {
+  content: {
+    parts: Array<{ text: string }>;
+    role: string;
+  };
+  finishReason: string;
+  index: number;
+  safetyRatings: GeminiSafetyRating[];
+}
+
+export interface GeminiResponse {
+  candidates?: GeminiCandidate[];
+  promptFeedback?: {
+    safetyRatings: GeminiSafetyRating[];
+  };
+  // Thêm các trường khác nếu có, ví dụ error
+  error?: {
+    code: number;
+    message: string;
+    status: string;
+  }
+}
+
+export type UIWritingPart1Control = {
+  isFetchingInitialData: boolean;
+  isGenerateNewPromptButtonLoading: boolean;
+  isGenerateNewPromptButtonDisabled: boolean;
+  shouldShowImageSkeleton: boolean;
+  shouldShowPromptSkeleton: boolean;
+  isAnswerAreaDisabled: boolean;
+  isSubmitAnswerButtonLoading: boolean;
+  isSubmitAnswerButtonDisabled: boolean;
+  shouldRenderGradeDisplay: boolean;
+}
 //---------------------------- tên gọi khác
 export type TestAnswerSheet = Map<QuestionNumber, AnswerData>;
 export type ResultID = string;
