@@ -1,6 +1,6 @@
 import { CommentActionType } from "../../hooks/_CommentSectionHook";
 import { ProfileHookState } from "./state";
-import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, GradedFeedback, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, Permission, PexelsPhoto, QuestionID, QuestionNumber, QuestionPage, Role, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, UserComment, UserRow, WritingPart1Prompt, WritingSheetData } from "./type";
+import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, EssayQuestionPayload, GradedFeedback, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, Permission, PexelsPhoto, QuestionID, QuestionNumber, QuestionPage, Role, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, UserComment, UserRow, WritingPart1Prompt, WritingSheetData, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart2SheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3SheetData } from "./type";
 
 type RenderTestActiion =
     | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber; qID: QuestionID; answer: string; } }
@@ -187,11 +187,79 @@ type ToeicWritingPart1Action =
     | { type: 'SET_CURRENT_SHEET_ID'; payload: number }
     | { type: 'SET_TOTAL_SHEETS'; payload: number }
     | { type: 'INTERNAL_NEW_SHEET_READY'; payload: { newActiveSheet: WritingSheetData; totalSheets: number } };
+
+/**
+ * @type WritingToeicPart2Action
+ * @description Các loại action cho reducer của WritingToeicPart2.
+ */
+type WritingToeicPart2Action =
+    // --- Actions cho CSDL & Sheet ---
+    | { type: 'PART2_DB_INIT_START' }
+    | { type: 'PART2_DB_INIT_SUCCESS'; payload: { latestSheet: WritingToeicPart2SheetData | null; totalSheets: number } }
+    | { type: 'PART2_DB_OPERATION_ERROR'; payload: string }
+    | { type: 'PART2_LOAD_SHEET_START'; payload: { sheetId: number } }
+    | { type: 'PART2_LOAD_SHEET_SUCCESS'; payload: { sheetData: WritingToeicPart2SheetData; totalSheets: number } }
+    | { type: 'PART2_CREATE_SHEET_SUCCESS'; payload: { newSheet: WritingToeicPart2SheetData; totalSheets: number } } // Khi tạo sheet trắng ban đầu
+    | { type: 'PART2_INTERNAL_NEW_SHEET_READY'; payload: { newActiveSheet: WritingToeicPart2SheetData; totalSheets: number } } // Khi generateNewPrompt tạo sheet mới
+    | { type: 'PART2_UPDATE_SHEET_IN_STATE'; payload: Partial<WritingToeicPart2SheetData> } // Cập nhật cục bộ sau khi DB update
+    | { type: 'PART2_SET_CURRENT_SHEET_ID'; payload: number }
+    | { type: 'PART2_SET_TOTAL_SHEETS'; payload: number }
+
+    // --- Actions cho việc tạo đề bài ---
+    | { type: 'PART2_GENERATE_PROMPT_START' }
+    // payload nên là các trường cần thiết để xây dựng WritingToeicPart2Prompt và cập nhật SheetData
+    | { type: 'PART2_GENERATE_PROMPT_SUCCESS'; payload: Pick<WritingToeicPart2Prompt, 'id' | 'receivedEmail' | 'instructionText' | 'generatedAt' | 'part'> }
+    | { type: 'PART2_GENERATE_PROMPT_FAILURE'; payload: string }
+
+    // --- Actions cho việc trả lời của người dùng ---
+    | { type: 'PART2_UPDATE_USER_RESPONSE'; payload: string }
+    | { type: 'PART2_SUBMIT_RESPONSE_START' }
+    // payload là WritingToeicPart2GradedFeedback
+    | { type: 'PART2_SUBMIT_RESPONSE_SUCCESS'; payload: WritingToeicPart2GradedFeedback }
+    | { type: 'PART2_SUBMIT_RESPONSE_FAILURE'; payload: string }
+
+    // --- Actions khác ---
+    | { type: 'PART2_CLEAR_ERROR' };
+
+/**
+ * @type WritingToeicPart3Action
+ * @description Các loại action cho reducer của WritingToeicPart3.
+ * @comment Các hành động để cập nhật trạng thái của Part 3.
+ */
+type WritingToeicPart3Action =
+    // --- Actions cho CSDL & Sheet ---
+    | { type: 'PART3_DB_INIT_START' }
+    | { type: 'PART3_DB_INIT_SUCCESS'; payload: { latestSheet: WritingToeicPart3SheetData | null; totalSheets: number } }
+    | { type: 'PART3_DB_OPERATION_ERROR'; payload: string }
+    | { type: 'PART3_LOAD_SHEET_START'; payload: { sheetId: number } }
+    | { type: 'PART3_LOAD_SHEET_SUCCESS'; payload: { sheetData: WritingToeicPart3SheetData; totalSheets: number } }
+    | { type: 'PART3_CREATE_SHEET_SUCCESS'; payload: { newSheet: WritingToeicPart3SheetData; totalSheets: number } }
+    | { type: 'PART3_INTERNAL_NEW_SHEET_READY'; payload: { newActiveSheet: WritingToeicPart3SheetData; totalSheets: number } }
+    | { type: 'PART3_UPDATE_SHEET_IN_STATE'; payload: Partial<WritingToeicPart3SheetData> }
+    | { type: 'PART3_SET_CURRENT_SHEET_ID'; payload: number }
+    | { type: 'PART3_SET_TOTAL_SHEETS'; payload: number }
+
+    // --- Actions cho việc tạo đề bài ---
+    | { type: 'PART3_GENERATE_ESSAY_QUESTION_START' }
+    // payload nên là các trường cần thiết để xây dựng WritingToeicPart3Prompt và cập nhật SheetData
+    // Cụ thể ở đây là EssayQuestionDataFromApi (chứa essayQuestion) và directions cố định.
+    | { type: 'PART3_GENERATE_ESSAY_QUESTION_SUCCESS'; payload: EssayQuestionPayload }
+    | { type: 'PART3_GENERATE_ESSAY_QUESTION_FAILURE'; payload: string }
+
+    // --- Actions cho việc trả lời của người dùng ---
+    | { type: 'PART3_UPDATE_USER_ESSAY'; payload: string }
+    | { type: 'PART3_SUBMIT_ESSAY_START' }
+    // payload là WritingToeicPart3GradedFeedback
+    | { type: 'PART3_SUBMIT_ESSAY_SUCCESS'; payload: WritingToeicPart3GradedFeedback }
+    | { type: 'PART3_SUBMIT_ESSAY_FAILURE'; payload: string }
+
+    // --- Actions khác ---
+    | { type: 'PART3_CLEAR_ERROR' };
+
 export type {
     AdminReportAction, CategoryHookAction, CommentAction, FullTestScreenAction, LectureCardAction,
     LectureHookAction, MultiQuestionAction, PermissionHookAction, ProfileHookAction,
-    RenderTestActiion, RoleHookAction,
-    RowHookAction, TestHookAction, TestReviewHookAction, ToeicWritingPart1Action, TopicHookAction, UserCommentAction,
-    UserHookAction
+    RenderTestActiion, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, ToeicWritingPart1Action, TopicHookAction, UserCommentAction,
+    UserHookAction, WritingToeicPart2Action, WritingToeicPart3Action
 };
 

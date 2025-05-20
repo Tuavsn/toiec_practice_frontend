@@ -2,7 +2,7 @@
 import { Dispatch, useEffect, useReducer } from 'react';
 import { fetchAndConvertImageToBase64, fetchImageFromPexels, generateKeywordsAndInstructionForPart1, gradeAnswerWithGeminiSDK, suggestKeywordForImageSearch } from '../api/api';
 import { useToast } from '../context/ToastProvider';
-import { addSheet, getLatestSheetByIdFromDB, getLatestSheetByTimestampFromDB, getSheetById, getSheetsCountFromDB, initializeDB, updateSheetToDB } from '../database/indexdb';
+import { addPart1Sheet, getLatestSheetByIdFromDB, getLatestSheetByTimestampFromDB, getPart1SheetById, getSheetsCountFromDB, initializeDB, updateSheetToDB } from '../database/indexdb';
 import { ToeicWritingPart1Action } from '../utils/types/action';
 import { initialToeicWritingPart1State } from '../utils/types/emptyValue';
 import { ToeicWritingPart1State } from '../utils/types/state';
@@ -138,8 +138,8 @@ async function initEffect(isMounted: boolean, dispatch: Dispatch<ToeicWritingPar
 
         if (!latestSheet && total === 0) {
             console.log("useToeicPart1Logic: không có sheet");
-            const newSheetId = await addSheet({ status: 'blank', createdAt: Date.now() });
-            latestSheet = await getSheetById(newSheetId); // Получаем созданный лист
+            const newSheetId = await addPart1Sheet({ status: 'blank', createdAt: Date.now() });
+            latestSheet = await getPart1SheetById(newSheetId); // Получаем созданный лист
             total = 1;
             if (latestSheet && isMounted) {
                 dispatch({ type: 'CREATE_SHEET_SUCCESS', payload: { newSheet: latestSheet, totalSheets: total } });
@@ -166,7 +166,7 @@ async function _onSubmitAnswercb(state: ToeicWritingPart1State, dispatch: Dispat
 
     try {
         // 3. Get the most up-to-date version of the sheet from DB before modifying
-        let sheetToUpdate = await getSheetById(state.currentSheetId!);
+        let sheetToUpdate = await getPart1SheetById(state.currentSheetId!);
         if (!sheetToUpdate) {
             throw new Error("Không tìm thấy bài làm hiện tại trong DB.");
         }
@@ -215,7 +215,7 @@ async function _onSubmitAnswercb(state: ToeicWritingPart1State, dispatch: Dispat
         // 7. Fetch the definitive final version from DB and dispatch LOAD_SHEET_SUCCESS
         // This action's reducer will correctly set isLoadingGrade: false, update all
         // currentSheetData, currentFeedback, etc., ensuring UI consistency with DB.
-        const finalSheetFromDb = await getSheetById(state.currentSheetId!);
+        const finalSheetFromDb = await getPart1SheetById(state.currentSheetId!);
         if (finalSheetFromDb) {
             dispatch({ type: 'LOAD_SHEET_SUCCESS', payload: { sheetData: finalSheetFromDb, totalSheets: state.totalSheets } });
         } else {
@@ -230,7 +230,7 @@ async function _onSubmitAnswercb(state: ToeicWritingPart1State, dispatch: Dispat
         // 8. Handle creation of a new blank sheet if this was the latest sheet submitted
         const latestSheetInDb = await getLatestSheetByIdFromDB();
         if (latestSheetInDb && state.currentSheetId === latestSheetInDb.id && finalSheetFromDb.status === 'graded') {
-            await addSheet({ status: 'blank', createdAt: Date.now() });
+            await addPart1Sheet({ status: 'blank', createdAt: Date.now() });
             const newTotalSheets = await getSheetsCountFromDB();
             dispatch({ type: 'SET_TOTAL_SHEETS', payload: newTotalSheets });
         }
@@ -276,7 +276,7 @@ async function _navigateToSheetCb(state: ToeicWritingPart1State, dispatch: Dispa
 
     // --- Main Logic Path ---
     try {
-        const sheetFromDb = await getSheetById(sheetIdToLoad);
+        const sheetFromDb = await getPart1SheetById(sheetIdToLoad);
         const currentTotalSheetsInDb = await getSheetsCountFromDB(); // Get the most up-to-date total
 
         // Guard 3: Sheet not found in the database.
@@ -325,9 +325,9 @@ async function _generateNewQuestionCb(state: ToeicWritingPart1State, dispatch: D
             }
             //
         } else { //
-            const newSheetIdFromDb = await addSheet({ status: 'blank', createdAt: Date.now() });
+            const newSheetIdFromDb = await addPart1Sheet({ status: 'blank', createdAt: Date.now() });
             targetSheetId = newSheetIdFromDb;
-            sheetToUpdateFromState = await getSheetById(newSheetIdFromDb) ?? null; //
+            sheetToUpdateFromState = await getPart1SheetById(newSheetIdFromDb) ?? null; //
             currentTotalSheets = await getSheetsCountFromDB();
 
             if (sheetToUpdateFromState) {
@@ -367,11 +367,11 @@ async function _generateNewQuestionCb(state: ToeicWritingPart1State, dispatch: D
         };
 
         //
-        const sheetToFinallyUpdate = await getSheetById(targetSheetId);
+        const sheetToFinallyUpdate = await getPart1SheetById(targetSheetId);
         if (!sheetToFinallyUpdate) throw new Error(`Не найден лист с ID ${targetSheetId} для финального обновления.`);
 
         await updateSheetToDB({ ...sheetToFinallyUpdate, ...promptSheetDataUpdate } as WritingSheetData); //
-        const finalUpdatedSheet = await getSheetById(targetSheetId);
+        const finalUpdatedSheet = await getPart1SheetById(targetSheetId);
 
         if (finalUpdatedSheet) {
             //

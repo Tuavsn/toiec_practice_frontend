@@ -14,6 +14,8 @@ const TestReviewPage = React.lazy(() => import("../pages/TestReviewPage/TestRevi
 const UserProfilePage = React.lazy(() => import("../pages/UserProfilePage/UserProfilePage"));
 const ToeicPart1Page = React.lazy(() => import("../pages/WritingPracticePage/ToeicPart1Page"));
 const LectureDetailsPage = React.lazy(() => import("../pages/LectureDetailsPage/LectureDetailsPage"));
+const WritingToeicPart2Page = React.lazy(() => import("../pages/WritingPracticePage/ToeicPart2Page"));
+const WritingToeicPart3Page = React.lazy(() => import("../pages/WritingPracticePage/ToeicPart3Page"));
 const TestOverallResultPage = React.lazy(() => import("../pages/TestOverallResultPage/TestOverallResultPage"));
 
 
@@ -34,6 +36,8 @@ export default function UserRoutes() {
                 {/* Test Routes */}
                 <Route path="/test/*" element={<TestRoutes />} />
                 <Route path="/writing/p1" element={<ToeicPart1Page />} />
+                <Route path="/writing/p2" element={<WritingToeicPart2Page />} />
+                <Route path="/writing/p3" element={<WritingToeicPart3Page />} />
 
                 <Route path="/exercise" element={<ExercisePage />} />
                 {/* Do Exercise  Page */}

@@ -8,10 +8,16 @@ import {
     CategoryLabel, CategoryRow, Comment_t, CommentPage,
     CommentReport, CreateCommentReportPayload,
     CreateCommentRequest, DeleteCommentRequest,
+    EssayQuestionApiResponse,
     ExerciseType, GradedFeedback, ImageDataWithMimeType, Lecture, LectureCard, LectureID,
-    LectureProfile, LectureRow, Permission, PermissionID,
+    LectureProfile, LectureRow, Part2EmailContext, Permission, PermissionID,
     PexelsPhoto, PexelsSearchResponse, QuestionID, QuestionRow, RecommendDoc, RecommendLecture, RecommendTest, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, TargetType, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateCommentReportStatusPayload, UpdateQuestionForm, UserComment, UserRow,
-    WritingPart1Prompt
+    WritingPart1Prompt,
+    WritingToeicPart2ApiPromptData,
+    WritingToeicPart2GradedFeedback,
+    WritingToeicPart2GrammarCorrection,
+    WritingToeicPart2PromptContextForGrading,
+    WritingToeicPart3GradedFeedback
 } from "../utils/types/type";
 import axios from "./axios-customize";
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
@@ -24,6 +30,7 @@ const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 // Sử dụng model bạn chỉ định, lấy từ .env
 const GEMINI_MODEL_FOR_IMAGE: string = import.meta.env.VITE_GEMINI_MULTIMODAL_MODEL;
 const GEMINI_MODEL_FOR_TEXT: string = import.meta.env.VITE_GEMINI_TEXT_MODEL;
+const GEMINI_MODEL_FOR_THINKING: string = import.meta.env.VITE_GEMINI_THINKING_MODEL;
 const defaultSafetySettingsList = [
     { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
     { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
@@ -46,7 +53,7 @@ export const wakeupServers = async (): Promise<void> => {
 
         await Promise.all(
             [
-                axios.get(`${import.meta.env.VITE_API_URL}/categories?current=1&pageSize=1`),
+                fetch(`${import.meta.env.VITE_API_URL}/categories?current=1&pageSize=1`,{ method: "GET" }),
                 fetch(import.meta.env.VITE_TOXIC_CLASSIFIER_API_URL, { method: "HEAD" })
             ]
         )
@@ -90,7 +97,7 @@ export const callPostTestRecord = async (testRecord: TestRecord): Promise<ApiRes
 }
 export const callGetExercisePaper = async (exerciseType: ExerciseType): Promise<ApiResponse<TableData<QuestionRow>>> => {
 
-    const response = await axios.get<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/questions?${exerciseType}&pageSize=200`,);
+    const response = await axios.get<ApiResponse<TableData<QuestionRow>>>(`${import.meta.env.VITE_API_URL}/questions?${exerciseType}&pageSize=20`,);
     return response.data;
 }
 
@@ -1497,5 +1504,735 @@ export async function gradeAnswerWithGeminiSDK(
     } catch (error) {
         console.error("Lỗi khi chấm điểm (JSON mode) bằng Gemini SDK:", error);
         return null;
+    }
+}
+
+//------------------------------------------------------
+// Section: API Functions cho TOEIC Writing Part 2
+//------------------------------------------------------
+
+/**
+ * @async
+ * @function generateEmailPromptForPart2
+ * @description Gọi Gemini API để tạo một kịch bản email cho TOEIC Writing Part 2.
+ * Trả về thông tin email nhận được dưới dạng JSON.
+ * @returns {Promise<WritingToeicPart2ApiPromptData | null>} Dữ liệu email nhận được hoặc null nếu có lỗi.
+ * @comment Bình luận bằng tiếng Việt: Hàm này gửi yêu cầu đến Gemini để tạo một email đề bài cho Part 2,
+ * bao gồm người gửi, chủ đề, nội dung và các tác vụ cụ thể. Kết quả trả về dưới dạng JSON.
+ */
+export async function generateEmailPromptForPart2(alreadyDoneEmailTopicList: Part2EmailContext[] | undefined, signal?: AbortSignal,): Promise<WritingToeicPart2ApiPromptData | null> {
+    // Kiểm tra xem SDK đã được khởi tạo chưa
+    if (!ai) {
+        console.error("Lỗi api.ts: Gemini AI SDK (GoogleGenAI) chưa được khởi tạo (thiếu API key?).");
+        return null;
+    }
+    let excludedTopicsPromptSegment = "";
+    if (alreadyDoneEmailTopicList && alreadyDoneEmailTopicList.length > 0) {
+        const topicStrings = alreadyDoneEmailTopicList.map(
+            (ec: Part2EmailContext) => {
+                return `{ "senderEmail": ${ec.email}, recipientName: ${ec.recipientName},"subject": ${ec.subject}, "tasks": ${JSON.stringify(ec.tasks)} }`;
+            }
+        );
+        const avoidTopicContextContent = topicStrings.join(",\n    ");
+        excludedTopicsPromptSegment = `
+
+Please ensure the new email scenario you generate is substantially different from the following topics already presented to the student. Do NOT repeat or closely rephrase these scenarios:
+[
+    ${avoidTopicContextContent}
+]`;
+    }
+    // Prompt tiếng Anh cho Gemini (như đã thiết kế ở Bước 3.1)
+    const englishPromptForGemini = `
+[SYSTEM]
+You are an AI assistant specialized in creating authentic and diverse English language learning content for the TOEIC® Speaking & Writing Tests. Your responses must be accurate, adhere to specified formats, and reflect typical workplace or business-related communication scenarios. All your generated content for the email prompt itself (senderName, senderEmail, recipientName, subject, body, tasks) should be in English.
+
+[ROLE]
+Act as an expert test content designer for TOEIC Writing Part 2 ("Respond to a written request"). Your task is to generate a complete email scenario that a test-taker would receive. This scenario includes the incoming email, the name of the recipient of that email, and a specific persona the test-taker must adopt for their reply.
+
+[CONTEXT]
+The email scenario you generate will be presented to a student preparing for the TOEIC Writing test. The student will have approximately 10 minutes to read the received email and write a response of about 100-150 words.
+The core of the task is for the student to understand the incoming email and write an appropriate reply fulfilling the requests or addressing the points made, while adopting a given persona.
+
+[TASK]
+Generate ONE complete and unique email scenario.${excludedTopicsPromptSegment} 
+
+The scenario MUST include:
+1.  An incoming email with:
+    * A plausible sender name ('senderName').
+    * A plausible sender email address ('senderEmail').
+    * A plausible recipient name ('recipientName') for the email. This should be a realistic human-sounding name (e.g., "Mr. John Smith", "Sarah Connor", "Dr. Evelyn Reed"). 
+    * A clear and concise subject line ('subject').
+    * A body ('body') that presents a situation and contains 2 OR 3 distinct actionable items.
+        * The email body must follow standard business email conventions (Greeting, Opening, Body, Closing, Salutation).
+        * **The Greeting in the 'body' MUST use the generated 'recipientName' (e.g., "Dear {{recipientName}},", "Hello {{recipientName}},"). Do NOT use generic placeholders like "[Recipient Name]", "[Employee Name]", or "[Customer Name]" in the greeting.** 
+        * The 'body' should be written in a natural, professional tone. The length of this incoming email body should be concise, approximately 70-120 words.
+    * A summary of the 2-3 actionable items in an array of strings ('tasks').
+
+2.  A description of the persona the test-taker (who is acting as the 'recipientName') should adopt for their reply ('recipientPersonaDescription'). This description should be concise and align with the 'recipientName' and the email's content (e.g., if recipientName is "Cherie Black", persona could be "Cherie Black, a Marketing Representative").
+
+To ensure variety in the generated scenarios, please consider creating emails that would require the test-taker (as the 'recipientPersonaDescription') to respond by:
+    * Asking for information.
+    * Making requests.
+    * Providing information.
+    * Making a complaint or explaining problems.
+    * Making suggestions or recommendations.
+    Feel free to combine these types or create other common business scenarios.
+
+You MUST provide your output ONLY as a single, valid JSON object, following this exact structure. Do not include any explanatory text before or after the JSON object. Ensure all strings within the JSON are properly escaped.
+
+JSON Structure:
+{
+  "senderName": "string",
+  "senderEmail": "string",
+  "recipientName": "string",
+  "subject": "string",
+  "body": "string",
+  "tasks": [
+    "string", 
+    "string"
+  ],
+  "recipientPersonaDescription": "string"
+}
+
+Ensure the 'recipientPersonaDescription' logically describes the role of the 'recipientName'.
+Now, generate a new, unique email scenario
+  `;
+    const generateEmailPromptResponseSchema: Schema = {
+        type: Type.OBJECT,
+        properties: {
+            senderName: {
+                type: Type.STRING,
+                description: "Họ tên đầy đủ của người gửi email (ví dụ: 'Sarah Chen', 'Phòng Dịch Vụ Khách Hàng').",
+            },
+            senderEmail: {
+                type: Type.STRING,
+                description: "Một địa chỉ email hợp lệ cho người gửi (ví dụ: 's.chen@examplebiz.com', 'support@techsolutions.co').",
+            },
+            subject: {
+                type: Type.STRING,
+                description: "Một dòng chủ đề email rõ ràng và ngắn gọn.",
+            },
+            body: {
+                type: Type.STRING,
+                description: "Toàn bộ nội dung của email mà người dự thi nhận được. Chuỗi này nên chứa lời chào, mở đầu, nội dung chính với 2-3 mục cần hành động, và kết thúc. Sử dụng \\n cho các ngắt dòng nếu cần trong nội dung email.",
+            },
+            tasks: {
+                type: Type.ARRAY,
+                description: "Một mảng các chuỗi, mỗi chuỗi mô tả ngắn gọn một mục cần hành động hoặc câu hỏi trong email. Phải có 2 hoặc 3 mục.",
+                items: {
+                    type: Type.STRING,
+                    description: "Mô tả ngắn gọn về một nhiệm vụ hoặc câu hỏi (ví dụ: 'Xác nhận ngày giao hàng cho đơn hàng #123', 'Hỏi về việc thêm mặt hàng Z vào đơn hàng')."
+                }
+            },
+            recipientPersonaDescription: {
+                type: Type.STRING,
+                description: "Mô tả ngắn gọn vai trò người nhận (người dự thi) cần đóng, ví dụ: 'A Customer Service Manager'"
+            },
+            recipientName: {
+                type: Type.STRING,
+                description: "Tên của người nhận email (người dự thi) mà người gửi đã đề cập trong email. Ví dụ: 'Mr. John Doe', 'Ms. Jane Smith'."
+            }
+        },
+        // Tất cả các trường này đều quan trọng để tạo thành một đề bài email hoàn chỉnh.
+        required: ["senderName", "senderEmail", "subject", "body", "tasks"]
+    };
+    // Cấu hình cho Gemini API call
+    const contentConfig: GenerateContentConfig = {
+        abortSignal: signal,
+        safetySettings: defaultSafetySettingsList,
+        temperature: 0.75, // Tăng một chút sự sáng tạo cho kịch bản email
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 4096, // Email có thể dài hơn
+        // Yêu cầu Gemini trả về JSON cho đề bài email
+        responseMimeType: 'application/json',
+        responseSchema: generateEmailPromptResponseSchema,
+    };
+    let rawResponseText: string | null = null;
+    try {
+        // Sử dụng model text phù hợp (ví dụ: gemini-pro)
+        const result = await ai.models.generateContent({
+            model: GEMINI_MODEL_FOR_THINKING, // Model phù hợp cho việc tạo text
+            contents: [{ text: englishPromptForGemini }],
+            // Sử dụng cấu trúc config như người dùng đã cung cấp
+            // Nếu SDK của bạn mong đợi generationConfig và safetySettings riêng lẻ ở đây, hãy điều chỉnh.
+            // Dựa trên ví dụ cuối cùng của người dùng `ai.models.generateContent({..., config: contentConfig})`
+            // thì contentConfig nên chứa tất cả các thông số.
+            // Tuy nhiên, các SDK Gemini thường có `generationConfig` và `safetySettings` là các thuộc tính riêng biệt
+            // của object truyền vào `generateContent`, hoặc được set khi lấy model `genAI.getGenerativeModel({...})`.
+            // Giả sử SDK của bạn hỗ trợ một object config chung như bạn đã ví dụ.
+            // Nếu không, cấu trúc này cần được điều chỉnh:
+            // generationConfig: { temperature: 0.75, topK: 40, topP: 0.95, maxOutputTokens: 1024, responseMimeType: 'application/json' },
+            // safetySettings: defaultSafetySettingsList,
+            // Tạm thời tuân theo cấu trúc config của bạn
+            config: contentConfig
+        });
+
+
+        // Trích xuất text từ response (cần kiểm tra cấu trúc thực tế của `result` từ SDK `@google/genai` bạn đang dùng)
+        if (result && typeof (result as any).text === 'string') { // Dựa trên ví dụ của người dùng về result.text
+            rawResponseText = (result as any).text;
+        } else if (result && typeof (result as any).response?.text === 'function') { // Cấu trúc SDK phổ biến hơn
+            rawResponseText = (result as any).response.text();
+        } else if (result && (result as any).response?.candidates?.[0]?.content?.parts?.[0]?.text) { // Một cấu trúc khả dĩ khác
+            rawResponseText = (result as any).response.candidates[0].content.parts[0].text;
+        }
+
+
+        if (!rawResponseText) {
+            console.warn("generateEmailPromptForPart2: Gemini trả về phản hồi rỗng.");
+            return null;
+        }
+
+        // Parse JSON từ text trả về
+        const parsedJson = JSON.parse(rawResponseText) as WritingToeicPart2ApiPromptData;
+
+        // Kiểm tra sơ bộ cấu trúc JSON nhận được
+        if (
+            parsedJson && typeof parsedJson.senderName === 'string' &&
+            typeof parsedJson.senderEmail === 'string' &&
+            typeof parsedJson.recipientName === 'string' && parsedJson.recipientName.trim() !== '' &&
+            typeof parsedJson.subject === 'string' &&
+            typeof parsedJson.body === 'string' && parsedJson.body.trim() !== '' && // << KIỂM TRA body
+            Array.isArray(parsedJson.tasks) && parsedJson.tasks.length >= 2 && parsedJson.tasks.every((t: any) => typeof t === 'string') &&
+            typeof parsedJson.recipientPersonaDescription === 'string' && parsedJson.recipientPersonaDescription.trim() !== ''
+        ) {
+            return parsedJson as WritingToeicPart2ApiPromptData;
+        }
+
+    } catch (error) {
+        if ((error as Error).name === 'AbortError') {
+            console.log("generateEmailPromptForPart2: Gọi API bị hủy.");
+        } else {
+            console.error("Lỗi trong generateEmailPromptForPart2:", (error as Error).message, "\nRaw response (nếu có):", rawResponseText);
+        }
+        return null;
+
+    }
+    return null;
+}
+
+
+/**
+ * @async
+ * @function gradeEmailResponseForPart2
+ * @description Gọi Gemini API để chấm điểm email trả lời của người dùng cho Part 2.
+ * Yêu cầu Gemini trả về JSON với schema định sẵn, các giải thích lỗi bằng tiếng Việt.
+ * @param {number} sheetId - ID của bài làm (dùng để tạo ID cho feedback).
+ * @param {string} userAnswerEmail - Email trả lời của người dùng.
+ * @param {WritingToeicPart2ApiReceivedEmail} originalReceivedEmail - Email gốc mà người dùng đã nhận (để cung cấp ngữ cảnh).
+ * @returns {Promise<WritingToeicPart2GradedFeedback | null>} Dữ liệu phản hồi đã chấm điểm hoặc null nếu có lỗi.
+ * @comment Bình luận bằng tiếng Việt: Hàm này gửi email của người dùng và email gốc đến Gemini để chấm điểm.
+ * Nó sử dụng một rubric chi tiết và yêu cầu Gemini trả về kết quả dưới dạng JSON,
+ * trong đó các phần giải thích cho người dùng phải bằng tiếng Việt.
+ */
+export async function gradeEmailResponseForPart2(
+    signal: AbortSignal,
+    sheetId: number,
+    userAnswerEmail: string,
+    originalPromptContext: WritingToeicPart2PromptContextForGrading,
+): Promise<WritingToeicPart2GradedFeedback | null> {
+    // Kiểm tra SDK
+    if (!ai) {
+        console.error("Lỗi api.ts: Gemini AI SDK (GoogleGenAI) chưa được khởi tạo.");
+        return null;
+    }
+
+    // System instruction (tiếng Anh, nhưng yêu cầu output tiếng Việt cho user)
+    const systemInstructionForGrader: Content = {
+        parts: [{ text: "You are a fair, strict, and helpful expert TOEIC Writing Part 2 (Respond to an Email) grader. Your primary goal is to provide constructive feedback to ESL learners. IMPORTANT: All detailed explanations, overall feedback text, and any specific advice for the student MUST be written entirely in VIETNAMESE. Adhere strictly to the requested JSON output schema." }]
+    };
+
+    // Prompt chính cho việc chấm điểm (tiếng Anh)
+    const gradingPromptText = `
+    A student was given the following email to respond to:
+    Sender: ${originalPromptContext.senderName} (${originalPromptContext.senderEmail})
+    Subject: ${originalPromptContext.subject}
+    Original Email Body:
+    """
+    ${originalPromptContext.body}
+    """
+    Key tasks the student needed to address from the original email:
+    ${originalPromptContext.tasks.map(task => `- ${task}`).join('\n')}
+
+    The student's reply email is:
+    """
+    ${userAnswerEmail}
+    """
+
+    Please evaluate the student's reply based on the following TOEIC Part 2 criteria (overall score from 0 to 4, where 4 is excellent):
+    1.  Task Completion: Were all tasks/questions from the original email fully and accurately addressed?
+    2.  Organization & Cohesion: Is the email well-structured (greeting, body paragraphs, closing)? Are ideas linked logically?
+    3.  Vocabulary: Is word choice appropriate for a workplace email, precise, and varied?
+    4.  Grammar & Mechanics: Are sentences grammatically correct? Correct use of tenses, S-V agreement, articles, prepositions, punctuation, spelling.
+    5.  Tone & Email Conventions: Is the tone appropriate (e.g., polite, professional)? Are standard email greetings and closings used correctly?
+
+    Provide your response strictly as a single JSON object adhering to the provided schema.
+    All student-facing text in the JSON (feedbackText, explanations for corrections) MUST be in VIETNAMESE.
+  `;
+
+    // Định nghĩa JSON Schema cho output của Gemini (như đã thiết kế ở Bước 3.2)
+    const gradingResponseSchema: Schema = {
+        type: Type.OBJECT,
+        properties: {
+            score: { type: Type.INTEGER, description: "Tổng điểm từ 0 đến 4 (Thang điểm ví dụ cho Part 2). Final score." }, // Max score adjusted to 4 as typical for TOEIC Part 2 individual task
+            feedbackText: { type: Type.STRING, description: "Nhận xét tổng quát chi tiết (3-5 câu) bằng TIẾNG VIỆT. Giải thích điểm số, nêu điểm mạnh và điểm cần cải thiện." },
+            corrections: {
+                type: Type.ARRAY,
+                description: "Một danh sách các lỗi cụ thể và gợi ý sửa. Nếu không có lỗi, trả về mảng rỗng [].",
+                items: {
+                    type: Type.OBJECT,
+                    properties: {
+                        original: { type: Type.STRING, description: "Phần câu gốc có lỗi (tiếng Anh)." },
+                        suggestion: { type: Type.STRING, description: "Gợi ý sửa lỗi (tiếng Anh)." },
+                        explanation: { type: Type.STRING, description: "Giải thích chi tiết về lỗi bằng TIẾNG VIỆT." },
+                        errorType: { type: Type.STRING, description: "Loại lỗi (ví dụ: 'Grammar', 'Vocabulary', 'Task Fulfillment', 'Organization', 'Tone', 'Mechanics')", enum: ["Grammar", "Vocabulary", "Task Fulfillment", "Organization", "Tone", "Mechanics", "Other"] }
+                    },
+                    required: ["original", "suggestion", "explanation"] // errorType is optional in data, but good to ask for
+                }
+            }
+        },
+        required: ["score", "feedbackText", "corrections"]
+    };
+
+    // Cấu hình cho Gemini API call
+    const contentConfigForGrading: GenerateContentConfig = {
+        abortSignal: signal,
+        safetySettings: defaultSafetySettingsList,
+        temperature: 0.3, // Thấp hơn để việc chấm điểm nhất quán hơn
+        topK: 30,
+        topP: 0.90,
+        maxOutputTokens: 6048, // Cho phép output JSON dài hơn với giải thích tiếng Việt
+        systemInstruction: systemInstructionForGrader,
+        responseSchema: gradingResponseSchema,
+        responseMimeType: 'application/json', // Quan trọng khi sử dụng responseSchema
+    };
+    let rawResponseText: string | null = null;
+    try {
+        // Sử dụng model text phù hợp, có thể là gemini-pro hoặc model mới hơn bạn đang dùng
+        const result = await ai.models.generateContent({
+
+            model: GEMINI_MODEL_FOR_THINKING, // Hoặc model mạnh hơn nếu cần cho việc phân tích và JSON generation
+            contents: [{ text: gradingPromptText }], // Chỉ gửi text prompt, vì Part 2 không có hình ảnh trực tiếp
+            config: contentConfigForGrading // Sử dụng cấu trúc config như bạn đã yêu cầu
+        });
+
+
+        // Trích xuất text từ response (cần kiểm tra và điều chỉnh cho SDK của bạn)
+        if (result && typeof (result as any).text === 'string') {
+            rawResponseText = (result as any).text;
+        } else if (result && typeof (result as any).response?.text === 'function') {
+            rawResponseText = (result as any).response.text();
+        } else if (result && (result as any).response?.candidates?.[0]?.content?.parts?.[0]?.text) {
+            rawResponseText = (result as any).response.candidates[0].content.parts[0].text;
+        }
+
+
+        if (!rawResponseText) {
+            console.warn("gradeEmailResponseForPart2: Gemini trả về phản hồi rỗng.");
+            return null;
+        }
+
+        // Parse JSON response
+        const parsedJson = JSON.parse(rawResponseText);
+
+        // Validate sơ bộ và tạo đối tượng GradedFeedback
+        // (Thêm kiểm tra chặt chẽ hơn nếu cần)
+        if (typeof parsedJson.score === 'number' && typeof parsedJson.feedbackText === 'string' && Array.isArray(parsedJson.corrections)) {
+            return {
+                id: sheetId.toString(), // ID của feedback lấy từ sheetId
+                answerId: sheetId.toString(), // ID của câu trả lời cũng là sheetId
+                score: parsedJson.score,
+                feedbackText: parsedJson.feedbackText, // Nên bằng tiếng Việt
+                corrections: parsedJson.corrections.map((corr: WritingToeicPart2GrammarCorrection) => ({
+                    original: corr.original || "",
+                    suggestion: corr.suggestion || "",
+                    explanation: corr.explanation || "", // Nên bằng tiếng Việt
+                    errorType: corr.errorType || "Other",
+                })),
+                gradedAt: Date.now(), // Sử dụng timestamp dạng number
+            } as WritingToeicPart2GradedFeedback;
+        } else {
+            console.warn("gradeEmailResponseForPart2: Cấu trúc JSON chấm điểm từ Gemini không đúng:", parsedJson);
+            // Trả về một lỗi có cấu trúc nếu muốn
+            return {
+                id: sheetId.toString(), answerId: sheetId.toString(), score: 0,
+                feedbackText: "Lỗi: Phản hồi từ AI chấm điểm có cấu trúc không hợp lệ. Vui lòng thử lại.",
+                corrections: [], gradedAt: Date.now(),
+            };
+        }
+    } catch (error) {
+        if ((error as Error).name === 'AbortError') {
+            console.log("gradeEmailResponseForPart2: Call was aborted.");
+            return null;
+        }
+        console.error("Lỗi api.ts - gradeEmailResponseForPart2:", error, "\nRaw response was:", rawResponseText ?? "N/A");
+        return {
+            id: sheetId.toString(),
+            answerId: sheetId.toString(),
+            score: 0,
+            feedbackText: `Lỗi khi chấm điểm: ${(error as Error).message}. Vui lòng thử lại.`,
+            corrections: [],
+            gradedAt: Date.now(),
+        };
+    }
+}
+
+/**
+ * @async
+ * @function generateEssayQuestionForPart3
+ * @description Gọi Gemini API để tạo một câu hỏi luận (opinion question) cho TOEIC Writing Part 3.
+ * Có khả năng nhận vào danh sách các chủ đề đã có để tránh trùng lặp.
+ * @param {string[]} [historyTopics] - (Tùy chọn) Mảng các câu hỏi luận đã được sử dụng trước đó.
+ * @param {AbortSignal} [signal] - (Tùy chọn) AbortSignal để hủy request.
+ * @returns {Promise<EssayQuestionApiResponse | null>} Một object chứa câu hỏi luận hoặc null nếu có lỗi/bị hủy.
+ * @comment Bình luận bằng tiếng Việt: Hàm này yêu cầu Gemini tạo một câu hỏi luận mới cho Part 3,
+ * đồng thời cung cấp danh sách các câu hỏi cũ để Gemini tránh tạo lại.
+ */
+export async function generateEssayQuestionForPart3(
+    historyTopics?: string[],
+    signal?: AbortSignal
+): Promise<EssayQuestionApiResponse | null> {
+    // Kiểm tra SDK và AbortSignal
+    if (!ai) {
+        console.error("Lỗi api.ts: Gemini AI SDK (GoogleGenAI) chưa được khởi tạo.");
+        return null;
+    }
+    if (signal?.aborted) {
+        console.log("generateEssayQuestionForPart3: Operation aborted before starting.");
+        return null;
+    }
+
+    // Xây dựng phần prompt để liệt kê các chủ đề cần tránh
+    let exclusionInstructions = "";
+    if (historyTopics && historyTopics.length > 0) {
+        const topicsToExcludeString = historyTopics
+            .map(topic => `- "${topic.replace(/"/g, '\\"')}"`) // Escape quotes in existing topics
+            .join("\n");
+        exclusionInstructions = `
+
+CRITICAL: Ensure the new essay question you generate is unique and NOT a rephrasing or similar to any of the following previously used questions:
+${topicsToExcludeString}`;
+    }
+
+    // Prompt tiếng Anh cho Gemini (dựa trên thiết kế đã có, thêm phần tránh trùng lặp)
+    const englishPromptForGemini = `
+[SYSTEM]
+You are an AI assistant highly skilled in creating authentic and varied English language test prompts for the TOEIC® Speaking & Writing Tests. Your generated questions must be clear, unambiguous, and suitable for eliciting extended opinion-based responses.
+
+[ROLE]
+Act as an expert test content designer for TOEIC Writing Part 3 ("Write an Opinion Essay"). Your task is to generate a single, thought-provoking opinion question.
+
+[CONTEXT]
+The question you generate will be presented to a student preparing for the TOEIC Writing test. They will need to write an essay of at least 300 words in 30 minutes, stating, explaining, and supporting their opinion. Topics should be general and relatable, often concerning work, education, technology, lifestyle, or societal trends. Avoid overly niche, controversial, sensitive, or highly political topics.
+${exclusionInstructions}
+[TASK]
+Generate ONE unique opinion question suitable for a TOEIC Writing Part 3 essay.
+To ensure variety, please try to formulate your question based on one of the following common TOEIC essay question types. You can choose a type or synthesize elements:
+
+1.  **Advantage / Disadvantage:** Asks the writer to discuss the pros or cons of a topic and clarify their stance.
+    * Example inspiration: "Is working at a start-up company advantageous or disadvantageous? Give reasons and examples to prove the point."
+
+2.  **Preference:** Presents choices and asks the writer to select and justify their preference.
+    * Example inspiration: "Some people like to live in apartments and some like to live in townhouses. What type of house do you prefer? Give examples to prove your point."
+
+3.  **General Opinion:** Asks for the writer's viewpoint on a general topic or issue.
+    * Example inspiration: "What do you think about the issue of employees not being allowed to listen to music while working? Give reasons and examples to back up your point."
+
+4.  **Agree / Disagree:** Presents a statement or opinion and asks the writer whether they agree or disagree, and why.
+    * Example inspiration: "Statement: 'Continuous learning is the most important factor for career success in the modern world.' To what extent do you agree or disagree with this statement? Provide specific reasons and examples."
+
+5.  **Importance:** Asks the writer to explain why something is important to a particular group or in a specific context.
+    * Example inspiration: "Why do you think effective communication skills are important in the workplace? Provide specific reasons and examples."
+
+The generated question should clearly prompt for an opinion and imply the need for supporting reasons and examples.
+
+Your output MUST be a single, valid JSON object with one key, "essayQuestion", containing the generated question as a string. Ensure the JSON is valid. No other text should be included in your response.
+
+Example Output Format:
+{
+  "essayQuestion": "Some people prefer to work for a large corporation, while others prefer a small company. Which work environment do you believe offers more benefits to employees? Support your opinion with specific reasons and examples."
+}
+
+Now, generate a new, unique opinion question.
+`; // Kết thúc prompt tiếng Anh
+
+    // Schema đơn giản cho output JSON
+    const essayQuestionResponseSchema: Schema = {
+        type: Type.OBJECT,
+        properties: {
+            essayQuestion: {
+                type: Type.STRING,
+                description: "The generated TOEIC Writing Part 3 essay question."
+            }
+        },
+        required: ["essayQuestion"]
+    };
+
+    // Cấu hình cho Gemini API call
+    const contentConfig: GenerateContentConfig = {
+        abortSignal: signal, // << SỬ DỤNG ABORTSIGNAL ĐÚNG CÁCH
+        safetySettings: defaultSafetySettingsList,
+        temperature: 0.8, // Tăng một chút để có sự đa dạng trong câu hỏi
+        maxOutputTokens: 1024, // Câu hỏi luận thường không quá dài
+        responseMimeType: 'application/json',
+        responseSchema: essayQuestionResponseSchema,
+    };
+
+    let rawResponseText: string | undefined;
+    try {
+        if (signal?.aborted) throw new DOMException('Aborted before API call', 'AbortError');
+
+        const result = await ai.models.generateContent({
+            model: GEMINI_MODEL_FOR_TEXT, // Model phù hợp cho việc tạo text
+            contents: [{ text: englishPromptForGemini }],
+            config: contentConfig
+        });
+
+        if (signal?.aborted) throw new DOMException('Aborted during/after API call', 'AbortError');
+
+        // --- Trích xuất text nhất quán ---
+        if (result && typeof (result as any).text === 'string') { rawResponseText = (result as any).text; }
+        else if (result && typeof (result as any).response?.text === 'function') { rawResponseText = (result as any).response.text(); }
+        else if (result && (result as any).response?.candidates?.[0]?.content?.parts?.[0]?.text) { rawResponseText = (result as any).response.candidates[0].content.parts[0].text; }
+        // --- Kết thúc trích xuất text ---
+
+        if (!rawResponseText) {
+            console.warn("generateEssayQuestionForPart3: Gemini trả về phản hồi rỗng.");
+            throw new Error("Phản hồi rỗng từ AI tạo câu hỏi luận Part 3.");
+        }
+
+        const parsedJson = JSON.parse(rawResponseText);
+
+        if (parsedJson && typeof parsedJson.essayQuestion === 'string' && parsedJson.essayQuestion.trim() !== '') {
+            return parsedJson as EssayQuestionApiResponse;
+        } else {
+            console.warn("generateEssayQuestionForPart3: JSON parse được nhưng thiếu trường 'essayQuestion' hoặc trường rỗng. Parsed:", parsedJson, "Raw:", rawResponseText);
+            throw new Error("Cấu trúc JSON cho câu hỏi luận không hợp lệ hoặc rỗng.");
+        }
+
+    } catch (error) {
+        if ((error as Error).name === 'AbortError') {
+            console.log("generateEssayQuestionForPart3: Gọi API bị hủy bởi AbortSignal.");
+        } else {
+            console.error("Lỗi trong generateEssayQuestionForPart3:", (error as Error).message, "\nRaw response (nếu có):", rawResponseText);
+        }
+        return null; // Trả về null nếu có lỗi hoặc bị hủy
+    }
+}
+
+/**
+ * @async
+ * @function gradeEssayForPart3
+ * @description Gọi Gemini API để chấm điểm bài luận Part 3 của người dùng.
+ * Yêu cầu Gemini trả về JSON với schema định sẵn, các giải thích lỗi bằng tiếng Việt.
+ * @param {number} sheetId - ID của bài làm (dùng để tạo ID cho feedback).
+ * @param {string} studentEssayText - Nội dung bài luận của người dùng.
+ * @param {string} originalEssayQuestion - Câu hỏi luận gốc đã được giao.
+ * @param {AbortSignal} [signal] - (Tùy chọn) AbortSignal để hủy request.
+ * @returns {Promise<WritingToeicPart3GradedFeedback | null>} Dữ liệu phản hồi đã chấm điểm hoặc null nếu có lỗi.
+ * @comment Bình luận bằng tiếng Việt: Hàm này gửi câu hỏi, bài luận của người dùng đến Gemini để chấm điểm.
+ * Rubric và yêu cầu output JSON (với các phần tiếng Việt) được định nghĩa trong prompt.
+ */
+export async function gradeEssayForPart3(
+    sheetId: number,
+    studentEssayText: string,
+    originalEssayQuestion: string,
+    signal?: AbortSignal
+): Promise<WritingToeicPart3GradedFeedback | null> {
+    // Kiểm tra SDK và AbortSignal
+    if (!ai) {
+        console.error("Lỗi api.ts: Gemini AI SDK (GoogleGenAI) chưa được khởi tạo.");
+        return null;
+    }
+    if (signal?.aborted) {
+        console.log("gradeEssayForPart3: Operation aborted before starting.");
+        return null;
+    }
+
+    // System instruction (tiếng Anh, nhưng yêu cầu output tiếng Việt cho user)
+    const systemInstructionForGrader: Content = { // Đảm bảo type Content được import đúng
+        parts: [{ text: "You are an AI assistant acting as an expert, meticulous, and constructive grader for the TOEIC® Writing Test, specifically Part 3 'Write an Opinion Essay.' Your primary language for analysis and internal reasoning is English, but all feedback directed to the student MUST be in VIETNAMESE. Adhere strictly to the requested JSON output schema." }]
+    };
+
+    // Prompt chính cho việc chấm điểm (tiếng Anh)
+    const gradingPromptText = `
+[SYSTEM]
+You are an AI assistant acting as an expert, meticulous, and constructive grader for the TOEIC® Writing Test, specifically Part 3 "Write an Opinion Essay." Your primary language for analysis and internal reasoning is English, but all feedback directed to the student MUST be in VIETNAMESE. You must strictly adhere to the JSON output format requested.
+
+[ROLE]
+Evaluate the student's essay provided below, which was written in response to the given TOEIC Part 3 question. Assess it based on established TOEIC scoring criteria. Your goal is to provide a fair score (0-5 points) and actionable, detailed feedback in VIETNAMESE to help the student improve their essay writing skills.
+
+[CONTEXT]
+The student was given the following essay question:
+"${originalEssayQuestion.replace(/"/g, '\\"')}"
+
+The student wrote the following essay (minimum 300 words expected):
+"""
+${studentEssayText.replace(/"/g, '\\"')}
+"""
+
+The essay will be scored on a scale of 0-5. Please evaluate the essay based on the following criteria:
+1.  **Opinion Support & Development:** How effectively is the opinion stated, developed, and supported with relevant, specific reasons, details, and examples? Is the argument logical and convincing?
+2.  **Organization & Structure:** How clear is the essay's structure (introduction with a clear thesis, well-developed body paragraphs with distinct main ideas, and a concluding paragraph)? Is there logical progression and flow between ideas, sentences, and paragraphs (coherence and cohesion, use of transition words)?
+3.  **Grammar:** What is the accuracy and appropriate use of grammatical structures? Consider sentence formation, verb tenses, subject-verb agreement, articles, prepositions, word order, etc.
+4.  **Vocabulary:** What is the range, precision, and appropriateness of the vocabulary used for an opinion essay? Is there an attempt to use varied and sophisticated language where appropriate? Are there significant lexical errors?
+
+[TASK]
+Provide your evaluation ONLY as a single, valid JSON object. Do not include any text outside of this JSON object.
+All textual feedback intended for the student within the JSON fields (specifically 'overallFeedback', all properties within 'detailedFeedback', and all items in 'keyImprovementAreas') MUST be written entirely in VIETNAMESE.
+
+The JSON output must conform to the following schema:
+{
+  "type": "OBJECT",
+  "properties": {
+    "score": {
+      "type": "INTEGER",
+      "description": "Overall score from 0 to 5 for the essay."
+    },
+    "overallFeedback": {
+      "type": "STRING",
+      "description": "Detailed overall feedback (approximately 4-6 sentences) in VIETNAMESE. This should explain the score, highlight key strengths, and identify major weaknesses across the scoring criteria. Offer general advice for improvement."
+    },
+    "detailedFeedback": {
+      "type": "OBJECT",
+      "description": "Detailed feedback per category, in VIETNAMESE.",
+      "properties": {
+        "opinionSupportFeedback": {
+          "type": "STRING",
+          "description": "Specific comments on how the student stated, developed, and supported their opinion, including the relevance and sufficiency of reasons and examples (in VIETNAMESE)."
+        },
+        "organizationFeedback": {
+          "type": "STRING",
+          "description": "Specific comments on the essay's structure, paragraphing, topic sentences, coherence, and use of transitions (in VIETNAMESE)."
+        },
+        "grammarVocabularyFeedback": {
+          "type": "STRING",
+          "description": "Specific comments on grammar accuracy and vocabulary choice. Highlight any recurring errors or particularly good/poor usage. Suggest areas for language improvement (in VIETNAMESE)."
+        }
+      },
+      "required": ["opinionSupportFeedback", "organizationFeedback", "grammarVocabularyFeedback"]
+    },
+    "keyImprovementAreas": {
+      "type": "ARRAY",
+      "description": "A list of 2-3 main bullet points summarizing the most critical areas the student should focus on for improvement, in VIETNAMESE.",
+      "items": {
+        "type": "STRING",
+        "description": "A specific area for improvement (in VIETNAMESE)."
+      }
+    }
+  },
+  "required": ["score", "overallFeedback", "detailedFeedback", "keyImprovementAreas"]
+}
+
+Now, evaluate the student's essay based on the provided question and essay text, and generate your response strictly in the JSON format described above. Remember, all student-facing narrative feedback must be in VIETNAMESE.
+`
+
+    const essayGradingResponseSchema: Schema = {
+        type: Type.OBJECT,
+        properties: {
+            score: { type: Type.INTEGER, description: "Điểm tổng từ 0 đến 5 cho bài luận." },
+            overallFeedback: { type: Type.STRING, description: "Nhận xét tổng quát chi tiết (khoảng 4-6 câu) bằng TIẾNG VIỆT..." },
+            detailedFeedback: {
+                type: Type.OBJECT, description: "Nhận xét chi tiết theo từng tiêu chí, bằng TIẾNG VIỆT.",
+                properties: {
+                    opinionSupportFeedback: { type: Type.STRING, description: "Nhận xét về cách phát triển và bảo vệ quan điểm... (bằng TIẾNG VIỆT)." },
+                    organizationFeedback: { type: Type.STRING, description: "Nhận xét về cấu trúc bài luận... (bằng TIẾNG VIỆT)." },
+                    grammarVocabularyFeedback: { type: Type.STRING, description: "Nhận xét về việc sử dụng ngữ pháp và từ vựng... (bằng TIẾNG VIỆT)." }
+                },
+                required: ["opinionSupportFeedback", "organizationFeedback", "grammarVocabularyFeedback"]
+            },
+            keyImprovementAreas: {
+                type: Type.ARRAY, description: "Danh sách 2-3 điểm chính cần cải thiện nhất... (bằng TIẾNG VIỆT).",
+                items: { type: Type.STRING, description: "Một lĩnh vực cụ thể cần cải thiện." }
+            }
+        },
+        required: ["score", "overallFeedback", "detailedFeedback", "keyImprovementAreas"]
+    };
+
+    // Cấu hình cho Gemini API call
+    const contentConfigForGrading: GenerateContentConfig = {
+        abortSignal: signal, // Thêm AbortSignal
+        safetySettings: defaultSafetySettingsList, // Đã định nghĩa ở đâu đó
+        temperature: 0.35, // Nhiệt độ thấp hơn để chấm điểm nhất quán hơn
+        maxOutputTokens: 6048, // Cho phép output JSON dài hơn với giải thích tiếng Việt
+        systemInstruction: systemInstructionForGrader,
+        responseSchema: essayGradingResponseSchema, // Schema đã định nghĩa
+        responseMimeType: 'application/json', // Quan trọng khi sử dụng responseSchema
+    };
+
+    let rawResponseText: string | undefined;
+    try {
+        if (signal?.aborted) throw new DOMException('Aborted before API call', 'AbortError');
+
+        const result = await ai.models.generateContent({
+            model: GEMINI_MODEL_FOR_THINKING, // Hoặc model mạnh hơn nếu cần cho việc phân tích và JSON generation
+            contents: [{ text: gradingPromptText.replace("{{essayQuestion}}", originalEssayQuestion.replace(/"/g, '\\"')).replace("{{studentEssayText}}", studentEssayText.replace(/"/g, '\\"')) }],
+            config: contentConfigForGrading
+        });
+
+        if (signal?.aborted) throw new DOMException('Aborted during/after API call', 'AbortError');
+
+        // --- Trích xuất text nhất quán ---
+        if (result && typeof (result as any).text === 'string') { rawResponseText = (result as any).text; }
+        else if (result && typeof (result as any).response?.text === 'function') { rawResponseText = (result as any).response.text(); }
+        else if (result && (result as any).response?.candidates?.[0]?.content?.parts?.[0]?.text) { rawResponseText = (result as any).response.candidates[0].content.parts[0].text; }
+        // --- Kết thúc trích xuất text ---
+
+        if (!rawResponseText) {
+            console.warn("gradeEssayForPart3: Gemini trả về phản hồi rỗng.");
+            throw new Error("Phản hồi rỗng từ AI chấm điểm bài luận.");
+        }
+
+        const parsedJson = JSON.parse(rawResponseText);
+
+        // Validate sơ bộ và tạo đối tượng GradedFeedback
+        if (
+            parsedJson &&
+            typeof parsedJson.score === 'number' &&
+            typeof parsedJson.overallFeedback === 'string' &&
+            parsedJson.detailedFeedback &&
+            typeof parsedJson.detailedFeedback.opinionSupportFeedback === 'string' &&
+            typeof parsedJson.detailedFeedback.organizationFeedback === 'string' &&
+            typeof parsedJson.detailedFeedback.grammarVocabularyFeedback === 'string' &&
+            Array.isArray(parsedJson.keyImprovementAreas)
+        ) {
+            return {
+                id: sheetId.toString(), // ID của feedback lấy từ sheetId
+                answerId: sheetId.toString(), // ID của câu trả lời cũng là sheetId
+                score: parsedJson.score,
+                overallFeedback: parsedJson.overallFeedback, // Nên bằng tiếng Việt
+                detailedFeedback: { // Đảm bảo các trường này cũng bằng tiếng Việt
+                    opinionSupportFeedback: parsedJson.detailedFeedback.opinionSupportFeedback,
+                    organizationFeedback: parsedJson.detailedFeedback.organizationFeedback,
+                    grammarVocabularyFeedback: parsedJson.detailedFeedback.grammarVocabularyFeedback,
+                },
+                keyImprovementAreas: parsedJson.keyImprovementAreas.map((area: any) => String(area)), // Nên bằng tiếng Việt
+                gradedAt: Date.now(), // Sử dụng timestamp dạng number
+            };
+        } else {
+            console.warn("gradeEssayForPart3: Cấu trúc JSON chấm điểm từ Gemini không đúng:", parsedJson, "Raw response:", rawResponseText);
+            throw new Error("Cấu trúc JSON chấm điểm không hợp lệ từ AI.");
+        }
+    } catch (error) {
+        if ((error as Error).name === 'AbortError') {
+            console.log("gradeEssayForPart3: Gọi API bị hủy bởi AbortSignal.");
+            return null; // Hoặc rethrow tùy theo cách hook xử lý
+        }
+        console.error("Lỗi trong gradeEssayForPart3:", (error as Error).message, "\nRaw response (nếu có):", rawResponseText);
+        // Trả về một đối tượng feedback lỗi có cấu trúc để UI hiển thị
+        return {
+            id: sheetId.toString(),
+            answerId: sheetId.toString(),
+            score: 0,
+            overallFeedback: `Lỗi khi chấm điểm bài luận: ${(error as Error).message}. Vui lòng thử lại.`,
+            detailedFeedback: {
+                opinionSupportFeedback: "Không có dữ liệu.",
+                organizationFeedback: "Không có dữ liệu.",
+                grammarVocabularyFeedback: "Không có dữ liệu."
+            },
+            keyImprovementAreas: ["Không thể xử lý yêu cầu chấm điểm."],
+            gradedAt: Date.now(),
+        };
     }
 }

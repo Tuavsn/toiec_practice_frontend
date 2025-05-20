@@ -1,6 +1,6 @@
 import { TreeNode } from "primereact/treenode";
-import { AdminReportsState, CategoryHookState, CommentSectionState, CommentsState, LectureCardState, LectureHookState, MultiQuestionState, PermissionHookState, ProfileHookState, RoleHookState, TestHookState, TestReviewHookState, ToeicWritingPart1State, TopicHookState, UserHookState } from "./state";
-import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, TestSheet, Topic, UserRow } from "./type";
+import { AdminReportsState, CategoryHookState, CommentSectionState, CommentsState, LectureCardState, LectureHookState, MultiQuestionState, PermissionHookState, ProfileHookState, RoleHookState, TestHookState, TestReviewHookState, ToeicWritingPart1State, TopicHookState, UserHookState, WritingToeicPart3State } from "./state";
+import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, TestSheet, Topic, UserRow, WritingToeicPart2State } from "./type";
 export const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
@@ -312,3 +312,30 @@ export const initialToeicWritingPart1State: ToeicWritingPart1State = {
     totalSheets: 0,
     isDbLoading: true,
 } as const;
+
+export const initialToeicWritingPart2State: WritingToeicPart2State = {
+    isDbLoading: true, // Bắt đầu với true cho đến khi DB được khởi tạo
+    isLoadingPrompt: false,
+    isLoadingGrade: false,
+    currentSheetId: null,
+    currentSheetData: null,
+    currentPrompt: null,
+    userResponseText: '', // Sẽ là userEmailResponseText
+    currentFeedback: null,
+    totalSheets: 0,
+    error: null,
+} as const;
+
+export const initialToeicWritingPart3State: WritingToeicPart3State = {
+  isDbLoading: true,
+  isLoadingPrompt: false,
+  isLoadingGrade: false,
+  currentSheetId: null,
+  currentSheetData: null,
+  currentPrompt: null,
+  userEssayText: '',
+  currentFeedback: null,
+  totalSheets: 0,
+  error: null,
+} as const;
+
