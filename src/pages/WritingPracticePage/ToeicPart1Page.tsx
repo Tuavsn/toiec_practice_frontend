@@ -371,7 +371,11 @@ function PromptDisplay({ prompt, isLoading }: PromptDisplayProps) {
 
 function ImageDisplay({ image, isLoading, imageAltText }: ImageDisplayProps) {
     if (isLoading) {
-        return <Skeleton width="100%" height="300px" className="mb-3" />;
+        return (
+            <div className="flex flex-1 justify-content-center align-items-center mb-3" style={{ height: '300px',  }}>
+                <Skeleton width="100%" height="300px" className="mb-3" />
+            </div>
+        )
     }
 
     if (!image || !image.src.large) {

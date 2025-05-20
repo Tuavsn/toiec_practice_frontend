@@ -1086,6 +1086,366 @@ export type UIWritingPart1Control = {
   isSubmitAnswerButtonDisabled: boolean;
   shouldRenderGradeDisplay: boolean;
 }
+
+/**
+ * @interface WritingToeicPart2Prompt
+ * @description Định nghĩa cấu trúc của một đề bài email cho Part 2.
+ * Đề bài thường là một email yêu cầu người dùng phản hồi, giải quyết vấn đề hoặc cung cấp thông tin.
+ */
+export interface WritingToeicPart2Prompt {
+  // Mã định danh duy nhất cho đề bài (có thể dùng id của SheetData)
+  id: string;
+  // Loại phần thi (luôn là 2 cho Part 2)
+  part: 2;
+  // Email nhận được (đề bài)
+  receivedEmail: {
+    senderName: string; // Tên người gửi
+    senderEmail: string; // Email người gửi
+    recipientName?: string;
+    subject: string; // Tiêu đề email
+    body: string; // Nội dung email người dùng nhận được
+    // Các yêu cầu cụ thể hoặc câu hỏi trong email mà người dùng cần trả lời
+    tasks: string[]; // Ví dụ: ["Hỏi về giá sản phẩm X", "Đề xuất một cuộc họp"]
+  };
+  // Hướng dẫn chung cho người dùng (ví dụ: "Đọc email và viết thư trả lời.")
+  instructionText: string;
+  recipientPersonaDescription: string;
+  // Thời gian tạo đề bài (timestamp)
+  generatedAt: number;
+}
+
+/**
+ * @interface WritingToeicPart2UserAnswer
+ * @description Định nghĩa cấu trúc email trả lời của người dùng.
+ * (Thực tế, đây có thể chỉ là một chuỗi string, nhưng để mở rộng có thể làm thành object)
+ */
+export interface WritingToeicPart2UserAnswer {
+  // Mã định danh của câu trả lời (có thể dùng id của SheetData)
+  id: string;
+  // Nội dung email người dùng soạn thảo
+  responseText: string;
+  // Thời gian nộp bài (timestamp)
+  submittedAt: number;
+}
+
+/**
+ * @interface WritingToeicPart2GrammarCorrection
+ * @description Cấu trúc cho một lỗi ngữ pháp và gợi ý sửa.
+ * Tương tự Part 1, nhưng có thể có thêm các yếu tố đặc thù cho email.
+ */
+export interface WritingToeicPart2GrammarCorrection {
+  // Phần văn bản gốc có lỗi (tiếng Anh)
+  original: string;
+  // Gợi ý sửa lỗi (tiếng Anh)
+  suggestion: string;
+  // Giải thích lỗi (bằng tiếng Việt)
+  explanation: string;
+  // Loại lỗi (ví dụ: 'Grammar', 'Vocabulary', 'Tone') - tùy chọn
+  errorType?: string;
+}
+
+/**
+ * @interface WritingToeicPart2GradedFeedback
+ * @description Định nghĩa cấu trúc phản hồi và điểm số sau khi chấm email Part 2.
+ */
+export interface WritingToeicPart2GradedFeedback {
+  // Mã định danh của feedback (có thể dùng id của SheetData)
+  id: string;
+  // Mã định danh của câu trả lời tương ứng (có thể dùng id của SheetData)
+  answerId: string;
+  // Điểm số (ví dụ: 0-4 cho Part 2, tùy theo thang điểm TOEIC)
+  score: number;
+  // Nhận xét chi tiết từ LLM (bằng tiếng Việt)
+  // Tập trung vào: hoàn thành yêu cầu, rõ ràng, tổ chức, từ vựng, ngữ pháp, văn phong email.
+  feedbackText: string;
+  // Danh sách sửa lỗi ngữ pháp hoặc gợi ý cải thiện từ vựng/văn phong
+  corrections?: WritingToeicPart2GrammarCorrection[];
+  // Thời gian chấm bài (timestamp)
+  gradedAt: number;
+}
+
+/**
+ * @type WritingToeicPart2SheetStatus
+ * @description Định nghĩa các trạng thái có thể có của một bài thực hành Part 2.
+ * - 'blank': Mới tạo, chưa có đề bài.
+ * - 'prompt_generated': Đề bài (email) đã có, chờ người dùng trả lời.
+ * - 'answered': Người dùng đã nộp email trả lời, chờ chấm điểm.
+ * - 'graded': Đã chấm điểm, có phản hồi.
+ */
+export type WritingToeicPart2SheetStatus = 'blank' | 'prompt_generated' | 'answered' | 'graded';
+
+/**
+ * @interface WritingToeicPart2SheetData
+ * @description Định nghĩa cấu trúc cho một bài thực hành Part 2 lưu trong IndexedDB.
+ */
+export interface WritingToeicPart2SheetData {
+  // ID tự tăng, cũng là số thứ tự bài làm
+  id: number;
+  // Trạng thái của bài làm
+  status: WritingToeicPart2SheetStatus;
+  // Thời gian tạo bài làm (timestamp)
+  createdAt: number;
+
+  // --- Dữ liệu đề bài ---
+  // Email nhận được (đề bài)
+  promptReceivedEmailSenderName?: string;
+  promptReceivedEmailSenderEmail?: string;
+  promptRecipientName?: string;
+  promptReceivedEmailSubject?: string;
+  promptReceivedEmailBody?: string;
+  promptReceivedEmailTasks?: string[]; // Mảng các yêu cầu
+  // Hướng dẫn chung
+  promptInstructionText?: string;
+  // Thời gian tạo đề bài
+  promptGeneratedAt?: number;
+
+  // --- Dữ liệu câu trả lời của người dùng ---
+  userAnswerText?: string;
+  userAnswerSubmittedAt?: number;
+
+  // --- Dữ liệu điểm và phản hồi ---
+  gradeScore?: number;
+  gradeFeedbackText?: string; // Bằng tiếng Việt
+  gradeCorrections?: WritingToeicPart2GrammarCorrection[];
+  gradeGradedAt?: number;
+  promptRecipientPersonaDescription?: string;
+}
+
+/**
+ * @interface WritingToeicPart2GeneratedPromptData
+ * @description Defines the structure of the JSON object expected directly from Gemini when generating a Part 2 email prompt.
+ * @comment Định nghĩa cấu trúc JSON mà Gemini trả về khi tạo đề bài Part 2.
+ */
+export interface WritingToeicPart2GeneratedPromptData {
+  senderName: string;
+  senderEmail: string;
+  subject: string;
+  body: string;
+  tasks: string[];
+  recipientPersonaDescription: string;
+}
+
+/**
+ * @interface WritingToeicPart2PromptContextForGrading
+ * @description Defines the necessary context of the original email prompt that needs to be passed to the grading function.
+ * @comment Thông tin email gốc cần thiết để Gemini chấm điểm.
+ */
+export interface WritingToeicPart2PromptContextForGrading {
+  senderName: string;
+  senderEmail: string; // Optional, might not be strictly needed by grader if senderName and subject are enough context
+  subject: string;
+  body: string;
+  tasks: string[]; // The specific tasks the student was supposed to address
+}
+
+// Your other Part 2 types: WritingToeicPart2GradedFeedback, WritingToeicPart2SheetData, etc.
+// WritingToeicPart2Prompt (the one used in your hook's state) would be constructed from WritingToeicPart2GeneratedPromptData
+// and would include instructionText, id, part, etc.
+export interface WritingToeicPart2Prompt {
+  id: string;
+  part: 2;
+  receivedEmail: { // Thông tin email mà người dùng nhận được
+    senderName: string;
+    senderEmail: string; // Có thể tùy chọn nếu không quá quan trọng với UI hiển thị
+    recipientName?: string; // 
+    subject: string;
+    body: string; // Đã bao gồm lời chào với recipientName
+    tasks: string[];
+  }; // Use the grading context here
+  recipientPersonaDescription: string;
+  instructionText: string;
+  generatedAt: number;
+}
+
+export interface WritingToeicPart2ApiPromptData {
+  senderName: string;
+  senderEmail: string;
+  recipientName: string;
+  subject: string;
+  body: string;
+  tasks: string[];
+  recipientPersonaDescription: string;
+  WritingToeicPart2ApiPromptData: string;
+}
+/**
+ * @typedef WritingToeicPart2ApiReceivedEmail
+ * @description Cấu trúc dữ liệu email nhận được (đề bài) trả về từ API tạo đề Part 2.
+ */
+export type WritingToeicPart2ApiReceivedEmail = WritingToeicPart2Prompt['receivedEmail']
+
+
+/**
+ * @interface WritingToeicPart2State
+ * @description Định nghĩa trạng thái cho trang TOEIC Part 2 trong React hook.
+ */
+export interface WritingToeicPart2State {
+  // --- Trạng thái tải ---
+  isDbLoading: boolean; // Đang tải/khởi tạo CSDL
+  isLoadingPrompt: boolean; // Đang tạo đề bài email mới
+  isLoadingGrade: boolean; // Đang chấm điểm email trả lời
+
+  // --- Dữ liệu bài làm hiện tại ---
+  currentSheetId: number | null;
+  currentSheetData: WritingToeicPart2SheetData | null; // Dữ liệu đầy đủ của sheet hiện tại từ DB
+
+  // --- Dữ liệu được suy ra từ currentSheetData cho UI ---
+  currentPrompt: WritingToeicPart2Prompt | null; // Đề bài email hiện tại
+  userResponseText: string; // Nội dung email người dùng đang soạn
+  currentFeedback: WritingToeicPart2GradedFeedback | null; // Phản hồi và điểm cho email hiện tại
+
+  // --- Thông tin chung & lỗi ---
+  totalSheets: number; // Tổng số bài làm đã lưu
+  error: string | null; // Thông báo lỗi
+}
+
+export interface Part2EmailContext {
+  email: string;
+  subject: string;
+  tasks: string[];
+  recipientName: string;
+}
+
+/**
+ * @interface EssayQuestionApiResponse
+ * @description Định nghĩa cấu trúc JSON mong đợi từ Gemini cho câu hỏi luận Part 3.
+ * @comment Cấu trúc đơn giản chỉ chứa câu hỏi luận.
+ */
+export interface EssayQuestionApiResponse {
+  essayQuestion: string;
+}
+
+export interface WritingToeicPart3GradedFeedback {
+  score: number; // Điểm tổng từ 0 đến 5 cho bài luận
+
+  overallFeedback: string; // Nhận xét tổng quát chi tiết (khoảng 4-6 câu) bằng TIẾNG VIỆT
+
+  detailedFeedback: {
+    opinionSupportFeedback: string; // Nhận xét về cách phát triển và bảo vệ quan điểm (TIẾNG VIỆT)
+    organizationFeedback: string;   // Nhận xét về cấu trúc bài luận (TIẾNG VIỆT)
+    grammarVocabularyFeedback: string; // Nhận xét về ngữ pháp và từ vựng (TIẾNG VIỆT)
+  };
+
+  keyImprovementAreas: string[]; // Danh sách 2-3 điểm chính cần cải thiện (TIẾNG VIỆT)
+}
+/**
+ * @interface EssayQuestionDataFromApi
+ * @description Định nghĩa cấu trúc JSON trả về từ API khi tạo câu hỏi luận Part 3.
+ * @comment Cấu trúc này khớp với output của hàm generateEssayQuestionForPart3.
+ */
+export interface EssayQuestionDataFromApi {
+  essayQuestion: string; // Câu hỏi luận
+}
+
+/**
+ * @interface WritingToeicPart3Prompt
+ * @description Định nghĩa cấu trúc của một đề bài luận Part 3.
+ * @comment Bao gồm câu hỏi luận và các thông tin liên quan.
+ */
+export interface WritingToeicPart3Prompt {
+  // ID của sheet mà đề bài này thuộc về
+  id: string;
+  // Loại phần thi, luôn là 3 cho Part 3
+  part: 3;
+  // Câu hỏi luận chính
+  essayQuestion: string;
+  // Hướng dẫn chung cho người dùng (có thể lấy từ đề bài TOEIC gốc)
+  directions: string; // Ví dụ: "You will write an essay... at least 300 words."
+  // Thời gian tạo đề bài (timestamp)
+  generatedAt: number;
+}
+
+/**
+ * @type WritingToeicPart3UserAnswer
+ * @description Định nghĩa cấu trúc bài luận của người dùng.
+ * Đơn giản là một chuỗi string dài.
+ * @comment Bài luận do người dùng soạn thảo.
+ */
+export type WritingToeicPart3UserAnswer = string; // Hoặc một object nếu muốn thêm metadata
+
+/**
+ * @interface WritingToeicPart3DetailedFeedbackCriteria
+ * @description Nhận xét chi tiết theo từng tiêu chí cho bài luận Part 3.
+ * @comment Các mục nhận xét cụ thể bằng tiếng Việt.
+ */
+export interface WritingToeicPart3DetailedFeedbackCriteria {
+  opinionSupportFeedback: string; // Nhận xét về cách phát triển và bảo vệ quan điểm
+  organizationFeedback: string;   // Nhận xét về cấu trúc, mạch lạc, liên kết
+  grammarVocabularyFeedback: string; // Nhận xét về ngữ pháp và từ vựng
+}
+
+/**
+ * @interface WritingToeicPart3GradedFeedback
+ * @description Định nghĩa cấu trúc phản hồi và điểm số sau khi chấm bài luận Part 3.
+ * @comment Cấu trúc này khớp với JSON schema đã thiết kế cho hàm gradeEssayForPart3.
+ */
+export interface WritingToeicPart3GradedFeedback {
+  // ID của feedback, thường là ID của sheet
+  id: string;
+  // ID của câu trả lời (bài luận) tương ứng, thường là ID của sheet
+  answerId: string;
+  // Điểm số (ví dụ: 0-5)
+  score: number;
+  // Nhận xét tổng quát bằng TIẾNG VIỆT
+  overallFeedback: string;
+  // Nhận xét chi tiết theo từng tiêu chí, bằng TIẾNG VIỆT
+  detailedFeedback: WritingToeicPart3DetailedFeedbackCriteria;
+  // Danh sách các lĩnh vực chính cần cải thiện, bằng TIẾNG VIỆT
+  keyImprovementAreas: string[];
+  // Thời gian chấm bài (timestamp)
+  gradedAt: number;
+}
+
+/**
+ * @type WritingToeicPart3SheetStatus
+ * @description Định nghĩa các trạng thái có thể có của một bài thực hành luận Part 3.
+ * - 'blank': Mới tạo, chưa có câu hỏi luận.
+ * - 'prompt_generated': Câu hỏi luận đã có, chờ người dùng viết bài.
+ * - 'answered': Người dùng đã nộp bài luận, chờ chấm điểm.
+ * - 'graded': Đã chấm điểm, có phản hồi.
+ * @comment Các giai đoạn của một bài làm Part 3.
+ */
+export type WritingToeicPart3SheetStatus = 'blank' | 'prompt_generated' | 'answered' | 'graded';
+
+/**
+ * @interface WritingToeicPart3SheetData
+ * @description Định nghĩa cấu trúc cho một bài thực hành luận Part 3 lưu trong IndexedDB.
+ * @comment Dữ liệu được lưu trữ lâu dài trong trình duyệt cho mỗi bài luận.
+ */
+export interface WritingToeicPart3SheetData {
+  // ID tự tăng, cũng là số thứ tự bài làm
+  id: number;
+  // Trạng thái của bài làm
+  status: WritingToeicPart3SheetStatus;
+  // Thời gian tạo bài làm (timestamp)
+  createdAt: number;
+
+  // --- Dữ liệu đề bài ---
+  essayQuestion?: string; // Câu hỏi luận
+  promptDirections?: string; // Hướng dẫn làm bài (có thể cố định hoặc từ API)
+  promptGeneratedAt?: number; // Thời gian tạo câu hỏi
+
+  // --- Dữ liệu bài luận của người dùng ---
+  userEssayText?: WritingToeicPart3UserAnswer; // Nội dung bài luận
+  userEssaySubmittedAt?: number; // Thời gian nộp bài
+
+  // --- Dữ liệu điểm và phản hồi ---
+  gradeScore?: number;
+  gradeOverallFeedback?: string; // Nhận xét chung (tiếng Việt)
+  gradeDetailedFeedback?: WritingToeicPart3DetailedFeedbackCriteria; // Nhận xét chi tiết (tiếng Việt)
+  gradeKeyImprovementAreas?: string[]; // Lĩnh vực cần cải thiện (tiếng Việt)
+  gradeGradedAt?: number; // Thời gian chấm bài
+}
+export type WritingToeicPart3UIControls = {
+  isFetchingInitialData: boolean;
+  isGenerateNewEssayQuestionButtonLoading: boolean;
+  isGenerateNewEssayQuestionButtonDisabled: boolean;
+  shouldShowEssayQuestionSkeleton: boolean;
+  isEssayEditorDisabled: boolean;
+  isSubmitEssayButtonLoading: boolean;
+  isSubmitEssayButtonDisabled: boolean;
+  shouldRenderEssayGradeDisplay: boolean;
+}
+export type EssayQuestionPayload = { id: string; essayQuestion: string; directions: string; generatedAt: number; part: 3 }
 //---------------------------- tên gọi khác
 export type TestAnswerSheet = Map<QuestionNumber, AnswerData>;
 export type ResultID = string;
