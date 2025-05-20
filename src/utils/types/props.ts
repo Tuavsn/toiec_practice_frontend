@@ -436,6 +436,15 @@ interface EssayGradeDisplayProps {
   // Cờ báo hiệu đang tải/chấm điểm
   isLoading: boolean;
 }
+interface GlassCardProps {
+  title: string; // Tiêu đề chính của card
+  onClick: () => void; // Hành động khi click
+  bgColorClass: string; // Lớp màu nền, ví dụ: 'bg-orange-700'
+  textColorClass?: string; // Lớp màu chữ, ví dụ: 'text-white'
+  icon?: string; // Tên icon của PrimeIcons, ví dụ: 'pi pi-book'
+  className?: string; // Các lớp CSS tùy chỉnh thêm
+  // Bạn có thể thêm các props khác nếu cần, ví dụ: description, etc.
+}
 export type {
     ActivityLogProps, AdminCategoryTableProps, AdminGenericTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AnswerFormProps, AssignmentQuestionTableProps, ButtonListProps,
     ConfirmSubmitDialogProps, DialogAssignmentQuestionActionProps, DialogDeleteLectureBodyProps,
@@ -446,7 +455,7 @@ export type {
     DialogUpdateTopicBodyProps, DialogUpdateUserBodyProps,
     DialogUserRowProps, DoExercisePageProps,
     DoTestPageProps, EmailGradeDisplayProps, EmailPromptDisplayProps, EmailResponseFormProps, EssayEditorFormProps, EssayGradeDisplayProps, EssayQuestionDisplayProps, FullTestAreaProps,
-    FullTestScreenProps, GradeDisplayProps, ImageDisplayProps, LectureActionButtonProps, LectureReduceProps, PanelHeaderProps, PartDetailSectionProps, PromptDisplayProps, QuestionActionButtonProps,
+    FullTestScreenProps, GlassCardProps, GradeDisplayProps, ImageDisplayProps, LectureActionButtonProps, LectureReduceProps, PanelHeaderProps, PartDetailSectionProps, PromptDisplayProps, QuestionActionButtonProps,
     QuestionTableProps,
     RenderPressStartButtonProps,
     RenderTestProps,

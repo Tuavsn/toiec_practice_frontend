@@ -2,7 +2,7 @@
 import { Dispatch, useEffect, useReducer } from 'react';
 import { fetchAndConvertImageToBase64, fetchImageFromPexels, generateKeywordsAndInstructionForPart1, gradeAnswerWithGeminiSDK, suggestKeywordForImageSearch } from '../api/api';
 import { useToast } from '../context/ToastProvider';
-import { addPart1Sheet, getLatestSheetByIdFromDB, getLatestSheetByTimestampFromDB, getPart1SheetById, getSheetsCountFromDB, initializeDB, updateSheetToDB } from '../database/indexdb';
+import { addPart1Sheet, getLatestPart1SheetByIdFromDB, getLatestPart1SheetByTimestampFromDB, getPart1SheetById, getPart1SheetsCountFromDB, initializeDB, updatePart1SheetToDB, } from '../database/indexdb';
 import { ToeicWritingPart1Action } from '../utils/types/action';
 import { initialToeicWritingPart1State } from '../utils/types/emptyValue';
 import { ToeicWritingPart1State } from '../utils/types/state';
@@ -133,8 +133,8 @@ async function initEffect(isMounted: boolean, dispatch: Dispatch<ToeicWritingPar
     dispatch({ type: 'DB_INIT_START' });
     try {
         await initializeDB();
-        let latestSheet = await getLatestSheetByTimestampFromDB();
-        let total = await getSheetsCountFromDB();
+        let latestSheet = await getLatestPart1SheetByTimestampFromDB();
+        let total = await getPart1SheetsCountFromDB();
 
         if (!latestSheet && total === 0) {
             console.log("useToeicPart1Logic: không có sheet");
@@ -178,7 +178,7 @@ async function _onSubmitAnswercb(state: ToeicWritingPart1State, dispatch: Dispat
             userAnswerSubmittedAt: Date.now(),
             status: 'answered'
         };
-        await updateSheetToDB(sheetToUpdate); // Assuming updateSheet is your DB save function
+        await updatePart1SheetToDB(sheetToUpdate); // Assuming updateSheet is your DB save function
 
         dispatch({ type: 'UPDATE_SHEET_IN_STATE', payload: { userAnswerText: sheetToUpdate.userAnswerText, userAnswerSubmittedAt: sheetToUpdate.userAnswerSubmittedAt, status: 'answered', id: sheetToUpdate.id } });
 
@@ -210,7 +210,7 @@ async function _onSubmitAnswercb(state: ToeicWritingPart1State, dispatch: Dispat
             gradeGradedAt: feedback.gradedAt.getTime(),
             status: 'graded'
         };
-        await updateSheetToDB(sheetToUpdate); // Save the fully graded sheet to DB
+        await updatePart1SheetToDB(sheetToUpdate); // Save the fully graded sheet to DB
 
         // 7. Fetch the definitive final version from DB and dispatch LOAD_SHEET_SUCCESS
         // This action's reducer will correctly set isLoadingGrade: false, update all
@@ -228,10 +228,10 @@ async function _onSubmitAnswercb(state: ToeicWritingPart1State, dispatch: Dispat
         }
 
         // 8. Handle creation of a new blank sheet if this was the latest sheet submitted
-        const latestSheetInDb = await getLatestSheetByIdFromDB();
+        const latestSheetInDb = await getLatestPart1SheetByIdFromDB();
         if (latestSheetInDb && state.currentSheetId === latestSheetInDb.id && finalSheetFromDb.status === 'graded') {
             await addPart1Sheet({ status: 'blank', createdAt: Date.now() });
-            const newTotalSheets = await getSheetsCountFromDB();
+            const newTotalSheets = await getPart1SheetsCountFromDB();
             dispatch({ type: 'SET_TOTAL_SHEETS', payload: newTotalSheets });
         }
 
@@ -277,7 +277,7 @@ async function _navigateToSheetCb(state: ToeicWritingPart1State, dispatch: Dispa
     // --- Main Logic Path ---
     try {
         const sheetFromDb = await getPart1SheetById(sheetIdToLoad);
-        const currentTotalSheetsInDb = await getSheetsCountFromDB(); // Get the most up-to-date total
+        const currentTotalSheetsInDb = await getPart1SheetsCountFromDB(); // Get the most up-to-date total
 
         // Guard 3: Sheet not found in the database.
         if (!sheetFromDb) {
@@ -285,7 +285,7 @@ async function _navigateToSheetCb(state: ToeicWritingPart1State, dispatch: Dispa
             dispatch({ type: 'DB_OPERATION_ERROR', payload: `Không tìm thấy bài làm số ${sheetIdToLoad}.` });
 
             // Attempt to recover gracefully by loading the latest known valid sheet, if any.
-            const latestSheetFallback = await getLatestSheetByTimestampFromDB();
+            const latestSheetFallback = await getLatestPart1SheetByTimestampFromDB();
             if (latestSheetFallback) {
                 console.log(`HOOK: navigateToSheetCb: Fallback - loading latest sheet ID: ${latestSheetFallback.id}`);
                 dispatch({ type: 'LOAD_SHEET_SUCCESS', payload: { sheetData: latestSheetFallback, totalSheets: currentTotalSheetsInDb } });
@@ -314,7 +314,7 @@ async function _generateNewQuestionCb(state: ToeicWritingPart1State, dispatch: D
     let currentTotalSheets = state.totalSheets;
 
     try {
-        const latestSheetInDb = await getLatestSheetByIdFromDB();
+        const latestSheetInDb = await getLatestPart1SheetByIdFromDB();
 
         if (latestSheetInDb && latestSheetInDb.status === 'blank') {
             targetSheetId = latestSheetInDb.id;
@@ -328,7 +328,7 @@ async function _generateNewQuestionCb(state: ToeicWritingPart1State, dispatch: D
             const newSheetIdFromDb = await addPart1Sheet({ status: 'blank', createdAt: Date.now() });
             targetSheetId = newSheetIdFromDb;
             sheetToUpdateFromState = await getPart1SheetById(newSheetIdFromDb) ?? null; //
-            currentTotalSheets = await getSheetsCountFromDB();
+            currentTotalSheets = await getPart1SheetsCountFromDB();
 
             if (sheetToUpdateFromState) {
                 dispatch({ type: 'INTERNAL_NEW_SHEET_READY', payload: { newActiveSheet: sheetToUpdateFromState, totalSheets: currentTotalSheets } });
@@ -370,7 +370,7 @@ async function _generateNewQuestionCb(state: ToeicWritingPart1State, dispatch: D
         const sheetToFinallyUpdate = await getPart1SheetById(targetSheetId);
         if (!sheetToFinallyUpdate) throw new Error(`Не найден лист с ID ${targetSheetId} для финального обновления.`);
 
-        await updateSheetToDB({ ...sheetToFinallyUpdate, ...promptSheetDataUpdate } as WritingSheetData); //
+        await updatePart1SheetToDB({ ...sheetToFinallyUpdate, ...promptSheetDataUpdate } as WritingSheetData); //
         const finalUpdatedSheet = await getPart1SheetById(targetSheetId);
 
         if (finalUpdatedSheet) {
