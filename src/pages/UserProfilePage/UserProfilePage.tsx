@@ -134,7 +134,7 @@ function itemLectureTemplate({ id, name, topic, percent: completePercent }: Lect
                 <p className="pb-5" data-testid={`lecture-content-${id}`}>
                     <strong>Nội dung:</strong> {topic.join(", ")}
                 </p>
-                <Link to={`${name}___${id}`} data-testid={`lecture-link-${id}`}>
+                <Link to={`/lecture/${name}___${id}`} data-testid={`lecture-link-${id}`}>
                     <Button severity="help" label="Học ngay" data-testid={`lecture-button-${id}`} />
                 </Link>
                 <ProgressBar className="mt-3" color={hueValue} value={completePercent}></ProgressBar>

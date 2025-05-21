@@ -1,6 +1,6 @@
 import { TreeNode } from "primereact/treenode";
 import { AdminReportsState, CategoryHookState, CommentSectionState, CommentsState, LectureCardState, LectureHookState, MultiQuestionState, PermissionHookState, ProfileHookState, RoleHookState, TestHookState, TestReviewHookState, ToeicWritingPart1State, TopicHookState, UserHookState, WritingToeicPart3State } from "./state";
-import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, TestSheet, Topic, UserRow, WritingToeicPart2State } from "./type";
+import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, TestSheet, ToeicSpeakingPartState, ToeicSpeakingPracticeView, Topic, UserRow, WritingToeicPart2State } from "./type";
 export const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
@@ -327,15 +327,27 @@ export const initialToeicWritingPart2State: WritingToeicPart2State = {
 } as const;
 
 export const initialToeicWritingPart3State: WritingToeicPart3State = {
-  isDbLoading: true,
-  isLoadingPrompt: false,
-  isLoadingGrade: false,
-  currentSheetId: null,
-  currentSheetData: null,
-  currentPrompt: null,
-  userEssayText: '',
-  currentFeedback: null,
-  totalSheets: 0,
-  error: null,
+    isDbLoading: true,
+    isLoadingPrompt: false,
+    isLoadingGrade: false,
+    currentSheetId: null,
+    currentSheetData: null,
+    currentPrompt: null,
+    userEssayText: '',
+    currentFeedback: null,
+    totalSheets: 0,
+    error: null,
 } as const;
 
+export const initialToeicSpeakingState: ToeicSpeakingPartState = {
+    currentView: ToeicSpeakingPracticeView.INTRO, // Màn hình ban đầu là giới thiệu
+    tasks: [], // Danh sách các câu hỏi/nhiệm vụ sẽ được tải từ prompts.json
+    currentTaskIndex: 0,
+    // currentSubQuestionIndex: undefined, // Sẽ dùng khi có task loại RESPOND_TO_QUESTIONS
+    userResponses: [],
+    isTestInProgress: false,
+    isLoadingPrompts: false,
+    overallError: undefined,
+    isLoadingPexelsImage: false,
+    isLoadingTasks: false,
+} as const;
