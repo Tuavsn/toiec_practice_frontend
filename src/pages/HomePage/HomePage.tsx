@@ -146,7 +146,7 @@ function News() {
                     <div className="col">
                         <Card className="p-4 h-full" header={(
                             <div className="flex align-items-center">
-                                <img src="https://prepedu.com/_ipx/_/imgs/home/slide.svg" className="max-w-4rem mr-4" />
+                                <img src="https://cdn-icons-png.flaticon.com/512/1892/1892655.png" className="max-w-4rem mr-4" />
                                 <h3>Bài học chất lượng cao, phù hợp với mọi đối tượng</h3>
                             </div>
                         )}>
@@ -158,7 +158,7 @@ function News() {
                     <div className="col">
                         <Card className="p-4 h-full" header={(
                             <div className="flex align-items-center">
-                                <img src="https://prepedu.com/_ipx/_/imgs/home/check_note.svg" className="max-w-4rem mr-4" />
+                                <img src="https://cdn-icons-png.flaticon.com/512/18288/18288593.png" className="max-w-4rem mr-4" />
                                 <h3>Đầy đủ bài mẫu, bài tập, progress test như thi thật</h3>
                             </div>
                         )}>
@@ -170,7 +170,7 @@ function News() {
                     <div className="col">
                         <Card className="p-4 h-full" header={(
                             <div className="flex align-items-center">
-                                <img src="https://prepedu.com/_ipx/_/imgs/home/copy.svg" className="max-w-4rem mr-4" />
+                                <img src="https://cdn-icons-png.flaticon.com/512/272/272369.png" className="max-w-4rem mr-4" />
                                 <h3>Có hệ thống chấm điểm và phân tích</h3>
                             </div>
                         )}>
@@ -182,47 +182,7 @@ function News() {
                 </div>
             </div>
 
-            <div className="py-6">
-                <h2 className="text-center"><a href="/test" style={{ color: "#004B8D" }}>Đề thi mới</a></h2>
-                <div className="grid">
-                    <div className="col">
-                        <Card className="p-4 h-full" header={(
-                            <div className="flex align-items-center">
-                                <img src="https://prepedu.com/_ipx/_/imgs/home/slide.svg" className="max-w-4rem mr-4" />
-                                <h3>Bài học chất lượng cao, phù hợp với mọi đối tượng</h3>
-                            </div>
-                        )}>
-                            <p className="m-0">
-                                Hệ thống bài học phù hợp với mọi đối tượng, giúp người học dễ dàng tiếp cận và nhanh chóng làm quen với đề thi TOEIC.
-                            </p>
-                        </Card>
-                    </div>
-                    <div className="col">
-                        <Card className="p-4 h-full" header={(
-                            <div className="flex align-items-center">
-                                <img src="https://prepedu.com/_ipx/_/imgs/home/check_note.svg" className="max-w-4rem mr-4" />
-                                <h3>Đầy đủ bài mẫu, bài tập, progress test như thi thật</h3>
-                            </div>
-                        )}>
-                            <p className="m-0">
-                                Hệ thống bài tập phong phú, từ dễ đến khó giúp cho người học nhanh chóng đạt được mục tiêu mong muốn.
-                            </p>
-                        </Card>
-                    </div>
-                    <div className="col">
-                        <Card className="p-4 h-full" header={(
-                            <div className="flex align-items-center">
-                                <img src="https://prepedu.com/_ipx/_/imgs/home/copy.svg" className="max-w-4rem mr-4" />
-                                <h3>Có hệ thống chấm điểm và phân tích</h3>
-                            </div>
-                        )}>
-                            <p className="m-0">
-                                TOEIC Practice cung cấp hệ thống chấm điểm bài thi chính xác kết hợp với hệ thống phân tích mạnh mẽ.
-                            </p>
-                        </Card>
-                    </div>
-                </div>
-            </div>
+
         </>
     )
 }

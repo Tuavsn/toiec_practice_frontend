@@ -106,7 +106,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
         for (const match of matches) {
             const mentionPerson = initialMentionSuggestions.filter((m) => m.name === match[1])
 
-            userIds.add(mentionPerson[0].id); 
+            userIds.add(mentionPerson[0].id);
         }
         return Array.from(userIds);
     };
@@ -147,7 +147,13 @@ const CommentForm: React.FC<CommentFormProps> = ({
                 onChange={
                     (e: FormEvent<HTMLInputElement>) => {
                         const event = e as unknown as React.ChangeEvent<HTMLTextAreaElement>
-                        setText(event.currentTarget.value)
+                        if (event.currentTarget.value.toString() === "0") {
+                            setText(text + event.currentTarget.innerText)
+                        }
+                        else {
+                            setText(event.currentTarget.value)
+
+                        }
                     }
                 }
                 suggestions={filteredSuggestions}

@@ -1,6 +1,6 @@
 import { TreeNode } from "primereact/treenode";
-import { AdminReportsState, CategoryHookState, CommentSectionState, CommentsState, LectureCardState, LectureHookState, MultiQuestionState, PermissionHookState, ProfileHookState, RoleHookState, TestHookState, TestReviewHookState, TopicHookState, UserHookState } from "./state";
-import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, TestSheet, Topic, UserRow } from "./type";
+import { AdminReportsState, CategoryHookState, CommentSectionState, CommentsState, LectureCardState, LectureHookState, MultiQuestionState, PermissionHookState, ProfileHookState, RoleHookState, TestHookState, TestReviewHookState, ToeicWritingPart1State, TopicHookState, UserHookState, WritingToeicPart3State } from "./state";
+import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, TestSheet, Topic, UserRow, WritingToeicPart2State } from "./type";
 export const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
 export const emptyLectureRowValue: LectureRow = {
@@ -264,36 +264,78 @@ export const initialStateCommentList: CommentsState = {
 } as const
 
 export const initialCommentSectionState: CommentSectionState = {
-  // ... existing initial fields ...
-  rootComments: [],
-  repliesByParentId: {},
-  meta: null,
-  replyMetaByParentId: {},
-  isLoadingRootComments: false,
-  isLoadingReplies: {},
-  isCreatingComment: false,
-  isDeletingComment: {},
-  isTogglingLike: {},
-  error: null,
-  mentionSuggestions: [],
-  activeReplyParentId: null,
-  visibleRepliesParentId: null,
+    // ... existing initial fields ...
+    rootComments: [],
+    repliesByParentId: {},
+    meta: null,
+    replyMetaByParentId: {},
+    isLoadingRootComments: false,
+    isLoadingReplies: {},
+    isCreatingComment: false,
+    isDeletingComment: {},
+    isTogglingLike: {},
+    error: null,
+    mentionSuggestions: [],
+    activeReplyParentId: null,
+    visibleRepliesParentId: null,
 
-  // --- Initial values for new report flow fields ---
-  isReportDialogVisible: false,
-  commentForReporting: null,
-  isSubmittingReport: false,
-  reportSubmitError: null,
-  // reportSubmitSuccessMessage: null,
+    // --- Initial values for new report flow fields ---
+    isReportDialogVisible: false,
+    commentForReporting: null,
+    isSubmittingReport: false,
+    reportSubmitError: null,
+    // reportSubmitSuccessMessage: null,
 } as const;
 
 export const initialAdminReportState: AdminReportsState = {
-  reports: [],
-  meta: null,
-  isLoading: false,
+    reports: [],
+    meta: null,
+    isLoading: false,
+    error: null,
+    isUpdatingReportStatus: {},
+    updateReportError: {},
+    isDeletingReport: {},
+    deleteReportError: {},
+} as const;
+
+export const initialToeicWritingPart1State: ToeicWritingPart1State = {
+    isLoadingImage: false,
+    isCreatingQuestion: false,
+    isLoadingGrade: false,
+    currentImage: null,
+    currentPrompt: null,
+    userAnswerText: '',
+    currentFeedback: null,
+    error: null,
+    currentSheetId: null,
+    currentSheetData: null,
+    totalSheets: 0,
+    isDbLoading: true,
+} as const;
+
+export const initialToeicWritingPart2State: WritingToeicPart2State = {
+    isDbLoading: true, // Bắt đầu với true cho đến khi DB được khởi tạo
+    isLoadingPrompt: false,
+    isLoadingGrade: false,
+    currentSheetId: null,
+    currentSheetData: null,
+    currentPrompt: null,
+    userResponseText: '', // Sẽ là userEmailResponseText
+    currentFeedback: null,
+    totalSheets: 0,
+    error: null,
+} as const;
+
+export const initialToeicWritingPart3State: WritingToeicPart3State = {
+  isDbLoading: true,
+  isLoadingPrompt: false,
+  isLoadingGrade: false,
+  currentSheetId: null,
+  currentSheetData: null,
+  currentPrompt: null,
+  userEssayText: '',
+  currentFeedback: null,
+  totalSheets: 0,
   error: null,
-  isUpdatingReportStatus: {},
-  updateReportError: {},
-  isDeletingReport: {},
-  deleteReportError: {},
-} as const; 
+} as const;
+

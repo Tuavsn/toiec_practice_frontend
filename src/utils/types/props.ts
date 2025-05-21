@@ -1,8 +1,9 @@
+import { PaginatorPageChangeEvent } from "primereact/paginator";
 import { TreeNode } from "primereact/treenode";
 import { Dispatch, MutableRefObject } from "react";
 import { CategoryHookAction, FullTestScreenAction, LectureHookAction, MultiQuestionAction, PermissionHookAction, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, TopicHookAction, UserHookAction } from "./action";
-import { LectureHookState, MultiQuestionState, TestReviewHookState } from "./state";
-import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Permission, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, Topic, TopicOverview, TopicStat, UserAnswerRecord, UserDetailResultRow, UserRow } from "./type";
+import { LectureHookState, MultiQuestionState, TestReviewHookState, WritingToeicPart3State } from "./state";
+import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, GradedFeedback, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Permission, PexelsPhoto, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, Topic, TopicOverview, TopicStat, UIWritingPart1Control, UserAnswerRecord, UserDetailResultRow, UserRow, WritingPart1Prompt, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart3GradedFeedback, WritingToeicPart3Prompt, WritingToeicPart3UIControls } from "./type";
 
 interface ButtonListProps {
     pageMapper: QuestionPage[],
@@ -188,7 +189,7 @@ interface DoExercisePageProps {
 interface DialogQuestionActionProps {
     isVisible: boolean,
     title: string,
-  
+
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
     currentSelectedQuestion: React.MutableRefObject<TreeNode>,
     topicList: React.MutableRefObject<Topic[]>,
@@ -324,31 +325,137 @@ interface UserAnswerSideTabProps {
     dotestDataRef: React.MutableRefObject<TestSheet>
 }
 
+interface ImageDisplayProps {
+    image: PexelsPhoto | null;
+    isLoading: boolean;
+    imageAltText?: string; // Văn bản thay thế cho ảnh
+}
+
+interface PromptDisplayProps {
+    prompt: WritingPart1Prompt | null;
+    isLoading: boolean;
+}
+interface AnswerFormProps {
+    answerText: string;
+    onAnswerChange: (text: string) => void;
+    onSubmit: () => void;
+    isSubmitting: boolean;
+    isSubmitAnswerButtonDisable: boolean; // Để vô hiệu hoá nếu chưa có đề
+}
+interface PanelHeaderProps {
+    generateNewQuestion: () => void,
+    currentSheetId: number | null,
+    uiControl: UIWritingPart1Control,
+    totalSheets: number,
+}
+
+interface GradeDisplayProps {
+    feedback: GradedFeedback | null;
+
+    uiControls: UIWritingPart1Control
+}
+
+interface EmailPromptDisplayProps {
+    prompt: WritingToeicPart2Prompt | null;
+    isLoading: boolean;
+}
+
+interface WritingToeicPart2InitialMessageProps {
+    error: string | null;
+    // Thêm callback nếu muốn có nút "Thử lại" hoặc "Tạo đề mới" trực tiếp từ đây
+    // onRetry?: () => void;
+}
+interface WritingToeicPart2PromptSectionProps {
+    prompt: WritingToeicPart2Prompt | null;
+    isLoading: boolean; // isLoading cho skeleton của EmailPromptDisplay
+}
+interface WritingToeicPart2ResponseSectionProps {
+    userResponseText: string;
+    onResponseChange: (text: string) => void;
+    onSubmit: () => void;
+    isSubmitting: boolean; // Loading của nút submit
+    isFormDisabled: boolean; // Vô hiệu hóa toàn bộ form (ví dụ: khi đang tải đề)
+    // isPromptAvailable: boolean; // Không cần nữa nếu component này chỉ render khi prompt có sẵn
+}
+interface WritingToeicPart2GradeSectionProps {
+    feedback: WritingToeicPart2GradedFeedback | null;
+    isLoading: boolean; // isLoading cho skeleton của EmailGradeDisplay
+}
+interface WritingToeicPart2PaginatorSectionProps {
+    currentSheetId: number | null;
+    totalSheets: number;
+    onPageChange: (event: PaginatorPageChangeEvent) => void;
+    isDisabled: boolean;
+}
+
+interface EmailResponseFormProps {
+    // Nội dung email hiện tại của người dùng
+    responseText: string;
+    // Callback khi nội dung thay đổi
+    onResponseChange: (text: string) => void;
+    // Callback khi nhấn nút nộp bài
+    onSubmit: () => void;
+    // Cờ báo hiệu đang nộp bài (cho trạng thái loading của nút)
+    isSubmitting: boolean;
+    // Cờ báo hiệu toàn bộ form có bị vô hiệu hóa không (ví dụ: khi đang tải đề)
+    isFormDisabled: boolean;
+}
+interface EmailGradeDisplayProps {
+    // Đối tượng chứa thông tin điểm và nhận xét
+    feedback: WritingToeicPart2GradedFeedback | null;
+    // Cờ báo hiệu đang tải/chấm điểm
+    isLoading: boolean;
+}
+
+interface WritingToeicPart3PanelHeaderProps {
+    state: WritingToeicPart3State;
+    uiControls: WritingToeicPart3UIControls;
+    generateNewEssayQuestion: () => void;
+}
+interface EssayQuestionDisplayProps {
+  // Đối tượng chứa câu hỏi luận và hướng dẫn
+  prompt: WritingToeicPart3Prompt | null;
+  // Cờ báo hiệu đang tải đề bài
+  isLoading: boolean;
+}
+interface EssayEditorFormProps {
+  // Nội dung bài luận hiện tại của người dùng
+  essayText: string;
+  // Callback khi nội dung thay đổi
+  onEssayChange: (text: string) => void;
+  // Callback khi nhấn nút nộp bài
+  onSubmit: () => void;
+  // Cờ báo hiệu đang nộp bài (cho trạng thái loading của nút)
+  isSubmitting: boolean;
+  // Cờ báo hiệu toàn bộ form có bị vô hiệu hóa không (ví dụ: khi đang tải đề)
+  isFormDisabled: boolean;
+}
+interface EssayGradeDisplayProps {
+  // Đối tượng chứa thông tin điểm và nhận xét chi tiết cho bài luận
+  feedback: WritingToeicPart3GradedFeedback | null;
+  // Cờ báo hiệu đang tải/chấm điểm
+  isLoading: boolean;
+}
+interface GlassCardProps {
+  title: string; // Tiêu đề chính của card
+  onClick: () => void; // Hành động khi click
+  bgColorClass: string; // Lớp màu nền, ví dụ: 'bg-orange-700'
+  textColorClass?: string; // Lớp màu chữ, ví dụ: 'text-white'
+  icon?: string; // Tên icon của PrimeIcons, ví dụ: 'pi pi-book'
+  className?: string; // Các lớp CSS tùy chỉnh thêm
+  // Bạn có thể thêm các props khác nếu cần, ví dụ: description, etc.
+}
 export type {
-    ActivityLogProps, AdminCategoryTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AssignmentQuestionTableProps, ButtonListProps,
+    ActivityLogProps, AdminCategoryTableProps, AdminGenericTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AnswerFormProps, AssignmentQuestionTableProps, ButtonListProps,
     ConfirmSubmitDialogProps, DialogAssignmentQuestionActionProps, DialogDeleteLectureBodyProps,
-    DialogDeleteRowBodyProps,
-    DialogLectureProps,
-    DialogQuestionActionProps,
-    DialogQuestionPageProps,
-    DialogRoleRowProps,
-    DialogRowProps,
-    DialogTestRowProps,
-    DialogUpdateCategoryBodyProps,
-    DialogUpdateLectureBodyProps,
-    DialogUpdatePermissionBodyProps,
-    DialogUpdateRoleBodyProps,
-    DialogUpdateTestBodyProps,
-    DialogUpdateTopicBodyProps,
-    DialogUpdateUserBodyProps,
-    DialogUserRowProps,
-    DoExercisePageProps,
-    DoTestPageProps,
-    FullTestAreaProps,
-    FullTestScreenProps,
-    LectureActionButtonProps, LectureReduceProps,
-    PartDetailSectionProps,
-    QuestionActionButtonProps,
+    DialogDeleteRowBodyProps, DialogLectureProps, DialogQuestionActionProps,
+    DialogQuestionPageProps, DialogRoleRowProps, DialogRowProps,
+    DialogTestRowProps, DialogUpdateCategoryBodyProps, DialogUpdateLectureBodyProps, DialogUpdatePermissionBodyProps,
+    DialogUpdateRoleBodyProps, DialogUpdateTestBodyProps,
+    DialogUpdateTopicBodyProps, DialogUpdateUserBodyProps,
+    DialogUserRowProps, DoExercisePageProps,
+    DoTestPageProps, EmailGradeDisplayProps, EmailPromptDisplayProps, EmailResponseFormProps, EssayEditorFormProps, EssayGradeDisplayProps, EssayQuestionDisplayProps, FullTestAreaProps,
+    FullTestScreenProps, GlassCardProps, GradeDisplayProps, ImageDisplayProps, LectureActionButtonProps, LectureReduceProps, PanelHeaderProps, PartDetailSectionProps, PromptDisplayProps, QuestionActionButtonProps,
     QuestionTableProps,
     RenderPressStartButtonProps,
     RenderTestProps,
@@ -364,6 +471,6 @@ export type {
     TestToolBarProps, TimerClockProps, ToolBarFrameProps, UpdateQuestionDialogProps,
     UserAnswerSheetFullTestProps,
     UserAnswerSheetProps,
-    UserAnswerSheetReviewProps, UserAnswerSideBarProps, UserAnswerSideTabProps
+    UserAnswerSheetReviewProps, UserAnswerSideBarProps, UserAnswerSideTabProps, WritingToeicPart2GradeSectionProps, WritingToeicPart2InitialMessageProps, WritingToeicPart2PaginatorSectionProps, WritingToeicPart2PromptSectionProps, WritingToeicPart2ResponseSectionProps, WritingToeicPart3PanelHeaderProps
 };
 
