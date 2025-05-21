@@ -145,7 +145,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
             >{comment.userDisplayName || 'Người dùng ẩn danh'}</span>
             {comment.deleted && <Tag severity="warning" value="Đã xóa" className="ml-2 text-xs"></Tag>}
           </div>
-          <div className={`text-sm surface-content ${comment.deleted ? 'italic text-color-secondary' : ''} mt-1 break-word`}>
+          <div className={`text-sm surface-content ${comment.deleted ? 'italic text-color-secondary' : ''} mt-1 break-word`}
+            style={{ fontFamily: `'Segoe UI', Roboto, 'Helvetica Neue', sans-serif` }}
+          >
             {comment.deleted
               ? (comment.deleteReason || 'Bình luận này đã bị xóa.')
               : <CommentContentRenderer content={comment.content} potentialMentionedUsers={potentialMentionedUsers} />
