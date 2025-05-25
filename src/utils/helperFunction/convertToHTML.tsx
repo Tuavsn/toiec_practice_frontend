@@ -69,13 +69,13 @@ export function ConvertThisAssignmentQuestionToHTML(
 
     const resourcesElement: JSX.Element[] = [];
     const questionsElement: JSX.Element[] = [];
-    
+
     if (assignmentQuestion.resources) {
         resourcesElement.push(...ResourcesToHTML(assignmentQuestion.resources, assignmentQuestionNum));
     }
     questionsElement.push(<h5 key={"group" + assignmentQuestionNum} > {assignmentQuestionNum}. {assignmentQuestion.content} </h5>);
     questionsElement.push(
-        AssignmentAnswerToHTML(assignmentQuestion, assignmentQuestionNum,userAnswerSheet.get(assignmentQuestionNum.toString()) ?? "", updateUserAnswerSheet),
+        AssignmentAnswerToHTML(assignmentQuestion, assignmentQuestionNum, userAnswerSheet.get(assignmentQuestionNum.toString()) ?? "", updateUserAnswerSheet),
         <Divider key={"divider" + assignmentQuestionNum} />
     )
 
@@ -105,7 +105,7 @@ export function ConvertThisAssignmentQuestionToHTML(
     )
 }
 
-function ResourcesToHTML(resources: Resource[], qNum: number): JSX.Element[] {
+function ResourcesToHTML(resources: Resource[], qNum: number, isAutoPlay: boolean = true): JSX.Element[] {
     if (!resources) {
         return [<h1 key={"res_" + qNum}>Cố lên</h1>]
     }
@@ -123,7 +123,7 @@ function ResourcesToHTML(resources: Resource[], qNum: number): JSX.Element[] {
                     break;
                 case 'audio':
                     resourcesElement.unshift(
-                        <audio key={"audio" + qNum + index.toString()} className='w-full' controls autoPlay={true}>
+                        <audio key={"audio" + qNum + index.toString()} className='w-full' controls autoPlay={isAutoPlay}>
                             <source src={r.content} type="audio/mpeg" />
                             Your browser does not support the audio element.
                         </audio>
@@ -174,12 +174,12 @@ export function FullTestResourcesToHTML(testType: TestType, resources: Resource[
 }
 
 
-function RenderAudioHTML(testType: TestType, audioSource: string, keyPrefix: string, changePage: (offset: number) => void): JSX.Element {
+function RenderAudioHTML(testType: TestType, audioSource: string, keyPrefix: string, changePage: (offset: number) => void, isAutoPlay: boolean = true): JSX.Element {
     if (testType === 'fulltest') {
         return (
             <div key={"div" + keyPrefix}>
                 <h5 className="text-center pt-1">Listen . . .🔊</h5>
-                <audio key={keyPrefix} className='w-full' autoPlay={true} onPause={(e) => e.currentTarget.play()} onEnded={() => changePage(1)} hidden>
+                <audio key={keyPrefix} className='w-full' autoPlay={isAutoPlay} onPause={(e) => e.currentTarget.play()} onEnded={() => changePage(1)} hidden>
                     <source src={audioSource} type="audio/mpeg" />
                     Your browser does not support the audio element.
                 </audio>
@@ -188,14 +188,14 @@ function RenderAudioHTML(testType: TestType, audioSource: string, keyPrefix: str
         )
     }
     return (
-        <audio key={keyPrefix} className='w-full' controls autoPlay={true} >
+        <audio key={keyPrefix} className='w-full' controls autoPlay={isAutoPlay} >
             <source src={audioSource} type="audio/mpeg" />
             Your browser does not support the audio element.
         </audio>
     )
 }
 
-function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, testType: TestType, changePage: (offset: number) => void): JSX.Element[] {
+function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, testType: TestType, changePage: (offset: number) => void, isAutoPlay: boolean = true): JSX.Element[] {
     if (!resources) {
         return [<h1 key={"res_" + qNum}>Cố lên</h1>]
     }
@@ -219,7 +219,7 @@ function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, testTy
                         resourcesElement.unshift(
                             <div key={"div" + keyPrefix}>
                                 <h5 className="text-center pt-1">Listen . . .🔊</h5>
-                                <audio key={keyPrefix} className='w-full' autoPlay={true} onPause={(e) => e.currentTarget.play()} onEnded={() => changePage(1)} hidden>
+                                <audio key={keyPrefix} className='w-full' autoPlay={isAutoPlay} onPause={(e) => e.currentTarget.play()} onEnded={() => changePage(1)} hidden>
                                     <source src={r.content} type="audio/mpeg" />
                                     Your browser does not support the audio element.
                                 </audio>
@@ -228,7 +228,7 @@ function TestResourcesToHTML(resources: Resource[], qNum: QuestionNumber, testTy
                         )
                     } else {
                         resourcesElement.unshift(
-                            <audio key={keyPrefix} className='w-full' controls autoPlay={true} >
+                            <audio key={keyPrefix} className='w-full' controls autoPlay={isAutoPlay} >
                                 <source src={r.content} type="audio/mpeg" />
                                 Your browser does not support the audio element.
                             </audio>
@@ -437,8 +437,8 @@ function TranscriptAndExplain({ transcript, explanation }: { transcript: string,
     )
 }
 
-function AssignmentAnswerToHTML(question: AssignmentQuestion, assignmentQuestionNum:number,userAnswer: string, updateUserAnswerSheet: (qID: QuestionID, answer: string) => void) {
-    const answerTexts: string[] =question.answers;
+function AssignmentAnswerToHTML(question: AssignmentQuestion, assignmentQuestionNum: number, userAnswer: string, updateUserAnswerSheet: (qID: QuestionID, answer: string) => void) {
+    const answerTexts: string[] = question.answers;
     return (
         <div key={"panswer" + assignmentQuestionNum} className={"flex flex-column gap-3"}>
             {question.answers.map((answer, index) => {
@@ -663,10 +663,20 @@ const QuestionHeader: React.FC<{ question: QuestionAnswerRecord, setReloadToolba
     const [, setReload] = React.useState(false);
 
     return (
-        <div>
-            <h5 key={`h5-${questionNum}`}>{questionNum}. {content}</h5>
-            <Button className={`p-0 m-0 ml-1 ${flag ? "text-red-500" : "text-gray-500"}`} icon="pi pi-flag-fill" text
-                onClick={() => { question.flag = !flag; setReload(pre => pre = !pre); setReloadToolbar(pre => pre = !pre) }} />
+        <div className="flex align-items-center">
+            <Button
+                className={`p-0 m-0 ml-1 ${flag ? "text-red-500" : "text-gray-500"}`}
+                icon="pi pi-flag-fill"
+                text
+                onClick={() => {
+                    question.flag = !flag;
+                    setReload(pre => !pre);
+                    setReloadToolbar(pre => !pre);
+                }}
+            />
+            <h5 key={`h5-${questionNum}`} className="m-0 ml-2">
+                {questionNum}. {content}
+            </h5>
         </div>
     )
 }
@@ -700,10 +710,10 @@ const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: Ques
                 {question.answers.map((thisAnswer, index) => {
                     return (
                         // Tạo radio button cho mỗi đáp án
-                        <div key={"answerbox" + index} className={"flex align-items-center py-3 "}>
+                        <div key={"answerbox" + index} className={"flex align-items-center  "}>
                             <input
                                 key={index + "radio" + currentQuestionNumber}
-                                style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', top: '6px' }} // Tùy chỉnh kiểu radio button
+                                style={{ accentColor: '#00BFFF', width: '24px', height: '24px', position: 'relative', }} // Tùy chỉnh kiểu radio button
                                 type="radio"                          // Loại input là radio
                                 id={"id" + currentQuestionNumber + index} // ID duy nhất cho mỗi radio
                                 name={`answer-${currentQuestionNumber}`}   // Name chung cho các radio cùng câu hỏi

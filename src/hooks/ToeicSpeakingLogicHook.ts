@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { fetchToeicSpeakingPrompts } from "../api/api";
 import { ToeicSpeakingPartAction } from "../utils/types/action";
 import { initialToeicSpeakingState } from "../utils/types/emptyValue";
-import { FetchTaskContentFailurePayload, FetchTaskContentRequestPayload, FetchTaskContentSuccessPayload, SaveResponsePayload, ToeicSpeakingLoadedTask, ToeicSpeakingPartActionType, ToeicSpeakingPartState, ToeicSpeakingPracticeView, ToeicSpeakingPromptTask, ToeicSpeakingUserResponse, UseToeicSpeakingReturn } from "../utils/types/type";
+import { FetchTaskContentFailurePayload, FetchTaskContentRequestPayload, FetchTaskContentSuccessPayload, SaveResponsePayload, ToeicSpeakingLoadedTask, ToeicSpeakingPartActionType, ToeicSpeakingPartState, ToeicSpeakingPracticeView, ToeicSpeakingPromptTask, ToeicSpeakingTaskType, ToeicSpeakingUserResponse, UseToeicSpeakingReturn } from "../utils/types/type";
 
 function toeicSpeakingPartReducer(
   state: ToeicSpeakingPartState,
@@ -39,11 +39,15 @@ function toeicSpeakingPartReducer(
       };
     case ToeicSpeakingPartActionType.START_SIMULATION:
       if (state.tasks.length === 0) {
-        return {
-          ...state,
-          overallError: "Không thể bắt đầu: Không có bài tập nào.",
-        };
+        return { ...state, overallError: "Không thể bắt đầu: Không có bài tập nào." };
       }
+      const firstTask = state.tasks[0];
+      let initialViewForFirstTask = ToeicSpeakingPracticeView.LOADING_TASK_CONTENT;
+
+      if (firstTask && (firstTask.type !== ToeicSpeakingTaskType.DESCRIBE_PICTURE || firstTask.imageUrl)) {
+        initialViewForFirstTask = ToeicSpeakingPracticeView.PREPARATION;
+      }
+
       return {
         ...state,
         isTestInProgress: true,
@@ -51,10 +55,7 @@ function toeicSpeakingPartReducer(
         currentSubQuestionIndex: undefined,
         userResponses: [],
         overallError: undefined,
-        // Logic to determine the next view (e.g., LOADING_TASK_CONTENT or PREPARATION)
-        // will be handled by a dedicated action or within the component that renders the task
-        // For now, let's assume the first task might need preparation.
-        currentView: ToeicSpeakingPracticeView.LOADING_TASK_CONTENT, // Placeholder, this will be refined
+        currentView: initialViewForFirstTask, // Use determined view
       };
     case ToeicSpeakingPartActionType.PROCEED_TO_PREPARATION:
       return {

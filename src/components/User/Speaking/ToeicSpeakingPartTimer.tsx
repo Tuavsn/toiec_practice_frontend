@@ -62,7 +62,7 @@ const ToeicSpeakingPartTimer: React.FC<ToeicSpeakingPartTimerProps> = ({
                 clearInterval(intervalRef.current);
             }
         };
-    }, [durationSeconds, onTimerEnd]); // onTimerEnd should be stable if memoized by parent
+    }, [ onTimerEnd]); // onTimerEnd should be stable if memoized by parent
 
     // Effect to manage 'hasExceededStandardTime' state
     useEffect(() => {
