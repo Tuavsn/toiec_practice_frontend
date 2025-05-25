@@ -44,6 +44,7 @@ interface RenderTestProps {
     doTestDataRef: React.MutableRefObject<TestSheet>
     changePageOffset: (offset: number) => void
     moveToPage: (pageIndex: number) => void
+    autoSaveDraftTest: () => void
 }
 
 type RichEditorProps = {
@@ -244,7 +245,8 @@ interface FullTestAreaProps {
     thisQuestion: QuestionAnswerRecord
     setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>
     changePageOffset: (offset: number) => void,
-    doTestDataRef: React.MutableRefObject<TestSheet>
+    doTestDataRef: React.MutableRefObject<TestSheet>,
+    autoSaveDraftTest: () => void
 }
 interface SkillInsightsProps {
     parts: TopicStat[]
@@ -501,6 +503,16 @@ interface ToeicSpeakingPartAudioRecorderProps {
    */
   isRecordingActivePhase: boolean;
 }
+
+interface RadioButtonGroupProps {
+    currentQuestionNumber: number,
+    question: QuestionAnswerRecord,
+    answerTexts: string[],
+    setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>,
+    doTestDataRef: React.MutableRefObject<TestSheet>
+    autoSaveDraftTest: () => void,
+}
+
 export type {
     ActivityLogProps, AdminCategoryTableProps, AdminGenericTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AnswerFormProps, AssignmentQuestionTableProps, ButtonListProps,
     ConfirmSubmitDialogProps, DialogAssignmentQuestionActionProps, DialogDeleteLectureBodyProps,
@@ -512,9 +524,8 @@ export type {
     DialogUserRowProps, DoExercisePageProps,
     DoTestPageProps, EmailGradeDisplayProps, EmailPromptDisplayProps, EmailResponseFormProps, EssayEditorFormProps, EssayGradeDisplayProps, EssayQuestionDisplayProps, FullTestAreaProps,
     FullTestScreenProps, GlassCardProps, GradeDisplayProps, ImageDisplayProps, LectureActionButtonProps, LectureReduceProps, PanelHeaderProps, PartDetailSectionProps, PromptDisplayProps, QuestionActionButtonProps,
-    QuestionTableProps, RenderPressStartButtonProps,
-    RenderTestProps,
-    RennderTutorialProps,
+    QuestionTableProps, RadioButtonGroupProps, RenderPressStartButtonProps,
+    RenderTestProps, RennderTutorialProps,
     ResourceSectionProps,
     ResultTableProps,
     RichEditorProps,

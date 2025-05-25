@@ -1,10 +1,10 @@
 import { CheckboxChangeEvent } from "primereact/checkbox";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { callGetTestDetailPageData } from "../api/api";
+import { callGetIsDraftTestExist, callGetTestDetailPageData } from "../api/api";
 import { addQuestionListByPartIndex } from "../database/indexdb";
 import { emptyTestDetailPageData } from "../utils/types/emptyValue";
-import { TestDetailPageData, TestDocument, TestID, WorkerResponse } from "../utils/types/type";
+import { TestDetailPageData, TestDocument, TestID, TestPaperWorkerRequest, WorkerResponse } from "../utils/types/type";
 
 
 export const useCheckBox = () => {
@@ -55,7 +55,7 @@ export function useTestDetail() {
 function loadTestPaper(testId: TestID, setIsDoneLoading: Dispatch<SetStateAction<boolean>>) {
     const worker = new Worker(new URL('../workers/getTestPaper.worker.ts', import.meta.url), { type: 'module' });
     // Send a message to the worker
-    worker.postMessage({ testId, parts: "0" });
+    worker.postMessage({ testId, parts: "0" } as TestPaperWorkerRequest);
 
     // xử lý worker responses
     worker.onmessage = async (event: MessageEvent<WorkerResponse<TestDocument>>) => {
@@ -78,16 +78,25 @@ function loadTestPaper(testId: TestID, setIsDoneLoading: Dispatch<SetStateAction
     };
 }
 
-export const useTimeLimitChooser = (limitTime: number, testId: TestID) => {
+export const useTimeLimitChooser = (limitTime: number, testId: TestID, parts: boolean[]) => {
     const [timeLimit, setTimeLimit] = useState<number>(limitTime);
     const [isButtonClicked, setIsButtonClicked] = useState<boolean>(false);
     const [isDoneLoading, setIsDoneLoading] = useState<boolean>(false);
+    const [isDraftExist, setIsDraftExist] = useState<boolean>(false);
     useEffect(() => setTimeLimit(limitTime), [limitTime]);
-    useEffect(() => loadTestPaper(testId, setIsDoneLoading), [testId])
+    useEffect(() => {
+        loadTestPaper(testId, setIsDoneLoading)
+        callGetIsDraftTestExist(testId, parts[0] === true ? "fulltest" : "practice").then(isDraftExist => {
+            console.log(`Draft test existence for ${testId}:`, isDraftExist);
+
+            setIsDraftExist(isDraftExist !== "none");
+        })
+    }, [testId])
     return {
         setIsButtonClicked,
         isButtonClicked,
         isDoneLoading,
+        isDraftExist,
         setTimeLimit,
         timeLimit,
     }

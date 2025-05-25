@@ -1,6 +1,7 @@
 import { DataTableValue } from "primereact/datatable";
 import { Dispatch, SetStateAction } from "react";
 import { NavigateFunction } from "react-router-dom";
+import { FullTestScreenState } from "./state";
 
 export interface ChatMessage {
   sender: "user" | "bot";
@@ -1731,6 +1732,11 @@ export interface GetAiFeedbackFailurePayload {
   error: string;
 }
 
+export type TestDraft = {
+    draftTestScreenState: FullTestScreenState
+    draftTestData: TestSheet
+}
+
 export type EssayQuestionPayload = { id: string; essayQuestion: string; directions: string; generatedAt: number; part: 3 }
 //---------------------------- tên gọi khác
 export type TestAnswerSheet = Map<QuestionNumber, AnswerData>;
@@ -1740,6 +1746,7 @@ export type UserID = string;
 export type QuestionNumber = number;
 export type milisecond = number;
 export type TestID = string;
+export type DraftLocation = "indexDB" | "server" | "none"; 
 type RoleID = string;
 export type PermissionID = string;
 export type LectureID = string;
@@ -1821,3 +1828,7 @@ export interface PexelsSearchResponse { // Making this exportable
 }
 
 
+export interface TestPaperWorkerRequest {
+  testId: TestID;
+  parts: string;
+}

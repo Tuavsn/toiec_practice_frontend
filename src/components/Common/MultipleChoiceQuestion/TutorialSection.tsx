@@ -13,7 +13,7 @@ const RennderTutorial: React.FC<RennderTutorialProps> = React.memo(
             case 1:
                 tutorialSection = <div data-testid="tutorial-section" className="py-5 text-center " key="image-div">
                     <audio src="https://tuine09.blob.core.windows.net/resources/DIRECTION-PART-1.mp3" hidden autoPlay onEnded={setTutorialIsDone} />
-                    <Image key="image"  src="https://tuine09.blob.core.windows.net/resources/image_2024-12-03_105043723.png" />
+                    <Image key="image"  src="https://tuine09.blob.core.windows.net/resources/DIRECTION-PART-1%20(1).png" />
                 </div>;
                 break;
             case 2: tutorialSection = <div data-testid="tutorial-section" className="py-5 text-center " key="image-div">

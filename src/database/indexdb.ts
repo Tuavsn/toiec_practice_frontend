@@ -1,11 +1,14 @@
-import { DBSchema, openDB } from 'idb';
-import { Part2EmailContext, QuestionListByPart, TestDocument, WritingSheetData, WritingToeicPart2SheetData, WritingToeicPart3SheetData } from '../utils/types/type';
+import { DBSchema, IDBPDatabase, openDB } from 'idb';
+import { Part2EmailContext, QuestionListByPart, TestDocument, TestDraft, TestID, WritingSheetData, WritingToeicPart2SheetData, WritingToeicPart3SheetData } from '../utils/types/type';
 
-const DB_NAME = 'TOEICWritingAppDB';
-const DB_VERSION = 3;
-const STORE_NAME_PART1 = 'sheets_part1';
-const STORE_NAME_PART2 = 'sheets_part2';
-const STORE_NAME_PART3 = 'sheets_part3';
+const DB_PRACTICE_NAME = 'TOEICWritingAppDB' as const;
+const DB_PRACTICE_VERSION = 3 as const;
+const STORE_PRACTICE_NAME_PART1 = 'sheets_part1' as const;
+const STORE_PRACTICE_NAME_PART2 = 'sheets_part2' as const;
+const STORE_PRACTICE_NAME_PART3 = 'sheets_part3' as const;
+
+const DB_TEST_PAPER_NAME = 'TestDatabase' as const;
+const DB_TEST_PAPER_VERSION = 2 as const;
 // Định nghĩa schema của IndexedDB
 interface TestDB extends DBSchema {
 
@@ -13,15 +16,29 @@ interface TestDB extends DBSchema {
         key: number; // Key là chỉ số (index) của phần (partNum)
         value: QuestionListByPart; // Giá trị là dữ liệu của questionList
     };
+    meta: {
+        key: string;
+        value: string;
+    };
 }
 
 // Hàm khởi tạo cơ sở dữ liệu
-const initTestDB = async () => {
-    return openDB<TestDB>('TestDatabase', DB_VERSION, {
-        upgrade(db) {
-            // Tạo object store cho questionListByPart nếu chưa tồn tại
-            if (!db.objectStoreNames.contains('questionListByPart')) {
-                db.createObjectStore('questionListByPart', { autoIncrement: true }); // Sử dụng autoIncrement
+export const initTestDB = async (): Promise<IDBPDatabase<TestDB>> => {
+    return openDB<TestDB>(DB_TEST_PAPER_NAME, DB_TEST_PAPER_VERSION, {
+        upgrade(db, oldVersion) {
+            //------------------------------------------------------
+            // Nếu phiên bản cũ < 1: tạo questionListByPart
+            //------------------------------------------------------
+            if (oldVersion < 1) {
+                db.createObjectStore('questionListByPart', { autoIncrement: true });
+            }
+            //------------------------------------------------------
+            // Nếu phiên bản cũ < 2: tạo meta store
+            //------------------------------------------------------
+            if (oldVersion < 2) {
+                const metaStore = db.createObjectStore('meta');
+                const now = new Date().toISOString();
+                metaStore.put(now, 'createdAt');
             }
         },
     });
@@ -29,32 +46,47 @@ const initTestDB = async () => {
 
 
 
-// Hàm thêm dữ liệu vào questionListByPart
-export const addQuestionListByPartIndex = async (data: TestDocument) => {
-    const db = await initTestDB(); // Mở database
-    const tx = db.transaction('questionListByPart', 'readwrite'); // Tạo transaction cho questionListByPart
-    const store = tx.objectStore('questionListByPart');
-
-    // Thêm từng phần tử vào store, sử dụng index làm key
-    await Promise.all(data.map((item, i) => store.put(item, i)));
-
-    await tx.done; // Kết thúc transaction
-    console.log('Dữ liệu questionListByPart đã được thêm thành công');
+/**
+ * Đọc ngày tạo database
+ */
+export const getDbCreationDate = async (): Promise<Date> => {
+    const db = await initTestDB();
+    const iso = await db.get('meta', 'createdAt');
+    if (!iso) {
+        throw new Error('Không tìm thấy ngày tạo trong meta store');
+    }
+    return new Date(iso);
 };
 
-// Hàm truy vấn dữ liệu theo partNum
-export const queryByPartIndex = async (partNum: number): Promise<QuestionListByPart> => {
-    const db = await initTestDB(); // Mở database
-    // Lấy dữ liệu từ questionListByPart
-    const questions = await db.get('questionListByPart', partNum);
-
-    // Kiểm tra nếu không có dữ liệu
-    if (!questions) {
-        console.error(`Không tìm thấy dữ liệu cho partNum: ${partNum}`);
-        throw new Error(`Không tìm thấy dữ liệu cho partNum: ${partNum}`);
+export const addQuestionListByPartIndex = async (data: TestDocument): Promise<void> => {
+    //------------------------------------------------------
+    // Guard clause: nếu array rỗng thì thôi
+    //------------------------------------------------------
+    if (!data.length) {
+        console.warn('No items to add');
+        return;
     }
 
-    return questions // Trả về kết quả
+    const db = await initTestDB();
+    const tx = db.transaction('questionListByPart', 'readwrite');
+    const store = tx.objectStore('questionListByPart');
+
+    await Promise.all(data.map((item, i) => store.put(item, i)));
+    await tx.done;
+    console.log('Added questionListByPart successfully');
+};
+
+export const queryByPartIndex = async (partNum: number): Promise<QuestionListByPart> => {
+    if (partNum < 0) {
+        throw new Error('partNum phải >= 0');
+    }
+
+    const db = await initTestDB();
+    const result = await db.get('questionListByPart', partNum);
+    if (!result) {
+        throw new Error(`Không tìm thấy dữ liệu cho partNum: ${partNum}`);
+    }
+    return result;
 };
 
 let dbPromise: Promise<IDBDatabase> | null = null;
@@ -71,7 +103,7 @@ function getDb(): Promise<IDBDatabase> {
     }
 
     dbPromise = new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        const request = indexedDB.open(DB_PRACTICE_NAME, DB_PRACTICE_VERSION);
 
         request.onerror = (event) => {
             console.error("Lỗi mở IndexedDB:", event);
@@ -90,35 +122,35 @@ function getDb(): Promise<IDBDatabase> {
             const transaction = (event.target as IDBOpenDBRequest).transaction; // Lấy transaction từ event
 
             const oldVersion = event.oldVersion;
-            if (oldVersion < 1 && !db.objectStoreNames.contains(STORE_NAME_PART1)) {
-                const store = db.createObjectStore(STORE_NAME_PART1, { keyPath: 'id', autoIncrement: true });
+            if (oldVersion < 1 && !db.objectStoreNames.contains(STORE_PRACTICE_NAME_PART1)) {
+                const store = db.createObjectStore(STORE_PRACTICE_NAME_PART1, { keyPath: 'id', autoIncrement: true });
                 // Index for sorting/querying by creation timestamp
                 store.createIndex('createdAt_idx', 'createdAt', { unique: false });
                 // Index for status if we need to query by it often (optional for now)
                 // store.createIndex('status_idx', 'status', { unique: false });
-                console.log(`Object store "${STORE_NAME_PART1}" đã được tạo.`);
+                console.log(`Object store "${STORE_PRACTICE_NAME_PART1}" đã được tạo.`);
             }
             // Tạo store MỚI cho Part 2 nếu chưa có (từ version < 2)
-            if (oldVersion < 2 && !db.objectStoreNames.contains(STORE_NAME_PART2)) {
-                const storeP2 = db.createObjectStore(STORE_NAME_PART2, { keyPath: 'id', autoIncrement: true });
+            if (oldVersion < 2 && !db.objectStoreNames.contains(STORE_PRACTICE_NAME_PART2)) {
+                const storeP2 = db.createObjectStore(STORE_PRACTICE_NAME_PART2, { keyPath: 'id', autoIncrement: true });
                 // Index để sắp xếp/truy vấn theo thời gian tạo
                 storeP2.createIndex('createdAt_idx_p2', 'createdAt', { unique: false });
                 // Index cho status nếu cần truy vấn thường xuyên (tùy chọn)
                 // storeP2.createIndex('status_idx_p2', 'status', { unique: false });
-                console.log(`Object store "${STORE_NAME_PART2}" đã được tạo.`);
+                console.log(`Object store "${STORE_PRACTICE_NAME_PART2}" đã được tạo.`);
             }
-            if (event.oldVersion < 3 && !db.objectStoreNames.contains(STORE_NAME_PART3)) {
-                const storeP3 = db.createObjectStore(STORE_NAME_PART3, { keyPath: 'id', autoIncrement: true });
+            if (event.oldVersion < 3 && !db.objectStoreNames.contains(STORE_PRACTICE_NAME_PART3)) {
+                const storeP3 = db.createObjectStore(STORE_PRACTICE_NAME_PART3, { keyPath: 'id', autoIncrement: true });
                 // Index để sắp xếp/truy vấn theo thời gian tạo
                 storeP3.createIndex('createdAt_idx_p3', 'createdAt', { unique: false });
                 // Index cho status nếu cần truy vấn thường xuyên (tùy chọn)
                 // storeP3.createIndex('status_idx_p3', 'status', { unique: false });
-                console.log(`Object store "${STORE_NAME_PART3}" đã được tạo.`);
+                console.log(`Object store "${STORE_PRACTICE_NAME_PART3}" đã được tạo.`);
             }
             // Xử lý các nâng cấp version khác ở đây nếu có trong tương lai
             if (transaction) {
                 transaction.oncomplete = () => {
-                    console.log(`Giao dịch nâng cấp DB version ${DB_VERSION} hoàn tất.`);
+                    console.log(`Giao dịch nâng cấp DB version ${DB_PRACTICE_VERSION} hoàn tất.`);
                 };
             }
         };
@@ -139,8 +171,8 @@ async function performPart1DbOperation<T>(
 ): Promise<T> {
     const db = await getDb();
     return new Promise<T>((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME_PART1, mode);
-        const store = transaction.objectStore(STORE_NAME_PART1);
+        const transaction = db.transaction(STORE_PRACTICE_NAME_PART1, mode);
+        const store = transaction.objectStore(STORE_PRACTICE_NAME_PART1);
         const request = operation(store);
 
         request.onsuccess = () => resolve(request.result);
@@ -234,8 +266,8 @@ export async function getPart1SheetsCountFromDB(): Promise<number> {
 export async function getLatestPart1SheetByTimestampFromDB(): Promise<WritingSheetData | undefined> {
     const db = await getDb();
     return new Promise<WritingSheetData | undefined>((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME_PART1, 'readonly');
-        const store = transaction.objectStore(STORE_NAME_PART1);
+        const transaction = db.transaction(STORE_PRACTICE_NAME_PART1, 'readonly');
+        const store = transaction.objectStore(STORE_PRACTICE_NAME_PART1);
         const index = store.index('createdAt_idx'); // Use the index
 
         // Open a cursor to get the last record (highest timestamp)
@@ -266,8 +298,8 @@ export async function getLatestPart1SheetByTimestampFromDB(): Promise<WritingShe
 export async function getLatestPart1SheetByIdFromDB(): Promise<WritingSheetData | undefined> {
     const db = await getDb();
     return new Promise<WritingSheetData | undefined>((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME_PART1, 'readonly');
-        const store = transaction.objectStore(STORE_NAME_PART1);
+        const transaction = db.transaction(STORE_PRACTICE_NAME_PART1, 'readonly');
+        const store = transaction.objectStore(STORE_PRACTICE_NAME_PART1);
 
         // Open a cursor on the main store (keyPath 'id') in 'prev' direction to get the last item.
         const cursorRequest = store.openCursor(null, 'prev');
@@ -309,8 +341,8 @@ async function performPart2DbOperation<T>(
             reject(new Error("Kết nối cơ sở dữ liệu không thành công."));
             return;
         }
-        const transaction = db.transaction(STORE_NAME_PART2, mode);
-        const store = transaction.objectStore(STORE_NAME_PART2);
+        const transaction = db.transaction(STORE_PRACTICE_NAME_PART2, mode);
+        const store = transaction.objectStore(STORE_PRACTICE_NAME_PART2);
         const request = operation(store) as IDBRequest<T>; // Cast sang IDBRequest<T>
 
         request.onsuccess = () => resolve(request.result);
@@ -394,8 +426,8 @@ export async function getPart2SheetsCount(): Promise<number> {
 export async function getLatestPart2SheetByTimestamp(): Promise<WritingToeicPart2SheetData | undefined> {
     const db = await getDb();
     return new Promise<WritingToeicPart2SheetData | undefined>((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME_PART2, 'readonly');
-        const store = transaction.objectStore(STORE_NAME_PART2);
+        const transaction = db.transaction(STORE_PRACTICE_NAME_PART2, 'readonly');
+        const store = transaction.objectStore(STORE_PRACTICE_NAME_PART2);
         const index = store.index('createdAt_idx_p2'); // Sử dụng index đã tạo cho Part 2
 
         const cursorRequest = index.openCursor(null, 'prev'); // 'prev' để lấy theo thứ tự giảm dần (mới nhất trước)
@@ -421,8 +453,8 @@ export async function getLatestPart2SheetByTimestamp(): Promise<WritingToeicPart
 export async function getLatestPart2SheetById(): Promise<WritingToeicPart2SheetData | undefined> {
     const db = await getDb();
     return new Promise<WritingToeicPart2SheetData | undefined>((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME_PART2, 'readonly');
-        const store = transaction.objectStore(STORE_NAME_PART2);
+        const transaction = db.transaction(STORE_PRACTICE_NAME_PART2, 'readonly');
+        const store = transaction.objectStore(STORE_PRACTICE_NAME_PART2);
         const cursorRequest = store.openCursor(null, 'prev'); // 'prev' trên keyPath mặc định (id)
 
         cursorRequest.onsuccess = (event) => {
@@ -457,8 +489,8 @@ export async function getAllPart2Sheets(): Promise<WritingToeicPart2SheetData[]>
 export async function getLastestPart2TopicFromDB(limit: number = 10): Promise<Part2EmailContext[] | undefined> {
     const db = await getDb(); // Đảm bảo getDb() trả về Promise<IDBDatabase>
     return new Promise<Part2EmailContext[]>((resolve, reject) => { // Không trả về undefined ở đây nữa, luôn là mảng
-        const transaction = db.transaction(STORE_NAME_PART2, "readonly");
-        const store = transaction.objectStore(STORE_NAME_PART2);
+        const transaction = db.transaction(STORE_PRACTICE_NAME_PART2, "readonly");
+        const store = transaction.objectStore(STORE_PRACTICE_NAME_PART2);
         const index = store.index("createdAt_idx_p2"); // Đảm bảo index này tồn tại
 
         const part2EmailContextList: Part2EmailContext[] = [];
@@ -535,8 +567,8 @@ async function performPart3DbOperation<T>(
             reject(new Error("Kết nối cơ sở dữ liệu không thành công cho Part 3."));
             return;
         }
-        const transaction = db.transaction(STORE_NAME_PART3, mode);
-        const store = transaction.objectStore(STORE_NAME_PART3);
+        const transaction = db.transaction(STORE_PRACTICE_NAME_PART3, mode);
+        const store = transaction.objectStore(STORE_PRACTICE_NAME_PART3);
         const request = operation(store) as IDBRequest<T>;
 
         request.onsuccess = () => resolve(request.result);
@@ -619,8 +651,8 @@ export async function getPart3SheetsCount(): Promise<number> {
 export async function getLatestPart3SheetByTimestamp(): Promise<WritingToeicPart3SheetData | undefined> {
     const db = await getDb();
     return new Promise<WritingToeicPart3SheetData | undefined>((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME_PART3, 'readonly');
-        const store = transaction.objectStore(STORE_NAME_PART3);
+        const transaction = db.transaction(STORE_PRACTICE_NAME_PART3, 'readonly');
+        const store = transaction.objectStore(STORE_PRACTICE_NAME_PART3);
         const index = store.index('createdAt_idx_p3'); // Sử dụng index của Part 3
 
         const cursorRequest = index.openCursor(null, 'prev');
@@ -645,8 +677,8 @@ export async function getLatestPart3SheetByTimestamp(): Promise<WritingToeicPart
 export async function getLatestPart3SheetById(): Promise<WritingToeicPart3SheetData | undefined> {
     const db = await getDb();
     return new Promise<WritingToeicPart3SheetData | undefined>((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME_PART3, 'readonly');
-        const store = transaction.objectStore(STORE_NAME_PART3);
+        const transaction = db.transaction(STORE_PRACTICE_NAME_PART3, 'readonly');
+        const store = transaction.objectStore(STORE_PRACTICE_NAME_PART3);
         const cursorRequest = store.openCursor(null, 'prev');
 
         cursorRequest.onsuccess = (event) => {
@@ -674,8 +706,8 @@ export async function getAllPart3Sheets(): Promise<WritingToeicPart3SheetData[]>
 export async function getSomeHistoryTopicsForPart3(limit: number = 10): Promise<string[] | undefined> {
     const db = await getDb(); // Đảm bảo getDb() trả về Promise<IDBDatabase>
     return new Promise<string[]>((resolve, reject) => { // Không trả về undefined ở đây nữa, luôn là mảng
-        const transaction = db.transaction(STORE_NAME_PART3, "readonly");
-        const store = transaction.objectStore(STORE_NAME_PART3);
+        const transaction = db.transaction(STORE_PRACTICE_NAME_PART3, "readonly");
+        const store = transaction.objectStore(STORE_PRACTICE_NAME_PART3);
         const index = store.index("createdAt_idx_p3"); // Đảm bảo index này tồn tại
 
         const part3TopicList: string[] = [];
@@ -729,4 +761,88 @@ export async function getSomeHistoryTopicsForPart3(limit: number = 10): Promise<
  */
 export async function initializeDB(): Promise<IDBDatabase> {
     return getDb();
+}
+
+
+
+//------------------------------------------------------
+// Define IndexedDB schema
+//------------------------------------------------------
+interface DraftDBSchema extends DBSchema {
+    drafts: {
+        key: TestID;
+        value: TestDraft;
+    };
+}
+
+let dbDraftPromise: Promise<IDBPDatabase<DraftDBSchema>>;
+//------------------------------------------------------
+// Initialize or get IndexedDB instance with named store
+//------------------------------------------------------
+function getDB() {
+    if (!dbDraftPromise) {
+        dbDraftPromise = openDB<DraftDBSchema>('TestDraftDB', 1, {
+            upgrade(db) {
+                if (!db.objectStoreNames.contains('drafts')) {
+                    db.createObjectStore('drafts', { keyPath: undefined });
+                }
+            },
+        });
+    }
+    return dbDraftPromise;
+}
+
+//------------------------------------------------------
+// Check if a draft exists for a given testID
+//------------------------------------------------------
+export async function checkDraftInIndexDB(testID: TestID): Promise<boolean> {
+    const db = await getDB();
+    const tx = db.transaction('drafts', 'readonly');
+    const store = tx.objectStore('drafts');
+    const record = await store.get(testID);
+    await tx.done;
+    return record !== undefined;
+}
+
+//------------------------------------------------------
+// Get existing draft or throw if none
+//------------------------------------------------------
+export async function getDraftFromIndexDB(testID: TestID): Promise<TestDraft> {
+    const db = await getDB();
+    const tx = db.transaction('drafts', 'readonly');
+    const store = tx.objectStore('drafts');
+    const record = await store.get(testID);
+    await tx.done;
+
+    // guard clause: nếu không tìm thấy draft
+    if (!record) {
+        throw new Error(`No draft found for testID: ${testID}`);
+    }
+
+    return record;
+}
+
+//------------------------------------------------------
+// Upsert (insert or update) draft into IndexedDB
+//------------------------------------------------------
+export async function upsertDraftToIndexDB(
+    testID: TestID,
+    draft: TestDraft,
+): Promise<void> {
+    const db = await getDB();
+    const tx = db.transaction('drafts', 'readwrite');
+    const store = tx.objectStore('drafts');
+    await store.put(draft, testID);
+    await tx.done;
+}
+
+//------------------------------------------------------
+// Delete draft from IndexedDB
+//------------------------------------------------------
+export async function deleteDraftFromIndexDB(testID: TestID): Promise<void> {
+  const db = await getDB();
+  const tx = db.transaction('drafts', 'readwrite');
+  const store = tx.objectStore('drafts');
+  await store.delete(testID);
+  await tx.done;
 }
