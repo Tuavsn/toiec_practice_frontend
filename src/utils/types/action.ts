@@ -1,5 +1,5 @@
 import { CommentActionType } from "../../hooks/_CommentSectionHook";
-import { ProfileHookState } from "./state";
+import { FullTestScreenState, ProfileHookState } from "./state";
 import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, EssayQuestionPayload, FetchTaskContentFailurePayload, FetchTaskContentRequestPayload, FetchTaskContentSuccessPayload, GetAiFeedbackFailurePayload, GetAiFeedbackRequestPayload, GetAiFeedbackSuccessPayload, GradedFeedback, LectureCard, LectureRow, LoadPromptsSuccessPayload, Meta, MultipleChoiceQuestion, Permission, PexelsPhoto, QuestionID, QuestionNumber, QuestionPage, Role, SaveResponsePayload, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, ToeicSpeakingPartActionType, Topic, UserComment, UserRow, WritingPart1Prompt, WritingSheetData, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart2SheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3SheetData } from "./type";
 
 type RenderTestActiion =
@@ -12,6 +12,7 @@ type FullTestScreenAction =
     | { type: "SET_CURRENT_PAGE_INDEX"; payload: number }
     | { type: "SET_CURRENT_PAGE_OFFSET"; payload: number }
     | { type: "SET_TUTORIALS_DONE"; payload: number }
+    | { type: "SET_STATE"; payload: FullTestScreenState }
 
 type RowHookAction<RowModel> =
     | { type: 'FETCH_ROWS_SUCCESS'; payload: [RowModel[], number] }

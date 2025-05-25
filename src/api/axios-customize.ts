@@ -1,6 +1,14 @@
 import axiosClient from "axios";
 
-
+/**
+ * Mở rộng interface để support trường `cachePolicy` trên mỗi request
+ */
+declare module "axios" {
+    export interface AxiosRequestConfig {
+        /** Ví dụ: 'no-cache' | 'max-age=3600' */
+        cachePolicy?: string;
+    }
+}
 
 /**
  * Creates an initial 'axios' instance with custom settings.
@@ -27,6 +35,17 @@ instance.interceptors.request.use(function (config) {
     if (!config.headers.Accept && config.headers["Content-Type"]) {
         config.headers.Accept = "application/json";
         config.headers["Content-Type"] = "application/json; charset=utf-8";
+    }
+
+    // ------------------------------------------------------
+    // 3. Thêm cache header nếu có `config.cachePolicy`
+    // ------------------------------------------------------
+    if (config.cachePolicy) {
+        config.headers["Cache-Control"] = config.cachePolicy;
+        // nếu muốn thêm pragma
+        if (config.cachePolicy === "no-cache") {
+            config.headers.Pragma = "no-cache";
+        }
     }
     return config;
 });

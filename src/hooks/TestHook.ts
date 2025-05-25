@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { callGetTestPaper, callPostTestRecord } from '../api/api';
+import { callGetIsDraftTestExist, callGetTestPaper, callPostTestRecord } from '../api/api';
 import { useTestState } from '../context/TestStateProvider';
-import { queryByPartIndex } from '../database/indexdb';
+import { deleteDraftFromIndexDB, getDraftFromIndexDB, queryByPartIndex, upsertDraftToIndexDB } from '../database/indexdb';
 import { MappingPageWithQuestionNum } from '../utils/helperFunction/convertToHTML';
 import prepareForTest from '../utils/helperFunction/prepareForTest';
 import SetWebPageTitle from '../utils/helperFunction/setTitlePage';
 import { FullTestScreenAction } from '../utils/types/action';
 import { emptyDoTestData } from '../utils/types/emptyValue';
 import { FullTestScreenState } from '../utils/types/state';
-import { AnswerRecord, milisecond, Question_PageIndex, QuestionAnswerRecord, QuestionNumber, ResultID, TestID, TestRecord, TestSheet, TestType } from '../utils/types/type';
+import { AnswerRecord, DraftLocation, milisecond, Question_PageIndex, QuestionAnswerRecord, QuestionNumber, ResultID, TestDraft, TestID, TestRecord, TestSheet, TestType } from '../utils/types/type';
 import { useMultipleQuestionX } from './MultipleQuestionHook';
 
 //------------------ Custom Hook: useTestPage ------------------//
@@ -137,6 +137,8 @@ function fullTestScreenReducer(
             return { ...state, currentPageIndex: action.payload };
         case "SET_CURRENT_PAGE_OFFSET":
             return { ...state, currentPageIndex: state.currentPageIndex + action.payload };
+        case "SET_STATE":
+            return { ...state, ...action.payload };
         default:
             return state;
     }
@@ -153,6 +155,7 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
     const thisQuestion: QuestionAnswerRecord = doTestDataRef.current.questionList[fullTestScreenState.currentPageIndex];
     const changePage = (offset: number) => {
         const newPageIndex = fullTestScreenState.currentPageIndex + offset;
+        console.log("Changing page to:", newPageIndex, "Current page index:", fullTestScreenState.currentPageIndex);
         if (newPageIndex >= 0 && newPageIndex < doTestDataRef.current.questionList.length) {
             CalculateTimeSpent(thisQuestion, doTestDataRef.current.timeCountStart);
             fullTestScreenDispatch({ type: "SET_CURRENT_PAGE_INDEX", payload: newPageIndex });
@@ -161,10 +164,13 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
     const moveToPage = (pageIndex: number) => {
         CalculateTimeSpent(thisQuestion, doTestDataRef.current.timeCountStart);
         fullTestScreenDispatch({ type: "SET_CURRENT_PAGE_INDEX", payload: pageIndex });
+        autoSaveDraftTest();
     }
     const onEndTest = async () => {
         setTestScreenState({ state: "SUBMITING", resultID: "" });
-        sendFinalResultToServer().then((resultId: ResultID) => setTestScreenState({ state: "NAVIGATE_TO_RESULT", resultID: resultId }));
+        const resultId: ResultID = await sendFinalResultToServer()
+        setTestScreenState({ state: "NAVIGATE_TO_RESULT", resultID: resultId });
+        await deleteDraftFromIndexDB(id);
     }
 
     // hàm gửi dữ liệu bài  làm kết thúc của người dùng về server
@@ -181,11 +187,44 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
         }
         return (await callPostTestRecord(resultBodyObject)).data.resultId;
     }
+
+    const autoSaveDraftTest = useCallback(() => {
+        console.log("Auto-saving draft test...", fullTestScreenState.currentPageIndex);
+
+        upsertDraftToIndexDB(id, {
+            draftTestData: doTestDataRef.current,
+            draftTestScreenState: fullTestScreenState
+        } as TestDraft);
+        //callSaveDreftTestToServer();
+    }, [fullTestScreenState, id])
+
     useEffect(() => {
-        GetQuestionFromIndexDB(parts).then((QnAList) => {
-            doTestDataRef.current = { ...QnAList, secondsLeft: Number(time) * 60, testType: testType };
+        if (fullTestScreenState.isLoading) return;
+        autoSaveDraftTest();
+    }, [fullTestScreenState.currentPageIndex, autoSaveDraftTest]);
+
+    useEffect(() => {
+        SetWebPageTitle("Làm bài thi");
+        callGetIsDraftTestExist(id).then(async (draftLocationExist: DraftLocation) => {
+            switch (draftLocationExist) {
+                case "server":
+                    break;
+                case "indexDB":
+                    const { draftTestScreenState, draftTestData } = await getDraftFromIndexDB(id);
+                    doTestDataRef.current = draftTestData;
+                    fullTestScreenDispatch({ type: "SET_STATE", payload: draftTestScreenState })
+                    break;
+                case "none":
+                    const QnAList = await GetQuestionFromIndexDB(parts);
+                    doTestDataRef.current = { ...QnAList, secondsLeft: Number(time) * 60, testType: testType };
+                    break;
+                default:
+                    console.error("Unknown draft location:", draftLocationExist);
+                    break;
+            }
             fullTestScreenDispatch({ type: "SET_LOADING", payload: false });
         });
+
 
     }, [])
     return {
@@ -196,8 +235,13 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
         changePage,
         moveToPage,
         onEndTest,
+        autoSaveDraftTest
     }
 }
+
+
+
+
 
 async function GetQuestionFromIndexDB(parts: string): Promise<TestSheet> {
     if (parts === "0") parts = "1234567";

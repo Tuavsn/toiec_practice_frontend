@@ -1,8 +1,10 @@
 import { Button } from "primereact/button";
 import { Checkbox, CheckboxChangeEvent } from "primereact/checkbox";
+import { confirmPopup, ConfirmPopup, ConfirmPopupProps } from "primereact/confirmpopup";
 import { InputNumber } from "primereact/inputnumber";
-import { memo } from "react";
+import { memo, MouseEvent } from "react";
 import { Navigate } from "react-router-dom";
+import { deleteDraftFromIndexDB } from "../../../database/indexdb";
 import { useCheckBox, useTimeLimitChooser } from "../../../hooks/TestDetailPaperHook";
 import { AmINotLoggedIn } from "../../../utils/helperFunction/AuthCheck";
 import { TestID } from "../../../utils/types/type";
@@ -43,8 +45,45 @@ interface TimeLimitChooserProps {
 }
 
 const TimeLimitChooser: React.FC<TimeLimitChooserProps> = ({ limitTime, parts, testId, isNotLogIn }) => {
-    const { setTimeLimit, timeLimit, isButtonClicked, isDoneLoading, setIsButtonClicked } = useTimeLimitChooser(limitTime, testId);
-    const isButtonDisabled = isButtonClicked && !isDoneLoading
+    const {
+        setIsButtonClicked,
+        isButtonClicked,
+        isDoneLoading,
+        setTimeLimit,
+        isDraftExist,
+        timeLimit,
+    } = useTimeLimitChooser(limitTime, testId);
+
+    const isButtonDisabled = isButtonClicked && !isDoneLoading;
+    const isNavigateToDoTestPage = isButtonClicked && isDoneLoading;
+
+    const accept = () => {
+        setIsButtonClicked(true)
+    }
+    const reject = () => {
+        deleteDraftFromIndexDB(testId).then(
+            () => setIsButtonClicked(true)
+        )
+
+
+    }
+
+    const confirm = (event: MouseEvent<HTMLButtonElement>) => {
+        if (!isDraftExist) {
+            setIsButtonClicked(true);
+            return;
+        }
+        confirmPopup({
+            target: event.currentTarget,
+            message: 'Chúng tôi nhận thấy bạn có một bài thi chưa hoàn thành. Bạn có muốn tiếp tục làm bài thi này không?',
+            icon: 'pi pi-exclamation-triangle',
+            defaultFocus: 'accept',
+            accept,
+            reject,
+            acceptLabel: 'Tiếp tục làm bài',
+            rejectLabel: 'Bỏ qua',
+        } as ConfirmPopupProps)
+    }
     return (
         <div className="flex p-5 justify-content-center gap-2">
             <InputNumber
@@ -54,8 +93,14 @@ const TimeLimitChooser: React.FC<TimeLimitChooserProps> = ({ limitTime, parts, t
                 max={limitTime}/*     */ value={parts[0] ? limitTime : timeLimit}
                 disabled={parts[0]}/* */ onValueChange={(e) => setTimeLimit(e.value ?? limitTime)}
             />
-            <Button disabled={isNotLogIn || isButtonDisabled} loading={isButtonDisabled} label="Làm bài" data-testid="start-button" onClick={() => setIsButtonClicked(true)} />
-            {isButtonClicked && isDoneLoading && <Navigate to={`dotest/${timeLimit}/${DecodeCheckBoxesToUrl(parts)}`}></Navigate>}
+            <Button disabled={isNotLogIn || isButtonDisabled}
+                loading={isButtonDisabled}
+                label="Làm bài"
+                data-testid="start-button"
+                onClick={confirm}
+            />
+            {isNavigateToDoTestPage && <Navigate to={`dotest/${timeLimit}/${DecodeCheckBoxesToUrl(parts)}`}></Navigate>}
+            <ConfirmPopup />
         </div>
     )
 }

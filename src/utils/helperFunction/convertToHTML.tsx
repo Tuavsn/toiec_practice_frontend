@@ -7,6 +7,7 @@ import { Image } from 'primereact/image';
 import { ScrollPanel } from "primereact/scrollpanel";
 import React from "react";
 import ChatWindow from "../../components/User/ChatWindow/ChatWindow";
+import { RadioButtonGroupProps } from "../types/props";
 import { AssignmentQuestion, MultipleChoiceQuestion, PracticeAnswerSheet, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, QuestionRow, Resource, SelectedQuestionDialogTestOverallPage, SingleUserAnswerOverview, TestAnswerSheet, TestReviewAnswerSheet, TestSheet, TestType, UserAnswerRecord } from "../types/type";
 export function MappingPageWithQuestionNum(questionList: MultipleChoiceQuestion[]): QuestionPage[] {
     let pageNum = 0;
@@ -612,6 +613,7 @@ export function ConvertThisFullTestQuestionToHTML(
     changePage: (offset: number) => void,
     setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>,
     doTestDataRef: React.MutableRefObject<TestSheet>,
+    autoSaveDraftTest: () => void
 ): [JSX.Element[], JSX.Element[]] {
     const { resources, subQuestions, content, questionId, questionNum } = question;
 
@@ -645,13 +647,13 @@ export function ConvertThisFullTestQuestionToHTML(
             resoursesElement.push(...buildResources(resources, questionId));
 
             // Thêm phần tử HTML của câu hỏi con
-            questionsElement.push(BuildFullTestQuestionHTML(subq, setReloadToolbar, doTestDataRef));
+            questionsElement.push(BuildFullTestQuestionHTML(subq, setReloadToolbar, doTestDataRef,autoSaveDraftTest));
         });
     } else {
         // Nếu không có câu hỏi con, thêm câu hỏi chính
         questionsElement.push(<QuestionHeader key={`h5-${questionNum}`} question={question} setReloadToolbar={setReloadToolbar} />);
         // Thêm phần tử HTML của câu hỏi chính
-        questionsElement.push(BuildFullTestQuestionHTML(question, setReloadToolbar, doTestDataRef));
+        questionsElement.push(BuildFullTestQuestionHTML(question, setReloadToolbar, doTestDataRef,autoSaveDraftTest));
     }
 
     // Trả về hai mảng JSX: tài nguyên và câu hỏi
@@ -685,7 +687,8 @@ const QuestionHeader: React.FC<{ question: QuestionAnswerRecord, setReloadToolba
 function BuildFullTestQuestionHTML(
     question: QuestionAnswerRecord,             // Đối tượng câu hỏi trắc nghiệm
     setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>,
-    doTestDataRef: React.MutableRefObject<TestSheet>
+    doTestDataRef: React.MutableRefObject<TestSheet>,
+    autoSaveDraftTest: () => void
 ): JSX.Element {
 
     // Lấy số câu hỏi hiện tại
@@ -697,13 +700,20 @@ function BuildFullTestQuestionHTML(
     // Trả về phần tử HTML cho câu hỏi
     return (
         <div key={"answer" + currentQuestionNumber} className={"flex flex-column gap-3 my-3"}>
-            <RadioButtonGroup currentQuestionNumber={currentQuestionNumber} question={question} answerTexts={answerTexts} setReloadToolbar={setReloadToolbar} doTestDataRef={doTestDataRef} />
+            <RadioButtonGroup 
+            currentQuestionNumber={currentQuestionNumber} 
+            question={question} answerTexts={answerTexts} 
+            setReloadToolbar={setReloadToolbar}
+             doTestDataRef={doTestDataRef} 
+             autoSaveDraftTest={autoSaveDraftTest}
+             />
+
         </div>
     )
 }
 
-const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: QuestionAnswerRecord, answerTexts: string[], setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>, doTestDataRef: React.MutableRefObject<TestSheet> }> =
-    ({ currentQuestionNumber, answerTexts, question, setReloadToolbar, doTestDataRef }) => {
+const RadioButtonGroup: React.FC<RadioButtonGroupProps> =
+    ({ currentQuestionNumber, answerTexts, question, setReloadToolbar, doTestDataRef,autoSaveDraftTest }) => {
         const [, setReload] = React.useState(false);
         return (
             <>
@@ -727,6 +737,7 @@ const RadioButtonGroup: React.FC<{ currentQuestionNumber: number, question: Ques
                                         setReloadToolbar(pre => pre = !pre);
                                     }
                                     question.userAnswer = thisAnswer;
+                                    autoSaveDraftTest();
                                 }}
                             />
                             <label key={index + "label" + currentQuestionNumber} htmlFor={"id" + currentQuestionNumber + index} style={{ marginLeft: '8px' }}>

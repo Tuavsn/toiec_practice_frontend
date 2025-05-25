@@ -5,9 +5,9 @@ import { ConvertThisFullTestQuestionToHTML } from "../../../utils/helperFunction
 import { FullTestAreaProps } from "../../../utils/types/props"
 
 export const FullTestArea: React.FC<FullTestAreaProps> = React.memo(
-    ({ changePageOffset, setReloadToolbar, doTestDataRef, thisQuestion }) => {
+    ({ changePageOffset, setReloadToolbar, doTestDataRef, thisQuestion,autoSaveDraftTest }) => {
 
-        const [resourcesElement, questionsElement] = ConvertThisFullTestQuestionToHTML(thisQuestion, changePageOffset, setReloadToolbar, doTestDataRef);
+        const [resourcesElement, questionsElement] = ConvertThisFullTestQuestionToHTML(thisQuestion, changePageOffset, setReloadToolbar, doTestDataRef, autoSaveDraftTest);
         return (
             <div className="flex xl:flex-row lg:flex-row flex-wrap md:flex-column sm:flex-column justify-content-between gap-1 custom-scrollpanel px-0 py-0 align-items-center"
             >
