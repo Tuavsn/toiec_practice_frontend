@@ -78,7 +78,7 @@ function loadTestPaper(testId: TestID, setIsDoneLoading: Dispatch<SetStateAction
     };
 }
 
-export const useTimeLimitChooser = (limitTime: number, testId: TestID) => {
+export const useTimeLimitChooser = (limitTime: number, testId: TestID, parts: boolean[]) => {
     const [timeLimit, setTimeLimit] = useState<number>(limitTime);
     const [isButtonClicked, setIsButtonClicked] = useState<boolean>(false);
     const [isDoneLoading, setIsDoneLoading] = useState<boolean>(false);
@@ -86,9 +86,9 @@ export const useTimeLimitChooser = (limitTime: number, testId: TestID) => {
     useEffect(() => setTimeLimit(limitTime), [limitTime]);
     useEffect(() => {
         loadTestPaper(testId, setIsDoneLoading)
-        callGetIsDraftTestExist(testId).then(isDraftExist => {
+        callGetIsDraftTestExist(testId, parts[0] === true ? "fulltest" : "practice").then(isDraftExist => {
             console.log(`Draft test existence for ${testId}:`, isDraftExist);
-            
+
             setIsDraftExist(isDraftExist !== "none");
         })
     }, [testId])

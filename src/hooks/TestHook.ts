@@ -189,6 +189,7 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
     }
 
     const autoSaveDraftTest = useCallback(() => {
+        if (fullTestScreenState.isLoading || testType !== "fulltest") return;
         console.log("Auto-saving draft test...", fullTestScreenState.currentPageIndex);
 
         upsertDraftToIndexDB(id, {
@@ -199,13 +200,14 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
     }, [fullTestScreenState, id])
 
     useEffect(() => {
-        if (fullTestScreenState.isLoading) return;
+
         autoSaveDraftTest();
     }, [fullTestScreenState.currentPageIndex, autoSaveDraftTest]);
 
     useEffect(() => {
         SetWebPageTitle("Làm bài thi");
-        callGetIsDraftTestExist(id).then(async (draftLocationExist: DraftLocation) => {
+        callGetIsDraftTestExist(id, testType).then(async (draftLocationExist: DraftLocation) => {
+
             switch (draftLocationExist) {
                 case "server":
                     break;

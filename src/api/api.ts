@@ -14,7 +14,7 @@ import {
     EssayQuestionApiResponse,
     ExerciseType, GradedFeedback, ImageDataWithMimeType, Lecture, LectureCard, LectureID,
     LectureProfile, LectureRow, Part2EmailContext, Permission, PermissionID,
-    PexelsPhoto, PexelsSearchResponse, QuestionID, QuestionRow, RecommendDoc, RecommendLecture, RecommendTest, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, TargetType, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, ToeicSpeakingPromptTask, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateCommentReportStatusPayload, UpdateQuestionForm, UserComment, UserRow,
+    PexelsPhoto, PexelsSearchResponse, QuestionID, QuestionRow, RecommendDoc, RecommendLecture, RecommendTest, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, TargetType, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, TestType, ToeicSpeakingPromptTask, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateCommentReportStatusPayload, UpdateQuestionForm, UserComment, UserRow,
     WritingPart1Prompt,
     WritingToeicPart2ApiPromptData,
     WritingToeicPart2GradedFeedback,
@@ -273,8 +273,11 @@ export const callGetMyRecommend = async (): Promise<[(RecommendLecture[] | null)
 }
 
 
-export const callGetIsDraftTestExist = async (testId: TestID): Promise<DraftLocation> => {
+export const callGetIsDraftTestExist = async (testId: TestID, testType: TestType): Promise<DraftLocation> => {
     try {
+        if (testType !== "fulltest") {
+            return "none";
+        }
         const isDraftInIndexDB = await checkDraftInIndexDB(testId);
         if (isDraftInIndexDB) {
             return "indexDB";

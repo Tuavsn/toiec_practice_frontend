@@ -52,7 +52,7 @@ const TimeLimitChooser: React.FC<TimeLimitChooserProps> = ({ limitTime, parts, t
         setTimeLimit,
         isDraftExist,
         timeLimit,
-    } = useTimeLimitChooser(limitTime, testId);
+    } = useTimeLimitChooser(limitTime, testId,parts);
 
     const isButtonDisabled = isButtonClicked && !isDoneLoading;
     const isNavigateToDoTestPage = isButtonClicked && isDoneLoading;
