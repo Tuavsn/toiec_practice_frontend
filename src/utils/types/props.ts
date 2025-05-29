@@ -3,7 +3,7 @@ import { TreeNode } from "primereact/treenode";
 import { Dispatch, MutableRefObject } from "react";
 import { CategoryHookAction, FullTestScreenAction, LectureHookAction, MultiQuestionAction, PermissionHookAction, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, TopicHookAction, UserHookAction } from "./action";
 import { LectureHookState, MultiQuestionState, TestReviewHookState, WritingToeicPart3State } from "./state";
-import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, GradedFeedback, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Permission, PexelsPhoto, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, Topic, TopicOverview, TopicStat, UIWritingPart1Control, UserAnswerRecord, UserDetailResultRow, UserRow, WritingPart1Prompt, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart3GradedFeedback, WritingToeicPart3Prompt, WritingToeicPart3UIControls } from "./type";
+import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, GradedFeedback, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Permission, PexelsPhoto, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, ToeicSpeakingLoadedTask, ToeicSpeakingPracticeView, ToeicSpeakingSubQuestion, Topic, TopicOverview, TopicStat, UIWritingPart1Control, UserAnswerRecord, UserDetailResultRow, UserRow, WritingPart1Prompt, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart3GradedFeedback, WritingToeicPart3Prompt, WritingToeicPart3UIControls } from "./type";
 
 interface ButtonListProps {
     pageMapper: QuestionPage[],
@@ -44,6 +44,7 @@ interface RenderTestProps {
     doTestDataRef: React.MutableRefObject<TestSheet>
     changePageOffset: (offset: number) => void
     moveToPage: (pageIndex: number) => void
+    autoSaveDraftTest: () => void
 }
 
 type RichEditorProps = {
@@ -244,7 +245,8 @@ interface FullTestAreaProps {
     thisQuestion: QuestionAnswerRecord
     setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>
     changePageOffset: (offset: number) => void,
-    doTestDataRef: React.MutableRefObject<TestSheet>
+    doTestDataRef: React.MutableRefObject<TestSheet>,
+    autoSaveDraftTest: () => void
 }
 interface SkillInsightsProps {
     parts: TopicStat[]
@@ -413,38 +415,104 @@ interface WritingToeicPart3PanelHeaderProps {
     generateNewEssayQuestion: () => void;
 }
 interface EssayQuestionDisplayProps {
-  // Đối tượng chứa câu hỏi luận và hướng dẫn
-  prompt: WritingToeicPart3Prompt | null;
-  // Cờ báo hiệu đang tải đề bài
-  isLoading: boolean;
+    // Đối tượng chứa câu hỏi luận và hướng dẫn
+    prompt: WritingToeicPart3Prompt | null;
+    // Cờ báo hiệu đang tải đề bài
+    isLoading: boolean;
 }
 interface EssayEditorFormProps {
-  // Nội dung bài luận hiện tại của người dùng
-  essayText: string;
-  // Callback khi nội dung thay đổi
-  onEssayChange: (text: string) => void;
-  // Callback khi nhấn nút nộp bài
-  onSubmit: () => void;
-  // Cờ báo hiệu đang nộp bài (cho trạng thái loading của nút)
-  isSubmitting: boolean;
-  // Cờ báo hiệu toàn bộ form có bị vô hiệu hóa không (ví dụ: khi đang tải đề)
-  isFormDisabled: boolean;
+    // Nội dung bài luận hiện tại của người dùng
+    essayText: string;
+    // Callback khi nội dung thay đổi
+    onEssayChange: (text: string) => void;
+    // Callback khi nhấn nút nộp bài
+    onSubmit: () => void;
+    // Cờ báo hiệu đang nộp bài (cho trạng thái loading của nút)
+    isSubmitting: boolean;
+    // Cờ báo hiệu toàn bộ form có bị vô hiệu hóa không (ví dụ: khi đang tải đề)
+    isFormDisabled: boolean;
 }
 interface EssayGradeDisplayProps {
-  // Đối tượng chứa thông tin điểm và nhận xét chi tiết cho bài luận
-  feedback: WritingToeicPart3GradedFeedback | null;
-  // Cờ báo hiệu đang tải/chấm điểm
-  isLoading: boolean;
+    // Đối tượng chứa thông tin điểm và nhận xét chi tiết cho bài luận
+    feedback: WritingToeicPart3GradedFeedback | null;
+    // Cờ báo hiệu đang tải/chấm điểm
+    isLoading: boolean;
 }
 interface GlassCardProps {
-  title: string; // Tiêu đề chính của card
-  onClick: () => void; // Hành động khi click
-  bgColorClass: string; // Lớp màu nền, ví dụ: 'bg-orange-700'
-  textColorClass?: string; // Lớp màu chữ, ví dụ: 'text-white'
-  icon?: string; // Tên icon của PrimeIcons, ví dụ: 'pi pi-book'
-  className?: string; // Các lớp CSS tùy chỉnh thêm
-  // Bạn có thể thêm các props khác nếu cần, ví dụ: description, etc.
+    title: string; // Tiêu đề chính của card
+    onClick: () => void; // Hành động khi click
+    bgColorClass: string; // Lớp màu nền, ví dụ: 'bg-orange-700'
+    textColorClass?: string; // Lớp màu chữ, ví dụ: 'text-white'
+    icon?: string; // Tên icon của PrimeIcons, ví dụ: 'pi pi-book'
+    className?: string; // Các lớp CSS tùy chỉnh thêm
+    // Bạn có thể thêm các props khác nếu cần, ví dụ: description, etc.
 }
+
+//------------------------------------------------------
+// Props for Components (will be expanded)
+//------------------------------------------------------
+interface ToeicSpeakingPartTimerProps {
+    durationSeconds: number;
+    standardDurationSeconds: number;
+    onTimerEnd: () => void;
+    isPrepTime: boolean;
+    title?: string;
+}
+
+interface ToeicSpeakingPartTaskPromptProps {
+    task: ToeicSpeakingLoadedTask; // Task đã có thể chứa imageUrl và cờ loading
+    subQuestion?: ToeicSpeakingSubQuestion;
+    isRecording: boolean;
+    // isLoadingContent is now part of task.isContentLoading
+    onStartRecording?: () => void;
+    onStopRecording?: () => void;
+    currentPrepTime?: number;
+    currentResponseTime?: number;
+}
+
+interface ToeicSpeakingPartTaskPlayerProps {
+    task: ToeicSpeakingLoadedTask;
+    taskIndex: number; // Index of the current task, needed for actions
+    currentGlobalView: ToeicSpeakingPracticeView; // Global view state from the hook
+    isCurrentTaskContentLoading: boolean; // From uiControls
+    // Actions from the useToeicSpeaking hook
+    actions: {
+        fetchDynamicContentForTask: (taskIndex: number) => Promise<void>;
+        proceedToPreparation: () => void; // Manually move to preparation phase
+        startRecordingPhase: () => void;
+        saveResponse: (data: { taskId: string; subQuestionId?: string; audioBlob: Blob }) => void;
+        // We'll need more actions later, e.g.:
+        // startRecordingPhase: () => void;
+        // saveResponseAndProceed: (response: UserResponseData) => void;
+        // completeSimulation: () => void;
+    };
+}
+interface ToeicSpeakingPartAudioRecorderProps {
+  /**
+   * Callback function invoked when recording is complete and the audio Blob is ready.
+   * @param audioBlob The recorded audio data as a Blob.
+   */
+  onRecordingComplete: (audioBlob: Blob) => void;
+  /**
+   * Prop to signal if recording should automatically stop (e.g., when a parent timer ends).
+   * The component will watch this prop.
+   */
+  forceStop?: boolean;
+  /**
+   * Is recording currently allowed by the parent component (e.g., during response phase).
+   */
+  isRecordingActivePhase: boolean;
+}
+
+interface RadioButtonGroupProps {
+    currentQuestionNumber: number,
+    question: QuestionAnswerRecord,
+    answerTexts: string[],
+    setReloadToolbar: React.Dispatch<React.SetStateAction<boolean>>,
+    doTestDataRef: React.MutableRefObject<TestSheet>
+    autoSaveDraftTest: () => void,
+}
+
 export type {
     ActivityLogProps, AdminCategoryTableProps, AdminGenericTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AnswerFormProps, AssignmentQuestionTableProps, ButtonListProps,
     ConfirmSubmitDialogProps, DialogAssignmentQuestionActionProps, DialogDeleteLectureBodyProps,
@@ -456,10 +524,8 @@ export type {
     DialogUserRowProps, DoExercisePageProps,
     DoTestPageProps, EmailGradeDisplayProps, EmailPromptDisplayProps, EmailResponseFormProps, EssayEditorFormProps, EssayGradeDisplayProps, EssayQuestionDisplayProps, FullTestAreaProps,
     FullTestScreenProps, GlassCardProps, GradeDisplayProps, ImageDisplayProps, LectureActionButtonProps, LectureReduceProps, PanelHeaderProps, PartDetailSectionProps, PromptDisplayProps, QuestionActionButtonProps,
-    QuestionTableProps,
-    RenderPressStartButtonProps,
-    RenderTestProps,
-    RennderTutorialProps,
+    QuestionTableProps, RadioButtonGroupProps, RenderPressStartButtonProps,
+    RenderTestProps, RennderTutorialProps,
     ResourceSectionProps,
     ResultTableProps,
     RichEditorProps,
@@ -468,7 +534,7 @@ export type {
     SkillInsightsProps,
     TestAreaProps,
     TestReviewAreaProps,
-    TestToolBarProps, TimerClockProps, ToolBarFrameProps, UpdateQuestionDialogProps,
+    TestToolBarProps, TimerClockProps, ToeicSpeakingPartAudioRecorderProps, ToeicSpeakingPartTaskPlayerProps, ToeicSpeakingPartTaskPromptProps, ToeicSpeakingPartTimerProps, ToolBarFrameProps, UpdateQuestionDialogProps,
     UserAnswerSheetFullTestProps,
     UserAnswerSheetProps,
     UserAnswerSheetReviewProps, UserAnswerSideBarProps, UserAnswerSideTabProps, WritingToeicPart2GradeSectionProps, WritingToeicPart2InitialMessageProps, WritingToeicPart2PaginatorSectionProps, WritingToeicPart2PromptSectionProps, WritingToeicPart2ResponseSectionProps, WritingToeicPart3PanelHeaderProps

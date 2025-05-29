@@ -1,0 +1,51 @@
+{
+  "tasks": [
+    {
+      "id": "RA001",
+      "type": "readAloud",
+      "title": "Câu 1-2: Đọc một đoạn văn",
+      "instructions": "In this part of the test, you will read a text on the screen aloud. You will have 45 seconds to prepare. Then, you will have 45 seconds to read the text aloud. (Trong phần này của bài thi, bạn sẽ đọc to một đoạn văn bản được hiển thị. Bạn sẽ có 45 giây để chuẩn bị. Sau đó, bạn sẽ có 45 giây để đọc to đoạn văn đó.)",
+      "prepTimeSeconds": 45,
+      "responseTimeSeconds": 45,
+      "content": "The local library is pleased to announce its annual summer reading challenge, which will begin on June 1st and run through August 31st. Participants of all ages are encouraged to sign up at the main desk. This year's theme is 'Adventures in Literature,' and special events, including author visits and workshops, will be held every Saturday. We hope to foster a lifelong love of reading within our community."
+    },
+    {
+      "id": "DP001",
+      "type": "describePicture",
+      "title": "Câu 3: Miêu tả một bức tranh",
+      "instructions": "In this part of the test, you will describe a picture on the screen in as much detail as you can. You will have 45 seconds to prepare your response. Then, you will have 30 seconds to speak about the picture. (Trong phần này của bài thi, bạn sẽ miêu tả một bức tranh hiển thị trên màn hình càng chi tiết càng tốt. Bạn sẽ có 45 giây để chuẩn bị. Sau đó, bạn sẽ có 30 giây để nói về bức tranh đó.)",
+      "prepTimeSeconds": 45,
+      "responseTimeSeconds": 30,
+      "imageQuery": "people working in a modern office"
+    },
+    {
+      "id": "RQ001",
+      "type": "respondToQuestions",
+      "title": "Câu 4-6: Trả lời câu hỏi",
+      "instructions": "In this part of the test, you will answer three questions. For each question, you will have 3 seconds to prepare after you hear the question. You will have 15 seconds to respond to questions 4 and 5, and 30 seconds to respond to question 6. (Trong phần này của bài thi, bạn sẽ trả lời ba câu hỏi. Đối với mỗi câu hỏi, bạn sẽ có 3 giây để chuẩn bị sau khi nghe câu hỏi. Bạn sẽ có 15 giây để trả lời câu hỏi 4 và 5, và 30 giây để trả lời câu hỏi 6.)",
+      "prepTimeSeconds": 0, 
+      "responseTimeSeconds": 0, 
+      "seriesTitle": "Interview about Television Watching Habits",
+      "questions": [
+        {
+          "questionId": "RQ001a",
+          "prepTimeSeconds": 3,
+          "responseTimeSeconds": 15,
+          "questionText": "Imagine a marketing company is researching television viewing habits in your country. You've agreed to a telephone interview. Question: When was the last time you watched television, and what program did you watch?"
+        },
+        {
+          "questionId": "RQ001b",
+          "prepTimeSeconds": 3,
+          "responseTimeSeconds": 15,
+          "questionText": "Question: Do you prefer watching television alone or with others? Why?"
+        },
+        {
+          "questionId": "RQ001c",
+          "prepTimeSeconds": 3,
+          "responseTimeSeconds": 30,
+          "questionText": "Question: If you could create any new television program, what kind would it be and why?"
+        }
+      ]
+    }
+  ]
+}

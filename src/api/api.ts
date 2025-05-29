@@ -1,17 +1,20 @@
 import { Content, GenerateContentConfig, GoogleGenAI, HarmBlockThreshold, HarmCategory, Schema, Type } from "@google/genai";
 import { isCancel } from "axios";
 import { Toast } from "primereact/toast";
+import { checkDraftInIndexDB } from "../database/indexdb";
 import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ProfileHookState } from "../utils/types/state";
+import * as promptsData from '../utils/types/ToeicSpeakingPrompts.json'; // Dữ liệu prompts được import trực tiếp
 import {
     ApiResponse, AssignmentQuestion, CategoryID,
     CategoryLabel, CategoryRow, Comment_t, CommentPage,
     CommentReport, CreateCommentReportPayload,
     CreateCommentRequest, DeleteCommentRequest,
+    DraftLocation,
     EssayQuestionApiResponse,
     ExerciseType, GradedFeedback, ImageDataWithMimeType, Lecture, LectureCard, LectureID,
     LectureProfile, LectureRow, Part2EmailContext, Permission, PermissionID,
-    PexelsPhoto, PexelsSearchResponse, QuestionID, QuestionRow, RecommendDoc, RecommendLecture, RecommendTest, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, TargetType, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateCommentReportStatusPayload, UpdateQuestionForm, UserComment, UserRow,
+    PexelsPhoto, PexelsSearchResponse, QuestionID, QuestionRow, RecommendDoc, RecommendLecture, RecommendTest, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, TargetType, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, TestType, ToeicSpeakingPromptTask, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateCommentReportStatusPayload, UpdateQuestionForm, UserComment, UserRow,
     WritingPart1Prompt,
     WritingToeicPart2ApiPromptData,
     WritingToeicPart2GradedFeedback,
@@ -20,6 +23,7 @@ import {
     WritingToeicPart3GradedFeedback
 } from "../utils/types/type";
 import axios from "./axios-customize";
+
 const host = "https://toeic-practice-hze3cbbff4ctd8ce.southeastasia-01.azurewebsites.net";
 //------------------------------------------------------
 // Biến môi trường và Khởi tạo SDK
@@ -53,7 +57,7 @@ export const wakeupServers = async (): Promise<void> => {
 
         await Promise.all(
             [
-                fetch(`${import.meta.env.VITE_API_URL}/categories?current=1&pageSize=1`,{ method: "GET" }),
+                fetch(`${import.meta.env.VITE_API_URL}/categories?current=1&pageSize=1`, { method: "GET" }),
                 fetch(import.meta.env.VITE_TOXIC_CLASSIFIER_API_URL, { method: "HEAD" })
             ]
         )
@@ -255,20 +259,39 @@ export const callGetReviewTestPaper = async (id: ResultID): Promise<TestReviewAn
 export const callGetMyRecommend = async (): Promise<[(RecommendLecture[] | null), (RecommendTest[] | null)]> => {
     let recommendDoc: [(RecommendLecture[] | null), (RecommendTest[] | null)] = [null, null];
     try {
-
-        const response = await axios.get<ApiResponse<RecommendDoc>>(`${import.meta.env.VITE_API_URL}/recommendations/me`)
+        const response = await axios.get<ApiResponse<RecommendDoc>>(`${import.meta.env.VITE_API_URL}/recommendations/me`,)
         recommendDoc = [
             response.data.data.recommendedLectures,
             response.data.data.recommendedTests
         ]
     } catch (error) {
-        console.error("Lỗi lấy gợi ý ");
+        console.error("Lỗi lấy gợi ý ", error);
     }
     finally {
         return recommendDoc;
     }
 }
 
+
+export const callGetIsDraftTestExist = async (testId: TestID, testType: TestType): Promise<DraftLocation> => {
+    try {
+        if (testType !== "fulltest") {
+            return "none";
+        }
+        const isDraftInIndexDB = await checkDraftInIndexDB(testId);
+        if (isDraftInIndexDB) {
+            return "indexDB";
+        }
+        // const response = await axios.get<ApiResponse<boolean>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/draft`);
+        // if (response.data.data) {
+        //     return "server";
+        // }
+        return "none";
+    } catch (error) {
+        console.error("Lỗi khi kiểm tra bài thi nháp:", error);
+        return "none";
+    }
+}
 
 export const callGetCategoryLabel = async (): Promise<ApiResponse<CategoryLabel[]>> => {
     const response = await axios.get<ApiResponse<CategoryLabel[]>>(`${import.meta.env.VITE_API_URL}/categories/none-page`);
@@ -2236,3 +2259,107 @@ Now, evaluate the student's essay based on the provided question and essay text,
         };
     }
 }
+
+//------------------------------------------------------
+// API Functions
+// Các hàm tương tác với "nguồn dữ liệu" (hiện tại là file JSON)
+//------------------------------------------------------
+
+/**
+ * @description Tải danh sách các câu hỏi/nhiệm vụ từ nguồn dữ liệu.
+ * Trong tương lai, đây có thể là một cuộc gọi API thực sự đến backend.
+ * Hiện tại, nó đọc từ file prompts.json đã import và thực hiện kiểm tra cơ bản.
+ * @returns Promise chứa mảng các ToeicSpeakingPromptTask, hoặc null nếu có lỗi.
+ */
+export const fetchToeicSpeakingPrompts = async (): Promise<ToeicSpeakingPromptTask[] | null> => {
+    // Mô phỏng một cuộc gọi API bất đồng bộ
+    await new Promise(resolve => setTimeout(resolve, 100)); // Độ trễ nhỏ để mô phỏng
+
+    // Không dùng try-catch ở đây theo yêu cầu (vì hook sẽ không dùng try-catch)
+    // Thay vào đó, kiểm tra dữ liệu và trả về null nếu không hợp lệ.
+    // Logic try-catch thực sự cho network/parsing sẽ ở đây nếu đây là fetch() thật.
+    if (
+        promptsData &&
+        typeof promptsData === 'object' &&
+        'tasks' in promptsData &&
+        Array.isArray((promptsData as any).tasks)
+    ) {
+        // Giả sử cấu trúc cơ bản là đúng, kiểu dữ liệu của từng task sẽ được reducer xử lý/kiểm tra thêm nếu cần.
+        return (promptsData as { tasks: ToeicSpeakingPromptTask[] }).tasks;
+    } else {
+        console.error(
+            '[ToeicSpeakingApi] Cấu trúc dữ liệu prompts.json không hợp lệ hoặc không tìm thấy "tasks".'
+        );
+        return null; // Trả về null nếu dữ liệu không đúng cấu trúc mong đợi
+    }
+};
+
+/**
+ * @async
+ * @function userFetchImageFromPexels (Renamed to avoid conflict if you had it elsewhere)
+ * @description Tìm và lấy một hình ảnh ngẫu nhiên từ Pexels dựa trên từ khóa.
+ * @param {string} keyword - Từ khóa để tìm kiếm hình ảnh.
+ * @returns {Promise<PexelsPhoto | null>} Một đối tượng ảnh Pexels hoặc null nếu không tìm thấy.
+ */
+async function userFetchImageFromPexels(keyword: string, fetchDataFn: <T>(url: string, options?: RequestInit) => Promise<T>): Promise<PexelsPhoto | null> {
+    if (!PEXELS_API_KEY || PEXELS_API_KEY === 'YOUR_PEXELS_API_KEY_FALLBACK') {
+        console.error("Thiếu PEXELS_API_KEY hoặc đang dùng fallback. Vui lòng kiểm tra file .env của bạn.");
+        // To align with the wrapper's expectation of handling throws, we throw here.
+        // The wrapper will catch this and return null for the URL.
+        throw new Error("Chưa cấu hình Pexels API key đúng cách.");
+    }
+    const url = `${PEXELS_BASE_URL}/search?query=${encodeURIComponent(keyword)}&per_page=10&page=1&orientation=landscape`;
+    const options: RequestInit = {
+        headers: {
+            Authorization: PEXELS_API_KEY,
+        },
+    };
+
+    // try-catch is in your original function, which is good.
+    // The outer wrapper will also have a try-catch.
+    // try { // Your original function already has a try-catch that re-throws.
+    const data = await fetchDataFn<PexelsSearchResponse>(url, options);
+    if (data.photos && data.photos.length > 0) {
+        const randomIndex = Math.floor(Math.random() * data.photos.length);
+        return data.photos[randomIndex];
+    }
+    return null; // Không tìm thấy ảnh nào
+    // } catch (error) { // Your function re-throws, so this catch is as per your snippet.
+    //     console.error(`Lỗi khi lấy ảnh từ Pexels với từ khóa "${keyword}" (trong userFetchImageFromPexels):`, error);
+    //     throw error;
+    // }
+}
+export const fetchPexelsImage = async (query: string): Promise<string | null> => {
+    // Define a dummy fetchData for the sake of this example if it's not globally available
+    // In your actual project, ensure `WorkspaceData` is correctly defined and imported
+    // into the scope where `userFetchImageFromPexels` can use it.
+    const DUMMY_FETCH_DATA_FN_FOR_USER_FUNCTION = async <T>(url: string, options?: RequestInit): Promise<T> => {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorBody = await response.text();
+            console.error(`[DUMMY_FETCH_DATA_FN] HTTP error! status: ${response.status}`, errorBody);
+            throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+        }
+        return response.json();
+    };
+
+
+    try {
+        // Call your function, passing the dummy fetchData or your actual one
+        const photoObject = await userFetchImageFromPexels(query, DUMMY_FETCH_DATA_FN_FOR_USER_FUNCTION);
+
+        if (photoObject && photoObject.src) {
+            // Prefer 'medium', then 'large', then 'original' as fallback
+            return photoObject.src.medium || photoObject.src.large || photoObject.src.original;
+        } else {
+            // userFetchImageFromPexels returned null (no photo found)
+            console.warn(`[ToeicSpeakingApi] No photo object returned from userFetchImageFromPexels for query: "${query}"`);
+            return null;
+        }
+    } catch (error) {
+        // This catch block handles errors thrown by userFetchImageFromPexels
+        // (e.g., API key issue, network errors from fetchData if it throws)
+        console.error(`[ToeicSpeakingApi] Error utilizing userFetchImageFromPexels for query "${query}":`, error);
+        return null; // Adhere to "return null on error"
+    }
+};

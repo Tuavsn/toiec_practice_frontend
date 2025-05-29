@@ -1,6 +1,6 @@
 import { CommentActionType } from "../../hooks/_CommentSectionHook";
-import { ProfileHookState } from "./state";
-import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, EssayQuestionPayload, GradedFeedback, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, Permission, PexelsPhoto, QuestionID, QuestionNumber, QuestionPage, Role, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, UserComment, UserRow, WritingPart1Prompt, WritingSheetData, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart2SheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3SheetData } from "./type";
+import { FullTestScreenState, ProfileHookState } from "./state";
+import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, EssayQuestionPayload, FetchTaskContentFailurePayload, FetchTaskContentRequestPayload, FetchTaskContentSuccessPayload, GetAiFeedbackFailurePayload, GetAiFeedbackRequestPayload, GetAiFeedbackSuccessPayload, GradedFeedback, LectureCard, LectureRow, LoadPromptsSuccessPayload, Meta, MultipleChoiceQuestion, Permission, PexelsPhoto, QuestionID, QuestionNumber, QuestionPage, Role, SaveResponsePayload, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, ToeicSpeakingPartActionType, Topic, UserComment, UserRow, WritingPart1Prompt, WritingSheetData, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart2SheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3SheetData } from "./type";
 
 type RenderTestActiion =
     | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber; qID: QuestionID; answer: string; } }
@@ -12,6 +12,7 @@ type FullTestScreenAction =
     | { type: "SET_CURRENT_PAGE_INDEX"; payload: number }
     | { type: "SET_CURRENT_PAGE_OFFSET"; payload: number }
     | { type: "SET_TUTORIALS_DONE"; payload: number }
+    | { type: "SET_STATE"; payload: FullTestScreenState }
 
 type RowHookAction<RowModel> =
     | { type: 'FETCH_ROWS_SUCCESS'; payload: [RowModel[], number] }
@@ -256,10 +257,34 @@ type WritingToeicPart3Action =
     // --- Actions khác ---
     | { type: 'PART3_CLEAR_ERROR' };
 
+
+type ToeicSpeakingPartAction =
+    | { type: ToeicSpeakingPartActionType.LOAD_PROMPTS_REQUEST }
+    | { type: ToeicSpeakingPartActionType.LOAD_PROMPTS_SUCCESS; payload: LoadPromptsSuccessPayload }
+    | { type: ToeicSpeakingPartActionType.LOAD_PROMPTS_FAILURE; payload: string }
+
+    | { type: ToeicSpeakingPartActionType.FETCH_TASK_CONTENT_REQUEST; payload: FetchTaskContentRequestPayload }
+    | { type: ToeicSpeakingPartActionType.FETCH_TASK_CONTENT_SUCCESS; payload: FetchTaskContentSuccessPayload }
+    | { type: ToeicSpeakingPartActionType.FETCH_TASK_CONTENT_FAILURE; payload: FetchTaskContentFailurePayload }
+
+    | { type: ToeicSpeakingPartActionType.START_SIMULATION }
+    | { type: ToeicSpeakingPartActionType.PROCEED_TO_PREPARATION }
+    | { type: ToeicSpeakingPartActionType.START_RECORDING_PHASE }
+    | { type: ToeicSpeakingPartActionType.SAVE_RESPONSE; payload: SaveResponsePayload }
+    | { type: ToeicSpeakingPartActionType.GET_AI_FEEDBACK_REQUEST; payload: GetAiFeedbackRequestPayload }
+    | { type: ToeicSpeakingPartActionType.GET_AI_FEEDBACK_SUCCESS; payload: GetAiFeedbackSuccessPayload }
+    | { type: ToeicSpeakingPartActionType.GET_AI_FEEDBACK_FAILURE; payload: GetAiFeedbackFailurePayload }
+    | { type: ToeicSpeakingPartActionType.NEXT_QUESTION_OR_TASK }
+    | { type: ToeicSpeakingPartActionType.COMPLETE_SIMULATION }
+    | { type: ToeicSpeakingPartActionType.RESET_SIMULATION }
+    | { type: ToeicSpeakingPartActionType.SET_OVERALL_ERROR; payload: string }
+    | { type: ToeicSpeakingPartActionType.CLEAR_OVERALL_ERROR };
+
+
 export type {
     AdminReportAction, CategoryHookAction, CommentAction, FullTestScreenAction, LectureCardAction,
     LectureHookAction, MultiQuestionAction, PermissionHookAction, ProfileHookAction,
-    RenderTestActiion, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, ToeicWritingPart1Action, TopicHookAction, UserCommentAction,
+    RenderTestActiion, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, ToeicSpeakingPartAction, ToeicWritingPart1Action, TopicHookAction, UserCommentAction,
     UserHookAction, WritingToeicPart2Action, WritingToeicPart3Action
 };
 

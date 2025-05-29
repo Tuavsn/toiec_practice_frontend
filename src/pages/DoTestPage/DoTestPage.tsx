@@ -55,7 +55,7 @@ const RenderMainPage: React.FC = () => {
 //--------------------------------------------------------------------------
 // Component `TestFrame` dùng để quản lý và hiển thị giao diện làm bài thi chính
 const TestFrame: React.FC<{ setTestScreenState: React.Dispatch<React.SetStateAction<TestScreenState>> }> = React.memo(
-    ({setTestScreenState}) => {
+    ({ setTestScreenState }) => {
         const {
             fullTestScreenDispatch,
             fullTestScreenState,
@@ -64,6 +64,7 @@ const TestFrame: React.FC<{ setTestScreenState: React.Dispatch<React.SetStateAct
             changePage,
             moveToPage,
             onEndTest,
+            autoSaveDraftTest
         } = useTestFrame(setTestScreenState);
         if (fullTestScreenState.isLoading) return <SubmitLoading />
         // Nếu chưa hiển thị phần hướng dẫn của bài thi hiện tại, hiển thị hướng dẫn
@@ -76,6 +77,7 @@ const TestFrame: React.FC<{ setTestScreenState: React.Dispatch<React.SetStateAct
             <RenderTest
                 currentPageIndex={fullTestScreenState.currentPageIndex}
                 changePageOffset={changePage}
+                autoSaveDraftTest={autoSaveDraftTest}
                 doTestDataRef={doTestDataRef}
                 thisQuestion={thisQuestion}
                 moveToPage={moveToPage}
@@ -88,7 +90,7 @@ const TestFrame: React.FC<{ setTestScreenState: React.Dispatch<React.SetStateAct
 //--------------------------------------------------------------------------
 // Component `RenderTest` hiển thị giao diện chính khi làm bài thi
 const RenderTest: React.FC<RenderTestProps> = React.memo(
-    ({ changePageOffset, moveToPage, currentPageIndex, doTestDataRef, thisQuestion,onEndTest }) => {
+    ({ changePageOffset, moveToPage, currentPageIndex, doTestDataRef, thisQuestion, onEndTest ,autoSaveDraftTest}) => {
         const [, setReloadToolbar] = useState<boolean>(false);
         return (
 
@@ -105,6 +107,7 @@ const RenderTest: React.FC<RenderTestProps> = React.memo(
                 {/* Khu vực chính hiển thị câu hỏi và các nút điều hướng */}
                 < div id="test-area-container" className="max-w-screen p-0" >
                     <FullTestArea
+                        autoSaveDraftTest={autoSaveDraftTest}
                         thisQuestion={thisQuestion}
                         doTestDataRef={doTestDataRef}
                         setReloadToolbar={setReloadToolbar}

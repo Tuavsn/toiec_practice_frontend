@@ -1,17 +1,15 @@
 import axios from "../api/axios-customize";
-import { ApiResponse, MultipleChoiceQuestion, Question_PageIndex, TestDocument, TestID, TestPaper, WorkerResponse } from "../utils/types/type";
-interface TestPaperWorkerRequest {
-    testId: TestID;
-    parts: string;
-}
+import { ApiResponse, MultipleChoiceQuestion, Question_PageIndex, TestDocument, TestPaper, TestPaperWorkerRequest, WorkerResponse } from "../utils/types/type";
+
 
 self.onmessage = async (event: MessageEvent<TestPaperWorkerRequest>) => {
-    const { testId, parts } = event.data;
+    const { testId, parts, } = event.data;
     const postfix = parts === '0' ? 'practice?parts=1234567' : `practice?parts=${parts}`;
 
     try {
+
         const response = await axios.get<ApiResponse<TestPaper>>(
-            `${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}`
+            `${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}`,
         );
 
         if (response.data) {
@@ -20,7 +18,7 @@ self.onmessage = async (event: MessageEvent<TestPaperWorkerRequest>) => {
             self.postMessage({ status: 'success', data: testDocument } as WorkerResponse<TestDocument>);
         }
     } catch (error: any) {
-        self.postMessage({ status: 'error', message: error.message } as WorkerResponse<null>);
+        self.postMessage({ status: 'error', message: `worker file error: ${error.message}` } as WorkerResponse<null>);
     }
 };
 

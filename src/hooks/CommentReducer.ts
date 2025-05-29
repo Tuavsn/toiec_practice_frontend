@@ -19,15 +19,15 @@ export const commentReducer = (
     // Tải Bình Luận Gốc (Fetch Root Comments)
     //----------------------------------
     case CommentActionType.FETCH_ROOT_COMMENTS_START:
-      console.log("REDUCER: FETCH_ROOT_COMMENTS_START");
+// console.log("REDUCER: FETCH_ROOT_COMMENTS_START");
       return {
         ...state,
         isLoadingRootComments: true,
         error: null, // Clear previous general errors
       };
     case CommentActionType.FETCH_ROOT_COMMENTS_SUCCESS:
-      console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - Raw Payload:", action.payload);
-      console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - Current rootComments count before update:", state.rootComments.length);
+// console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - Raw Payload:", action.payload);
+// console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - Current rootComments count before update:", state.rootComments.length);
       // Ensure payload and its nested properties are valid before spreading
       const newRootComments = action.payload?.comments || [];
       const newMeta = action.payload?.meta || null;
@@ -38,9 +38,9 @@ export const commentReducer = (
         meta: newMeta,
         error: null,
       };
-      console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - New rootComments count after update:", newStateAfterRootSuccess.rootComments.length);
+// console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - New rootComments count after update:", newStateAfterRootSuccess.rootComments.length);
       if (newRootComments.length > 0) {
-        console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - First new comment:", newRootComments[0]);
+// console.log("REDUCER: FETCH_ROOT_COMMENTS_SUCCESS - First new comment:", newRootComments[0]);
       }
       return newStateAfterRootSuccess;
     case CommentActionType.FETCH_ROOT_COMMENTS_FAILURE:

@@ -1,6 +1,7 @@
 import { DataTableValue } from "primereact/datatable";
 import { Dispatch, SetStateAction } from "react";
 import { NavigateFunction } from "react-router-dom";
+import { FullTestScreenState } from "./state";
 
 export interface ChatMessage {
   sender: "user" | "bot";
@@ -1445,6 +1446,297 @@ export type WritingToeicPart3UIControls = {
   isSubmitEssayButtonDisabled: boolean;
   shouldRenderEssayGradeDisplay: boolean;
 }
+
+/**
+ * @description Loại của câu hỏi trong bài thi nói TOEIC.
+ * - readAloud: Đọc to một đoạn văn.
+ * - describePicture: Miêu tả một bức tranh (hình ảnh sẽ được tải động).
+ * - respondToQuestions: Trả lời các câu hỏi (có thể là một chuỗi câu hỏi).
+ * - respondToQuestionsWithInfo: Trả lời các câu hỏi dựa trên thông tin cho trước.
+ * - proposeSolution: Đề xuất giải pháp cho một vấn đề.
+ * - expressOpinion: Trình bày quan điểm về một chủ đề.
+ */
+export enum ToeicSpeakingTaskType {
+  READ_ALOUD = "readAloud",
+  DESCRIBE_PICTURE = "describePicture",
+  RESPOND_TO_QUESTIONS = "respondToQuestions",
+  RESPOND_TO_QUESTIONS_WITH_INFO = "respondToQuestionsWithInfo",
+  PROPOSE_SOLUTION = "proposeSolution",
+  EXPRESS_OPINION = "expressOpinion",
+}
+
+/**
+ * @description Thông tin cho các câu hỏi cần đọc/tham khảo trước khi trả lời (ví dụ: lịch trình cho câu 7-9).
+ */
+export interface ToeicSpeakingTaskProvidedInfo {
+  text?: string; // Nội dung văn bản
+  // Nếu thông tin cung cấp cũng có thể là hình ảnh, thêm imageQuery ở đây.
+  // imageQuery?: string; // Từ khóa để tìm ảnh nếu cần
+}
+
+/**
+ * @description Cấu trúc cho một câu hỏi đơn lẻ, đặc biệt dùng trong `RESPOND_TO_QUESTIONS` series.
+ */
+export interface ToeicSpeakingSubQuestion {
+  questionId: string; // ID định danh cho câu hỏi phụ
+  prepTimeSeconds: number; // Thời gian chuẩn bị (giây) - tiêu chuẩn ETS
+  responseTimeSeconds: number; // Thời gian trả lời (giây) - tiêu chuẩn ETS
+  questionText: string; // Nội dung câu hỏi
+}
+
+/**
+ * @description Cấu trúc cơ bản cho một nhiệm vụ trong bài thi TOEIC Speaking.
+ * `prepTimeSeconds` và `responseTimeSeconds` là thời gian TIÊU CHUẨN của ETS.
+ * Logic ứng dụng sẽ nhân 1.5x lên các giá trị này để ra thời gian thực tế cho người dùng.
+ */
+export interface ToeicSpeakingTaskBase {
+  id: string; // ID định danh cho nhiệm vụ/câu hỏi chính
+  type: ToeicSpeakingTaskType; // Loại nhiệm vụ
+  title: string; // Tiêu đề của phần thi (ví dụ: "Câu 1-2: Đọc một đoạn văn")
+  instructions: string; // Hướng dẫn chung cho phần thi/câu hỏi
+  prepTimeSeconds: number; // Thời gian chuẩn bị (giây) - tiêu chuẩn ETS
+  responseTimeSeconds: number; // Thời gian trả lời (giây) - tiêu chuẩn ETS
+}
+
+/**
+ * @description Nhiệm vụ đọc to đoạn văn.
+ */
+export interface ToeicSpeakingReadAloudTask extends ToeicSpeakingTaskBase {
+  type: ToeicSpeakingTaskType.READ_ALOUD;
+  content: string; // Nội dung đoạn văn cần đọc
+}
+
+/**
+ * @description Nhiệm vụ miêu tả tranh.
+ * Hình ảnh sẽ được tải động từ Pexels dựa trên `imageQuery`.
+ */
+export interface ToeicSpeakingDescribePictureTask extends ToeicSpeakingTaskBase {
+  type: ToeicSpeakingTaskType.DESCRIBE_PICTURE;
+  imageQuery: string; // Từ khóa/chủ đề để tìm kiếm ảnh trên Pexels (ví dụ: "office meeting", "park scene")
+  // `image` field (URL of the fetched image) will be added to the task dynamically in the state after fetching.
+}
+
+/**
+ * @description Nhiệm vụ trả lời chuỗi câu hỏi (ví dụ: Câu 4-6).
+ */
+export interface ToeicSpeakingRespondToQuestionsTask extends ToeicSpeakingTaskBase {
+  type: ToeicSpeakingTaskType.RESPOND_TO_QUESTIONS;
+  seriesTitle?: string; // Tiêu đề cho cả chuỗi câu hỏi (nếu có)
+  questions: ToeicSpeakingSubQuestion[]; // Danh sách các câu hỏi phụ
+}
+
+/**
+ * @description Nhiệm vụ trả lời câu hỏi dựa trên thông tin cho trước (ví dụ: Câu 7-9).
+ */
+export interface ToeicSpeakingRespondToQuestionsWithInfoTask extends ToeicSpeakingTaskBase {
+  type: ToeicSpeakingTaskType.RESPOND_TO_QUESTIONS_WITH_INFO;
+  providedInfo: ToeicSpeakingTaskProvidedInfo; // Thông tin được cung cấp (văn bản, lịch trình, etc.)
+  seriesTitle?: string; // Tiêu đề cho cả chuỗi câu hỏi
+  questions: ToeicSpeakingSubQuestion[]; // Danh sách các câu hỏi phụ
+}
+
+/**
+ * @description Nhiệm vụ đề xuất giải pháp (ví dụ: Câu 10).
+ */
+export interface ToeicSpeakingProposeSolutionTask extends ToeicSpeakingTaskBase {
+  type: ToeicSpeakingTaskType.PROPOSE_SOLUTION;
+  problemContext: string; // Mô tả vấn đề/tình huống (có thể là text thay cho audio prompt)
+}
+
+/**
+ * @description Nhiệm vụ trình bày quan điểm (ví dụ: Câu 11).
+ */
+export interface ToeicSpeakingExpressOpinionTask extends ToeicSpeakingTaskBase {
+  type: ToeicSpeakingTaskType.EXPRESS_OPINION;
+  topic: string; // Chủ đề cần trình bày quan điểm
+}
+
+/**
+ * @description Union type cho tất cả các loại nhiệm vụ TOEIC Speaking.
+ * Đây là kiểu dữ liệu sẽ được đọc từ prompts.json (hoặc nguồn dữ liệu khác).
+ * Đối với `ToeicSpeakingDescribePictureTask`, sau khi fetch ảnh, chúng ta có thể muốn thêm một trường `imageUrl?: string` vào state,
+ * nên có thể cần một type khác cho task trong state, hoặc làm cho `imageUrl` optional ở đây.
+ * For now, we'll handle the fetched image URL within the component or an enriched state type.
+ */
+export type ToeicSpeakingPromptTask = // Renamed to clarify it's from the prompt source
+  | ToeicSpeakingReadAloudTask
+  | ToeicSpeakingDescribePictureTask
+  | ToeicSpeakingRespondToQuestionsTask
+  | ToeicSpeakingRespondToQuestionsWithInfoTask
+  | ToeicSpeakingProposeSolutionTask
+  | ToeicSpeakingExpressOpinionTask;
+
+//------------------------------------------------------
+// Task in State (after potential enrichment like fetching image URL)
+//------------------------------------------------------
+/**
+ * @description Properties that can be added to a task at runtime (e.g., after fetching data).
+ * Các thuộc tính có thể được thêm vào một nhiệm vụ trong quá trình chạy (ví dụ: sau khi tải dữ liệu).
+ */
+export interface LoadedTaskRuntimeProperties {
+  imageUrl?: string; // URL của hình ảnh đã tải về cho DescribePictureTask
+  isContentLoading?: boolean; // Cờ báo nội dung động (ví dụ: ảnh) đang được tải
+  contentError?: string; // Lỗi khi tải nội dung động
+}
+
+/**
+ * @description Represents a task within the application's state.
+ * It's the original prompt task intersected with runtime properties.
+ * Đại diện cho một nhiệm vụ trong trạng thái của ứng dụng.
+ * Nó là sự kết hợp (intersection) của nhiệm vụ gốc từ prompt và các thuộc tính runtime.
+ */
+export type ToeicSpeakingLoadedTask =
+  | (ToeicSpeakingReadAloudTask & LoadedTaskRuntimeProperties)
+  | (ToeicSpeakingDescribePictureTask & LoadedTaskRuntimeProperties) // imageUrl sẽ được sử dụng chính ở đây
+  | (ToeicSpeakingRespondToQuestionsTask & LoadedTaskRuntimeProperties)
+  | (ToeicSpeakingRespondToQuestionsWithInfoTask & LoadedTaskRuntimeProperties)
+  | (ToeicSpeakingProposeSolutionTask & LoadedTaskRuntimeProperties)
+  | (ToeicSpeakingExpressOpinionTask & LoadedTaskRuntimeProperties);
+
+
+
+
+//------------------------------------------------------
+// User Response and Feedback
+// Định nghĩa cấu trúc cho câu trả lời của người dùng và phản hồi từ AI
+//------------------------------------------------------
+
+/**
+ * @description Thông tin phản hồi từ AI.
+ */
+export interface ToeicSpeakingFeedback {
+  transcript?: string; // Văn bản ghi âm từ giọng nói của người dùng
+  pronunciation?: string; // Đánh giá về phát âm
+  fluency?: string; // Đánh giá về sự trôi chảy
+  grammar?: string; // Đánh giá về ngữ pháp
+  vocabulary?: string; // Đánh giá về từ vựng
+  overall?: string; // Nhận xét chung
+}
+
+/**
+ * @description Câu trả lời của người dùng cho một nhiệm vụ.
+ */
+export interface ToeicSpeakingUserResponse {
+  responseId: string; // ID duy nhất cho câu trả lời này
+  taskId: string; // ID của nhiệm vụ đã trả lời
+  subQuestionId?: string; // ID của câu hỏi phụ (nếu có)
+  audioBlob?: Blob; // Dữ liệu audio dạng Blob để lưu vào IndexedDB
+  audioUrl?: string; // For playback, can be generated from Blob
+  feedback?: ToeicSpeakingFeedback; // Phản hồi từ AI
+  timestamp: number; // Thời điểm ghi âm
+  attemptNumber?: number; // Số lần thử (nếu cho phép làm lại)
+}
+
+//------------------------------------------------------
+// State Management (useReducer) for ToeicSpeakingPartPage
+//------------------------------------------------------
+
+export enum ToeicSpeakingPracticeView {
+  INTRO = "intro",
+  LOADING_TASK_CONTENT = "loadingTaskContent",
+  PREPARATION = "preparation",
+  RECORDING = "recording",
+  SUMMARY = "summary",
+}
+
+export interface ToeicSpeakingPartState {
+  currentView: ToeicSpeakingPracticeView;
+  tasks: ToeicSpeakingLoadedTask[]; // Sử dụng ToeicSpeakingLoadedTask để có thể chứa imageUrl
+  currentTaskIndex: number;
+  currentSubQuestionIndex?: number;
+  userResponses: ToeicSpeakingUserResponse[];
+  isTestInProgress: boolean;
+  currentTaskError?: string; // Lỗi liên quan đến việc tải hoặc hiển thị task hiện tại
+  overallError?: string; // Lỗi chung của cả trang
+  // Flags for specific loading states might be more granular
+  isLoadingTasks: boolean; // Loading tasks from prompts.json
+  isLoadingPexelsImage: boolean; // Specifically for Pexels image fetching
+  isLoadingAiFeedbackFor?: string; // taskId or responseId for which feedback is being fetched
+  isLoadingPrompts: boolean;
+}
+
+export enum ToeicSpeakingPartActionType {
+  LOAD_PROMPTS_REQUEST = "LOAD_PROMPTS_REQUEST",
+  LOAD_PROMPTS_SUCCESS = "LOAD_PROMPTS_SUCCESS",
+  LOAD_PROMPTS_FAILURE = "LOAD_PROMPTS_FAILURE",
+
+  FETCH_TASK_CONTENT_REQUEST = "FETCH_TASK_CONTENT_REQUEST",
+  FETCH_TASK_CONTENT_SUCCESS = "FETCH_TASK_CONTENT_SUCCESS",
+  FETCH_TASK_CONTENT_FAILURE = "FETCH_TASK_CONTENT_FAILURE",
+
+  START_SIMULATION = "START_SIMULATION",
+  PROCEED_TO_PREPARATION = "PROCEED_TO_PREPARATION", // Indicates content is ready, move to prep timer
+  // HIGHLIGHT: New action type
+  START_RECORDING_PHASE = "START_RECORDING_PHASE", // Prep time ended, move to recording timer & UI
+
+  // START_RECORDING and STOP_RECORDING_AND_SAVE were previous ideas,
+  // Let's refine SAVE_RESPONSE. START_RECORDING might be a local state in AudioRecorder.
+  SAVE_RESPONSE = "SAVE_RESPONSE", // Save the recorded audio response
+
+  GET_AI_FEEDBACK_REQUEST = "GET_AI_FEEDBACK_REQUEST",
+  GET_AI_FEEDBACK_SUCCESS = "GET_AI_FEEDBACK_SUCCESS",
+  GET_AI_FEEDBACK_FAILURE = "GET_AI_FEEDBACK_FAILURE",
+
+  NEXT_QUESTION_OR_TASK = "NEXT_QUESTION_OR_TASK",
+  COMPLETE_SIMULATION = "COMPLETE_SIMULATION",
+  RESET_SIMULATION = "RESET_SIMULATION",
+  SET_OVERALL_ERROR = "SET_OVERALL_ERROR",
+  CLEAR_OVERALL_ERROR = "CLEAR_OVERALL_ERROR",
+}
+
+export interface FetchTaskContentRequestPayload {
+  taskIndex: number;
+}
+export interface FetchTaskContentSuccessPayload {
+  taskIndex: number;
+  // Chỉ chứa các thuộc tính được cập nhật từ LoadedTaskRuntimeProperties
+  updatedProperties: Pick<LoadedTaskRuntimeProperties, 'imageUrl'>; // Hoặc Partial<LoadedTaskRuntimeProperties>
+}
+export interface FetchTaskContentFailurePayload {
+  taskIndex: number;
+  error: string;
+}
+
+// Payloads for actions
+export interface LoadPromptsSuccessPayload {
+  tasks: ToeicSpeakingPromptTask[]; // Tasks as defined in prompts.json
+}
+export interface FetchDynamicContentSuccessPayload {
+  taskIndex: number;
+  updatedTask: Partial<ToeicSpeakingLoadedTask>; // e.g., { imageUrl: '...' }
+}
+export interface SaveResponsePayload {
+  responseId: string; // ID duy nhất cho response này
+  taskId: string;
+  subQuestionId?: string;
+  audioBlob: Blob;
+  timestamp: number;
+}
+export interface GetAiFeedbackRequestPayload {
+  responseId: string; // ID của câu trả lời cần lấy feedback
+}
+export interface GetAiFeedbackSuccessPayload {
+  responseId: string;
+  feedback: ToeicSpeakingFeedback;
+}
+export interface GetAiFeedbackFailurePayload {
+  responseId: string;
+  error: string;
+}
+export interface GetAiFeedbackSuccessPayload {
+  responseId: string;
+  feedback: ToeicSpeakingFeedback;
+}
+export interface GetAiFeedbackFailurePayload {
+  responseId: string;
+  error: string;
+}
+
+export type TestDraft = {
+    draftTestScreenState: FullTestScreenState
+    draftTestData: TestSheet
+}
+
 export type EssayQuestionPayload = { id: string; essayQuestion: string; directions: string; generatedAt: number; part: 3 }
 //---------------------------- tên gọi khác
 export type TestAnswerSheet = Map<QuestionNumber, AnswerData>;
@@ -1454,6 +1746,7 @@ export type UserID = string;
 export type QuestionNumber = number;
 export type milisecond = number;
 export type TestID = string;
+export type DraftLocation = "indexDB" | "server" | "none"; 
 type RoleID = string;
 export type PermissionID = string;
 export type LectureID = string;
@@ -1491,7 +1784,51 @@ export interface MultiQuestionRef {
   abortControllerRef: AbortController | null,
   totalQuestions: number
 }
+//------------------------------------------------------
+// Custom Hook Definition
+//------------------------------------------------------
+
+export interface UseToeicSpeakingReturn {
+  // ViewState: Dữ liệu cần thiết cho UI để render
+  viewState: {
+    currentView: ToeicSpeakingPracticeView;
+    currentTask: ToeicSpeakingLoadedTask | undefined;
+    // currentSubQuestion: ToeicSpeakingSubQuestion | undefined; // Sẽ thêm khi cần
+    currentTaskIndex: number;
+    overallError?: string;
+    tasksCount: number;
+    currentTaskNumber: number; // Số thứ tự task hiện tại (1-based)
+  };
+  // UiControls: Các cờ điều khiển trạng thái của UI (loading, disabled, etc.)
+  uiControls: {
+    isPromptsLoading: boolean;
+    isStartSimulationDisabled: boolean;
+    isTestInProgress: boolean;
+    isCurrentTaskContentLoading: boolean;
+  };
+  // Actions: Các hàm để tương tác với state (dispatch actions)
+  actions: {
+    startSimulation: () => void;
+    resetSimulation: () => void;
+    fetchDynamicContentForTask: (taskIndex: number) => Promise<void>; // Returns a promise
+    proceedToPreparation: () => void; // Action to manually move to prep
+    completeSimulation: () => void; // Added for completeness
+    startRecordingPhase: () => void;
+    saveResponse: (data: Omit<SaveResponsePayload, 'responseId' | 'timestamp'> & { audioBlob: Blob }) => void; // Simplified input
+    goToNextTaskOrEnd: () => void;
+  };
+}
+
+export interface PexelsSearchResponse { // Making this exportable
+  total_results: number;
+  page: number;
+  per_page: number;
+  photos: PexelsPhoto[];
+  next_page?: string;
+}
 
 
-
-
+export interface TestPaperWorkerRequest {
+  testId: TestID;
+  parts: string;
+}
