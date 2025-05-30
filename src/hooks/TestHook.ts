@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
+import { MutableRefObject, useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { callGetIsDraftTestExist, callGetTestPaper, callPostTestRecord, callSaveDraftTestToServer, } from '../api/api';
+import { callGetDraftFromServer, callGetIsDraftTestExist, callGetTestPaper, callPostTestRecord, callSaveDraftTestToServer, } from '../api/api';
 import { useTestState } from '../context/TestStateProvider';
 import { deleteDraftFromIndexDB, getDraftFromIndexDB, queryByPartIndex, upsertDraftToIndexDB } from '../database/indexdb';
 import { MappingPageWithQuestionNum } from '../utils/helperFunction/convertToHTML';
@@ -207,23 +207,11 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
     useEffect(() => {
         SetWebPageTitle("Làm bài thi");
         callGetIsDraftTestExist(id, testType).then(async (draftLocationExist: DraftLocation) => {
+            let draftLocationExistCheck: DraftLocation | null = draftLocationExist;
+            do {
+                draftLocationExistCheck = await GetTestDraft(id, fullTestScreenDispatch, time, draftLocationExistCheck, testType, doTestDataRef, parts);
+            } while (draftLocationExistCheck === null)
 
-            switch (draftLocationExist) {
-                case "server":
-                    break;
-                case "indexDB":
-                    const { draftTestScreenState, draftTestData } = await getDraftFromIndexDB(id);
-                    doTestDataRef.current = draftTestData;
-                    fullTestScreenDispatch({ type: "SET_STATE", payload: draftTestScreenState })
-                    break;
-                case "none":
-                    const QnAList = await GetQuestionFromIndexDB(parts);
-                    doTestDataRef.current = { ...QnAList, secondsLeft: Number(time) * 60, testType: testType };
-                    break;
-                default:
-                    console.error("Unknown draft location:", draftLocationExist);
-                    break;
-            }
             fullTestScreenDispatch({ type: "SET_LOADING", payload: false });
         });
 
@@ -242,7 +230,31 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
 }
 
 
-
+async function GetTestDraft(id: TestID, fullTestScreenDispatch: (value: FullTestScreenAction) => void,
+    time: string, draftLocationExist: DraftLocation | null, testType: TestType, doTestDataRef: MutableRefObject<TestSheet>, parts: string): Promise<DraftLocation | null> {
+    switch (draftLocationExist) {
+        case "server":
+            const testDraft = await callGetDraftFromServer(id);
+            if (testDraft === null) {
+                return null;
+            }
+            doTestDataRef.current = testDraft.draftTestData;
+            fullTestScreenDispatch({ type: "SET_STATE", payload: testDraft.draftTestScreenState })
+            return "server";
+        case "indexDB":
+            const { draftTestScreenState, draftTestData } = await getDraftFromIndexDB(id);
+            doTestDataRef.current = draftTestData;
+            fullTestScreenDispatch({ type: "SET_STATE", payload: draftTestScreenState })
+            return "indexDB";
+        case "none":
+            const QnAList = await GetQuestionFromIndexDB(parts);
+            doTestDataRef.current = { ...QnAList, secondsLeft: Number(time) * 60, testType: testType };
+            return "none";
+        default:
+            console.error("Unknown draft location:", draftLocationExist);
+            return null;
+    }
+}
 
 
 async function GetQuestionFromIndexDB(parts: string): Promise<TestSheet> {

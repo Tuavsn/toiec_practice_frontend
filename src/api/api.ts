@@ -280,7 +280,7 @@ export const callGetIsDraftTestExist = async (testId: TestID, testType: TestType
             return "none";
         }
         const isDraftInIndexDB = await checkDraftInIndexDB(testId);
-        console.log("isdb",isDraftInIndexDB)
+        console.log("isdb", isDraftInIndexDB)
         if (isDraftInIndexDB) {
             return "indexDB";
         }
@@ -336,6 +336,16 @@ export const callGetTestCard = async (format: string, year: number, pageIndex: n
     return response.data;
 }
 
+export const callGetDraftFromServer = async (testId: TestID): Promise<TestDraft | null> => {
+    try {
+        const response = await axios.get<ApiResponse<{ testId: string, draftData: string }>>(`${import.meta.env.VITE_API_URL}/testDrafts/${testId}`);
+        return JSON.parse(response.data.data.draftData) as TestDraft;
+    } catch (error: any) {
+        console.error(error);
+        return null;
+    }
+
+}
 
 export const callPostDoctrine = async (lectureId: LectureID, request: string): Promise<boolean> => {
     try {
