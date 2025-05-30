@@ -1,6 +1,7 @@
 import { Content, GenerateContentConfig, GoogleGenAI, HarmBlockThreshold, HarmCategory, Schema, Type } from "@google/genai";
 import { isCancel } from "axios";
 import { Toast } from "primereact/toast";
+import { MutableRefObject } from "react";
 import { checkDraftInIndexDB } from "../database/indexdb";
 import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ProfileHookState } from "../utils/types/state";
@@ -14,7 +15,7 @@ import {
     EssayQuestionApiResponse,
     ExerciseType, GradedFeedback, ImageDataWithMimeType, Lecture, LectureCard, LectureID,
     LectureProfile, LectureRow, Part2EmailContext, Permission, PermissionID,
-    PexelsPhoto, PexelsSearchResponse, QuestionID, QuestionRow, RecommendDoc, RecommendLecture, RecommendTest, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, TargetType, Test, TestCard, TestDetailPageData, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, TestType, ToeicSpeakingPromptTask, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateCommentReportStatusPayload, UpdateQuestionForm, UserComment, UserRow,
+    PexelsPhoto, PexelsSearchResponse, QuestionID, QuestionRow, RecommendDoc, RecommendLecture, RecommendTest, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, TargetType, Test, TestCard, TestDetailPageData, TestDraft, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, TestType, ToeicSpeakingPromptTask, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateCommentReportStatusPayload, UpdateQuestionForm, UserComment, UserRow,
     WritingPart1Prompt,
     WritingToeicPart2ApiPromptData,
     WritingToeicPart2GradedFeedback,
@@ -279,18 +280,50 @@ export const callGetIsDraftTestExist = async (testId: TestID, testType: TestType
             return "none";
         }
         const isDraftInIndexDB = await checkDraftInIndexDB(testId);
+        console.log("isdb",isDraftInIndexDB)
         if (isDraftInIndexDB) {
             return "indexDB";
         }
-        // const response = await axios.get<ApiResponse<boolean>>(`${import.meta.env.VITE_API_URL}/tests/${testId}/draft`);
-        // if (response.data.data) {
-        //     return "server";
-        // }
+        const response = await axios.get<ApiResponse<{ exist: boolean }>>(`${import.meta.env.VITE_API_URL}/testDrafts/check-exist/${testId}`);
+        if (response.data.data.exist) {
+            return "server";
+        }
         return "none";
     } catch (error) {
         console.error("Lỗi khi kiểm tra bài thi nháp:", error);
         return "none";
     }
+}
+export const callSaveDraftTestToServer = async (
+    apiLock: MutableRefObject<boolean>,
+    id: TestID,
+    testDraft: TestDraft
+): Promise<void> => {
+    if (apiLock.current) return;
+
+    try {
+        apiLock.current = true;
+        await axios.put(`${import.meta.env.VITE_API_URL}/testDrafts`, {
+            testId: id,
+            draftData: JSON.stringify(testDraft),
+        });
+    } catch (e) {
+        console.error("Save draft failed:", e);
+    } finally {
+        apiLock.current = false;
+    }
+};
+
+export const callDeleteDraftFromServer = async (
+    testId: TestID
+) => {
+    try {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/${testId}`)
+
+    } catch (error: any) {
+        console.error(error);
+    }
+
 }
 
 export const callGetCategoryLabel = async (): Promise<ApiResponse<CategoryLabel[]>> => {

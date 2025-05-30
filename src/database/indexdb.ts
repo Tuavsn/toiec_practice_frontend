@@ -800,6 +800,7 @@ export async function checkDraftInIndexDB(testID: TestID): Promise<boolean> {
     const tx = db.transaction('drafts', 'readonly');
     const store = tx.objectStore('drafts');
     const record = await store.get(testID);
+    console.log(record)
     await tx.done;
     return record !== undefined;
 }
