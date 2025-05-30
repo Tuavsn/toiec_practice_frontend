@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { callGetIsDraftTestExist, callGetTestPaper, callPostTestRecord } from '../api/api';
+import { callGetIsDraftTestExist, callGetTestPaper, callPostTestRecord, callSaveDraftTestToServer, } from '../api/api';
 import { useTestState } from '../context/TestStateProvider';
 import { deleteDraftFromIndexDB, getDraftFromIndexDB, queryByPartIndex, upsertDraftToIndexDB } from '../database/indexdb';
 import { MappingPageWithQuestionNum } from '../utils/helperFunction/convertToHTML';
@@ -149,7 +149,7 @@ function fullTestScreenReducer(
 export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAction<TestScreenState>>) {
 
     const [fullTestScreenState, fullTestScreenDispatch] = useReducer(fullTestScreenReducer, initFullTestScreenState);
-
+    const apiLock = useRef<boolean>(false);
     const doTestDataRef = useRef<TestSheet>(emptyDoTestData);
     const { id = "", parts = "0", testType = "practice", time = "10" } = useParams<{ id: TestID, parts: string, testType: TestType, time: string }>();
     const thisQuestion: QuestionAnswerRecord = doTestDataRef.current.questionList[fullTestScreenState.currentPageIndex];
@@ -191,12 +191,12 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
     const autoSaveDraftTest = useCallback(() => {
         if (fullTestScreenState.isLoading || testType !== "fulltest") return;
         console.log("Auto-saving draft test...", fullTestScreenState.currentPageIndex);
-
-        upsertDraftToIndexDB(id, {
+        const testDraft: TestDraft = {
             draftTestData: doTestDataRef.current,
             draftTestScreenState: fullTestScreenState
-        } as TestDraft);
-        //callSaveDreftTestToServer();
+        }
+        upsertDraftToIndexDB(id, testDraft);
+        callSaveDraftTestToServer(apiLock, id, testDraft);
     }, [fullTestScreenState, id])
 
     useEffect(() => {

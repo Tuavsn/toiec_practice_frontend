@@ -4,6 +4,7 @@ import { confirmPopup, ConfirmPopup, ConfirmPopupProps } from "primereact/confir
 import { InputNumber } from "primereact/inputnumber";
 import { memo, MouseEvent } from "react";
 import { Navigate } from "react-router-dom";
+import { callDeleteDraftFromServer } from "../../../api/api";
 import { deleteDraftFromIndexDB } from "../../../database/indexdb";
 import { useCheckBox, useTimeLimitChooser } from "../../../hooks/TestDetailPaperHook";
 import { AmINotLoggedIn } from "../../../utils/helperFunction/AuthCheck";
@@ -52,7 +53,7 @@ const TimeLimitChooser: React.FC<TimeLimitChooserProps> = ({ limitTime, parts, t
         setTimeLimit,
         isDraftExist,
         timeLimit,
-    } = useTimeLimitChooser(limitTime, testId,parts);
+    } = useTimeLimitChooser(limitTime, testId, parts);
 
     const isButtonDisabled = isButtonClicked && !isDoneLoading;
     const isNavigateToDoTestPage = isButtonClicked && isDoneLoading;
@@ -61,11 +62,10 @@ const TimeLimitChooser: React.FC<TimeLimitChooserProps> = ({ limitTime, parts, t
         setIsButtonClicked(true)
     }
     const reject = () => {
+        callDeleteDraftFromServer(testId)
         deleteDraftFromIndexDB(testId).then(
             () => setIsButtonClicked(true)
         )
-
-
     }
 
     const confirm = (event: MouseEvent<HTMLButtonElement>) => {
