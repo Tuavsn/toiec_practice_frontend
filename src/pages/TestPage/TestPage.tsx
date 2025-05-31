@@ -4,7 +4,6 @@ import { useState } from "react"
 import FilterSection from "../../components/User/TestListViewer/FilterSection"
 import PageHeader from "../../components/User/TestListViewer/PageHeader"
 import PaginationSection from "../../components/User/TestListViewer/PaginationSection"
-import SkillTabs from "../../components/User/TestListViewer/SkillTabs"
 import TestCardGrid from "../../components/User/TestListViewer/TestCardGrid"
 import { useTestCard } from "../../hooks/TestCardHook"
 import { TestCard } from "../../utils/types/type"
@@ -23,16 +22,16 @@ export default function TestPage() {
     } = useTestCard()
 
     const [searchTerm, setSearchTerm] = useState("")
-    const [activeSkillTab, setActiveSkillTab] = useState(0)
+    // const [activeSkillTab, setActiveSkillTab] = useState(0)
 
     // Define skill types
-    const skillTypes = [
-        { name: "Tất cả", value: "all" },
-        { name: "Listening", value: "listening" },
-        { name: "Reading", value: "reading" },
-        { name: "Speaking", value: "speaking" },
-        { name: "Writing", value: "writing" },
-    ]
+    // const skillTypes = [
+    //     { name: "Tất cả", value: "all" },
+    //     { name: "Listening", value: "listening" },
+    //     { name: "Reading", value: "reading" },
+    //     { name: "Speaking", value: "speaking" },
+    //     { name: "Writing", value: "writing" },
+    // ]
 
     // Filter function for search
     const filterBySearch = (card: TestCard) => {
@@ -45,7 +44,7 @@ export default function TestPage() {
             <div className="p-4">
                 <PageHeader searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
-                <SkillTabs skillTypes={skillTypes} activeSkillTab={activeSkillTab} setActiveSkillTab={setActiveSkillTab} />
+                {/* <SkillTabs skillTypes={skillTypes} activeSkillTab={activeSkillTab} setActiveSkillTab={setActiveSkillTab} /> */}
 
                 <FilterSection
                     categoryLabels={categoryLabels}
