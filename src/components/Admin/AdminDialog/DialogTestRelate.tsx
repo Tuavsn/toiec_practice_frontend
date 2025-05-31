@@ -91,6 +91,8 @@ const RenderUpsertTestBody: React.FC<DialogUpdateTestBodyProps> = React.memo(
 
         const onInputNumberChange = (e: InputNumberValueChangeEvent, field: keyof TestRow) => {
             const value = e.value === null ? 0 : e.value; // Handle number input, default to 0 if null
+            console.log(value);
+            
             setFormData((prevRow) => ({
                 ...prevRow,
                 [field]: value
@@ -130,7 +132,7 @@ const RenderUpsertTestBody: React.FC<DialogUpdateTestBodyProps> = React.memo(
                     {
                         <div className="field flex-1">
                             <label htmlFor="difficulty" className="font-bold block mb-2">Độ khó</label>
-                            <InputNumber inputId="difficulty" value={formData.difficulty} onValueChange={(e) => onInputNumberChange(e, 'difficulty')} min={1} max={10} />
+                            <InputNumber inputId="difficulty" value={formData.difficulty} onValueChange={(e) => onInputNumberChange(e, 'difficulty')} min={1} max={990} />
                         </div>
                     }
                 </section>

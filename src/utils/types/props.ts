@@ -3,7 +3,7 @@ import { TreeNode } from "primereact/treenode";
 import { Dispatch, MutableRefObject } from "react";
 import { CategoryHookAction, FullTestScreenAction, LectureHookAction, MultiQuestionAction, PermissionHookAction, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, TopicHookAction, UserHookAction } from "./action";
 import { LectureHookState, MultiQuestionState, TestReviewHookState, WritingToeicPart3State } from "./state";
-import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, GradedFeedback, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Permission, PexelsPhoto, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, ToeicSpeakingLoadedTask, ToeicSpeakingPracticeView, ToeicSpeakingSubQuestion, Topic, TopicOverview, TopicStat, UIWritingPart1Control, UserAnswerRecord, UserDetailResultRow, UserRow, WritingPart1Prompt, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart3GradedFeedback, WritingToeicPart3Prompt, WritingToeicPart3UIControls } from "./type";
+import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, GradedFeedback, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Notification_t, Permission, PexelsPhoto, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, ToeicSpeakingLoadedTask, ToeicSpeakingPracticeView, ToeicSpeakingSubQuestion, Topic, TopicOverview, TopicStat, UIWritingPart1Control, UserAnswerRecord, UserDetailResultRow, UserRow, WritingPart1Prompt, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart3GradedFeedback, WritingToeicPart3Prompt, WritingToeicPart3UIControls } from "./type";
 
 interface ButtonListProps {
     pageMapper: QuestionPage[],
@@ -512,6 +512,50 @@ interface RadioButtonGroupProps {
     doTestDataRef: React.MutableRefObject<TestSheet>
     autoSaveDraftTest: () => void,
 }
+//------------------------------------------------------
+// Props for NotificationItem
+//------------------------------------------------------
+/**
+ * @interface NotificationItemProps
+ * @description Props cho component hiển thị một mục thông báo đơn lẻ.
+ * @property {Notification_t} notification - Đối tượng thông báo để hiển thị.
+ * @property {(notification: Notification_t) => void} onClick - Hàm callback khi mục thông báo được nhấp vào.
+ * @property {(notificationId: string) => void} onDelete - Hàm callback khi nút xóa thông báo được nhấp vào.
+ */
+interface NotificationItemProps {
+  notification: Notification_t;
+  onClick: (notification: Notification_t) => void; // Thường là handleNotificationClick từ hook
+  onDelete: (notificationId: string) => void;   // Thường là deleteNotificationItem từ hook
+}
+
+//------------------------------------------------------
+// Props for NotificationPanel
+//------------------------------------------------------
+/**
+ * @interface NotificationPanelProps
+ * @description Props cho component hiển thị bảng danh sách thông báo.
+ * Component này sẽ sử dụng hook useNotification để lấy dữ liệu và hàm xử lý.
+ * @property {() => void} onClosePanel - Hàm callback để đóng OverlayPanel chứa nó.
+ */
+interface NotificationPanelProps {
+  // Lấy các giá trị và hàm cần thiết trực tiếp từ useNotification hook.
+  // Tuy nhiên, chúng ta có thể truyền một callback để đóng panel khi một thông báo được click.
+  onClosePanel?: () => void;
+}
+
+//------------------------------------------------------
+// Props for NotificationIcon (Component hiển thị chuông và badge)
+//------------------------------------------------------
+/**
+ * @interface NotificationIconProps
+ * @description Props cho component hiển thị icon chuông thông báo và badge.
+ * @property {number} unreadCount - Số lượng thông báo chưa đọc.
+ * @property {(event: React.MouseEvent<HTMLElement>) => void} onClick - Hàm xử lý khi icon được nhấp, thường để mở OverlayPanel.
+ */
+interface NotificationIconProps {
+  unreadCount: number;
+  onClick: (event: React.MouseEvent<HTMLElement>) => void;
+}
 
 export type {
     ActivityLogProps, AdminCategoryTableProps, AdminGenericTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AnswerFormProps, AssignmentQuestionTableProps, ButtonListProps,
@@ -523,7 +567,7 @@ export type {
     DialogUpdateTopicBodyProps, DialogUpdateUserBodyProps,
     DialogUserRowProps, DoExercisePageProps,
     DoTestPageProps, EmailGradeDisplayProps, EmailPromptDisplayProps, EmailResponseFormProps, EssayEditorFormProps, EssayGradeDisplayProps, EssayQuestionDisplayProps, FullTestAreaProps,
-    FullTestScreenProps, GlassCardProps, GradeDisplayProps, ImageDisplayProps, LectureActionButtonProps, LectureReduceProps, PanelHeaderProps, PartDetailSectionProps, PromptDisplayProps, QuestionActionButtonProps,
+    FullTestScreenProps, GlassCardProps, GradeDisplayProps, ImageDisplayProps, LectureActionButtonProps, LectureReduceProps, NotificationIconProps, NotificationItemProps, NotificationPanelProps, PanelHeaderProps, PartDetailSectionProps, PromptDisplayProps, QuestionActionButtonProps,
     QuestionTableProps, RadioButtonGroupProps, RenderPressStartButtonProps,
     RenderTestProps, RennderTutorialProps,
     ResourceSectionProps,

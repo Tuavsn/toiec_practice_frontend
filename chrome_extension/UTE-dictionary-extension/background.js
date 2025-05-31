@@ -1,109 +1,256 @@
-// Tạo các mục menu ngữ cảnh (context menu)
-chrome.runtime.onInstalled.addListener(() => {
-    // Tạo mục menu ngữ cảnh cho dịch từ tiếng Anh sang tiếng Việt
-    chrome.contextMenus.create({
-        id: "en", // ID duy nhất cho mục menu
-        title: "Dịch Anh  ⇄ Việt", // Tiêu đề hiển thị trong menu
-        contexts: ["selection"], // Mục menu này chỉ hiển thị khi có văn bản được chọn
-    });
+// Filename: background.js
 
-    // Tạo mục menu ngữ cảnh cho dịch từ tiếng Việt sang tiếng Anh
-    chrome.contextMenus.create({
-        id: "vi", // ID duy nhất cho mục menu
-        title: "Dịch Việt  ⇄ Anh", // Tiêu đề hiển thị trong menu
-        contexts: ["selection"], // Mục menu này chỉ hiển thị khi có văn bản được chọn
-    });
-});
+//------------------------------------------------------
+// Setup context menu for translation
+//------------------------------------------------------
 
-// Xử lý khi người dùng nhấp vào menu ngữ cảnh
-chrome.contextMenus.onClicked.addListener((info) => {
-    const selectedText = info.selectionText; // Lấy văn bản đã chọn từ thông tin menu
+// Create context menu entries
+function createContextMenus() {
+  chrome.contextMenus.create({
+    id: "en",
+    title: "🇺🇸→🇻🇳 Translate to Vietnamese",
+    contexts: ["selection"],
+  });
 
-    // Truy vấn tab đang hoạt động để lấy tabId
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        const tabId = tabs[0].id; // Lấy ID của tab đang hoạt động
-
-        if (tabId) {
-            // Gọi hàm dịch văn bản đã chọn, truyền vào tabId, văn bản và ID của mục menu
-            translateSelectedText(tabId, selectedText, info.menuItemId);
-        } else {
-            // In ra lỗi nếu không tìm thấy tabId
-            console.error("tabId is missing.");
-        }
-    });
-});
-
-// Hàm để dịch văn bản
-function translateSelectedText(tabId, text, lang) {
-    const sourceLang = lang; // Ngôn ngữ nguồn (dựa vào ID mục menu)
-    const targetLang = lang === "vi" ? "en" : "vi"; // Đặt ngôn ngữ đích dựa trên ngôn ngữ nguồn
-
-    // Gửi yêu cầu đến API dịch
-    fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`)
-        .then(response => response.json()) // Chuyển đổi phản hồi thành JSON
-        .then(data => {
-            const translatedText = data[0][0][0]; // Lấy văn bản đã dịch từ dữ liệu
-            // Hiển thị văn bản đã dịch trên trang
-            chrome.scripting.executeScript({
-                target: { tabId: tabId }, // Chỉ định tab để thực thi script
-                func: showTranslatedText, // Hàm để hiển thị văn bản đã dịch
-                args: [translatedText, text] // Truyền văn bản đã dịch và văn bản gốc vào hàm
-            });
-        })
-        .catch(error => {
-            // Nếu có lỗi trong quá trình dịch, in ra lỗi và thông báo cho người dùng
-            console.error('Error:', error);
-            chrome.scripting.executeScript({
-                target: { tabId: tabId },
-                func: showTranslatedText,
-                args: ['Dịch không thành công. vui lòng thử lại sau', text] // Hiển thị thông báo lỗi
-            });
-        });
+  chrome.contextMenus.create({
+    id: "vi",
+    title: "🇻🇳→🇺🇸 Translate to English",
+    contexts: ["selection"],
+  });
 }
 
-// Hàm để hiển thị văn bản đã dịch
-function showTranslatedText(text, selectedText) {
-    const existingPopup = document.getElementById('translation-popup_for_extension_ute_app'); // Kiểm tra xem popup đã tồn tại chưa
-    if (existingPopup) {
-        existingPopup.remove(); // Nếu tồn tại, xóa popup hiện tại
+// Ensure context menu is created on install or browser startup
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.removeAll(createContextMenus);
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  chrome.contextMenus.removeAll(createContextMenus);
+});
+
+//------------------------------------------------------
+// Handle context menu click
+//------------------------------------------------------
+
+chrome.contextMenus.onClicked.addListener((info) => {
+  const selectedText = info.selectionText;
+
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const tabId = tabs[0].id;
+    if (tabId) {
+      translateSelectedText(tabId, selectedText, info.menuItemId);
+    }
+  });
+});
+
+//------------------------------------------------------
+// Translate text and inject popup
+//------------------------------------------------------
+
+function translateSelectedText(tabId, text, lang) {
+  const sourceLang = lang;
+  const targetLang = lang === "vi" ? "en" : "vi";
+
+  fetch(
+    `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(
+      text,
+    )}`,
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      const translatedText = data[0][0][0];
+      chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        func: showTranslatedText,
+        args: [translatedText, text, sourceLang, targetLang],
+      });
+    })
+    .catch(() => {
+      chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        func: showTranslatedText,
+        args: ["Translation failed. Please try again later.", text, sourceLang, targetLang],
+      });
+    });
+}
+
+//------------------------------------------------------
+// Function to inject and position the popup
+//------------------------------------------------------
+
+function showTranslatedText(translatedText, originalText, fromLang, toLang) {
+  const existingPopup = document.getElementById("translation-popup_for_extension_ute_app");
+  if (existingPopup) existingPopup.remove();
+
+  const popup = document.createElement("div");
+  popup.id = "translation-popup_for_extension_ute_app";
+  popup.style.cssText = `
+    position: absolute !important;
+    background: #ffffff !important;
+    border: 2px solid #1976d2 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+    padding: 15px !important;
+    z-index: 999999 !important;
+    max-width: 320px !important;
+    min-width: 250px !important;
+    font-family: 'Segoe UI', Arial, sans-serif !important;
+    font-size: 14px !important;
+    color: #212121 !important;
+    pointer-events: auto !important;
+    line-height: 1.4 !important;
+  `;
+
+  const header = document.createElement("div");
+  header.style.cssText = `
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 8px !important;
+    border-bottom: 2px solid #e3f2fd !important;
+  `;
+
+  const title = document.createElement("div");
+  title.textContent = fromLang === "vi" ? "🇻🇳 → 🇺🇸 Translation" : "🇺🇸 → 🇻🇳 Translation";
+  title.style.cssText = `
+    color: #1976d2 !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    background: #e3f2fd !important;
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+  `;
+
+  const closeButton = document.createElement("button");
+  closeButton.textContent = "×";
+  closeButton.style.cssText = `
+    background: #f44336 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 24px !important;
+    height: 24px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  `;
+  closeButton.addEventListener("click", () => popup.remove());
+
+  header.appendChild(title);
+  header.appendChild(closeButton);
+  popup.appendChild(header);
+
+  const originalSection = document.createElement("div");
+  originalSection.style.marginBottom = "12px";
+
+  const originalLabel = document.createElement("div");
+  originalLabel.textContent = "Original:";
+  originalLabel.style.cssText = `
+    color: #666 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    margin-bottom: 4px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+  `;
+
+  const original = document.createElement("div");
+  original.textContent = originalText;
+  original.style.cssText = `
+    background: #f5f5f5 !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 6px !important;
+    padding: 10px !important;
+    font-size: 13px !important;
+    color: #424242 !important;
+    font-style: italic !important;
+    word-wrap: break-word !important;
+  `;
+
+  originalSection.appendChild(originalLabel);
+  originalSection.appendChild(original);
+  popup.appendChild(originalSection);
+
+  const translatedSection = document.createElement("div");
+
+  const translatedLabel = document.createElement("div");
+  translatedLabel.textContent = "Translation:";
+  translatedLabel.style.cssText = `
+    color: #1976d2 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    margin-bottom: 4px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+  `;
+
+  const translated = document.createElement("div");
+  translated.textContent = translatedText;
+  translated.style.cssText = `
+    background: #e3f2fd !important;
+    border: 2px solid #1976d2 !important;
+    border-radius: 6px !important;
+    padding: 12px !important;
+    font-size: 14px !important;
+    color: #0d47a1 !important;
+    font-weight: 500 !important;
+    word-wrap: break-word !important;
+  `;
+
+  translatedSection.appendChild(translatedLabel);
+  translatedSection.appendChild(translated);
+  popup.appendChild(translatedSection);
+
+  //------------------------------------------------------
+  // Position popup near selected text
+  //------------------------------------------------------
+
+  const selection = window.getSelection();
+  if (selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+
+    let top = rect.bottom + window.scrollY + 10;
+    let left = rect.left + window.scrollX;
+
+    const popupHeight = 260;
+    const popupWidth = 320;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    if (top + popupHeight > window.scrollY + viewportHeight) {
+      top = rect.top + window.scrollY - popupHeight;
     }
 
-    const popup = document.createElement('div');                // Tạo phần tử div cho popup
-    popup.id = 'translation-popup';                             // Đặt ID cho popup
-    popup.style.position = 'absolute';                             // Đặt popup ở vị trí cố định
-    popup.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';   // Đặt nền trắng bán trong suốt
-    popup.style.border = '1px solid #ccc';                      // Đặt viền màu xám nhạt
-    popup.style.borderRadius = '8px';                           // Thêm góc bo tròn
-    popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';     // Thêm bóng mờ để tạo chiều sâu
-    popup.style.padding = '10px';                               // Đặt khoảng cách bên trong popup
-    popup.style.zIndex = 9999;                                  // Đảm bảo popup xuất hiện trên các phần tử khác
-    popup.style.pointerEvents = 'auto';                         // Cho phép các sự kiện chuột trên popup
-    popup.style.maxWidth = '300px';                             // Đặt chiều rộng tối đa cho popup
-    popup.style.fontFamily = 'Arial, sans-serif';               // Đặt font chữ sạch sẽ
-    popup.style.fontSize = '14px';                              // Đặt kích thước font chữ dễ đọc
-    popup.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-
-    // Định vị popup gần với văn bản đã chọn
-    const selection = window.getSelection(); // Lấy đối tượng lựa chọn hiện tại
-    if (selection.rangeCount > 0) { // Kiểm tra xem có lựa chọn nào không
-        const range = selection.getRangeAt(0); // Lấy dải lựa chọn đầu tiên
-        const rect = range.getBoundingClientRect(); // Lấy vị trí của dải lựa chọn
-        // Đặt vị trí cho popup bên dưới văn bản đã chọn
-        popup.style.top = `${rect.top + window.scrollY + rect.height + 5}px`; // Vị trí dọc
-        popup.style.left = `${rect.left + window.scrollX}px`; // Vị trí ngang
+    if (left + popupWidth > viewportWidth) {
+      left = viewportWidth - popupWidth - 10;
     }
 
-    popup.innerText = text; // Đặt văn bản đã dịch cho popup
-    document.body.appendChild(popup); // Thêm popup vào body của trang
+    if (left < 10) left = 10;
+    if (top < 10) top = 10;
 
-    // Đóng popup khi người dùng nhấp ra ngoài nó
-    const closePopup = (event) => {
-        if (!popup.contains(event.target)) { // Kiểm tra xem nhấp không nằm trong popup
-            popup.remove(); // Xóa popup
-            document.removeEventListener('click', closePopup); // Gỡ bỏ sự kiện nhấp
-        }
-    };
+    popup.style.top = `${top}px`;
+    popup.style.left = `${left}px`;
+  }
 
-    document.addEventListener('click', closePopup); // Thêm sự kiện nhấp cho toàn bộ tài liệu
+  document.body.appendChild(popup);
+
+  // Auto-close after 15s
+  setTimeout(() => popup.remove(), 15000);
+
+  // Close when clicking outside
+  const closePopup = (event) => {
+    if (!popup.contains(event.target)) {
+      popup.remove();
+      document.removeEventListener("click", closePopup);
+    }
+  };
+
+  setTimeout(() => {
+    document.addEventListener("click", closePopup);
+  }, 200);
 }

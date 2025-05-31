@@ -1,5 +1,5 @@
 import { Content, GenerateContentConfig, GoogleGenAI, HarmBlockThreshold, HarmCategory, Schema, Type } from "@google/genai";
-import { isCancel } from "axios";
+import { AxiosError, isCancel } from "axios";
 import { Toast } from "primereact/toast";
 import { MutableRefObject } from "react";
 import { checkDraftInIndexDB } from "../database/indexdb";
@@ -14,7 +14,7 @@ import {
     DraftLocation,
     EssayQuestionApiResponse,
     ExerciseType, GradedFeedback, ImageDataWithMimeType, Lecture, LectureCard, LectureID,
-    LectureProfile, LectureRow, Part2EmailContext, Permission, PermissionID,
+    LectureProfile, LectureRow, Notification_t, Part2EmailContext, Permission, PermissionID,
     PexelsPhoto, PexelsSearchResponse, QuestionID, QuestionRow, RecommendDoc, RecommendLecture, RecommendTest, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, TargetType, Test, TestCard, TestDetailPageData, TestDraft, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, TestType, ToeicSpeakingPromptTask, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateCommentReportStatusPayload, UpdateQuestionForm, UserComment, UserRow,
     WritingPart1Prompt,
     WritingToeicPart2ApiPromptData,
@@ -276,24 +276,46 @@ export const callGetMyRecommend = async (): Promise<[(RecommendLecture[] | null)
 
 export const callGetIsDraftTestExist = async (testId: TestID, testType: TestType): Promise<DraftLocation> => {
     try {
+
         if (testType !== "fulltest") {
             return "none";
         }
-        const isDraftInIndexDB = await checkDraftInIndexDB(testId);
-        console.log("isdb",isDraftInIndexDB)
-        if (isDraftInIndexDB) {
-            return "indexDB";
-        }
-        const response = await axios.get<ApiResponse<{ exist: boolean }>>(`${import.meta.env.VITE_API_URL}/testDrafts/check-exist/${testId}`);
-        if (response.data.data.exist) {
-            return "server";
-        }
-        return "none";
+        const draftIndexDBVersion = await GetDraftVersionFromIndexDB(testId);
+        const draftServerDBVersion = await GetDraftVersionFromServer(testId);
+        console.log("time left on indexdb %d . time left on server %d", draftIndexDBVersion, draftServerDBVersion);
+        return draftIndexDBVersion <= draftServerDBVersion ? "indexDB" : "server";
     } catch (error) {
         console.error("Lỗi khi kiểm tra bài thi nháp:", error);
         return "none";
     }
 }
+
+async function GetDraftVersionFromIndexDB(testId: TestID): Promise<number> {
+    try {
+        const draftIndexDBVersion = await checkDraftInIndexDB(testId);
+        console.log("isdb", draftIndexDBVersion)
+        if (draftIndexDBVersion) {
+            return draftIndexDBVersion;
+        }
+        return 999_999_999_999;
+    } catch (error: any) {
+        return 999_999_999_999;
+    }
+}
+
+async function GetDraftVersionFromServer(testId: TestID): Promise<number> {
+    try {
+
+        const response = await axios.get<ApiResponse<{ exist: boolean, version: number }>>(`${import.meta.env.VITE_API_URL}/testDrafts/check-exist/${testId}`);
+        if (!response.data.data.exist) {
+            return 999_999_999_999;
+        }
+        return response.data.data.version;
+    } catch (error: any) {
+        return 999_999_999_999;
+    }
+}
+
 export const callSaveDraftTestToServer = async (
     apiLock: MutableRefObject<boolean>,
     id: TestID,
@@ -304,6 +326,7 @@ export const callSaveDraftTestToServer = async (
     try {
         apiLock.current = true;
         await axios.put(`${import.meta.env.VITE_API_URL}/testDrafts`, {
+            version: testDraft.draftTestData.secondsLeft,
             testId: id,
             draftData: JSON.stringify(testDraft),
         });
@@ -336,6 +359,16 @@ export const callGetTestCard = async (format: string, year: number, pageIndex: n
     return response.data;
 }
 
+export const callGetDraftFromServer = async (testId: TestID): Promise<TestDraft | null> => {
+    try {
+        const response = await axios.get<ApiResponse<{ testId: string, draftData: string }>>(`${import.meta.env.VITE_API_URL}/testDrafts/${testId}`);
+        return JSON.parse(response.data.data.draftData) as TestDraft;
+    } catch (error: any) {
+        console.error(error);
+        return null;
+    }
+
+}
 
 export const callPostDoctrine = async (lectureId: LectureID, request: string): Promise<boolean> => {
     try {
@@ -365,12 +398,107 @@ export const callGetLectureRow = async (signal: AbortSignal, pageNumber: number,
 }
 export const callGetLectureCard = async (pageNumber: number, keyword: string, pageSize: number = 5): Promise<TableData<LectureCard> | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<LectureCard>>>(`${import.meta.env.VITE_API_URL}/lectures/client?info=true&current=${pageNumber + 1}&pageSize=${pageSize}&active=true&search=${keyword}`);
+        const response = await axios.get<ApiResponse<TableData<LectureCard>>>(`${import.meta.env.VITE_API_URL}/lectures/client?info=true&current=${pageNumber + 1}&pageSize=${pageSize}&active=true&orderDesc=true&search=${keyword}`);
         return response.data.data;
     } catch (error) {
         return null
     }
 }
+
+/**
+ * Lấy danh sách thông báo từ server.
+ * @async
+ * @function fetchNotifications
+ * @param {number} current - Số trang hiện tại (bắt đầu từ 0).
+ * @param {number} pageSize - Số lượng thông báo trên mỗi trang.
+ * @returns {Promise<ApiResponse<TableData<Notification_t>> | null>} Dữ liệu thông báo hoặc null nếu có lỗi.
+ */
+export const fetchNotifications = async (
+    current: number,
+    pageSize: number
+): Promise<ApiResponse<TableData<Notification_t>> | null> => {
+    try {
+        const response = await axios.get<ApiResponse<TableData<Notification_t>>>('/notifications', {
+            params: { current, pageSize },
+        });
+        return response.data;
+    } catch (error) {
+        // Ghi log lỗi ra console để debug
+        console.error('Lỗi khi lấy danh sách thông báo:', error instanceof AxiosError ? error.message : error);
+        return null; // Trả về null khi có lỗi theo yêu cầu
+    }
+};
+
+/**
+ * Đánh dấu một thông báo cụ thể là đã đọc.
+ * @async
+ * @function markNotificationAsRead
+ * @param {string} notificationId - ID của thông báo cần đánh dấu.
+ * @returns {Promise<ApiResponse<Notification_t> | null>} Thông báo đã cập nhật hoặc null nếu có lỗi.
+ */
+export const markNotificationAsRead = async (
+    notificationId: string
+): Promise<ApiResponse<Notification_t> | null> => {
+    // Kiểm tra notificationId để tránh lỗi không cần thiết
+    if (!notificationId) {
+        console.error('markNotificationAsRead: notificationId không được để trống.');
+        return null;
+    }
+    try {
+        const response = await axios.patch<ApiResponse<Notification_t>>(
+            `/notifications/${notificationId}/read`
+        );
+        return response.data;
+    } catch (error) {
+        console.error(`Lỗi khi đánh dấu thông báo ${notificationId} là đã đọc:`, error instanceof AxiosError ? error.message : error);
+        return null;
+    }
+};
+
+/**
+ * Đánh dấu tất cả thông báo là đã đọc.
+ * @async
+ * @function markAllNotificationsAsRead
+ * @returns {Promise<ApiResponse<any> | null>} Phản hồi từ API hoặc null nếu có lỗi.
+ * API response là "any" theo như mô tả, nhưng có thể cần điều chỉnh nếu API có cấu trúc trả về cụ thể.
+ */
+export const markAllNotificationsAsRead = async (): Promise<ApiResponse<any> | null> => {
+    try {
+        // API endpoint `/notifications/read-all` sử dụng PATCH
+        const response = await axios.patch<ApiResponse<any>>('/notifications/read-all');
+        return response.data;
+    } catch (error) {
+        console.error('Lỗi khi đánh dấu tất cả thông báo là đã đọc:', error instanceof AxiosError ? error.message : error);
+        return null;
+    }
+};
+
+/**
+ * Xóa một thông báo cụ thể.
+ * @async
+ * @function deleteNotification
+ * @param {string} notificationId - ID của thông báo cần xóa.
+ * @returns {Promise<ApiResponse<any> | null>} Phản hồi từ API hoặc null nếu có lỗi.
+ * API response là "any" theo như mô tả.
+ */
+export const deleteNotification = async (
+    notificationId: string
+): Promise<ApiResponse<any> | null> => {
+    // Guard clause để kiểm tra notificationId
+    if (!notificationId) {
+        console.error('deleteNotification: notificationId không được để trống.');
+        return null;
+    }
+    try {
+        const response = await axios.delete<ApiResponse<any>>(
+            `/notifications/${notificationId}`
+        );
+        return response.data;
+    } catch (error) {
+        console.error(`Lỗi khi xóa thông báo ${notificationId}:`, error instanceof AxiosError ? error.message : error);
+        return null;
+    }
+};
 
 export const callGetRelateLectures = async (lectureId: LectureID): Promise<RelateLectureTitle[] | null> => {
     try {
