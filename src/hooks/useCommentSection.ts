@@ -96,7 +96,7 @@ export const useCommentSection = ({
             abortControllerRef.current = new AbortController();
          
             await callApi(
-                (signal) => fetchRootCommentList(targetType, targetId, signal, page, pageSize, term, ["createdAt"], ["desc"], undefined),
+                (signal) => fetchRootCommentList(targetType, targetId, signal, page, pageSize, term, ["createdAt"], ["desc"],true),
                 CommentActionType.FETCH_ROOT_COMMENTS_START,
                 (payload: CommentPage) => ({ type: CommentActionType.FETCH_ROOT_COMMENTS_SUCCESS, payload: { comments: payload.result, meta: payload.meta } }),
                 CommentActionType.FETCH_ROOT_COMMENTS_FAILURE

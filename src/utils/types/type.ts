@@ -198,6 +198,61 @@ export interface CategoryLabel {
   year: number[];
 }
 
+/**
+ * @enum NotificationType
+ * @description Định nghĩa các loại thông báo được hỗ trợ.
+ */
+export enum NotificationType_t {
+  COMMENT_REPLY_TEST = "COMMENT_REPLY_TEST",
+  COMMENT_REPLY_LECTURE = "COMMENT_REPLY_LECTURE",
+  // Thêm các loại thông báo khác nếu cần
+}
+/**
+ * @enum NotificationActionType
+ * @description Enum định nghĩa các loại hành động cho reducer thông báo.
+ */
+export enum NotificationActionType {
+  FETCH_NOTIFICATIONS_START = 'FETCH_NOTIFICATIONS_START',
+  FETCH_NOTIFICATIONS_SUCCESS = 'FETCH_NOTIFICATIONS_SUCCESS',
+  FETCH_NOTIFICATIONS_FAILURE = 'FETCH_NOTIFICATIONS_FAILURE',
+
+  LOAD_MORE_NOTIFICATIONS_START = 'LOAD_MORE_NOTIFICATIONS_START',
+  LOAD_MORE_NOTIFICATIONS_SUCCESS = 'LOAD_MORE_NOTIFICATIONS_SUCCESS',
+  LOAD_MORE_NOTIFICATIONS_FAILURE = 'LOAD_MORE_NOTIFICATIONS_FAILURE',
+
+  MARK_AS_READ_SUCCESS = 'MARK_AS_READ_SUCCESS',
+  MARK_AS_READ_FAILURE = 'MARK_AS_READ_FAILURE', // Mặc dù API trả về null, ta vẫn có thể muốn cập nhật state lỗi
+
+  MARK_ALL_AS_READ_SUCCESS = 'MARK_ALL_AS_READ_SUCCESS',
+  MARK_ALL_AS_READ_FAILURE = 'MARK_ALL_AS_READ_FAILURE',
+
+  DELETE_NOTIFICATION_SUCCESS = 'DELETE_NOTIFICATION_SUCCESS',
+  DELETE_NOTIFICATION_FAILURE = 'DELETE_NOTIFICATION_FAILURE',
+
+  UPDATE_UNREAD_COUNT = 'UPDATE_UNREAD_COUNT', // Có thể cần một hành động riêng để cập nhật số lượng chưa đọc
+  // Hoặc tính toán lại từ danh sách thông báo mỗi khi thay đổi
+  RESET_NOTIFICATIONS = 'RESET_NOTIFICATIONS', // Hành động để reset state về ban đầu (ví dụ: khi logout)
+}
+/**
+ * @interface Notification_t
+ * @description Định nghĩa cấu trúc của một đối tượng thông báo.
+ * @property {string} id - Mã định danh duy nhất của thông báo.
+ * @property {NotificationType} type - Loại thông báo.
+ * @property {string} message - Nội dung của thông báo.
+ * @property {string} relatedId - ID liên quan đến nội dung thông báo (ví dụ: ID của bài test hoặc bài giảng).
+ * @property {string | Date} createdAt - Thời gian tạo thông báo (có thể là chuỗi ISO hoặc đối tượng Date).
+ * @property {boolean} read - Trạng thái đã đọc của thông báo.
+ */
+export interface Notification_t {
+  id: string;
+  type: NotificationType_t;
+  message: string;
+  relatedId: string;
+  createdAt: string; // API trả về string, có thể chuyển đổi sang Date nếu cần
+  read: boolean;
+  deepLink: string;
+}
+
 export interface LectureCard {
   id: string,
   name: string,

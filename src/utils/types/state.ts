@@ -1,4 +1,4 @@
-import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, GradedFeedback, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, OverallStat, Permission, PexelsPhoto, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow, WritingPart1Prompt, WritingSheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3Prompt, WritingToeicPart3SheetData, WritingToeicPart3UserAnswer } from "./type";
+import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, GradedFeedback, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, Notification_t, OverallStat, Permission, PexelsPhoto, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow, WritingPart1Prompt, WritingSheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3Prompt, WritingToeicPart3SheetData, WritingToeicPart3UserAnswer } from "./type";
 
 interface LectureHookState {
   isRefresh: boolean;
@@ -187,9 +187,28 @@ interface WritingToeicPart3State {
   error: string | null; // Thông báo lỗi
 }
 
+/**
+ * @interface NotificationState
+ * @description Định nghĩa cấu trúc state cho tính năng thông báo.
+ * @property {Notification_t[]} notifications - Danh sách các thông báo hiện tại.
+ * @property {Meta | null} meta - Thông tin phân trang từ API; null nếu chưa có dữ liệu.
+ * @property {number} unreadCount - Số lượng thông báo chưa đọc.
+ * @property {boolean} isLoading - Cờ báo hiệu đang tải dữ liệu.
+ * @property {string | null} error - Thông báo lỗi (nếu có).
+ * @property {boolean} isLoadingMore - Cờ báo hiệu đang tải thêm thông báo (cho phân trang).
+ */
+interface NotificationState {
+  notifications: Notification_t[];
+  meta: Meta | null;
+  unreadCount: number;
+  isLoading: boolean;
+  error: string | null;
+  isLoadingMore: boolean; // Để xử lý trạng thái loading riêng cho "Load More"
+}
+
 export type {
   AdminReportsState, CategoryHookState, CommentSectionState, CommentsState, FullTestScreenState,
-  LectureCardState, LectureHookState, MultiQuestionState, PermissionHookState, ProfileHookState,
+  LectureCardState, LectureHookState, MultiQuestionState, NotificationState, PermissionHookState, ProfileHookState,
   RenderTestState,
   RoleHookState, RowHookState, TestHookState, TestReviewHookState, ToeicWritingPart1State, TopicHookState, UserCommentState,
   UserHookState, WritingToeicPart3State

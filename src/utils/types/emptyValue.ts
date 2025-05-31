@@ -1,5 +1,5 @@
 import { TreeNode } from "primereact/treenode";
-import { AdminReportsState, CategoryHookState, CommentSectionState, CommentsState, LectureCardState, LectureHookState, MultiQuestionState, PermissionHookState, ProfileHookState, RoleHookState, TestHookState, TestReviewHookState, ToeicWritingPart1State, TopicHookState, UserHookState, WritingToeicPart3State } from "./state";
+import { AdminReportsState, CategoryHookState, CommentSectionState, CommentsState, LectureCardState, LectureHookState, MultiQuestionState, NotificationState, PermissionHookState, ProfileHookState, RoleHookState, TestHookState, TestReviewHookState, ToeicWritingPart1State, TopicHookState, UserHookState, WritingToeicPart3State } from "./state";
 import { AnswerData, CategoryRow, LectureRow, OverallStat, Permission, QuestionNumber, Role, TestDetailPageData, TestResultSummary, TestRow, TestSheet, ToeicSpeakingPartState, ToeicSpeakingPracticeView, Topic, UserRow, WritingToeicPart2State } from "./type";
 export const emptyDate = new Date(0, 0, 0);
 Object.freeze(emptyDate);
@@ -350,4 +350,13 @@ export const initialToeicSpeakingState: ToeicSpeakingPartState = {
     overallError: undefined,
     isLoadingPexelsImage: false,
     isLoadingTasks: false,
+} as const;
+
+export const initialNotificationState: NotificationState = {
+    notifications: [],
+    meta: null,
+    unreadCount: 0,
+    isLoading: false,
+    error: null,
+    isLoadingMore: false,
 } as const;
