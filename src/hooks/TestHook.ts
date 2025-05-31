@@ -1,6 +1,6 @@
 import { MutableRefObject, useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { callGetDraftFromServer, callGetIsDraftTestExist, callGetTestPaper, callPostTestRecord, callSaveDraftTestToServer, } from '../api/api';
+import { callDeleteDraftFromServer, callGetDraftFromServer, callGetIsDraftTestExist, callGetTestPaper, callPostTestRecord, callSaveDraftTestToServer, } from '../api/api';
 import { useTestState } from '../context/TestStateProvider';
 import { deleteDraftFromIndexDB, getDraftFromIndexDB, queryByPartIndex, upsertDraftToIndexDB } from '../database/indexdb';
 import { MappingPageWithQuestionNum } from '../utils/helperFunction/convertToHTML';
@@ -171,6 +171,7 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
         const resultId: ResultID = await sendFinalResultToServer()
         setTestScreenState({ state: "NAVIGATE_TO_RESULT", resultID: resultId });
         await deleteDraftFromIndexDB(id);
+        await callDeleteDraftFromServer(id);
     }
 
     // hàm gửi dữ liệu bài  làm kết thúc của người dùng về server
