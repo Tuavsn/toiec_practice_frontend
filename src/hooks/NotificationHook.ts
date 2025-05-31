@@ -19,7 +19,7 @@ const DEFAULT_PAGE_SIZE = 10; // Số lượng thông báo mặc định trên m
  * @description Hook tùy chỉnh để quản lý logic và state của thông báo.
  * Bao gồm fetch, đánh dấu đã đọc, xóa, và xử lý phân trang.
  */
-export const useNotification = () => {
+export const useNotification = (reload: boolean, setReload: React.Dispatch<React.SetStateAction<boolean>>) => {
     const [state, dispatch] = useReducer(notificationReducer, initialNotificationState);
     const navigate = useNavigate();
     const { toast } = useToast(); // Sử dụng hook toast toàn cục của bạn
@@ -61,14 +61,8 @@ export const useNotification = () => {
                 type: NotificationActionType.FETCH_NOTIFICATIONS_FAILURE,
                 payload: 'Không thể tải thông báo. Vui lòng thử lại.',
             });
-            toast.current?.show({
-                severity: 'error',
-                summary: 'Lỗi',
-                detail: 'Không thể tải thông báo. Vui lòng thử lại.',
-                life: 3000,
-            });
         }
-    }, [toast]); // Dependencies: toast (nếu nó thay đổi)
+    }, []); // Dependencies: toast (nếu nó thay đổi)
 
     /**
      * Tải thêm thông báo (phân trang).
@@ -101,14 +95,9 @@ export const useNotification = () => {
                 type: NotificationActionType.LOAD_MORE_NOTIFICATIONS_FAILURE,
                 payload: 'Không thể tải thêm thông báo.',
             });
-            toast.current?.show({
-                severity: 'error',
-                summary: 'Lỗi',
-                detail: 'Không thể tải thêm thông báo.',
-                life: 3000,
-            });
+
         }
-    }, [state.meta, state.isLoadingMore, toast]);
+    }, [state.meta, state.isLoadingMore]);
 
     /**
      * Đánh dấu một thông báo là đã đọc và điều hướng nếu cần.
@@ -150,12 +139,14 @@ export const useNotification = () => {
         }
 
         if (notification.deepLink) {
+            dispatch({ type: NotificationActionType.REDUCE_UNREAD_COUNT_BY_1 })
+            setReload(pre => !pre);
             navigate(notification.deepLink);
         } else {
             console.warn(`Loại thông báo không xác định: ${notification.type}`);
 
         }
-    }, [navigate, toast]);
+    }, [navigate, toast, reload]);
 
     /**
      * Đánh dấu tất cả thông báo là đã đọc.
@@ -170,6 +161,9 @@ export const useNotification = () => {
                 detail: 'Tất cả thông báo đã được đánh dấu là đã đọc.',
                 life: 3000,
             });
+            setReload(pre => !pre);
+            console.log("hả %d", state.unreadCount);
+
         } else {
             dispatch({
                 type: NotificationActionType.MARK_ALL_AS_READ_FAILURE,
@@ -182,7 +176,7 @@ export const useNotification = () => {
                 life: 3000,
             });
         }
-    }, [toast]);
+    }, [toast,state.unreadCount]);
 
     /**
      * Xóa một thông báo.
@@ -205,6 +199,7 @@ export const useNotification = () => {
                 detail: 'Thông báo đã được xóa.',
                 life: 3000,
             });
+            setReload(pre => !pre);
         } else {
             dispatch({
                 type: NotificationActionType.DELETE_NOTIFICATION_FAILURE,
@@ -237,7 +232,7 @@ export const useNotification = () => {
     // Tải thông báo ban đầu khi hook được sử dụng lần đầu (component mount)
     useEffect(() => {
         loadInitialNotifications();
-    }, [loadInitialNotifications]); // `loadInitialNotifications` là dependency
+    }, [loadInitialNotifications, reload]); // `loadInitialNotifications` là dependency
 
     //------------------------------------------------------
     // Return values

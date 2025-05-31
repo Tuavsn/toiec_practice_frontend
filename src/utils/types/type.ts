@@ -215,7 +215,7 @@ export enum NotificationActionType {
   FETCH_NOTIFICATIONS_START = 'FETCH_NOTIFICATIONS_START',
   FETCH_NOTIFICATIONS_SUCCESS = 'FETCH_NOTIFICATIONS_SUCCESS',
   FETCH_NOTIFICATIONS_FAILURE = 'FETCH_NOTIFICATIONS_FAILURE',
-
+  REDUCE_UNREAD_COUNT_BY_1 = "REDUCE_UNREAD_COUNT_BY_1",
   LOAD_MORE_NOTIFICATIONS_START = 'LOAD_MORE_NOTIFICATIONS_START',
   LOAD_MORE_NOTIFICATIONS_SUCCESS = 'LOAD_MORE_NOTIFICATIONS_SUCCESS',
   LOAD_MORE_NOTIFICATIONS_FAILURE = 'LOAD_MORE_NOTIFICATIONS_FAILURE',
@@ -248,7 +248,7 @@ export interface Notification_t {
   type: NotificationType_t;
   message: string;
   relatedId: string;
-  createdAt: string; // API trả về string, có thể chuyển đổi sang Date nếu cần
+  createdAt: number; // API trả về string, có thể chuyển đổi sang Date nếu cần
   read: boolean;
   deepLink: string;
 }

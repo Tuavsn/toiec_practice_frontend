@@ -526,6 +526,7 @@ interface NotificationItemProps {
   notification: Notification_t;
   onClick: (notification: Notification_t) => void; // Thường là handleNotificationClick từ hook
   onDelete: (notificationId: string) => void;   // Thường là deleteNotificationItem từ hook
+
 }
 
 //------------------------------------------------------
@@ -541,6 +542,8 @@ interface NotificationPanelProps {
   // Lấy các giá trị và hàm cần thiết trực tiếp từ useNotification hook.
   // Tuy nhiên, chúng ta có thể truyền một callback để đóng panel khi một thông báo được click.
   onClosePanel?: () => void;
+  setReload: React.Dispatch<React.SetStateAction<boolean>>
+  reload: boolean
 }
 
 //------------------------------------------------------
