@@ -398,7 +398,7 @@ export const callGetLectureRow = async (signal: AbortSignal, pageNumber: number,
 }
 export const callGetLectureCard = async (pageNumber: number, keyword: string, pageSize: number = 5): Promise<TableData<LectureCard> | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<LectureCard>>>(`${import.meta.env.VITE_API_URL}/lectures/client?info=true&current=${pageNumber + 1}&pageSize=${pageSize}&active=true&orderDesc=true&search=${keyword}`);
+        const response = await axios.get<ApiResponse<TableData<LectureCard>>>(`${import.meta.env.VITE_API_URL}/lectures/client?info=true&current=${pageNumber + 1}&pageSize=${pageSize}&orderDesc=true&active=true&search=${keyword}`);
         return response.data.data;
     } catch (error) {
         return null
@@ -418,7 +418,8 @@ export const fetchNotifications = async (
     pageSize: number
 ): Promise<ApiResponse<TableData<Notification_t>> | null> => {
     try {
-        const response = await axios.get<ApiResponse<TableData<Notification_t>>>('/notifications', {
+        current += 1;
+        const response = await axios.get<ApiResponse<TableData<Notification_t>>>(`${import.meta.env.VITE_API_URL}/notifications`, {
             params: { current, pageSize },
         });
         return response.data;
@@ -446,7 +447,7 @@ export const markNotificationAsRead = async (
     }
     try {
         const response = await axios.patch<ApiResponse<Notification_t>>(
-            `/notifications/${notificationId}/read`
+            `${import.meta.env.VITE_API_URL}/notifications/${notificationId}/read`
         );
         return response.data;
     } catch (error) {
@@ -465,7 +466,7 @@ export const markNotificationAsRead = async (
 export const markAllNotificationsAsRead = async (): Promise<ApiResponse<any> | null> => {
     try {
         // API endpoint `/notifications/read-all` sử dụng PATCH
-        const response = await axios.patch<ApiResponse<any>>('/notifications/read-all');
+        const response = await axios.patch<ApiResponse<any>>(`${import.meta.env.VITE_API_URL}/notifications/read-all`);
         return response.data;
     } catch (error) {
         console.error('Lỗi khi đánh dấu tất cả thông báo là đã đọc:', error instanceof AxiosError ? error.message : error);
@@ -483,17 +484,17 @@ export const markAllNotificationsAsRead = async (): Promise<ApiResponse<any> | n
  */
 export const deleteNotification = async (
     notificationId: string
-): Promise<ApiResponse<any> | null> => {
+): Promise<boolean | null> => {
     // Guard clause để kiểm tra notificationId
     if (!notificationId) {
         console.error('deleteNotification: notificationId không được để trống.');
         return null;
     }
     try {
-        const response = await axios.delete<ApiResponse<any>>(
-            `/notifications/${notificationId}`
+        await axios.delete<ApiResponse<any>>(
+            `${import.meta.env.VITE_API_URL}/notifications/${notificationId}`
         );
-        return response.data;
+        return true;
     } catch (error) {
         console.error(`Lỗi khi xóa thông báo ${notificationId}:`, error instanceof AxiosError ? error.message : error);
         return null;

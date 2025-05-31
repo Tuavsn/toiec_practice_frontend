@@ -109,6 +109,9 @@ interface UpdateUnreadCountAction {
     type: NotificationActionType.UPDATE_UNREAD_COUNT;
     payload: number; // Số lượng thông báo chưa đọc mới
 }
+interface ReduceUnreadCountTo1Action {
+    type: NotificationActionType.REDUCE_UNREAD_COUNT_BY_1;
+}
 
 interface ResetNotificationsAction {
     type: NotificationActionType.RESET_NOTIFICATIONS;
@@ -130,6 +133,7 @@ type NotificationAction =
     | MarkAsReadFailureAction
     | MarkAllAsReadSuccessAction
     | MarkAllAsReadFailureAction
+    | ReduceUnreadCountTo1Action
     | DeleteNotificationSuccessAction
     | DeleteNotificationFailureAction
     | UpdateUnreadCountAction
