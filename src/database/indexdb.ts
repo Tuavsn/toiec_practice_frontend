@@ -795,14 +795,18 @@ function getDB() {
 //------------------------------------------------------
 // Check if a draft exists for a given testID
 //------------------------------------------------------
-export async function checkDraftInIndexDB(testID: TestID): Promise<boolean> {
+export async function checkDraftInIndexDB(testID: TestID): Promise<number | null> {
     const db = await getDB();
     const tx = db.transaction('drafts', 'readonly');
     const store = tx.objectStore('drafts');
     const record = await store.get(testID);
     console.log(record)
     await tx.done;
-    return record !== undefined;
+    if (record) {
+        return record.version;
+    }
+
+    return null;
 }
 
 //------------------------------------------------------
@@ -841,9 +845,9 @@ export async function upsertDraftToIndexDB(
 // Delete draft from IndexedDB
 //------------------------------------------------------
 export async function deleteDraftFromIndexDB(testID: TestID): Promise<void> {
-  const db = await getDB();
-  const tx = db.transaction('drafts', 'readwrite');
-  const store = tx.objectStore('drafts');
-  await store.delete(testID);
-  await tx.done;
+    const db = await getDB();
+    const tx = db.transaction('drafts', 'readwrite');
+    const store = tx.objectStore('drafts');
+    await store.delete(testID);
+    await tx.done;
 }

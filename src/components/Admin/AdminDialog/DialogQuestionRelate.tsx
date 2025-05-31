@@ -77,6 +77,8 @@ const RenderUpdateQuestionBody: React.FC<UpdateQuestionDialogProps> = React.memo
 
         const handleChange = (e: { target: { name: any; value: any } }) => {
             const { name, value } = e.target;
+            console.log(name,value);
+            
             setFormData({ ...formData, [name]: value });
         };
         // khi nhấn nút Lưu

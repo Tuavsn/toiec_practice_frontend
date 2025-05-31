@@ -276,24 +276,45 @@ export const callGetMyRecommend = async (): Promise<[(RecommendLecture[] | null)
 
 export const callGetIsDraftTestExist = async (testId: TestID, testType: TestType): Promise<DraftLocation> => {
     try {
+
         if (testType !== "fulltest") {
             return "none";
         }
-        const isDraftInIndexDB = await checkDraftInIndexDB(testId);
-        console.log("isdb", isDraftInIndexDB)
-        if (isDraftInIndexDB) {
-            return "indexDB";
-        }
-        const response = await axios.get<ApiResponse<{ exist: boolean }>>(`${import.meta.env.VITE_API_URL}/testDrafts/check-exist/${testId}`);
-        if (response.data.data.exist) {
-            return "server";
-        }
-        return "none";
+        const draftIndexDBVersion = await GetDraftVersionFromIndexDB(testId);
+        const draftServerDBVersion = await GetDraftVersionFromServer(testId);
+        return draftIndexDBVersion <= draftServerDBVersion ? "indexDB" : "server";
     } catch (error) {
         console.error("Lỗi khi kiểm tra bài thi nháp:", error);
         return "none";
     }
 }
+
+async function GetDraftVersionFromIndexDB(testId: TestID): Promise<number> {
+    try {
+        const draftIndexDBVersion = await checkDraftInIndexDB(testId);
+        console.log("isdb", draftIndexDBVersion)
+        if (draftIndexDBVersion) {
+            return draftIndexDBVersion;
+        }
+        return 999_999_999_999;
+    } catch (error: any) {
+        return 999_999_999_999;
+    }
+}
+
+async function GetDraftVersionFromServer(testId: TestID): Promise<number> {
+    try {
+
+        const response = await axios.get<ApiResponse<{ exist: boolean, version: number }>>(`${import.meta.env.VITE_API_URL}/testDrafts/check-exist/${testId}`);
+        if (!response.data.data.exist) {
+            return 999_999_999_999;
+        }
+        return response.data.data.version;
+    } catch (error: any) {
+        return 999_999_999_999;
+    }
+}
+
 export const callSaveDraftTestToServer = async (
     apiLock: MutableRefObject<boolean>,
     id: TestID,
@@ -304,6 +325,7 @@ export const callSaveDraftTestToServer = async (
     try {
         apiLock.current = true;
         await axios.put(`${import.meta.env.VITE_API_URL}/testDrafts`, {
+            version: testDraft.draftTestData.secondsLeft,
             testId: id,
             draftData: JSON.stringify(testDraft),
         });
