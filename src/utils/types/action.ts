@@ -1,6 +1,6 @@
 import { CommentActionType } from "../../hooks/_CommentSectionHook";
 import { FullTestScreenState, ProfileHookState } from "./state";
-import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, EssayQuestionPayload, FetchTaskContentFailurePayload, FetchTaskContentRequestPayload, FetchTaskContentSuccessPayload, GetAiFeedbackFailurePayload, GetAiFeedbackRequestPayload, GetAiFeedbackSuccessPayload, GradedFeedback, LectureCard, LectureRow, LoadPromptsSuccessPayload, Meta, MultipleChoiceQuestion, Permission, PexelsPhoto, QuestionID, QuestionNumber, QuestionPage, Role, SaveResponsePayload, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, ToeicSpeakingPartActionType, Topic, UserComment, UserRow, WritingPart1Prompt, WritingSheetData, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart2SheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3SheetData } from "./type";
+import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, EssayQuestionPayload, FetchTaskContentFailurePayload, FetchTaskContentRequestPayload, FetchTaskContentSuccessPayload, GetAiFeedbackFailurePayload, GetAiFeedbackRequestPayload, GetAiFeedbackSuccessPayload, GradedFeedback, LectureCard, LectureRow, LoadPromptsSuccessPayload, Meta, MultipleChoiceQuestion, Notification_t, NotificationActionType, Permission, PexelsPhoto, QuestionID, QuestionNumber, QuestionPage, Role, SaveResponsePayload, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, ToeicSpeakingPartActionType, Topic, UserComment, UserRow, WritingPart1Prompt, WritingSheetData, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart2SheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3SheetData } from "./type";
 
 type RenderTestActiion =
     | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber; qID: QuestionID; answer: string; } }
@@ -24,6 +24,116 @@ type RowHookAction<RowModel> =
     | { type: 'OPEN_UPDATE_DIALOG'; payload: RowModel }
     | { type: 'OPEN_DELETE_DIALOG'; payload: RowModel }
     | { type: 'OPEN_CREATE_DIALOG'; payload: RowModel }
+
+
+interface FetchNotificationsStartAction {
+    type: NotificationActionType.FETCH_NOTIFICATIONS_START;
+}
+
+interface FetchNotificationsSuccessAction {
+    type: NotificationActionType.FETCH_NOTIFICATIONS_SUCCESS;
+    payload: {
+        notifications: Notification_t[];
+        meta: Meta;
+        unreadCount: number; // Tính toán và truyền vào đây
+    };
+}
+
+interface FetchNotificationsFailureAction {
+    type: NotificationActionType.FETCH_NOTIFICATIONS_FAILURE;
+    payload: string; // Thông điệp lỗi
+}
+
+interface LoadMoreNotificationsStartAction {
+    type: NotificationActionType.LOAD_MORE_NOTIFICATIONS_START;
+}
+
+interface LoadMoreNotificationsSuccessAction {
+    type: NotificationActionType.LOAD_MORE_NOTIFICATIONS_SUCCESS;
+    payload: {
+        notifications: Notification_t[]; // Thông báo mới để nối vào danh sách cũ
+        meta: Meta;
+        unreadCount: number; // Cập nhật lại số lượng chưa đọc
+    };
+}
+
+interface LoadMoreNotificationsFailureAction {
+    type: NotificationActionType.LOAD_MORE_NOTIFICATIONS_FAILURE;
+    payload: string; // Thông điệp lỗi
+}
+
+interface MarkAsReadSuccessAction {
+    type: NotificationActionType.MARK_AS_READ_SUCCESS;
+    payload: {
+        notificationId: string;
+        updatedNotification: Notification_t; // Thông báo đã được cập nhật từ API
+        newUnreadCount: number;
+    };
+}
+
+interface MarkAsReadFailureAction {
+    type: NotificationActionType.MARK_AS_READ_FAILURE;
+    payload: {
+        notificationId: string;
+        error: string;
+    };
+}
+
+interface MarkAllAsReadSuccessAction {
+    type: NotificationActionType.MARK_ALL_AS_READ_SUCCESS;
+    // Không cần payload phức tạp, chỉ cần cập nhật trạng thái 'read' của tất cả và unreadCount = 0
+}
+
+interface MarkAllAsReadFailureAction {
+    type: NotificationActionType.MARK_ALL_AS_READ_FAILURE;
+    payload: string; // Thông điệp lỗi
+}
+
+interface DeleteNotificationSuccessAction {
+    type: NotificationActionType.DELETE_NOTIFICATION_SUCCESS;
+    payload: {
+        notificationId: string;
+        newUnreadCount: number;
+    };
+}
+
+interface DeleteNotificationFailureAction {
+    type: NotificationActionType.DELETE_NOTIFICATION_FAILURE;
+    payload: {
+        notificationId: string;
+        error: string;
+    };
+}
+
+interface UpdateUnreadCountAction {
+    type: NotificationActionType.UPDATE_UNREAD_COUNT;
+    payload: number; // Số lượng thông báo chưa đọc mới
+}
+
+interface ResetNotificationsAction {
+    type: NotificationActionType.RESET_NOTIFICATIONS;
+}
+
+
+/**
+ * @typedef NotificationAction
+ * @description Union type cho tất cả các hành động liên quan đến thông báo.
+ */
+type NotificationAction =
+    | FetchNotificationsStartAction
+    | FetchNotificationsSuccessAction
+    | FetchNotificationsFailureAction
+    | LoadMoreNotificationsStartAction
+    | LoadMoreNotificationsSuccessAction
+    | LoadMoreNotificationsFailureAction
+    | MarkAsReadSuccessAction
+    | MarkAsReadFailureAction
+    | MarkAllAsReadSuccessAction
+    | MarkAllAsReadFailureAction
+    | DeleteNotificationSuccessAction
+    | DeleteNotificationFailureAction
+    | UpdateUnreadCountAction
+    | ResetNotificationsAction;
 
 type TopicHookAction = RowHookAction<Topic> |
 { type: 'SET_SEARCH'; payload: string }
@@ -283,7 +393,7 @@ type ToeicSpeakingPartAction =
 
 export type {
     AdminReportAction, CategoryHookAction, CommentAction, FullTestScreenAction, LectureCardAction,
-    LectureHookAction, MultiQuestionAction, PermissionHookAction, ProfileHookAction,
+    LectureHookAction, MultiQuestionAction, NotificationAction, PermissionHookAction, ProfileHookAction,
     RenderTestActiion, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, ToeicSpeakingPartAction, ToeicWritingPart1Action, TopicHookAction, UserCommentAction,
     UserHookAction, WritingToeicPart2Action, WritingToeicPart3Action
 };

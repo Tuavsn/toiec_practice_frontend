@@ -25,48 +25,26 @@ const UserAvatar: React.FC<UserAvatarProps> = memo(({
     const [imageUrlToDisplay, setImageUrlToDisplay] = useState<string | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    const originalUrl = comment.userAvatarUrl;
+
     const fallbackLabel = comment.userDisplayName ? comment.userDisplayName[0].toUpperCase() : 'U';
     const picsumUrl = `https://picsum.photos/seed/${comment.userId}/64/64`; // 64x64 avatar size
 
     useEffect(() => {
         setIsLoading(true); // Start loading when comment or originalUrl changes
 
-        // Pre-emptive check for obviously invalid or placeholder URLs
-        if (!originalUrl || originalUrl.trim() === "") {
-            // If no valid original URL, or it's the known problematic placeholder, try Picsum directly
-            setImageUrlToDisplay(picsumUrl);
-            // We could still try to "load" picsum to be consistent, but for now, let's assume it works
-            // or let Avatar handle its potential load failure by falling back to label/icon.
-            // For simplicity here, if original is bad, we set picsum and consider loading done for picsum.
-            // A more robust version would also "test load" picsum.
-            setIsLoading(false); // Assuming Picsum URL construction is enough for this path
-            return;
-        }
 
-        // Attempt to load the original URL
-        const imageTester = new Image();
-        imageTester.onload = () => {
-            setImageUrlToDisplay(originalUrl);
-            setIsLoading(false);
-        };
-        imageTester.onerror = () => {
-            // Original URL failed to load (429, 404, CORS, etc.)
-            // Fallback to Picsum URL
-            setImageUrlToDisplay(picsumUrl);
-            setIsLoading(false); // Consider loading done, Avatar will try to load picsumUrl
-        };
-        imageTester.src = originalUrl;
+        // If no valid original URL, or it's the known problematic placeholder, try Picsum directly
+        setImageUrlToDisplay(picsumUrl);
+        // We could still try to "load" picsum to be consistent, but for now, let's assume it works
+        // or let Avatar handle its potential load failure by falling back to label/icon.
+        // For simplicity here, if original is bad, we set picsum and consider loading done for picsum.
+        // A more robust version would also "test load" picsum.
+        setIsLoading(false); // Assuming Picsum URL construction is enough for this path
+        return;
 
-        // Cleanup: If the component unmounts while the image is still trying to load,
-        // you might want to clear the onload/onerror handlers to prevent state updates
-        // on an unmounted component, though React 18 handles this a bit better.
-        return () => {
-            imageTester.onload = null;
-            imageTester.onerror = null;
-            // You could also try imageTester.src = ""; to stop the browser from loading
-        };
-    }, [originalUrl, picsumUrl]); // Depend on originalUrl and picsumUrl (if comment.id changes)
+
+
+    }, [picsumUrl]); // Depend on originalUrl and picsumUrl (if comment.id changes)
 
     if (isLoading) {
         // Determine skeleton size based on Avatar size prop

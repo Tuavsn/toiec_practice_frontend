@@ -69,7 +69,7 @@ const TimeLimitChooser: React.FC<TimeLimitChooserProps> = ({ limitTime, parts, t
     }
 
     const confirm = (event: MouseEvent<HTMLButtonElement>) => {
-        if (!isDraftExist) {
+        if (!isDraftExist || parts[0] === false) {
             setIsButtonClicked(true);
             return;
         }
