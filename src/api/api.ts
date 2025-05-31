@@ -282,6 +282,7 @@ export const callGetIsDraftTestExist = async (testId: TestID, testType: TestType
         }
         const draftIndexDBVersion = await GetDraftVersionFromIndexDB(testId);
         const draftServerDBVersion = await GetDraftVersionFromServer(testId);
+        console.log("time left on indexdb %d . time left on server %d",draftIndexDBVersion,draftServerDBVersion);
         return draftIndexDBVersion <= draftServerDBVersion ? "indexDB" : "server";
     } catch (error) {
         console.error("Lỗi khi kiểm tra bài thi nháp:", error);
