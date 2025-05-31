@@ -1,37 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dictionary</title>
+    <title>UTE TOEIC Dictionary</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="styles.css">
 </head>
+<body>
+    <div class="extension-container">
+        <!-- Compact Header -->
+        <header class="compact-header">
+            <img src="Header-logo.png" alt="UTE TOEIC" class="compact-logo">
+        </header>
 
-<body class="w3-text-theme w3-cursive">
-    <div id="dictionary-app" class="w3-container w3-padding" style="width: clamp(200px, 50vw, 400px); max-width: 400px;">
-        <h2 class="w3-center">UTE TOEIC</h2>
-        <input type="text" id="word-input" class="w3-input w3-border" placeholder="Enter word" />
-        <button id="lookup-btn" class="w3-button w3-theme-l2 w3-block">Lookup</button>
-        <div id="definition" class="w3-margin-top"></div>
+        <!-- Compact Navigation -->
+        <div class="compact-tabs">
+            <button class="tab-btn active" data-tab="dictionary">📖 Dict</button>
+            <button class="tab-btn" data-tab="translator">🌐 Trans</button>
+            <button class="tab-btn" data-tab="word-day">⭐ Word</button>
+        </div>
+
+        <!-- Dictionary Tab -->
+        <div id="dictionary" class="tab-panel active">
+            <div class="search-box">
+                <input type="text" id="word-input" placeholder="Enter word..." class="compact-input">
+                <button id="lookup-btn" class="search-btn">🔍</button>
+            </div>
+            <div id="definition" class="result-area"></div>
+        </div>
+
+        <!-- Translator Tab -->
+        <div id="translator" class="tab-panel">
+            <button id="translate_switchButton" class="lang-toggle" data-from_lang="vi">
+                🇻🇳 ⇄ 🇺🇸
+            </button>
+            <textarea id="translate_inputText" placeholder="Enter text..." rows="3" class="translate-input"></textarea>
+            <button id="translate_translateButton" class="translate-btn">Translate</button>
+            <div id="translate_outputText" class="translate-output"></div>
+        </div>
+
+        <!-- Word of Day Tab -->
+        <div id="word-day" class="tab-panel">
+            <div id="word-of-day-content" class="word-day-content">
+                <div class="mini-spinner"></div>
+            </div>
+        </div>
     </div>
-    <hr>
-    <div id="translate_app" class="w3-container">
 
-        <h6 class="w3-center w3-theme w3-card w3-padding"><b>Dịch văn bản</b></h6>
-        <button id="translate_switchButton" class="w3-button w3-round-large w3-block w3-theme-l1 w3-margin-bottom"
-            data-from_lang="vi">Việt  ⇄ Anh</button>
-        <textarea id="translate_inputText" class="w3-input w3-border w3-margin-bottom" placeholder="Enter text here..."
-            rows="4"></textarea>
-
-        <button id="translate_translateButton" class="w3-button w3-block w3-theme-d4 w3-margin-bottom">Dịch</button>
-
-
-        <h6 class="w3-theme-l5">Dịch thành công:</h6>
-        <div id="translate_outputText" class="w3-border w3-margin-bottom"></div>
-    </div>
     <script src="dictionary.js"></script>
     <script src="translate.js"></script>
+    <script src="app.js"></script>
 </body>
-
 </html>
