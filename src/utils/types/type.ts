@@ -1733,8 +1733,9 @@ export interface GetAiFeedbackFailurePayload {
 }
 
 export type TestDraft = {
-    draftTestScreenState: FullTestScreenState
-    draftTestData: TestSheet
+  version: number,
+  draftTestScreenState: FullTestScreenState
+  draftTestData: TestSheet
 }
 
 export type EssayQuestionPayload = { id: string; essayQuestion: string; directions: string; generatedAt: number; part: 3 }
@@ -1746,7 +1747,7 @@ export type UserID = string;
 export type QuestionNumber = number;
 export type milisecond = number;
 export type TestID = string;
-export type DraftLocation = "indexDB" | "server" | "none"; 
+export type DraftLocation = "indexDB" | "server" | "none";
 type RoleID = string;
 export type PermissionID = string;
 export type LectureID = string;
