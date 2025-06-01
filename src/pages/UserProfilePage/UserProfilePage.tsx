@@ -384,10 +384,14 @@ const RecommendLectureStepper: React.FC<{ recommendLectures: RecommendLecture[] 
                 {
                     // Duyệt qua từng phần gợi ý trong suggestionOnParts
                     recommendLectures.map((suggestion, index) => {
-                        console.log(suggestion);
+                        const header = suggestion.name
+                            ? `${suggestion.name} (${index + 1})`
+                            : `Step ${index + 1}`;
                         const url = suggestion.id === "" ? "#" : `/lecture/${suggestion.name}___${suggestion.lectureId}`
+                        const key = `step_lec_${index}_${suggestion.id} ${Math.random()}`
+
                         return (
-                            <StepperPanel key={"step" + index} header={suggestion.name ?? index}>
+                            <StepperPanel key={key} header={header}>
                                 {/* Hiển thị nội dung gợi ý */}
                                 <div className="flex flex-column h-12rem">
                                     <div className="custom-box">
@@ -435,10 +439,12 @@ const RecommendTestStepper: React.FC<{ recommendTests: RecommendTest[] | null }>
                 {
                     // Duyệt qua từng phần gợi ý trong suggestionOnParts
                     recommendTests.map((suggestion, index) => {
-                        console.log(suggestion);
+                        const header = suggestion.name
+                            ? `${suggestion.name} (${index + 1})`
+                            : `Step ${index + 1}`;
                         const url = suggestion.id === "" ? "#" : `/test/${suggestion.testId}`
                         return (
-                            <StepperPanel key={"step" + index} header={suggestion.name ?? index}>
+                            <StepperPanel key={"step_test" + index} header={header}>
                                 {/* Hiển thị nội dung gợi ý */}
                                 <div className="flex flex-column h-12rem">
                                     <div className="custom-box">
