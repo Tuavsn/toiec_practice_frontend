@@ -259,8 +259,16 @@ export const callGetReviewTestPaper = async (id: ResultID): Promise<TestReviewAn
 
 export const callGetMyRecommend = async (): Promise<[(RecommendLecture[] | null), (RecommendTest[] | null)]> => {
     let recommendDoc: [(RecommendLecture[] | null), (RecommendTest[] | null)] = [null, null];
+    const token = localStorage.getItem("access_token");
     try {
-        const response = await axios.get<ApiResponse<RecommendDoc>>(`${import.meta.env.VITE_API_URL}/recommendations/me`,)
+        const response = await axios.get<ApiResponse<RecommendDoc>>(`${import.meta.env.VITE_API_URL}/recommendations/me`,
+            {
+                headers: {
+    Authorization: token,
+    'Cache-Control': `public, max-age=3600`,
+  }
+            }
+        )
         recommendDoc = [
             response.data.data.recommendedLectures,
             response.data.data.recommendedTests
