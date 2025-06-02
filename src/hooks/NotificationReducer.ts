@@ -148,7 +148,11 @@ export const notificationReducer = (
                 ...state,
                 unreadCount: action.payload,
             };
-
+        case NotificationActionType.REDUCE_UNREAD_COUNT_BY_1:
+            return {
+                ...state,
+                unreadCount: state.unreadCount-1,
+            };
         //------------------------------------------------------
         // Reset Notifications
         //------------------------------------------------------

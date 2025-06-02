@@ -13,7 +13,7 @@ import NotificationItem from './NotificationItem';
 //------------------------------------------------------
 // NotificationPanel Component
 //------------------------------------------------------
-const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClosePanel }) => {
+const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClosePanel, setReload, reload }) => {
     const {
         notifications,
         meta,
@@ -25,7 +25,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClosePanel }) =
         handleNotificationClick, // Original handler from the hook
         markAllAsRead,
         deleteNotificationItem,
-    } = useNotification();
+    } = useNotification(reload, setReload);
 
     // Wrapper for handleNotificationClick to also close the panel
     const onItemClick = (notification: Notification_t) => {
@@ -73,9 +73,9 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClosePanel }) =
     // Render Notification List
     //------------------------------------------------------
     return (
-        <div className="notification-panel" style={{ width: '380px', maxWidth: '90vw' }}>
+        <div className="notification-panel p-0" style={{ width: '380px', maxWidth: '90vw' }}>
             {/* Header: Mark all as read */}
-            <div className="p-3 flex justify-content-between align-items-center border-bottom-1 surface-border">
+            <div className="flex justify-content-between align-items-center border-bottom-1 surface-border">
                 <h5 className="m-0">Thông báo</h5>
                 {notifications.length > 0 && (
                     <Button
