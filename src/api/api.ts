@@ -264,9 +264,9 @@ export const callGetMyRecommend = async (): Promise<[(RecommendLecture[] | null)
         const response = await axios.get<ApiResponse<RecommendDoc>>(`${import.meta.env.VITE_API_URL}/recommendations/me`,
             {
                 headers: {
-    Authorization: token,
-    'Cache-Control': `public, max-age=3600`,
-  }
+                    Authorization: token,
+                    'Cache-Control': `public, max-age=3600`,
+                }
             }
         )
         recommendDoc = [
@@ -291,6 +291,9 @@ export const callGetIsDraftTestExist = async (testId: TestID, testType: TestType
         const draftIndexDBVersion = await GetDraftVersionFromIndexDB(testId);
         const draftServerDBVersion = await GetDraftVersionFromServer(testId);
         console.log("time left on indexdb %d . time left on server %d", draftIndexDBVersion, draftServerDBVersion);
+        if (draftIndexDBVersion === draftServerDBVersion && draftIndexDBVersion === 999_999_999_999) {
+            return "none";
+        }
         return draftIndexDBVersion <= draftServerDBVersion ? "indexDB" : "server";
     } catch (error) {
         console.error("Lỗi khi kiểm tra bài thi nháp:", error);
@@ -301,7 +304,6 @@ export const callGetIsDraftTestExist = async (testId: TestID, testType: TestType
 async function GetDraftVersionFromIndexDB(testId: TestID): Promise<number> {
     try {
         const draftIndexDBVersion = await checkDraftInIndexDB(testId);
-        console.log("isdb", draftIndexDBVersion)
         if (draftIndexDBVersion) {
             return draftIndexDBVersion;
         }
@@ -309,6 +311,27 @@ async function GetDraftVersionFromIndexDB(testId: TestID): Promise<number> {
     } catch (error: any) {
         return 999_999_999_999;
     }
+}
+
+//------------------------------------------------------
+// Function: Prefetch a single image
+//------------------------------------------------------
+export function prefetchImage(url: string): void {
+    if (!url) return;
+    const img = new Image();
+    img.src = url;
+}
+
+//------------------------------------------------------
+// Function: Prefetch a single audio file with throttle
+//------------------------------------------------------
+export function prefetchAudio(url: string, delay: number): void {
+    if (!url) return;
+    setTimeout(() => {
+        fetch(url, { method: 'GET', mode: 'no-cors' }).catch(() => {
+            // xử lý lỗi nếu cần
+        });
+    }, delay);
 }
 
 async function GetDraftVersionFromServer(testId: TestID): Promise<number> {
@@ -349,7 +372,7 @@ export const callDeleteDraftFromServer = async (
     testId: TestID
 ) => {
     try {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/${testId}`)
+        await axios.delete(`${import.meta.env.VITE_API_URL}/testDrafts/${testId}`)
 
     } catch (error: any) {
         console.error(error);
