@@ -3,25 +3,39 @@ import { ApiResponse, MultipleChoiceQuestion, Question_PageIndex, TestDocument, 
 
 
 self.onmessage = async (event: MessageEvent<TestPaperWorkerRequest>) => {
-    const { testId, parts, } = event.data;
-    const postfix = parts === '0' ? 'practice?parts=1234567' : `practice?parts=${parts}`;
+    const { testId, parts } = event.data;
+    const postfix = parts === '0'
+        ? 'practice?parts=1234567'
+        : `practice?parts=${parts}`;
 
     try {
-
+        //------------------------------------------------------
+        // Fetch main test data
+        //------------------------------------------------------
         const response = await axios.get<ApiResponse<TestPaper>>(
-            `${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}`,
+            `${import.meta.env.VITE_API_URL}/tests/${testId}/${postfix}`
         );
+        if (!response.data) throw new Error('No data');
 
-        if (response.data) {
-            const testPaper = response.data.data;
-            const testDocument: TestDocument = ConvertTestPaperToTestDocument(testPaper);
-            self.postMessage({ status: 'success', data: testDocument } as WorkerResponse<TestDocument>);
-        }
+        const testPaper = response.data.data;
+        const testDocument: TestDocument = ConvertTestPaperToTestDocument(testPaper);
+
+        //------------------------------------------------------
+        // Immediately notify main thread data is ready
+        //------------------------------------------------------
+        self.postMessage({ status: 'success', data: testDocument } as WorkerResponse<TestDocument>);
+
+        //------------------------------------------------------
+        // Gather image and audio URLs from testDocument (nested parts)
+        //------------------------------------------------------
+
+
+
+
     } catch (error: any) {
-        self.postMessage({ status: 'error', message: `worker file error: ${error.message}` } as WorkerResponse<null>);
+        self.postMessage({ status: 'error', message: `Worker error: ${error.message}` } as WorkerResponse<null>);
     }
 };
-
 
 function ConvertTestPaperToTestDocument(testPaper: TestPaper): TestDocument {
     const testDoc: TestDocument = [];
