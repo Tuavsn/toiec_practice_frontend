@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { callGetIsDraftTestExist, callGetTestDetailPageData } from "../api/api";
 import { addQuestionListByPartIndex } from "../database/indexdb";
-import { CleanupPrefetch, PreFetchResources } from "../utils/helperFunction/PrefetchResources";
+import { cleanupPrefetch, prefetchResources } from "../utils/helperFunction/PrefetchResources";
 import { emptyTestDetailPageData } from "../utils/types/emptyValue";
 import { TestDetailPageData, TestDocument, TestID, TestPaperWorkerRequest, WorkerResponse } from "../utils/types/type";
 
@@ -49,7 +49,7 @@ export function useTestDetail() {
             }
         });
         return () => {
-            CleanupPrefetch();
+            cleanupPrefetch();
         }
     }, [id]);
 
@@ -66,7 +66,7 @@ function loadTestPaper(testId: TestID, setIsDoneLoading: Dispatch<SetStateAction
         const { status, data, message } = event.data;
 
         if (status === 'success') {
-            Promise.resolve().then(() => PreFetchResources(data));
+            Promise.resolve().then(() => prefetchResources(data));
             await addQuestionListByPartIndex(data);
 
             console.log("Test Paper successfully loaded.");

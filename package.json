@@ -8,8 +8,10 @@
     "build": "tsc -b && vite build",
     "lint": "eslint src --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
+    "prod": "vite preview --port 5173",
     "test": "jest",
     "test:watch": "jest --watch"
+    
   },
   "dependencies": {
     "@google/genai": "^0.15.0",

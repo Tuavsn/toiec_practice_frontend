@@ -4,7 +4,7 @@ import { callDeleteDraftFromServer, callGetDraftFromServer, callGetIsDraftTestEx
 import { useTestState } from '../context/TestStateProvider';
 import { deleteDraftFromIndexDB, getDraftFromIndexDB, queryByPartIndex, upsertDraftToIndexDB } from '../database/indexdb';
 import { MappingPageWithQuestionNum } from '../utils/helperFunction/convertToHTML';
-import { CleanupPrefetch, PreFetchNeighborhood } from '../utils/helperFunction/PrefetchResources';
+import { cleanupPrefetch, prefetchNeighborhood } from '../utils/helperFunction/PrefetchResources';
 import prepareForTest from '../utils/helperFunction/prepareForTest';
 import SetWebPageTitle from '../utils/helperFunction/setTitlePage';
 import { FullTestScreenAction } from '../utils/types/action';
@@ -104,7 +104,7 @@ export function useTestScreen() {
         setIsOnTest(true);
         return () => {
             setIsOnTest(false);
-            CleanupPrefetch();
+            cleanupPrefetch();
         }
     }, [])
     const [testScreenState, setTestScreenState] = useState<TestScreenState>(currentState);
@@ -159,7 +159,7 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
         const newPageIndex = fullTestScreenState.currentPageIndex + offset;
         console.log("Changing page to:", newPageIndex, "Current page index:", fullTestScreenState.currentPageIndex);
 
-        Promise.resolve().then(() => PreFetchNeighborhood(doTestDataRef, newPageIndex));
+        Promise.resolve().then(() => prefetchNeighborhood(doTestDataRef.current.questionList, newPageIndex));
         if (newPageIndex >= 0 && newPageIndex < doTestDataRef.current.questionList.length) {
             CalculateTimeSpent(thisQuestion, doTestDataRef.current.timeCountStart);
             fullTestScreenDispatch({ type: "SET_CURRENT_PAGE_INDEX", payload: newPageIndex });
@@ -174,7 +174,7 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
         setTestScreenState({ state: "SUBMITING", resultID: "" });
         const resultId: ResultID = await sendFinalResultToServer()
         setTestScreenState({ state: "NAVIGATE_TO_RESULT", resultID: resultId });
-        await CleanupPrefetch();
+        
         await deleteDraftFromIndexDB(id);
         await callDeleteDraftFromServer(id);
     }
