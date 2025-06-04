@@ -800,7 +800,6 @@ export async function checkDraftInIndexDB(testID: TestID): Promise<number | null
     const tx = db.transaction('drafts', 'readonly');
     const store = tx.objectStore('drafts');
     const record = await store.get(testID);
-    console.log(record)
     await tx.done;
     if (record) {
         return record.version;
@@ -850,4 +849,6 @@ export async function deleteDraftFromIndexDB(testID: TestID): Promise<void> {
     const store = tx.objectStore('drafts');
     await store.delete(testID);
     await tx.done;
+    console.log("delete completed");
+    
 }

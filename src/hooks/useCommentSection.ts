@@ -57,7 +57,6 @@ export const useCommentSection = ({
         const currentController = abortControllerRef.current ?? new AbortController(); // Đảm bảo controller luôn tồn tại
 
         dispatch({ type: startActionType, payload: failurePayload }); // payload dùng cho START actions cần nó (e.g. DELETE_COMMENT_START)
-        console.dir(startActionType)
         try {
             const result = await apiCall(currentController.signal);
             if (currentController.signal.aborted) return null; // Kiểm tra nếu đã bị hủy trong lúc chờ

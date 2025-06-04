@@ -291,6 +291,7 @@ async function tryLoad(
     if (loc === "indexDB") {
         const { draftTestScreenState, draftTestData } = await getDraftFromIndexDB(id);
         dataRef.current = draftTestData;
+
         dispatch({ type: "SET_STATE", payload: draftTestScreenState });
         return true;
     }
@@ -302,6 +303,7 @@ async function tryLoad(
         secondsLeft: Number(time) * 60,
         testType,
     };
+
     return true;
 }
 
