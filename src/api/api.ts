@@ -395,7 +395,7 @@ export const callGetDraftFromServer = async (testId: TestID): Promise<TestDraft 
         const response = await axios.get<ApiResponse<{ testId: string, draftData: string }>>(`${import.meta.env.VITE_API_URL}/testDrafts/${testId}`);
         return JSON.parse(response.data.data.draftData) as TestDraft;
     } catch (error: any) {
-        console.error(error);
+        console.warn(error);
         return null;
     }
 
