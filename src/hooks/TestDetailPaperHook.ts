@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { callGetIsDraftTestExist, callGetTestDetailPageData } from "../api/api";
 import { addQuestionListByPartIndex } from "../database/indexdb";
-import { PreFetchResources } from "../utils/helperFunction/PrefetchResources";
+import { CleanupPrefetch, PreFetchResources } from "../utils/helperFunction/PrefetchResources";
 import { emptyTestDetailPageData } from "../utils/types/emptyValue";
 import { TestDetailPageData, TestDocument, TestID, TestPaperWorkerRequest, WorkerResponse } from "../utils/types/type";
 
@@ -48,6 +48,9 @@ export function useTestDetail() {
                 setTestInfo(newTestInfo);
             }
         });
+        return () => {
+            CleanupPrefetch();
+        }
     }, [id]);
 
     return { testInfo, id };

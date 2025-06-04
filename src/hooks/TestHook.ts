@@ -104,6 +104,7 @@ export function useTestScreen() {
         setIsOnTest(true);
         return () => {
             setIsOnTest(false);
+            CleanupPrefetch();
         }
     }, [])
     const [testScreenState, setTestScreenState] = useState<TestScreenState>(currentState);
