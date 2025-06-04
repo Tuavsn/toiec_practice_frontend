@@ -373,7 +373,7 @@ export const callDeleteDraftFromServer = async (
 ) => {
     try {
         await axios.delete(`${import.meta.env.VITE_API_URL}/testDrafts/${testId}`)
-
+        console.log("delete in server")
     } catch (error: any) {
         console.error(error);
     }
