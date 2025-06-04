@@ -4,6 +4,7 @@ import { callDeleteDraftFromServer, callGetDraftFromServer, callGetIsDraftTestEx
 import { useTestState } from '../context/TestStateProvider';
 import { deleteDraftFromIndexDB, getDraftFromIndexDB, queryByPartIndex, upsertDraftToIndexDB } from '../database/indexdb';
 import { MappingPageWithQuestionNum } from '../utils/helperFunction/convertToHTML';
+import { CleanupPrefetch, PreFetchNeighborhood } from '../utils/helperFunction/PrefetchResources';
 import prepareForTest from '../utils/helperFunction/prepareForTest';
 import SetWebPageTitle from '../utils/helperFunction/setTitlePage';
 import { FullTestScreenAction } from '../utils/types/action';
@@ -156,6 +157,8 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
     const changePage = (offset: number) => {
         const newPageIndex = fullTestScreenState.currentPageIndex + offset;
         console.log("Changing page to:", newPageIndex, "Current page index:", fullTestScreenState.currentPageIndex);
+
+        Promise.resolve().then(() => PreFetchNeighborhood(doTestDataRef, newPageIndex));
         if (newPageIndex >= 0 && newPageIndex < doTestDataRef.current.questionList.length) {
             CalculateTimeSpent(thisQuestion, doTestDataRef.current.timeCountStart);
             fullTestScreenDispatch({ type: "SET_CURRENT_PAGE_INDEX", payload: newPageIndex });
@@ -170,6 +173,7 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
         setTestScreenState({ state: "SUBMITING", resultID: "" });
         const resultId: ResultID = await sendFinalResultToServer()
         setTestScreenState({ state: "NAVIGATE_TO_RESULT", resultID: resultId });
+        await CleanupPrefetch();
         await deleteDraftFromIndexDB(id);
         await callDeleteDraftFromServer(id);
     }
@@ -262,6 +266,8 @@ export async function loadDraft(
                 : ["none"];
 
     for (const loc of fallbacks) {
+        console.log(loc);
+
         // Guard clause: nếu load thành công, return luôn
         const result = await tryLoad(loc, id, dispatch, time, testType, dataRef, parts);
         if (result) return loc;
@@ -289,10 +295,12 @@ async function tryLoad(
     }
 
     if (loc === "indexDB") {
-        const { draftTestScreenState, draftTestData } = await getDraftFromIndexDB(id);
-        dataRef.current = draftTestData;
+        const draft = await getDraftFromIndexDB(id);
+        if (!draft) return false;
 
-        dispatch({ type: "SET_STATE", payload: draftTestScreenState });
+        dataRef.current = draft.draftTestData;
+
+        dispatch({ type: "SET_STATE", payload: draft.draftTestScreenState });
         return true;
     }
 

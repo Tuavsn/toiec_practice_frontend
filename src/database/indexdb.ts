@@ -811,7 +811,7 @@ export async function checkDraftInIndexDB(testID: TestID): Promise<number | null
 //------------------------------------------------------
 // Get existing draft or throw if none
 //------------------------------------------------------
-export async function getDraftFromIndexDB(testID: TestID): Promise<TestDraft> {
+export async function getDraftFromIndexDB(testID: TestID): Promise<TestDraft | null> {
     const db = await getDB();
     const tx = db.transaction('drafts', 'readonly');
     const store = tx.objectStore('drafts');
@@ -820,7 +820,8 @@ export async function getDraftFromIndexDB(testID: TestID): Promise<TestDraft> {
 
     // guard clause: nếu không tìm thấy draft
     if (!record) {
-        throw new Error(`No draft found for testID: ${testID}`);
+        console.warn(`No draft found for testID: ${testID}`);
+        return null;
     }
 
     return record;
@@ -850,5 +851,5 @@ export async function deleteDraftFromIndexDB(testID: TestID): Promise<void> {
     await store.delete(testID);
     await tx.done;
     console.log("delete completed");
-    
+
 }

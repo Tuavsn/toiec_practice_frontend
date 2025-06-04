@@ -59,12 +59,17 @@ const TimeLimitChooser: React.FC<TimeLimitChooserProps> = ({ limitTime, parts, t
     const isNavigateToDoTestPage = isButtonClicked && isDoneLoading;
 
     const accept = () => {
-        setIsButtonClicked(true)
+        setIsButtonClicked(true);
     }
     const reject = () => {
-        callDeleteDraftFromServer(testId)
-        deleteDraftFromIndexDB(testId).then(
-            () => setIsButtonClicked(true)
+        setIsButtonClicked(true);
+        callDeleteDraftFromServer(testId).then(
+            () => {
+                deleteDraftFromIndexDB(testId).then(
+                    () => setIsButtonClicked(true)
+                )
+
+            }
         )
     }
 

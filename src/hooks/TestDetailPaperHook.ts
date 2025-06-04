@@ -3,8 +3,9 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { callGetIsDraftTestExist, callGetTestDetailPageData } from "../api/api";
 import { addQuestionListByPartIndex } from "../database/indexdb";
+import { PreFetchResources } from "../utils/helperFunction/PrefetchResources";
 import { emptyTestDetailPageData } from "../utils/types/emptyValue";
-import { Question_PageIndex, Resource, TestDetailPageData, TestDocument, TestID, TestPaperWorkerRequest, WorkerResponse } from "../utils/types/type";
+import { TestDetailPageData, TestDocument, TestID, TestPaperWorkerRequest, WorkerResponse } from "../utils/types/type";
 
 
 export const useCheckBox = () => {
@@ -80,62 +81,6 @@ function loadTestPaper(testId: TestID, setIsDoneLoading: Dispatch<SetStateAction
 }
 
 
-async function PreFetchResources(testDocument: TestDocument): Promise<void> {
-    const questionList: Question_PageIndex[] = [];
-    testDocument.forEach(
-        td => {
-            td.questionList.forEach(
-                q => {
-                    questionList.push(q);
-
-                }
-            )
-        }
-    );
-
-    if (!Array.isArray(questionList) || questionList.length === 0) return;
-
-    const head = document.head;
-    if (!head) return;
-
-    // Remove only the prefetch links previously inserted by this function
-    Array.from(head.querySelectorAll('link[data-prefetch-generated="true"]')).forEach(link => {
-        head.removeChild(link);
-    });
-
-    // Extract all resources in one pass
-    const resources: Resource[] = [];
-    questionList.forEach(
-        q => {
-            resources.push(...q.resources);
-            if (q.subQuestions.length > 0) {
-                q.subQuestions.forEach(
-                    sq => {
-                        resources.push(...sq.resources);
-                    }
-                )
-            }
-        }
-    )
-
-    // Append prefetch links
-    resources.forEach(({ type, content }) => {
-        if (type === 'paragraph') return;
-        const asType = type === 'image' ? 'image' : 'audio';
-        const linkEl = createPrefetchLink(content, asType);
-
-        head.appendChild(linkEl);
-    });
-    console.log("prefetch %d resources", resources.length);
-}
-function createPrefetchLink(url: string, asType: 'image' | 'audio'): HTMLLinkElement {
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.as = asType;
-    link.href = url;
-    link.setAttribute('data-prefetch-generated', 'true'); // tag for cleanup
-    return link;
-}
 
 export const useTimeLimitChooser = (limitTime: number, testId: TestID, parts: boolean[]) => {
     const [timeLimit, setTimeLimit] = useState<number>(limitTime);
