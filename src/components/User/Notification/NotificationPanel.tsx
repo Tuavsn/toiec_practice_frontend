@@ -5,7 +5,6 @@ import { Message } from 'primereact/message';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { ScrollPanel } from 'primereact/scrollpanel';
 import React from 'react';
-import { useNotification } from '../../../hooks/NotificationHook';
 import { NotificationPanelProps } from '../../../utils/types/props';
 import { Notification_t } from '../../../utils/types/type';
 import NotificationItem from './NotificationItem';
@@ -13,19 +12,22 @@ import NotificationItem from './NotificationItem';
 //------------------------------------------------------
 // NotificationPanel Component
 //------------------------------------------------------
-const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClosePanel, setReload, reload }) => {
-    const {
-        notifications,
-        meta,
-        unreadCount,
+const NotificationPanel: React.FC<NotificationPanelProps> = (
+    {
+        onClosePanel,
+        deleteNotificationItem,
+        error,
+        handleNotificationClick,
         isLoading,
         isLoadingMore,
-        error,
         loadMoreNotifications,
-        handleNotificationClick, // Original handler from the hook
         markAllAsRead,
-        deleteNotificationItem,
-    } = useNotification(reload, setReload);
+        meta,
+        notifications,
+        unreadCount
+    }
+) => {
+
 
     // Wrapper for handleNotificationClick to also close the panel
     const onItemClick = (notification: Notification_t) => {

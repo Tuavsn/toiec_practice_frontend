@@ -47,7 +47,7 @@ const useExercisePage = () => {
         userAnswerList = userAnswerList.filter(ans => ans.userAnswer !== "");
 
         if (userAnswerList.length === 0) {
-            navigate('/exercise');
+            navigate('/exercise', { replace: true });
             return;
         }
         sendFinalResultToServer(userAnswerList).then((resultId: ResultID) => navigate(`/test/${resultId}/review`));

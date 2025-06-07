@@ -6,6 +6,7 @@ import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator';
 import { Skeleton } from 'primereact/skeleton';
 import React, { Fragment, useEffect } from 'react';
 import { useCommentSection } from '../../../hooks/useCommentSection';
+import { AmINotLoggedIn } from '../../../utils/helperFunction/AuthCheck';
 import { TargetType } from '../../../utils/types/type';
 import CommentForm from './CommentForm';
 import CommentItem from './CommentItem';
@@ -43,6 +44,8 @@ const CommentSection: React.FC<CommentSectionComponentProps> = ({
         openReportDialog,
         handleSubmitReportWithToast,
     } = useCommentSection({ targetType, targetId });
+
+    const amINotLoggedIn = AmINotLoggedIn();
 
     //------------------------------------------------------
     // Tải bình luận gốc khi component mount hoặc target thay đổi
@@ -108,6 +111,7 @@ const CommentSection: React.FC<CommentSectionComponentProps> = ({
             <div className="comment-replies-list ml-5 pl-4 border-left-2 surface-border mt-1">
                 {replies.map(reply => (
                     <CommentItem
+                        amINotLoggedIn={amINotLoggedIn}
                         key={reply.id}
                         comment={reply}
                         currentUserId={currentUserId}
@@ -156,7 +160,7 @@ const CommentSection: React.FC<CommentSectionComponentProps> = ({
         <div className="comment-section p-card p-4 shadow-1">
             {/* Ensure Toast and ConfirmDialog are globally available or add them here if controlled locally */}
             <ReportCommentDialog
-                commentContextType= {targetType}
+                commentContextType={targetType}
                 visible={state.isReportDialogVisible}
                 onHide={closeReportDialog}
                 commentToReport={state.commentForReporting}
@@ -177,6 +181,7 @@ const CommentSection: React.FC<CommentSectionComponentProps> = ({
                 <Fragment key={comment.id}>
                     <CommentItem
                         comment={comment}
+                        amINotLoggedIn={amINotLoggedIn}
                         currentUserId={currentUserId}
                         potentialMentionedUsers={state.mentionSuggestions}
                         onToggleLike={toggleLike}
@@ -215,6 +220,7 @@ const CommentSection: React.FC<CommentSectionComponentProps> = ({
                 <h4 className="text-lg font-semibold mb-2">Để lại bình luận của bạn</h4>
                 <CommentForm
                     onSubmit={handlePostRootComment}
+                    amINotLoggedIn={AmINotLoggedIn()}
                     placeholder="Viết bình luận của bạn ở đây..."
                     isLoading={state.isCreatingComment && state.activeReplyParentId === null} // Loading if creating root comment
                     mentionSuggestions={state.mentionSuggestions}

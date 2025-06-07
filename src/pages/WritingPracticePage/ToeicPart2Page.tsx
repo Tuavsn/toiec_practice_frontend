@@ -10,7 +10,9 @@ import { Panel } from 'primereact/panel';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Skeleton } from 'primereact/skeleton';
 import { Tag } from 'primereact/tag';
+import { Navigate } from 'react-router-dom';
 import { useWritingToeicPart2Logic } from '../../hooks/ToeicWritingPart2LogicHook';
+import { AmINotLoggedIn } from '../../utils/helperFunction/AuthCheck';
 import { EmailGradeDisplayProps, EmailPromptDisplayProps, EmailResponseFormProps, WritingToeicPart2GradeSectionProps, WritingToeicPart2InitialMessageProps, WritingToeicPart2PaginatorSectionProps, WritingToeicPart2PromptSectionProps, WritingToeicPart2ResponseSectionProps } from '../../utils/types/props';
 
 export default function WritingToeicPart2Page() {
@@ -22,7 +24,8 @@ export default function WritingToeicPart2Page() {
         navigateToPart2Sheet,
         uiControls,
     } = useWritingToeicPart2Logic();
-
+        if (AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
+    
     // --- Guard chính cho việc tải dữ liệu từ DB ---
     if (uiControls.isFetchingInitialData) {
         return <WritingToeicPart2GlobalSpinner />;

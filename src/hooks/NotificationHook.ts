@@ -3,6 +3,7 @@ import { useCallback, useEffect, useReducer } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { deleteNotification, fetchNotifications, markAllNotificationsAsRead, markNotificationAsRead } from '../api/api';
 import { useToast } from '../context/ToastProvider';
+import { AmINotLoggedIn } from '../utils/helperFunction/AuthCheck';
 import { initialNotificationState } from '../utils/types/emptyValue';
 import { Notification_t, NotificationActionType } from '../utils/types/type';
 import { notificationReducer } from './NotificationReducer';
@@ -176,7 +177,7 @@ export const useNotification = (reload: boolean, setReload: React.Dispatch<React
                 life: 3000,
             });
         }
-    }, [toast,state.unreadCount]);
+    }, [toast, state.unreadCount]);
 
     /**
      * Xóa một thông báo.
@@ -231,6 +232,9 @@ export const useNotification = (reload: boolean, setReload: React.Dispatch<React
     //------------------------------------------------------
     // Tải thông báo ban đầu khi hook được sử dụng lần đầu (component mount)
     useEffect(() => {
+        if (AmINotLoggedIn()) {
+            return;
+        }
         loadInitialNotifications();
     }, [loadInitialNotifications, reload]); // `loadInitialNotifications` là dependency
 

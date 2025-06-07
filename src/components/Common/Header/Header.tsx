@@ -5,6 +5,7 @@ import { MenuItem } from "primereact/menuitem";
 import { OverlayPanel } from "primereact/overlaypanel";
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { callLogout } from "../../../api/api";
 import Logo from "../../../assets/Header-Logo.png";
 import { useTestState } from "../../../context/TestStateProvider";
 import { useNotification } from "../../../hooks/NotificationHook";
@@ -25,14 +26,26 @@ function Header() {
     const notificationPanelRef = useRef<OverlayPanel>(null); // Ref for notification panel
     const [reload, setReload] = useState<boolean>(false);
 
-    
+
     const { isOnTest } = useTestState();
 
     //------------------------------------------------------
     // Notification Hook Usage
     //------------------------------------------------------
-    const { unreadCount } = useNotification(reload,setReload); // Get unread count for the badge
-  
+    const {
+        deleteNotificationItem,
+        error,
+        handleNotificationClick,
+        isLoading,
+        isLoadingMore,
+        loadMoreNotifications,
+        markAllAsRead,
+        meta,
+        notifications,
+        unreadCount
+
+    } = useNotification(reload, setReload); // Get unread count for the badge
+
 
     const HeaderStart = <a href="#"><img src={Logo} height={70} alt="Logo" onClick={() => handleCommand('/home')} /></a>;
 
@@ -85,7 +98,19 @@ function Header() {
                 </div>
                 <OverlayPanel className="p-0" ref={notificationPanelRef} dismissable={true} showCloseIcon={false} >
                     {/* Pass callback to allow panel to close itself */}
-                    <NotificationPanel reload={reload} setReload={setReload} onClosePanel={() => notificationPanelRef.current?.hide()} />
+                    <NotificationPanel
+                        notifications={notifications}
+                        meta={meta}
+                        unreadCount={unreadCount}
+                        isLoading={isLoading}
+                        isLoadingMore={isLoadingMore}
+                        error={error}
+                        handleNotificationClick={handleNotificationClick}
+                        loadMoreNotifications={loadMoreNotifications}
+                        markAllAsRead={markAllAsRead}
+                        deleteNotificationItem={deleteNotificationItem}
+                        onClosePanel={() => notificationPanelRef.current?.hide()}
+                    />
                 </OverlayPanel>
 
                 {/* User Email and Profile */}
@@ -115,8 +140,14 @@ function Header() {
                             className="p-button-text p-button-plain p-button-danger w-full text-left" // Danger style and alignment
                             onClick={() => {
                                 userProfilePanelRef.current?.hide(); // Hide panel before clearing
-                                localStorage.clear();
-                                navigate('/home');
+
+                                callLogout().then(() => {
+                                    
+                                        navigate('/home')
+
+
+                                }
+                                )
                             }}
                         />
                     </div>

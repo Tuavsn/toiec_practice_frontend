@@ -93,9 +93,9 @@ export const useCommentSection = ({
             }
             abortControllerRef.current?.abort();
             abortControllerRef.current = new AbortController();
-         
+
             await callApi(
-                (signal) => fetchRootCommentList(targetType, targetId, signal, page, pageSize, term, ["createdAt"], ["desc"],true),
+                (signal) => fetchRootCommentList(targetType, targetId, signal, page, pageSize, term, ["createdAt"], ["desc"], true),
                 CommentActionType.FETCH_ROOT_COMMENTS_START,
                 (payload: CommentPage) => ({ type: CommentActionType.FETCH_ROOT_COMMENTS_SUCCESS, payload: { comments: payload.result, meta: payload.meta } }),
                 CommentActionType.FETCH_ROOT_COMMENTS_FAILURE
@@ -266,12 +266,12 @@ export const useCommentSection = ({
     }, [dispatch]);
 
     const handleSubmitReportWithToast = useCallback(async (
-       
+
         payload: CreateCommentReportPayload
     ): Promise<boolean> => { // Returns true for success, false for failure to let dialog know
         dispatch({ type: CommentActionType.SUBMIT_COMMENT_REPORT_START });
         try {
-            const report = await submitCommentReport( payload ,);
+            const report = await submitCommentReport(payload,);
             dispatch({ type: CommentActionType.SUBMIT_COMMENT_REPORT_SUCCESS, payload: { report } });
             toast?.current?.show({ severity: 'success', summary: 'Đã gửi', detail: 'Báo cáo của bạn đã được gửi thành công.' });
             return true;

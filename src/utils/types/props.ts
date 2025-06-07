@@ -3,7 +3,7 @@ import { TreeNode } from "primereact/treenode";
 import { Dispatch, MutableRefObject } from "react";
 import { CategoryHookAction, FullTestScreenAction, LectureHookAction, MultiQuestionAction, PermissionHookAction, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, TopicHookAction, UserHookAction } from "./action";
 import { LectureHookState, MultiQuestionState, TestReviewHookState, WritingToeicPart3State } from "./state";
-import { CategoryRow, DialogLectureJobType, DialogRowJobType, DoTestFunction, GradedFeedback, LectureRow, MultipleChoiceQuestion, MultiQuestionRef, Notification_t, Permission, PexelsPhoto, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, ToeicSpeakingLoadedTask, ToeicSpeakingPracticeView, ToeicSpeakingSubQuestion, Topic, TopicOverview, TopicStat, UIWritingPart1Control, UserAnswerRecord, UserDetailResultRow, UserRow, WritingPart1Prompt, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart3GradedFeedback, WritingToeicPart3Prompt, WritingToeicPart3UIControls } from "./type";
+import { CategoryRow, Comment_t, DeleteReason, DialogLectureJobType, DialogRowJobType, DoTestFunction, GradedFeedback, LectureRow, Meta, MultipleChoiceQuestion, MultiQuestionRef, Notification_t, Permission, PexelsPhoto, QuestionAnswerRecord, QuestionID, QuestionNumber, QuestionPage, ResourceIndex, ResultOverview, Role, TestAnswerSheet, TestID, TestRow, TestSheet, TestType, ToeicSpeakingLoadedTask, ToeicSpeakingPracticeView, ToeicSpeakingSubQuestion, Topic, TopicOverview, TopicStat, UIWritingPart1Control, UserAnswerRecord, UserDetailResultRow, UserRow, WritingPart1Prompt, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart3GradedFeedback, WritingToeicPart3Prompt, WritingToeicPart3UIControls } from "./type";
 
 interface ButtonListProps {
     pageMapper: QuestionPage[],
@@ -488,20 +488,20 @@ interface ToeicSpeakingPartTaskPlayerProps {
     };
 }
 interface ToeicSpeakingPartAudioRecorderProps {
-  /**
-   * Callback function invoked when recording is complete and the audio Blob is ready.
-   * @param audioBlob The recorded audio data as a Blob.
-   */
-  onRecordingComplete: (audioBlob: Blob) => void;
-  /**
-   * Prop to signal if recording should automatically stop (e.g., when a parent timer ends).
-   * The component will watch this prop.
-   */
-  forceStop?: boolean;
-  /**
-   * Is recording currently allowed by the parent component (e.g., during response phase).
-   */
-  isRecordingActivePhase: boolean;
+    /**
+     * Callback function invoked when recording is complete and the audio Blob is ready.
+     * @param audioBlob The recorded audio data as a Blob.
+     */
+    onRecordingComplete: (audioBlob: Blob) => void;
+    /**
+     * Prop to signal if recording should automatically stop (e.g., when a parent timer ends).
+     * The component will watch this prop.
+     */
+    forceStop?: boolean;
+    /**
+     * Is recording currently allowed by the parent component (e.g., during response phase).
+     */
+    isRecordingActivePhase: boolean;
 }
 
 interface RadioButtonGroupProps {
@@ -523,9 +523,9 @@ interface RadioButtonGroupProps {
  * @property {(notificationId: string) => void} onDelete - Hàm callback khi nút xóa thông báo được nhấp vào.
  */
 interface NotificationItemProps {
-  notification: Notification_t;
-  onClick: (notification: Notification_t) => void; // Thường là handleNotificationClick từ hook
-  onDelete: (notificationId: string) => void;   // Thường là deleteNotificationItem từ hook
+    notification: Notification_t;
+    onClick: (notification: Notification_t) => void; // Thường là handleNotificationClick từ hook
+    onDelete: (notificationId: string) => void;   // Thường là deleteNotificationItem từ hook
 
 }
 
@@ -539,11 +539,19 @@ interface NotificationItemProps {
  * @property {() => void} onClosePanel - Hàm callback để đóng OverlayPanel chứa nó.
  */
 interface NotificationPanelProps {
-  // Lấy các giá trị và hàm cần thiết trực tiếp từ useNotification hook.
-  // Tuy nhiên, chúng ta có thể truyền một callback để đóng panel khi một thông báo được click.
-  onClosePanel?: () => void;
-  setReload: React.Dispatch<React.SetStateAction<boolean>>
-  reload: boolean
+    // Lấy các giá trị và hàm cần thiết trực tiếp từ useNotification hook.
+    // Tuy nhiên, chúng ta có thể truyền một callback để đóng panel khi một thông báo được click.
+    onClosePanel?: () => void;
+    notifications: Notification_t[]
+    meta: Meta | null,
+    unreadCount: number
+    isLoading: boolean,
+    isLoadingMore: boolean,
+    error: string | null,
+    loadMoreNotifications: () => Promise<void>,
+    handleNotificationClick: (notification: Notification_t) => Promise<void>,
+    markAllAsRead: () => Promise<void>,
+    deleteNotificationItem: (notificationId: string) => Promise<void>,
 }
 
 //------------------------------------------------------
@@ -556,13 +564,39 @@ interface NotificationPanelProps {
  * @property {(event: React.MouseEvent<HTMLElement>) => void} onClick - Hàm xử lý khi icon được nhấp, thường để mở OverlayPanel.
  */
 interface NotificationIconProps {
-  unreadCount: number;
-  onClick: (event: React.MouseEvent<HTMLElement>) => void;
+    unreadCount: number;
+    onClick: (event: React.MouseEvent<HTMLElement>) => void;
+}
+
+interface CommentItemProps {
+    comment: Comment_t;
+    amINotLoggedIn: boolean;
+    currentUserId: string | null;
+    potentialMentionedUsers: Array<{ id: string; name: string; avatar?: string }>; // For CommentContentRenderer & reply form
+
+    // Actions
+    onToggleLike: (commentId: string) => void;
+    onDeleteComment: (commentId: string, reason: DeleteReason, parentId?: string | null) => void;
+
+    // Reply handling for this specific comment (if it's a root comment)
+    onShowReplyForm?: (parentId: string) => void; // Tells hook to set this comment.id as activeReplyParentId
+    isReplyFormVisible?: boolean; // True if form to reply TO THIS comment is visible
+    onPostReply?: (text: string, mentionedUserIds: string[], parentId: string) => Promise<void | unknown>;
+    isPostingReply?: boolean; // Loading state for the reply form
+
+    // Handling display of replies TO THIS comment
+    onShowReplies?: (parentId: string, currentReplyPage?: number) => void; // To load/show replies
+    // Replies to this comment are passed down and rendered by CommentSection directly after this item.
+    // This item only needs to trigger loading/showing them.
+    // We can show a "hide replies" button if they are visible for this parent.
+    areRepliesVisible?: boolean; // True if replies for THIS comment are currently shown by parent
+    isLoadingReplies?: boolean; // True if replies for THIS comment are being loaded
+    replyMeta?: Meta | null; // Pagination for this comment's replies
+    onOpenReportDialog: (comment: Comment_t) => void;
 }
 
 export type {
-    ActivityLogProps, AdminCategoryTableProps, AdminGenericTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AnswerFormProps, AssignmentQuestionTableProps, ButtonListProps,
-    ConfirmSubmitDialogProps, DialogAssignmentQuestionActionProps, DialogDeleteLectureBodyProps,
+    ActivityLogProps, AdminCategoryTableProps, AdminGenericTableProps, AdminLectureTableProps, AdminPermissionTableProps, AdminRoleTableProps, AdminRowTableProps, AdminGenericTableProps as AdminTableAndToolBarProps, AdminTestTableProps, AdminTopicTableProps, AdminUserTableProps, AnswerFormProps, AssignmentQuestionTableProps, ButtonListProps, CommentItemProps, ConfirmSubmitDialogProps, DialogAssignmentQuestionActionProps, DialogDeleteLectureBodyProps,
     DialogDeleteRowBodyProps, DialogLectureProps, DialogQuestionActionProps,
     DialogQuestionPageProps, DialogRoleRowProps, DialogRowProps,
     DialogTestRowProps, DialogUpdateCategoryBodyProps, DialogUpdateLectureBodyProps, DialogUpdatePermissionBodyProps,

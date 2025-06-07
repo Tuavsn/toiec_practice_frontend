@@ -193,6 +193,8 @@ export interface PracticeTitle {
   isCompleted: boolean
 }
 
+export type ChatGPTResponse = { sessionId: string, chatResponse: { choices: [{ message: { role: string, content: string } }] } }
+
 export interface CategoryLabel {
   format: string;
   year: number[];

@@ -11,7 +11,9 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { Skeleton } from "primereact/skeleton";
 import { Tag } from "primereact/tag";
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import { useWritingToeicPart3Logic } from "../../hooks/ToeicWritingPart3LLogicHook";
+import { AmINotLoggedIn } from "../../utils/helperFunction/AuthCheck";
 import { EssayEditorFormProps, EssayGradeDisplayProps, EssayQuestionDisplayProps, WritingToeicPart2PaginatorSectionProps, WritingToeicPart3PanelHeaderProps } from "../../utils/types/props";
 
 export default function WritingToeicPart3Page() {
@@ -23,6 +25,7 @@ export default function WritingToeicPart3Page() {
         navigateToPart3Sheet,
         uiControls,
     } = useWritingToeicPart3Logic();
+    if (AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
 
     // --- Guard chính cho việc tải dữ liệu từ DB ---
     // Bình luận: Nếu đang tải dữ liệu ban đầu từ CSDL, hiển thị spinner toàn trang.

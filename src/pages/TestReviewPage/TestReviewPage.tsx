@@ -122,7 +122,7 @@ const TextReviewArea: React.FC<TestReviewAreaProps> = React.memo(({ question, di
 
             {/* Chat Window */}
             <div className="flex-1" style={{ minWidth: "400px" }}>
-                <ChatWindow questionId={question.questionId} />
+                <ChatWindow questionId={question.questionId} context={JSON.stringify(question)} />
             </div>
         </div>
     );

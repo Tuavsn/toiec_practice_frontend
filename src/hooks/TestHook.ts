@@ -157,7 +157,7 @@ export function useTestFrame(setTestScreenState: React.Dispatch<React.SetStateAc
     const thisQuestion: QuestionAnswerRecord = doTestDataRef.current.questionList[fullTestScreenState.currentPageIndex];
     const changePage = (offset: number) => {
         const newPageIndex = fullTestScreenState.currentPageIndex + offset;
-        console.log("Changing page to:", newPageIndex, "Current page index:", fullTestScreenState.currentPageIndex);
+        
 
         Promise.resolve().then(() => prefetchNeighborhood(doTestDataRef.current.questionList, newPageIndex));
         if (newPageIndex >= 0 && newPageIndex < doTestDataRef.current.questionList.length) {
