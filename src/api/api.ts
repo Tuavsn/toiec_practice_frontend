@@ -1556,7 +1556,7 @@ export async function suggestKeywordForImageSearch(): Promise<string | null> {
         return null;
     }
 
-    const promptText = "Suggest a single, common English keyword phrase (1-3 words maximum) suitable for finding diverse images for a TOEIC Part 1 task. Examples: 'office meeting', 'park bench', 'kitchen preparation'. Output only the keyword phrase, no extra text or quotes.";
+    const promptText = "Suggest a single, common English keyword phrase (1-3 words maximum) suitable for finding diverse images for a TOEIC Writing Part 1 task. Examples: 'office meeting', 'park bench', 'kitchen preparation'. Output only the keyword phrase, no extra text or quotes.";
 
     try {
         const contentConfig: GenerateContentConfig = {
