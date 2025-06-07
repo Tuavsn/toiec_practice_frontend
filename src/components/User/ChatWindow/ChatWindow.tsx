@@ -50,7 +50,7 @@ const ChatWindow: React.FC<ChatWindowProps> = React.memo(({ questionId, context 
                     <Button
                         label="Bắt đầu chat với chuyên gia"
                         icon="pi pi-comments"
-                        onClick={() => startChat(context)}
+                        onClick={() => startChat()}
                         disabled={isLoading}
                         className="p-button-rounded p-button-success"
                     />
@@ -128,11 +128,11 @@ function useChat(questionId: string, context: string) {
         }
     }, [messageLogs, questionId]);
 
-    const startChat = async (context: string) => {
+    const startChat = async () => {
         console.log("Start Question id: " + questionId);
         setIsLoading(true);
         try {
-            const response = await callStartChat(questionId, context);
+            const response = await callStartChat(questionId);
 
             if (response && response.data) {
                 const { sessionId, chatResponse } = response.data;

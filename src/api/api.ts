@@ -1013,7 +1013,7 @@ export const callPutUserTarget = async (targetScore: number): Promise<void> => {
     }
 }
 
-export const callStartChat = async (questionId: string, context: string): Promise<ApiResponse<{ sessionId: string, chatResponse: { choices: [{ message: { role: string, content: string } }] } }> | null> => {
+export const callStartChat = async (questionId: string): Promise<ApiResponse<{ sessionId: string, chatResponse: { choices: [{ message: { role: string, content: string } }] } }> | null> => {
     try {
         const response = await axios.post<ApiResponse<ChatGPTResponse>>(
             `${import.meta.env.VITE_API_URL}/chatgpt/tutor`,
