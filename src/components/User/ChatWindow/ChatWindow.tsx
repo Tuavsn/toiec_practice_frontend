@@ -84,6 +84,14 @@ function useChat(questionId: string, context: string) {
     const [isLoading, setIsLoading] = useState(false);
     const [sessionId, setSessionId] = useState<string | null>(null);
 
+    // Reset chat state when questionId changes
+    useEffect(() => {
+        setMessageLogs([]);
+        setInput("");
+        setIsInitiated(false);
+        setSessionId(null);
+    }, [questionId]);
+
     // Check if there's a stored session ID
     useEffect(() => {
         console.log("Checking session for question: " + questionId);
@@ -94,7 +102,7 @@ function useChat(questionId: string, context: string) {
                 if (sessionData.expiry > Date.now()) {
                     setSessionId(sessionData.id);
                     setIsInitiated(true);
-
+                    
                     // If we have stored messages, restore them
                     const storedMessages = localStorage.getItem(`chat_messages_${questionId}`);
                     if (storedMessages) {
