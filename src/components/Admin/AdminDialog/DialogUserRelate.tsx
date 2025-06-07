@@ -3,7 +3,8 @@ import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import { Fieldset } from "primereact/fieldset";
 import React, { useRef, useState } from "react";
-import { callPutUpdateRoleForUser, callPutUpdateUserRow } from "../../../api/api";
+import { useNavigate } from "react-router-dom";
+import { callLogout, callPutUpdateRoleForUser, callPutUpdateUserRow } from "../../../api/api";
 import { useToast } from "../../../context/ToastProvider";
 import { RenderUserRowDialogParams, handeDeleteRowParams, handeSaveUserRowParams } from "../../../utils/types/prams";
 import { DialogDeleteRowBodyProps, DialogUpdateUserBodyProps, DialogUserRowProps } from "../../../utils/types/props";
@@ -73,6 +74,7 @@ const RenderUpdateUserBody: React.FC<DialogUpdateUserBodyProps> = React.memo(
         const [formData, setFormData] = useState<Role>(props.currentSelectedRow.role)
         const { toast } = useToast();
         const [isDisabled, setIsDisabled] = useState(false);
+        const navigate = useNavigate();
         const title = useRef<string>(props.currentSelectedRow.id ? "Sửa tài khoản" : "Thêm tài khoản");
         return (
             <Fieldset legend={title.current} >
@@ -83,7 +85,7 @@ const RenderUpdateUserBody: React.FC<DialogUpdateUserBodyProps> = React.memo(
                             <Dropdown
                                 name="overall skill"
                                 value={formData.id}
-                                options={props.roleList.map((r:Role) => { return { label: r.name, value: r.id } })}
+                                options={props.roleList.map((r: Role) => { return { label: r.name, value: r.id } })}
                                 onChange={(e) => setFormData({ ...formData, id: e.target.value || "" })}
                                 placeholder="Chọn loại"
                             />
@@ -92,7 +94,7 @@ const RenderUpdateUserBody: React.FC<DialogUpdateUserBodyProps> = React.memo(
                 </section>
                 {/* Save Button */}
                 <div className="field flex justify-content-end mt-5">
-                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => handleSave({ role: formData, user: props.currentSelectedRow, dispatch: props.dispatch, toast, setIsDisabled })} />
+                    <Button label="Lưu" icon="pi pi-save" disabled={isDisabled} onClick={() => handleSave({ role: formData, user: props.currentSelectedRow, dispatch: props.dispatch, toast, setIsDisabled, navigate: navigate })} />
                 </div>
 
             </Fieldset>
@@ -115,7 +117,12 @@ async function handleSave(params: handeSaveUserRowParams) {
     params.setIsDisabled(false);
     if (success) {
         params.toast.current?.show({ severity: 'success', summary: "Thành công", detail: "Thao tác thành công" });
-        params.dispatch({ type: "REFRESH_DATA" });
+        if (params.user.id === localStorage.getItem("iduser")) {
+            await callLogout()
+            params.navigate("/home", { replace: true });
+        } else {
+            params.dispatch({ type: "REFRESH_DATA" });
+        }
     } else {
         params.toast.current?.show({ severity: 'error', summary: "Lỗi", detail: "Sửa thất bại" });
     }

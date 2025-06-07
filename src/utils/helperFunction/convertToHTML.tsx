@@ -372,7 +372,7 @@ export function UserReviewSingleAnswerToHTML(question: SingleUserAnswerOverview)
                 {ConvertToTopicTag(question)}
 
             </div>
-            {ResourcesToHTML(question.resources, question.questionNum)}
+            {ResourcesToHTML(question.resources, question.questionNum, false)}
             <br />
             <h5 key={"h5" + question.questionNum} > {question.questionNum}.{question.content}  ({question.timeSpent} giây)</h5>
             <div key={"answer" + question.questionNum} className="flex flex-column gap-3 my-3">
@@ -412,7 +412,7 @@ export function UserReviewSingleAnswerToHTML(question: SingleUserAnswerOverview)
                 {ConvertReviewTopicToHTML(question)}
 
             </Card>
-            <ChatWindow questionId={question.questionId} />
+            <ChatWindow questionId={question.questionId} context={JSON.stringify(question)} />
         </section>
     return { body: body, title: title }
 }
@@ -511,7 +511,7 @@ export function ConvertUserAnswerRecordToHTML(question: UserAnswerRecord): [JSX.
 
     // Nếu câu hỏi có tài nguyên đi kèm (hình ảnh, audio,...)
     if (question.resources) {
-        resoursesElement.push(...ResourcesToHTML(question.resources, question.questionNum));
+        resoursesElement.push(...ResourcesToHTML(question.resources, question.questionNum, false));
     }
 
     // Nếu câu hỏi có các câu hỏi con (subQuestions)
@@ -525,7 +525,7 @@ export function ConvertUserAnswerRecordToHTML(question: UserAnswerRecord): [JSX.
             questionsElement.push(<h5 key={"h5" + subq.questionNum} > {subq.questionNum}.{subq.content} ({subq.timeSpent} giây)</h5>);
 
             // Nếu câu hỏi con có tài nguyên, thêm chúng vào
-            resoursesElement.push(...ResourcesToHTML(subq.resources, subq.questionNum));
+            resoursesElement.push(...ResourcesToHTML(subq.resources, subq.questionNum, false));
 
             // Xây dựng phần tử HTML cho từng câu hỏi con
             questionsElement.push(
@@ -647,13 +647,13 @@ export function ConvertThisFullTestQuestionToHTML(
             resoursesElement.push(...buildResources(resources, questionId));
 
             // Thêm phần tử HTML của câu hỏi con
-            questionsElement.push(BuildFullTestQuestionHTML(subq, setReloadToolbar, doTestDataRef,autoSaveDraftTest));
+            questionsElement.push(BuildFullTestQuestionHTML(subq, setReloadToolbar, doTestDataRef, autoSaveDraftTest));
         });
     } else {
         // Nếu không có câu hỏi con, thêm câu hỏi chính
         questionsElement.push(<QuestionHeader key={`h5-${questionNum}`} question={question} setReloadToolbar={setReloadToolbar} />);
         // Thêm phần tử HTML của câu hỏi chính
-        questionsElement.push(BuildFullTestQuestionHTML(question, setReloadToolbar, doTestDataRef,autoSaveDraftTest));
+        questionsElement.push(BuildFullTestQuestionHTML(question, setReloadToolbar, doTestDataRef, autoSaveDraftTest));
     }
 
     // Trả về hai mảng JSX: tài nguyên và câu hỏi
@@ -700,20 +700,20 @@ function BuildFullTestQuestionHTML(
     // Trả về phần tử HTML cho câu hỏi
     return (
         <div key={"answer" + currentQuestionNumber} className={"flex flex-column gap-3 my-3"}>
-            <RadioButtonGroup 
-            currentQuestionNumber={currentQuestionNumber} 
-            question={question} answerTexts={answerTexts} 
-            setReloadToolbar={setReloadToolbar}
-             doTestDataRef={doTestDataRef} 
-             autoSaveDraftTest={autoSaveDraftTest}
-             />
+            <RadioButtonGroup
+                currentQuestionNumber={currentQuestionNumber}
+                question={question} answerTexts={answerTexts}
+                setReloadToolbar={setReloadToolbar}
+                doTestDataRef={doTestDataRef}
+                autoSaveDraftTest={autoSaveDraftTest}
+            />
 
         </div>
     )
 }
 
 const RadioButtonGroup: React.FC<RadioButtonGroupProps> =
-    ({ currentQuestionNumber, answerTexts, question, setReloadToolbar, doTestDataRef,autoSaveDraftTest }) => {
+    ({ currentQuestionNumber, answerTexts, question, setReloadToolbar, doTestDataRef, autoSaveDraftTest }) => {
         const [, setReload] = React.useState(false);
         return (
             <>

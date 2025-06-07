@@ -1,6 +1,7 @@
 import { EditorTextChangeEvent } from "primereact/editor"
 import { Toast } from "primereact/toast"
 import { Dispatch, MutableRefObject } from "react"
+import { NavigateFunction } from "react-router-dom"
 import { LectureHookAction, RoleHookAction, RowHookAction, UserHookAction } from "./action"
 import { DialogLectureJobType, DialogRowJobType, LectureID, LectureRow, Permission, PermissionID, Role, TestRow, Topic, TopicID, UserRow } from "./type"
 
@@ -83,6 +84,7 @@ type handeSaveRoleParams = {
 }
 type handeSaveUserRowParams = {
   role: Role,
+  navigate: NavigateFunction,
   user: UserRow,
   toast: React.MutableRefObject<Toast | null>,
   dispatch: React.Dispatch<UserHookAction>,

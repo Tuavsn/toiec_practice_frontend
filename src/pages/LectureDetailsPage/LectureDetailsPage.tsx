@@ -152,6 +152,11 @@ const AssignmentSection: React.FC<{ lectureID: LectureID }> = React.memo(
             newAnswerSheet.set(qID, answer);
             setUserAnswerSheet(newAnswerSheet);
             if (newAnswerSheet.size >= totalQuestions.current) {
+                for (let i = 0; i < newAnswerSheet.size; ++i) {
+                    if (questionPage[i].correctAnswer !== newAnswerSheet.get((i + 1).toString())) {
+                        return;
+                    }
+                }
                 callPutPercentLecture(lectureID, 100).then(() => {
                     toast.current?.show({ severity: 'success', summary: 'Thành công', detail: 'Hoàn thành bài tập' });
                 });
@@ -176,6 +181,7 @@ const AssignmentSection: React.FC<{ lectureID: LectureID }> = React.memo(
                 setQuestionPage(response);
             }
             fetchAssignmentQuestion();
+           
         }, [])
         // Trả về phần giao diện của component
         return <Card title="Bài tập" className='shadow-7'>

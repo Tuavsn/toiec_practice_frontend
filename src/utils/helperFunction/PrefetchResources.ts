@@ -180,10 +180,14 @@ export async function prefetchResources(
     testDocument: TestDocument
 ): Promise<void> {
     const questions: ResourcePrefetch[] = [];
-    testDocument[0].questionList.slice(0, 3).forEach(
-        (q: Question_PageIndex) => {
-            questions.push(q);
+    testDocument.forEach(
+        (questionListByPart) => {
+            questionListByPart.questionList.slice(0, 3).forEach(
+                (q: Question_PageIndex) => {
+                    questions.push(q);
 
+                }
+            )
         }
     )
     if (!questions?.length) return;

@@ -278,7 +278,6 @@ export const initialCommentSectionState: CommentSectionState = {
     mentionSuggestions: [],
     activeReplyParentId: null,
     visibleRepliesParentId: null,
-
     // --- Initial values for new report flow fields ---
     isReportDialogVisible: false,
     commentForReporting: null,

@@ -3,9 +3,10 @@ import { ScrollPanel } from "primereact/scrollpanel"
 import React from "react"
 import { ConvertThisFullTestQuestionToHTML } from "../../../utils/helperFunction/convertToHTML"
 import { FullTestAreaProps } from "../../../utils/types/props"
+import { QuestionAnswerRecord, TestType } from "../../../utils/types/type"
 
 export const FullTestArea: React.FC<FullTestAreaProps> = React.memo(
-    ({ changePageOffset, setReloadToolbar, doTestDataRef, thisQuestion,autoSaveDraftTest }) => {
+    ({ changePageOffset, setReloadToolbar, doTestDataRef, thisQuestion, autoSaveDraftTest }) => {
 
         const [resourcesElement, questionsElement] = ConvertThisFullTestQuestionToHTML(thisQuestion, changePageOffset, setReloadToolbar, doTestDataRef, autoSaveDraftTest);
         return (
@@ -19,7 +20,7 @@ export const FullTestArea: React.FC<FullTestAreaProps> = React.memo(
                 </ScrollPanel>
 
                 <div className="flex-1 align-items-stretch" style={{ minWidth: '600px' }}>
-                    {(thisQuestion.partNum > 4) &&
+                    {(IsChangePageAllow(thisQuestion, doTestDataRef.current.testType)) &&
                         <div className="flex justify-content-end px-3 pt-2">
                             <b className="py-0 m-auto text-blue-300">Phần {thisQuestion.partNum}</b>
                             <span>
@@ -39,3 +40,13 @@ export const FullTestArea: React.FC<FullTestAreaProps> = React.memo(
         );
     }
 )
+
+function IsChangePageAllow(thisQuestion: QuestionAnswerRecord, testType: TestType): boolean {
+    if (testType !== "fulltest") {
+        return true;
+    }
+    if (thisQuestion.partNum > 4) {
+        return true
+    }
+    return false;
+}

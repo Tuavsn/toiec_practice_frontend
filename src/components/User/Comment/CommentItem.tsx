@@ -4,8 +4,10 @@ import { confirmDialog } from 'primereact/confirmdialog'; // For delete confirma
 import { Tag } from 'primereact/tag'; // Optional for other indicators
 import React from 'react';
 
+import { getReportReasonText } from '../../../utils/helperFunction/DeleteReasonEnumToLabel';
 import formatDate from '../../../utils/helperFunction/formatDateToString';
-import { Comment_t, DeleteReason, Meta } from '../../../utils/types/type';
+import { CommentItemProps } from '../../../utils/types/props';
+import { DeleteReason } from '../../../utils/types/type';
 import UserAvatar from '../Avatar/UserAvatar';
 import CommentContentRenderer from './CommentContentRenderer';
 import CommentForm from './CommentForm'; // The form for replying
@@ -13,31 +15,7 @@ import CommentForm from './CommentForm'; // The form for replying
 //------------------------------------------------------
 // Định nghĩa Types cho Props
 //------------------------------------------------------
-export interface CommentItemProps {
-  comment: Comment_t;
-  currentUserId: string | null;
-  potentialMentionedUsers: Array<{ id: string; name: string; avatar?: string }>; // For CommentContentRenderer & reply form
 
-  // Actions
-  onToggleLike: (commentId: string) => void;
-  onDeleteComment: (commentId: string, reason: DeleteReason, parentId?: string | null) => void;
-
-  // Reply handling for this specific comment (if it's a root comment)
-  onShowReplyForm?: (parentId: string) => void; // Tells hook to set this comment.id as activeReplyParentId
-  isReplyFormVisible?: boolean; // True if form to reply TO THIS comment is visible
-  onPostReply?: (text: string, mentionedUserIds: string[], parentId: string) => Promise<void | unknown>;
-  isPostingReply?: boolean; // Loading state for the reply form
-
-  // Handling display of replies TO THIS comment
-  onShowReplies?: (parentId: string, currentReplyPage?: number) => void; // To load/show replies
-  // Replies to this comment are passed down and rendered by CommentSection directly after this item.
-  // This item only needs to trigger loading/showing them.
-  // We can show a "hide replies" button if they are visible for this parent.
-  areRepliesVisible?: boolean; // True if replies for THIS comment are currently shown by parent
-  isLoadingReplies?: boolean; // True if replies for THIS comment are being loaded
-  replyMeta?: Meta | null; // Pagination for this comment's replies
-  onOpenReportDialog: (comment: Comment_t) => void;
-}
 
 
 //------------------------------------------------------
@@ -56,7 +34,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onShowReplies,
   areRepliesVisible,
   isLoadingReplies,
-  onOpenReportDialog
+  onOpenReportDialog,
+  amINotLoggedIn,
 }) => {
   const isOwner = comment.userId === currentUserId;
   const canReplyToThisComment = comment.level === 0; // Only root comments can be replied to
@@ -149,12 +128,13 @@ const CommentItem: React.FC<CommentItemProps> = ({
             style={{ fontFamily: `'Segoe UI', Roboto, 'Helvetica Neue', sans-serif` }}
           >
             {comment.deleted
-              ? (comment.deleteReason || 'Bình luận này đã bị xóa.')
+              ? (getReportReasonText(comment.deleteReason) || 'Bình luận này đã bị xóa.')
               : <CommentContentRenderer content={comment.content} potentialMentionedUsers={potentialMentionedUsers} />
             }
           </div>
           <div className="comment-actions text-xs text-color-secondary mt-2 flex align-items-center">
             <Button
+              disabled={amINotLoggedIn}
               icon={likeButtonIcon}
               className={`${likeButtonClass} p-button-rounded p-button-sm mr-1`}
               onClick={() => onToggleLike(comment.id)}
@@ -179,7 +159,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 onClick={handleDelete}
               />
             )}
-            {!isOwner && !comment.deleted && (
+            {!isOwner && !comment.deleted && !amINotLoggedIn && (
               <Button
                 icon="pi pi-flag"
                 className="p-button-text p-button-sm p-button-secondary ml-2 text-xs"
@@ -200,6 +180,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
       {canReplyToThisComment && isReplyFormVisible && onPostReply && (
         <div className="ml-5 pl-4 mt-2"> {/* Indent reply form */}
           <CommentForm
+            amINotLoggedIn={amINotLoggedIn}
             onSubmit={handleReplySubmit}
             placeholder={`Trả lời ${comment.userDisplayName || 'người dùng'}...`}
             isLoading={isPostingReply || false}

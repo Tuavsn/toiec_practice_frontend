@@ -41,7 +41,7 @@ const RenderMainPage: React.FC = () => {
         case "SUBMITING": // Khi đang gửi bài
             return <SubmitLoading />;
         case "NAVIGATE_TO_RESULT": // Khi đang gửi bài
-            return <Navigate to={`/test/${testScreenState.resultID}/review`} />;
+            return <Navigate replace={true} to={`/test/${testScreenState.resultID}/review`} />;
         default: // Nếu trạng thái không xác định, điều hướng lại
             if (window.history.length > 1) {
                 navigate(-1);
