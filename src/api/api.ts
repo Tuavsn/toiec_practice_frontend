@@ -1013,7 +1013,7 @@ export const callPutUserTarget = async (targetScore: number): Promise<void> => {
     }
 }
 
-export const callStartChat = async (questionId: string, context: string): Promise<ApiResponse<{ sessionId: string, chatResponse: { choices: [{ message: { role: string, content: string } }] } }> | null> => {
+export const callStartChat = async (questionId: string): Promise<ApiResponse<{ sessionId: string, chatResponse: { choices: [{ message: { role: string, content: string } }] } }> | null> => {
     try {
         const response = await axios.post<ApiResponse<ChatGPTResponse>>(
             `${import.meta.env.VITE_API_URL}/chatgpt/tutor`,
@@ -1556,7 +1556,7 @@ export async function suggestKeywordForImageSearch(): Promise<string | null> {
         return null;
     }
 
-    const promptText = "Suggest a single, common English keyword phrase (1-3 words maximum) suitable for finding diverse images for a TOEIC Part 1 task. Examples: 'office meeting', 'park bench', 'kitchen preparation'. Output only the keyword phrase, no extra text or quotes.";
+    const promptText = "Suggest a single, common English keyword phrase (1-3 words maximum) suitable for finding diverse images for a TOEIC Writing Part 1 task. Examples: 'office meeting', 'park bench', 'kitchen preparation'. Output only the keyword phrase, no extra text or quotes.";
 
     try {
         const contentConfig: GenerateContentConfig = {
