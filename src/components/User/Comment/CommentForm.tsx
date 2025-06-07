@@ -21,6 +21,7 @@ interface MentionSuggestion {
 export interface CommentFormProps {
     onSubmit: (text: string, mentionedUserIds: string[]) => Promise<void | unknown> | void | unknown;
     initialText?: string;
+    amINotLoggedIn: boolean;
     placeholder: string;
     isLoading: boolean;
     mentionSuggestions: MentionSuggestion[];
@@ -36,18 +37,16 @@ const CommentForm: React.FC<CommentFormProps> = ({
     initialText = "",
     placeholder,
     isLoading,
+    amINotLoggedIn,
     mentionSuggestions: initialMentionSuggestions,
     onCancel,
     autoFocus = false,
 }) => {
-
+    
+    
     const [text, setText] = useState<string>(initialText ?? "");
     const [filteredSuggestions, setFilteredSuggestions] = useState<MentionSuggestion[]>([]);
     const { toast } = useToast(); // Using the hook as defined in project.txt
-    // If useToast() returns { toast: useRef<Toast>(null) }, you need a ToastProvider or to pass the ref.
-    // For now, let's assume toast.current.show will be available if Toast is set up globally.
-    // Example: if appToastRef is exported: const toast = appToastRef;
-
     const mentionInputRef = useRef<HTMLTextAreaElement>(null); // Ref for the underlying textarea
 
     useEffect(() => {
@@ -59,6 +58,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
         if (autoFocus && mentionInputRef.current) {
             mentionInputRef.current.focus();
         }
+
     }, [autoFocus]);
 
     //------------------------------------------------------
@@ -180,10 +180,11 @@ const CommentForm: React.FC<CommentFormProps> = ({
                 <Button
                     type="submit"
                     label="Gửi"
+
                     icon="pi pi-send"
                     className="p-button-sm text-sm"
                     loading={isLoading}
-                    disabled={text === "" || isLoading}
+                    disabled={text === "" || isLoading || amINotLoggedIn }
                 />
             </div>
         </form>

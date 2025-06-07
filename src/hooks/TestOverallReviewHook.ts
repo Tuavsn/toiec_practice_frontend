@@ -20,7 +20,7 @@ export function useTestOverallResult() {
             const response = await callGetResult(id);
             callGetReviewTestPaper(id).then(testReviewAnswerSheet => sessionStorage.setItem("review", JSON.stringify(testReviewAnswerSheet)));
             if (response.data.type === "exercise") {
-                response.data.testName = "Ngân hàng câu hỏi"
+                response.data.testName = "ngân hàng câu hỏi"
             }
             ConvertEnglishToVietnamese(response.data);
             setOverallDetail(response.data);

@@ -3,26 +3,26 @@ import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
 import { ScrollPanel } from "primereact/scrollpanel";
 import React, { useEffect, useState } from "react";
+import ReactMarkdown from 'react-markdown';
 import { callContinueChat, callStartChat } from "../../../api/api";
 import { ChatMessage } from "../../../utils/types/type";
-import ReactMarkdown from 'react-markdown';
 
 interface ChatWindowProps {
     questionId: string;
+    context: string
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = React.memo(({ questionId }) => {
-    console.log("Chat window: " + questionId);
-    const { 
-        isInitiated, 
-        isLoading, 
-        input, 
-        setInput, 
-        messageLogs, 
-        startChat, 
-        sendMessage, 
-        handleKeyPress 
-    } = useChat(questionId);
+const ChatWindow: React.FC<ChatWindowProps> = React.memo(({ questionId, context }) => {
+    const {
+        isInitiated,
+        isLoading,
+        input,
+        setInput,
+        messageLogs,
+        startChat,
+        sendMessage,
+        handleKeyPress
+    } = useChat(questionId, context);
 
     return (
         <Card title="Hỏi cùng chuyên gia" className="bg-white-100 shadow-7 border-solid p-4 w-96">
@@ -44,13 +44,13 @@ const ChatWindow: React.FC<ChatWindowProps> = React.memo(({ questionId }) => {
                     </div>
                 )}
             </ScrollPanel>
-            
+
             {!isInitiated ? (
                 <div className="flex justify-content-center">
-                    <Button 
-                        label="Bắt đầu chat với chuyên gia" 
-                        icon="pi pi-comments" 
-                        onClick={startChat} 
+                    <Button
+                        label="Bắt đầu chat với chuyên gia"
+                        icon="pi pi-comments"
+                        onClick={() => startChat(context)}
                         disabled={isLoading}
                         className="p-button-rounded p-button-success"
                     />
@@ -65,11 +65,11 @@ const ChatWindow: React.FC<ChatWindowProps> = React.memo(({ questionId }) => {
                         placeholder="Nhập câu hỏi của bạn..."
                         disabled={isLoading}
                     />
-                    <Button 
-                        icon="pi pi-send" 
-                        onClick={() => sendMessage(input)} 
+                    <Button
+                        icon="pi pi-send"
+                        onClick={() => sendMessage(input, context)}
                         disabled={!input.trim() || isLoading}
-                        className="p-button-rounded p-button-primary" 
+                        className="p-button-rounded p-button-primary"
                     />
                 </div>
             )}
@@ -77,7 +77,7 @@ const ChatWindow: React.FC<ChatWindowProps> = React.memo(({ questionId }) => {
     );
 });
 
-function useChat(questionId: string) {
+function useChat(questionId: string, context: string) {
     const [messageLogs, setMessageLogs] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState("");
     const [isInitiated, setIsInitiated] = useState(false);
@@ -94,7 +94,7 @@ function useChat(questionId: string) {
                 if (sessionData.expiry > Date.now()) {
                     setSessionId(sessionData.id);
                     setIsInitiated(true);
-                    
+
                     // If we have stored messages, restore them
                     const storedMessages = localStorage.getItem(`chat_messages_${questionId}`);
                     if (storedMessages) {
@@ -120,70 +120,70 @@ function useChat(questionId: string) {
         }
     }, [messageLogs, questionId]);
 
-    const startChat = async () => {
+    const startChat = async (context: string) => {
         console.log("Start Question id: " + questionId);
         setIsLoading(true);
         try {
-            const response = await callStartChat(questionId);
-            
+            const response = await callStartChat(questionId, context);
+
             if (response && response.data) {
                 const { sessionId, chatResponse } = response.data;
                 const assistantMessage = chatResponse.choices[0].message.content;
-                
+
                 // Store session ID with 24-hour expiry
                 const expiryTime = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
                 localStorage.setItem(
-                    `chat_session_${questionId}`, 
+                    `chat_session_${questionId}`,
                     JSON.stringify({ id: sessionId, expiry: expiryTime })
                 );
-                
+
                 setSessionId(sessionId);
                 setIsInitiated(true);
                 setMessageLogs([{ sender: "bot", text: assistantMessage }]);
             } else {
                 // Handle error response
-                setMessageLogs([{ 
-                    sender: "bot", 
-                    text: "Xin lỗi, đã có lỗi xảy ra khi kết nối với chuyên gia. Vui lòng thử lại sau." 
+                setMessageLogs([{
+                    sender: "bot",
+                    text: "Xin lỗi, đã có lỗi xảy ra khi kết nối với chuyên gia. Vui lòng thử lại sau."
                 }]);
             }
         } catch (error) {
             console.error("Error starting chat:", error);
-            setMessageLogs([{ 
-                sender: "bot", 
-                text: "Xin lỗi, đã có lỗi xảy ra khi kết nối với chuyên gia. Vui lòng thử lại sau." 
+            setMessageLogs([{
+                sender: "bot",
+                text: "Xin lỗi, đã có lỗi xảy ra khi kết nối với chuyên gia. Vui lòng thử lại sau."
             }]);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const sendMessage = async (message: string) => {
+    const sendMessage = async (message: string, context: string) => {
         if (!message.trim() || !sessionId) return;
 
         setIsLoading(true);
         const newMessageLogs: ChatMessage[] = [...messageLogs, { sender: "user", text: message }];
         setMessageLogs(newMessageLogs);
         setInput("");
-        
+
         try {
-            const response = await callContinueChat(questionId, sessionId, message);
-            
+            const response = await callContinueChat(questionId, sessionId, message, context);
+
             if (response && response.data) {
                 const assistantMessage = response.data.chatResponse.choices[0].message.content;
                 setMessageLogs([...newMessageLogs, { sender: "bot", text: assistantMessage }]);
             } else {
                 // Handle error response
-                setMessageLogs([...newMessageLogs, { 
-                    sender: "bot", 
-                    text: "Xin lỗi, đã có lỗi xảy ra khi nhận phản hồi. Vui lòng thử lại sau." 
+                setMessageLogs([...newMessageLogs, {
+                    sender: "bot",
+                    text: "Xin lỗi, đã có lỗi xảy ra khi nhận phản hồi. Vui lòng thử lại sau."
                 }]);
             }
         } catch (error) {
             console.error("Error sending message:", error);
-            setMessageLogs([...newMessageLogs, { 
-                sender: "bot", 
-                text: "Xin lỗi, đã có lỗi xảy ra khi nhận phản hồi. Vui lòng thử lại sau." 
+            setMessageLogs([...newMessageLogs, {
+                sender: "bot",
+                text: "Xin lỗi, đã có lỗi xảy ra khi nhận phản hồi. Vui lòng thử lại sau."
             }]);
         } finally {
             setIsLoading(false);
@@ -192,19 +192,19 @@ function useChat(questionId: string) {
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter" && !isLoading) {
-            sendMessage(input);
+            sendMessage(input, context);
         }
     };
 
-    return { 
-        isInitiated, 
-        isLoading, 
-        input, 
-        setInput, 
-        messageLogs, 
-        startChat, 
-        sendMessage, 
-        handleKeyPress 
+    return {
+        isInitiated,
+        isLoading,
+        input,
+        setInput,
+        messageLogs,
+        startChat,
+        sendMessage,
+        handleKeyPress
     };
 }
 

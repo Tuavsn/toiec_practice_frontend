@@ -10,7 +10,9 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { Skeleton } from "primereact/skeleton";
 import { Tag } from "primereact/tag";
 import React from "react";
+import { Navigate } from "react-router-dom";
 import { useToeicPart1Logic } from "../../hooks/ToeicPart1LogicHook";
+import { AmINotLoggedIn } from "../../utils/helperFunction/AuthCheck";
 import { AnswerFormProps, GradeDisplayProps, ImageDisplayProps, PanelHeaderProps, PromptDisplayProps } from "../../utils/types/props";
 import { PexelsPhoto, UIWritingPart1Control, WritingPart1Prompt, WritingSheetData } from "../../utils/types/type";
 
@@ -33,6 +35,7 @@ export default function ToeicPart1Page() {
 
     } = state
     // All useEffects related to toasts and auto-prompt-generation are now in the hook.
+    if (AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
 
     // Primary DB Loading Guard
     if (state.isDbLoading) {
@@ -372,7 +375,7 @@ function PromptDisplay({ prompt, isLoading }: PromptDisplayProps) {
 function ImageDisplay({ image, isLoading, imageAltText }: ImageDisplayProps) {
     if (isLoading) {
         return (
-            <div className="flex flex-1 justify-content-center align-items-center mb-3" style={{ height: '300px',  }}>
+            <div className="flex flex-1 justify-content-center align-items-center mb-3" style={{ height: '300px', }}>
                 <Skeleton width="100%" height="300px" className="mb-3" />
             </div>
         )
