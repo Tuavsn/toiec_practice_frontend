@@ -27,7 +27,7 @@ const practiceSections = [
         items: [
             { title: "Đọc câu", path: "/doexercise/partNum=5", icon: "pi pi-align-left", bgColorClass: "bg-blue-500" },
             { title: "Đọc đoạn văn", path: "/doexercise/partNum=6", icon: "pi pi-list", bgColorClass: "bg-blue-500" },
-            { title: "Đọc hiểu", path: "/doexercise/partNum=7", icon: "pi pi-book-open", bgColorClass: "bg-blue-500" }, // Giả sử có icon này
+            { title: "Đọc hiểu", path: "/doexercise/partNum=7", icon: "pi pi-directions", bgColorClass: "bg-blue-500" }, // Giả sử có icon này
         ]
     },
     {
