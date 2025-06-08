@@ -1114,7 +1114,11 @@ export const fetchRootCommentList = async (
         const response = await axios.get<ApiResponse<CommentPage>>(
             `${import.meta.env.VITE_API_URL}/comments/root/${targetType}/${targetId}?${params.toString()}`, { signal }
         )
-
+        response.data.data.result.forEach(
+            (c) => {
+                c.userAvatarUrl = `https://picsum.photos/seed/${c.userId}/64/64`
+            }
+        )
         return response.data.data
     } catch (error) {
         console.error("Error fetching root comments:", error)
@@ -1153,7 +1157,11 @@ export const fetchRepliesList = async (
         const response = await axios.get<ApiResponse<CommentPage>>(
             `${import.meta.env.VITE_API_URL}/comments/replies/${targetType}/${targetId}/${parentId}?${params.toString()}`, { signal }
         )
-
+        response.data.data.result.forEach(
+            (c) => {
+                c.userAvatarUrl = `https://picsum.photos/seed/${c.userId}/64/64`
+            }
+        )
         return response.data.data
     } catch (error) {
         console.error("Error fetching replies:", error)
