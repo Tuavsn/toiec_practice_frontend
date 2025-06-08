@@ -1,5 +1,5 @@
 import { DBSchema, IDBPDatabase, openDB } from 'idb';
-import { Part2EmailContext, QuestionListByPart, TestDocument, TestDraft, TestID, WritingSheetData, WritingToeicPart2SheetData, WritingToeicPart3SheetData } from '../utils/types/type';
+import { ChatMessage, Part2EmailContext, QuestionListByPart, SessionData, TestDocument, TestDraft, TestID, WritingSheetData, WritingToeicPart2SheetData, WritingToeicPart3SheetData } from '../utils/types/type';
 
 const DB_PRACTICE_NAME = 'TOEICWritingAppDB' as const;
 const DB_PRACTICE_VERSION = 3 as const;
@@ -9,6 +9,12 @@ const STORE_PRACTICE_NAME_PART3 = 'sheets_part3' as const;
 
 const DB_TEST_PAPER_NAME = 'TestDatabase' as const;
 const DB_TEST_PAPER_VERSION = 2 as const;
+
+const CHATBOX_DB_NAME = 'chatBox_DB_CHATBOX_NAME' as const;
+const CHATBOX_DB_VERSION = 1 as const;
+const CHATBOX_SESSION_STORE = 'chatBox_sessions' as const;
+const CHATBOX_MESSAGES_STORE = 'chatBox_messages' as const;
+
 // Định nghĩa schema của IndexedDB
 interface TestDB extends DBSchema {
 
@@ -21,6 +27,12 @@ interface TestDB extends DBSchema {
         value: string;
     };
 }
+
+interface ChatBoxDB {
+  chatBox_sessions: SessionData;
+  chatBox_messages: ChatMessage[];
+}
+
 
 // Hàm khởi tạo cơ sở dữ liệu
 export const initTestDB = async (): Promise<IDBPDatabase<TestDB>> => {
@@ -852,4 +864,52 @@ export async function deleteDraftFromIndexDB(testID: TestID): Promise<void> {
     await tx.done;
     console.log("delete completed");
 
+}
+
+let chatBoxDbPromise: Promise<IDBPDatabase<ChatBoxDB>>;
+
+function chatBoxGetDb(): Promise<IDBPDatabase<ChatBoxDB>> {
+  if (!chatBoxDbPromise) {
+    chatBoxDbPromise = openDB<ChatBoxDB>(CHATBOX_DB_NAME, CHATBOX_DB_VERSION, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains(CHATBOX_SESSION_STORE)) {
+          db.createObjectStore(CHATBOX_SESSION_STORE);
+        }
+        if (!db.objectStoreNames.contains(CHATBOX_MESSAGES_STORE)) {
+          db.createObjectStore(CHATBOX_MESSAGES_STORE);
+        }
+      },
+    });
+  }
+  return chatBoxDbPromise;
+}
+
+export async function chatBoxGetSession(questionId: string): Promise<SessionData | undefined> {
+  const db = await chatBoxGetDb();
+  return db.get(CHATBOX_SESSION_STORE, questionId);
+}
+
+export async function chatBoxSetSession(questionId: string, data: SessionData): Promise<void> {
+  const db = await chatBoxGetDb();
+  await db.put(CHATBOX_SESSION_STORE, data, questionId);
+}
+
+export async function chatBoxDeleteSession(questionId: string): Promise<void> {
+  const db = await chatBoxGetDb();
+  await db.delete(CHATBOX_SESSION_STORE, questionId);
+}
+
+export async function chatBoxGetMessages(questionId: string): Promise<ChatMessage[] | undefined> {
+  const db = await chatBoxGetDb();
+  return db.get(CHATBOX_MESSAGES_STORE, questionId);
+}
+
+export async function chatBoxSetMessages(questionId: string, messages: ChatMessage[]): Promise<void> {
+  const db = await chatBoxGetDb();
+  await db.put(CHATBOX_MESSAGES_STORE, messages, questionId);
+}
+
+export async function chatBoxDeleteMessages(questionId: string): Promise<void> {
+  const db = await chatBoxGetDb();
+  await db.delete(CHATBOX_MESSAGES_STORE, questionId);
 }
