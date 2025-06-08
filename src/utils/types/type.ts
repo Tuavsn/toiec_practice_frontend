@@ -959,6 +959,10 @@ export type TestSheet = {
   testType: TestType,
 }
 
+export interface SessionData {
+  id: string;
+  expiry: number;
+}
 
 /**
  * @type WritingSheetStatus
