@@ -159,7 +159,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 onClick={handleDelete}
               />
             )}
-            {!isOwner && !comment.deleted && !amINotLoggedIn && (
+            {!amINotLoggedIn && (
               <Button
                 icon="pi pi-flag"
                 className="p-button-text p-button-sm p-button-secondary ml-2 text-xs"
