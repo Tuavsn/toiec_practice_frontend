@@ -13,10 +13,10 @@ import { Stepper, StepperRefAttributes } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
 import { Steps } from 'primereact/steps';
 import { TabPanel, TabView } from 'primereact/tabview';
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Doughnut, Pie } from "react-chartjs-2";
-import { Link, Navigate } from 'react-router-dom';
-import { callGetMyRecommend, callPutUserTarget } from '../../api/api';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { callGetMyRecommend, callPutPercentLecture, callPutUserTarget } from '../../api/api';
 import { CountAnswerTypeTemplate, detailUserResultRowBodyTemplate, typeUserResultRowBodyTemplate } from '../../components/Common/Column/CommonColumn';
 import useLectureProfile from '../../hooks/LectureProfileHook';
 import useProfile from '../../hooks/ProfileHook';
@@ -26,7 +26,7 @@ import formatDate from '../../utils/helperFunction/formatDateToString';
 import GetColorBasedOnValue from '../../utils/helperFunction/GetColorHueValue';
 import { ProfileHookAction } from '../../utils/types/action';
 import { ActivityLogProps, SkillInsightsProps } from '../../utils/types/props';
-import { LectureCard, RecommendLecture, RecommendTest, SkillStat, TopicStat, UserDetailResultRow } from '../../utils/types/type';
+import { LectureCard, LectureID, RecommendLecture, RecommendTest, SkillStat, TopicStat, UserDetailResultRow } from '../../utils/types/type';
 // Đăng ký các phần tử Chart.js cần thiết
 ChartJS.register(...registerables);
 // Đăng ký plugin DataLabels
@@ -39,7 +39,7 @@ export default function UserProfilePage() {
         dispatch
 
     } = useProfile();
-
+    const { onGoingLectures, completeLectures } = useLectureProfile();
     if (AmINotLoggedIn()) return <Navigate to={"/home?login=true"} />
 
     const { averageListeningScore, averageReadingScore } = overallStat!;
@@ -48,7 +48,7 @@ export default function UserProfilePage() {
         <main className="pt-8 flex gap-3 flex-column">
             <div key="area-1">
                 <Card key="user-goal" className='shadow-7' title="1. Mục tiêu bản thân"><UserGoal currentScore={averageListeningScore + averageReadingScore} target={target} dispatch={dispatch} /></Card>
-                <Card key="current-lecture" className='shadow-7' title="2. Các bài học đã tham gia"><CurrentLecture /></Card>
+                <Card key="current-lecture" className='shadow-7' title="2. Các bài học đã tham gia"><CurrentLecture completeLectures={completeLectures} onGoingLectures={onGoingLectures} /></Card>
             </div>
             <div key="area-2" className="flex gap-3 flex-wrap">
                 <Card key="progress-overview" className='shadow-7 flex-1' style={{ minWidth: "400px" }} title="2. Tổng quan tiến độ ">{ProgressOverview(overallStat!.averageListeningScore, overallStat!.averageReadingScore)}</Card>
@@ -57,7 +57,7 @@ export default function UserProfilePage() {
             <Card key="activity-log" className='shadow-7' title="4. Nhật ký học tập"><ActivityLog userResultRows={results} /></Card>
             <div key="area-3" className="flex gap-3 flex-wrap">
                 <Card key="time-spent" className="shadow-7 flex-1" style={{ minWidth: "590px" }} title="5. Thời gian học tập theo kỹ năng">{TimeSpent(skillStats)}</Card>
-                <Card key="suggestion" className='shadow-7 flex-1' title="6. Đề xuất cải thiện"><Suggestions /></Card>
+                <Card key="suggestion" className='shadow-7 flex-1' title="6. Đề xuất cải thiện"><Suggestions lectureCards={[...onGoingLectures, ...completeLectures]} /></Card>
 
             </div>
             {/* <Card key="stat" className='shadow-7' title="7. Thống kê"></Card> */}
@@ -101,9 +101,11 @@ const UserGoal: React.FC<{ target: number; currentScore: number, dispatch: React
 });
 
 //--- [2]-------------------------------------------------------------------------------------------------------------------------------------------
-const CurrentLecture: React.FC = React.memo(
-    () => {
-        const { onGoingLectures, completeLectures } = useLectureProfile();
+const CurrentLecture: React.FC<{ onGoingLectures: LectureCard[], completeLectures: LectureCard[] }> = React.memo(
+    ({ completeLectures,
+        onGoingLectures
+    }) => {
+
         const totalOnGoing = onGoingLectures.length;
         const totalComplete = completeLectures.length;
 
@@ -345,30 +347,33 @@ function TimeSpent(skillStats: SkillStat[]) {
 
 //---[7]-------------------------------------------------------------------------------------------------------------------------------------------
 // Hàm Suggestions hiển thị danh sách các gợi ý học TOEIC dưới dạng các bước với Stepper.
-function Suggestions() {
-    // stepperRef dùng để lưu trữ tham chiếu đến Stepper và sử dụng các phương thức điều hướng.
-    const [recommendLectures, setRecommendLectures] = useState<RecommendLecture[] | null>([])
-    const [recommendTests, setRecommendTests] = useState<RecommendTest[] | null>([])
-    useEffect(() => {
-        callGetMyRecommend().then(([lectureList, testList]) => {
-            setRecommendLectures(lectureList);
-            setRecommendTests(testList);
-        });
-    }, [])
-    return (
-        <TabView>
-            <TabPanel header="Bài học phù hợp với bạn">
-                <RecommendLectureStepper recommendLectures={recommendLectures} />
-            </TabPanel>
-            <TabPanel header="Đề thi phù hợp với bạn">
-                <RecommendTestStepper recommendTests={recommendTests} />
-            </TabPanel>
-        </TabView>
-    )
-}
+const Suggestions: React.FC<{ lectureCards: LectureCard[] }> = React.memo(
+    ({ lectureCards }) => {
+        // stepperRef dùng để lưu trữ tham chiếu đến Stepper và sử dụng các phương thức điều hướng.
+        const [recommendLectures, setRecommendLectures] = useState<RecommendLecture[] | null>([])
+        const [recommendTests, setRecommendTests] = useState<RecommendTest[] | null>([])
+        useEffect(() => {
+            callGetMyRecommend().then(([lectureList, testList]) => {
+                setRecommendLectures(lectureList);
+                setRecommendTests(testList);
+            });
+        }, [])
+        return (
+            <TabView>
+                <TabPanel header="Bài học phù hợp với bạn">
+                    <RecommendLectureStepper recommendLectures={recommendLectures} lectureCards={lectureCards} />
+                </TabPanel>
+                <TabPanel header="Đề thi phù hợp với bạn">
+                    <RecommendTestStepper recommendTests={recommendTests} />
+                </TabPanel>
+            </TabView>
+        )
+    }
+)
 
-const RecommendLectureStepper: React.FC<{ recommendLectures: RecommendLecture[] | null }> = React.memo(
-    ({ recommendLectures }) => {
+const RecommendLectureStepper: React.FC<{ recommendLectures: RecommendLecture[] | null, lectureCards: LectureCard[] }> = React.memo(
+    ({ recommendLectures, lectureCards }) => {
+        const navigate = useNavigate();
         const stepperRef = useRef<StepperRefAttributes | null>(null);
         if (!recommendLectures) {
             recommendLectures = [{
@@ -379,6 +384,26 @@ const RecommendLectureStepper: React.FC<{ recommendLectures: RecommendLecture[] 
             }]
         }
         const lastIndex = recommendLectures.length - 1;
+
+        const onClick = useCallback((url: string, lectureID: LectureID) => {
+            const foundIndex = lectureCards.findIndex(l => l.id === lectureID);
+            console.log(foundIndex);
+
+            if (foundIndex === -1) {
+                Promise.resolve().then(() => {
+
+                    // Now, call your API function from inside the deferred task
+                    callPutPercentLecture(lectureID, 10)
+                        .catch(err => {
+                            // It's still crucial to catch errors!
+                            console.error("The deferred API call failed:", err);
+                        });
+                });
+            }
+
+
+            navigate(encodeURI(url));
+        }, [lectureCards])
         return (
             <Stepper ref={stepperRef} orientation="vertical">
                 {
@@ -397,9 +422,9 @@ const RecommendLectureStepper: React.FC<{ recommendLectures: RecommendLecture[] 
                                     <div className="custom-box">
                                         <section>
                                             <p>{suggestion.explanation}</p>
-                                            <Link to={url}>
+                                            <Button link onClick={() => onClick(url, suggestion.lectureId)}>
                                                 <p className='text-center text-blue-300 hover:text-blue-500'>{">> "}Xem thêm tại đây{" <<"}</p>
-                                            </Link>
+                                            </Button>
                                         </section>
                                     </div>
 
