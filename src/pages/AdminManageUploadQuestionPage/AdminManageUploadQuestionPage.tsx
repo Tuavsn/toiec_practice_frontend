@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { FileUpload, FileUploadHandlerEvent, FileUploadHeaderTemplateOptions } from "primereact/fileupload";
-import { memo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { callPostImportExcel, callPostImportResource } from "../../api/api";
 import { CustomBreadCrumb } from "../../components/Common/Index";
@@ -18,11 +18,17 @@ export function AdminManageUploadQuestionPage() {
     const { toast } = useToast();
     const fileUploadRef = useRef<FileUpload>(null);
     const [isDisabled, setIsDisabled] = useState(false);
-
+    const isMounted = useRef(true);
+    useEffect(() => {
+        // This function runs when the component is unmounted
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
     //------------------------------------------------------
     // Xử lý tải lên file
     //------------------------------------------------------
-    const handleFileUpload = async (event: FileUploadHandlerEvent) => {
+    const handleFileUpload = useCallback((event: FileUploadHandlerEvent) => {
         setIsDisabled(true);
         toast.current?.show({
             severity: 'warn',
@@ -34,8 +40,6 @@ export function AdminManageUploadQuestionPage() {
         const files: File[] = event.files;
         const excelFiles: File[] = [];
         const resourceFiles: File[] = [];
-
-        // Phân loại file
         files.forEach((file) => {
             if (file.name.endsWith('.csv') || file.name.endsWith('.xlsx')) {
                 excelFiles.push(file);
@@ -44,25 +48,37 @@ export function AdminManageUploadQuestionPage() {
             }
         });
 
-        const [excelError = '', resourceError = ''] = await Promise.all([
+        // Simplified: Directly call Promise.all
+        Promise.all([
             callPostImportExcel(test_id, excelFiles),
             callPostImportResource(resourceFiles),
-        ]);
-
-        toast.current?.clear();
-        if (excelError || resourceError) {
-            toast.current?.show({ severity: 'error', summary: 'Tải câu hỏi', detail: 'Lỗi tải lên thất bại!' });
-            return;
-        }
-
-        toast.current?.show({
-            severity: 'success',
-            summary: 'Tải câu hỏi',
-            detail: 'Câu hỏi được tải lên thành công!',
-            life: 3000,
-        });
-        setIsDisabled(false);
-    };
+        ])
+            .then(([excelError = '', resourceError = '']) => {
+                toast.current?.clear();
+                if (excelError || resourceError) {
+                    toast.current?.show({ severity: 'error', summary: 'Tải câu hỏi', detail: 'Lỗi tải lên thất bại!' });
+                } else {
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Tải câu hỏi',
+                        detail: 'Câu hỏi được tải lên thành công!',
+                        life: 3000,
+                    });
+                }
+            })
+            .catch((error) => {
+                // Added clear() here for robustness
+                toast.current?.clear();
+                console.error("File upload failed catastrophically:", error);
+                toast.current?.show({ severity: 'error', summary: 'Lỗi Hệ Thống', detail: 'Không thể kết nối tới máy chủ!' });
+            })
+            .finally(() => {
+                if (isMounted.current) {
+                    setIsDisabled(false);
+                }
+            });
+        // Add all external variables and functions used inside to the dependency array
+    }, [toast, test_id]);
 
     //------------------------------------------------------
     // Template header với custom button

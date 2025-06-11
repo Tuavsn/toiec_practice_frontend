@@ -25,7 +25,7 @@ const TestInfoBox: React.FC<TestInfoBoxProps> = React.memo((props) => {
                         </td>
                         <td>
                             <h4 className="inline pl-4" data-testid="user-attempt">
-                                {props.totalUserAttempt || 39} người 👤
+                                {props.totalUserAttempt} người 👤
                             </h4>
                         </td>
                     </tr>
