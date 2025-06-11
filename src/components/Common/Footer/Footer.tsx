@@ -1,4 +1,4 @@
-import Logo from "../../../assets/Header-Logo.png"
+import Logo from "../../../assets/Header-Logo.png";
 import { useTestState } from "../../../context/TestStateProvider";
 
 export default function Footer() {
@@ -15,7 +15,7 @@ export default function Footer() {
                     </a>
                 </p>
             </div>
-            <div><p className="text-lg"><i>Developed From 2024</i></p></div>
+            <div><p className="text-lg"><i>Developed From 2025</i></p></div>
         </div>
     )
 }
