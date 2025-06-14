@@ -142,9 +142,13 @@ function Header() {
                                 userProfilePanelRef.current?.hide(); // Hide panel before clearing
 
                                 callLogout().then(() => {
-                                    
-                                        navigate('/home')
 
+                                    if (location.pathname === '/home') {
+                                        // full page reload
+                                        window.location.reload()
+                                    } else {
+                                        navigate('/home')
+                                    }
 
                                 }
                                 )
