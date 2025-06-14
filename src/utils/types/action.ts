@@ -1,6 +1,6 @@
 import { CommentActionType } from "../../hooks/_CommentSectionHook";
 import { FullTestScreenState, ProfileHookState } from "./state";
-import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, EssayQuestionPayload, FetchTaskContentFailurePayload, FetchTaskContentRequestPayload, FetchTaskContentSuccessPayload, GetAiFeedbackFailurePayload, GetAiFeedbackRequestPayload, GetAiFeedbackSuccessPayload, GradedFeedback, LectureCard, LectureRow, LoadPromptsSuccessPayload, Meta, MultipleChoiceQuestion, Notification_t, NotificationActionType, Permission, PexelsPhoto, QuestionID, QuestionNumber, QuestionPage, Role, SaveResponsePayload, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, ToeicSpeakingPartActionType, Topic, UserComment, UserRow, WritingPart1Prompt, WritingSheetData, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart2SheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3SheetData } from "./type";
+import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, EssayQuestionPayload, FetchTaskContentFailurePayload, FetchTaskContentRequestPayload, FetchTaskContentSuccessPayload, GetAiFeedbackFailurePayload, GetAiFeedbackRequestPayload, GetAiFeedbackSuccessPayload, GradedFeedback, LectureCard, LectureRow, LoadPromptsSuccessPayload, Meta, MilestoneItem, MultipleChoiceQuestion, Notification_t, NotificationActionType, Permission, PexelsPhoto, QuestionID, QuestionNumber, QuestionPage, Role, SaveResponsePayload, TableData, TestAnswerSheet, TestReviewAnswerSheet, TestRow, ToeicSpeakingPartActionType, Topic, UserComment, UserRow, WordOfTheDay, WritingPart1Prompt, WritingSheetData, WritingToeicPart2GradedFeedback, WritingToeicPart2Prompt, WritingToeicPart2SheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3SheetData } from "./type";
 
 type RenderTestActiion =
     | { type: "SET_USER_CHOICE_ANSWER_SHEET", payload: { qNum: QuestionNumber; qID: QuestionID; answer: string; } }
@@ -395,10 +395,16 @@ type ToeicSpeakingPartAction =
     | { type: ToeicSpeakingPartActionType.CLEAR_OVERALL_ERROR };
 
 
+type RoadmapAction =
+    | { type: "FETCH_START" }
+    | { type: "FETCH_SUCCESS"; payload: { wordOfTheDay: WordOfTheDay; milestoneItems: MilestoneItem[] } }
+    | { type: "FETCH_ERROR"; payload: string }
+
+
 export type {
     AdminReportAction, CategoryHookAction, CommentAction, FullTestScreenAction, LectureCardAction,
     LectureHookAction, MultiQuestionAction, NotificationAction, PermissionHookAction, ProfileHookAction,
-    RenderTestActiion, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, ToeicSpeakingPartAction, ToeicWritingPart1Action, TopicHookAction, UserCommentAction,
+    RenderTestActiion, RoadmapAction, RoleHookAction, RowHookAction, TestHookAction, TestReviewHookAction, ToeicSpeakingPartAction, ToeicWritingPart1Action, TopicHookAction, UserCommentAction,
     UserHookAction, WritingToeicPart2Action, WritingToeicPart3Action
 };
 

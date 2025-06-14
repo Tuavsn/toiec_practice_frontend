@@ -11,6 +11,7 @@ import slideico from "../../assets/slide_ico.svg";
 import testico from "../../assets/test_ico.svg";
 import website from "../../assets/website_flatform.jpg";
 import Banner from "../../components/User/Banner/Banner";
+import RoadmapSection from "../../components/User/RoadmapSection/RoadmapSection";
 import SetWebPageTitle from "../../utils/helperFunction/setTitlePage";
 
 export default function HomePage() {
@@ -26,6 +27,7 @@ export default function HomePage() {
 function HomeContent() {
     return (
         <>
+            <RoadmapSection />
             <Info />
             <News />
         </>

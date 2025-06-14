@@ -3,6 +3,7 @@ import { AxiosError, isCancel } from "axios";
 import { Toast } from "primereact/toast";
 import { MutableRefObject } from "react";
 import { checkDraftInIndexDB } from "../database/indexdb";
+import { AmINotLoggedIn } from "../utils/helperFunction/AuthCheck";
 import { emptyOverallStat } from "../utils/types/emptyValue";
 import { ProfileHookState } from "../utils/types/state";
 import * as promptsData from '../utils/types/ToeicSpeakingPrompts.json'; // Dữ liệu prompts được import trực tiếp
@@ -13,9 +14,10 @@ import {
     CreateCommentRequest, DeleteCommentRequest,
     DraftLocation,
     EssayQuestionApiResponse,
-    ExerciseType, GradedFeedback, ImageDataWithMimeType, Lecture, LectureCard, LectureID,
+    ExerciseType, GradedFeedback, ImageDataWithMimeType, Lecture, LectureCard, LectureCardRoadmap, LectureID,
     LectureProfile, LectureRow, Notification_t, Part2EmailContext, Permission, PermissionID,
-    PexelsPhoto, PexelsSearchResponse, QuestionID, QuestionRow, RecommendDoc, RecommendLecture, RecommendTest, RelateLectureTitle, Resource, ResourceIndex, ResultID, Role, TableData, TargetType, Test, TestCard, TestDetailPageData, TestDraft, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, TestType, ToeicSpeakingPromptTask, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateCommentReportStatusPayload, UpdateQuestionForm, UserComment, UserRow,
+    PexelsPhoto, PexelsSearchResponse, QuestionID, QuestionRow, RecommendDoc, RecommendLecture, RecommendTest, RelateLectureTitle, Resource, ResourceIndex, ResultID, RoadmapData, Role, TableData, TargetType, Test, TestCard, TestCardRoadmap, TestDetailPageData, TestDraft, TestID, TestPaper, TestRecord, TestResultSummary, TestReviewAnswerSheet, TestRow, TestType, ToeicSpeakingPromptTask, Topic, TopicID, UpdateAssignmentQuestionForm, UpdateCommentReportStatusPayload, UpdateQuestionForm, UserComment, UserRow,
+    WordOfTheDay,
     WritingPart1Prompt,
     WritingToeicPart2ApiPromptData,
     WritingToeicPart2GradedFeedback,
@@ -2592,3 +2594,148 @@ export const fetchPexelsImage = async (query: string): Promise<string | null> =>
         return null; // Adhere to "return null on error"
     }
 };
+
+/**
+ * @description Lấy toàn bộ dữ liệu roadmap (lecture + test), tối ưu bằng Promise.all
+ */
+export const fetchRoadmapData = async (): Promise<RoadmapData | null> => {
+    try {
+        // Gọi song song để fetch roadmap
+        return await getRoadmap();
+    } catch (error) {
+        console.error("Failed to fetch roadmap data:", error);
+        return null;
+    }
+};
+
+//------------------------------------------------------
+// Section: Core Logic
+//------------------------------------------------------
+
+/**
+ * @description Xử lý phân nhánh login và lấy dữ liệu phù hợp
+ */
+async function getRoadmap(): Promise<RoadmapData> {
+    // Nếu chưa login, fetch lectures + tests song song
+    if (AmINotLoggedIn()) {
+        const [lectures, tests] = await Promise.all([
+            getLectureCardsFromListPage(),
+            getTestCardsFromListPage(),
+        ]);
+        return { lectures, tests };
+    }
+
+    // Nếu đã login, fetch recommend + related song song
+    const [recommendLectures, recommendTests] = await callGetMyRecommend();
+    const lectures = buildUniqueLectureCards(recommendLectures || []);
+    const tests = buildTestCards(recommendTests || []);
+
+    // Fetch related lectures cho tất cả lectures, không chặn tuần tự
+    const related = await fetchRelatedLectures(lectures);
+    return {
+        lectures: [...lectures, ...related],
+        tests,
+    };
+}
+
+//------------------------------------------------------
+// Section: Helper Functions
+//------------------------------------------------------
+
+/**
+ * @description Chuyển mảng recommendLectures thành LectureCardRoadmap, loại bỏ duplicate theo id
+ */
+function buildUniqueLectureCards(
+    recommendLectures?: { lectureId: string; name: string }[]
+): LectureCardRoadmap[] {
+    if (!recommendLectures?.length) return [];
+    const seen = new Set<string>();
+    return recommendLectures.reduce<LectureCardRoadmap[]>((acc, rec) => {
+        if (!seen.has(rec.lectureId)) {
+            seen.add(rec.lectureId);
+            acc.push({ id: rec.lectureId, name: rec.name, mustTake: true });
+        }
+        return acc;
+    }, []);
+}
+
+/**
+ * @description Chuyển mảng recommendTests thành TestCardRoadmap
+ */
+function buildTestCards(
+    recommendTests?: { id: string; name: string }[]
+): TestCardRoadmap[] {
+    return recommendTests?.map((t) => ({ id: t.id, name: t.name })) ?? [];
+}
+
+/**
+ * @description Lấy thêm các lecture liên quan theo hàng loạt, trả về mustTake = false
+ */
+async function fetchRelatedLectures(
+    lectures: LectureCardRoadmap[]
+): Promise<LectureCardRoadmap[]> {
+    if (!lectures.length) return [];
+    // Tạo mảng promise
+    const allResponses = await Promise.all(
+        lectures.map((lec) => callGetRelateLectures(lec.id))
+    );
+    // Gộp kết quả và map thành LectureCardRoadmap
+    return allResponses
+        .filter((resp): resp is RelateLectureTitle[] => Array.isArray(resp))
+        .flat()
+        .map((rel) => ({ id: rel.id, name: rel.name, mustTake: false }));
+}
+
+/**
+ * @description Lấy lecture cards khi không login
+ */
+async function getLectureCardsFromListPage(): Promise<LectureCardRoadmap[]> {
+    const resp = await callGetLectureCard(1, "", 6);
+    if (!resp?.result?.length) return [];
+    return resp.result.map((lec) => ({
+        id: lec.id,
+        name: lec.name,
+        mustTake: false,
+    }));
+}
+
+/**
+ * @description Lấy test cards khi không login
+ */
+async function getTestCardsFromListPage(): Promise<TestCardRoadmap[]> {
+    const resp = await callGetTestCard("ETS", 0, 0);
+    if (!resp?.data?.result?.length) return [];
+    return resp.data.result.map((t) => ({ id: t.id, name: t.name }));
+}
+
+
+/**
+ * Lấy dữ liệu "Từ vựng của ngày".
+ * Đây là dữ liệu giả lập cho mục đích minh họa.
+ * Trả về WordOfTheDay nếu thành công, ngược lại trả về null.
+ */
+export const fetchWordOfTheDay = async (): Promise<WordOfTheDay> => {
+    try {
+        // Giả lập một API call thành công sau 1 giây
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        const mockWord: WordOfTheDay = {
+            word: "Milestone",
+            phonetic: "/ˈmaɪl.stoʊn/",
+            definition: "Một sự kiện hoặc giai đoạn phát triển quan trọng.",
+            example: "Passing the TOEIC test is a significant milestone in her career.",
+            audioUrl: "https://dictionary.cambridge.org/vi/media/english/us_pron/m/mil/miles/milestone.mp3", // Placeholder URL
+        }
+        return mockWord
+    } catch (error) {
+        console.error("Failed to fetch word of the day:", error)
+        const mockWord: WordOfTheDay = {
+            word: "Milestone",
+            phonetic: "/ˈmaɪl.stoʊn/",
+            definition: "Một sự kiện hoặc giai đoạn phát triển quan trọng.",
+            example: "Passing the TOEIC test is a significant milestone in her career.",
+            audioUrl: "https://dictionary.cambridge.org/vi/media/english/us_pron/m/mil/miles/milestone.mp3", // Placeholder URL
+        }
+        return mockWord
+    }
+}
+
