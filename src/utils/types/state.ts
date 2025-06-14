@@ -1,4 +1,4 @@
-import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, GradedFeedback, LectureCard, LectureRow, Meta, MultipleChoiceQuestion, Notification_t, OverallStat, Permission, PexelsPhoto, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow, WritingPart1Prompt, WritingSheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3Prompt, WritingToeicPart3SheetData, WritingToeicPart3UserAnswer } from "./type";
+import { CategoryRow, Comment_t, CommentReport, DialogLectureJobType, DialogRowJobType, GradedFeedback, LectureCard, LectureRow, Meta, MilestoneItem, MultipleChoiceQuestion, Notification_t, OverallStat, Permission, PexelsPhoto, QuestionPage, Role, SkillStat, TestAnswerSheet, TestReviewAnswerSheet, TestRow, Topic, TopicStat, UserComment, UserDetailResultRow, UserID, UserRow, WordOfTheDay, WritingPart1Prompt, WritingSheetData, WritingToeicPart3GradedFeedback, WritingToeicPart3Prompt, WritingToeicPart3SheetData, WritingToeicPart3UserAnswer } from "./type";
 
 interface LectureHookState {
   isRefresh: boolean;
@@ -100,6 +100,13 @@ interface LectureCardState {
   keyword: string,
   currentPageIndex: number,
 
+}
+
+interface RoadmapState {
+  wordOfTheDay: WordOfTheDay
+  milestoneItems: MilestoneItem[]
+  loading: boolean
+  error: string | null
 }
 
 interface CommentSectionState {
@@ -209,7 +216,7 @@ interface NotificationState {
 export type {
   AdminReportsState, CategoryHookState, CommentSectionState, CommentsState, FullTestScreenState,
   LectureCardState, LectureHookState, MultiQuestionState, NotificationState, PermissionHookState, ProfileHookState,
-  RenderTestState,
+  RenderTestState, RoadmapState,
   RoleHookState, RowHookState, TestHookState, TestReviewHookState, ToeicWritingPart1State, TopicHookState, UserCommentState,
   UserHookState, WritingToeicPart3State
 };

@@ -1894,3 +1894,38 @@ export interface TestPaperWorkerRequest {
   testId: TestID;
   parts: string;
 }
+
+// Dữ liệu cho một bài giảng
+export interface LectureCardRoadmap {
+  id: string
+  name: string
+  mustTake: boolean // `true` nếu là bài giảng bắt buộc
+}
+
+export type TestCardRoadmap = {
+  id: TestID,
+  name: string,
+}
+
+// Dữ liệu trả về từ API roadmap
+export interface RoadmapData {
+  lectures: LectureCardRoadmap[]
+  tests: TestCardRoadmap[]
+}
+
+// Dữ liệu cho "Từ vựng của ngày"
+export interface WordOfTheDay {
+  word: string
+  phonetic: string // Phiên âm
+  definition: string // Định nghĩa
+  example: string // Ví dụ
+  audioUrl: string // URL file âm thanh phát âm
+}
+
+// Loại item trên roadmap để phân biệt bài giảng và bài test
+export type MilestoneItem = (LectureCardRoadmap | TestCardRoadmap) & { type: "lecture" | "test" }
+
+// State cho useReducer
+
+
+// Actions cho useReducer
